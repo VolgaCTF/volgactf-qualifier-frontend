@@ -1,1 +1,1 @@
-# themas-quals-website
+# themis-quals-website
