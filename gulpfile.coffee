@@ -7,6 +7,8 @@ paths =
     scripts: [
         'bower_components/jquery/dist/jquery.js'
         'bower_components/bootstrap/dist/js/bootstrap.js'
+        'bower_components/history.js/scripts/bundled-uncompressed/html5/jquery.history.js'
+        'bower_components/underscore/underscore.js'
     ]
     stylesheets: [
         'bower_components/bootstrap/dist/css/bootstrap.css'
