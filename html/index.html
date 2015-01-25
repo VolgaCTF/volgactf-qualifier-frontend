@@ -1,10 +1,35 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
     <head>
         <title>Hello, World!</title>
+
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+
         <link rel="stylesheet" href="css/bootstrap.css">
     </head>
     <body>
-        <h1>Hello, World!</h1>
+        <div class="navbar navbar-default navbar-static-top">
+            <div class="container">
+                <div class="navbar-header">
+                    <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#themis-navbar">
+                        <span class="sr-only">Toggle navigation</span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                    </button>
+                    <a href="/" class="navbar-brand">VolgaCTF Quals 2015</a>
+                </div>
+                <div id="themis-navbar" class="collapse navbar-collapse">
+                    <ul class="nav navbar-nav navbar-right">
+                        <li class="active"><a href="/scoreboard">Scoreboard</a></li>
+                        <li><a href="/tasks">Tasks</a></li>
+                        <li><a href="/signin">Sign in</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <script src="js/jquery.js"></script>
+        <script src="js/bootstrap.js"></script>
     </body>
 </html>
