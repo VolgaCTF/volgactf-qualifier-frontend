@@ -3,6 +3,7 @@ del = require 'del'
 coffee = require 'gulp-coffee'
 gulpIf = require 'gulp-if'
 path = require 'path'
+plumber = require 'gulp-plumber'
 
 paths =
     scripts: [
@@ -11,10 +12,12 @@ paths =
         'bower_components/history.js/scripts/bundled-uncompressed/html5/jquery.history.js'
         'bower_components/underscore/underscore.js'
         'bower_components/requirejs/require.js'
+        'bower_components/eventEmitter/EventEmitter.js'
         'scripts/themis.coffee'
     ]
     stylesheets: [
         'bower_components/bootstrap/dist/css/bootstrap.css'
+        'stylesheets/themis.css'
     ]
     html: [
         'html/index.html'
@@ -29,6 +32,7 @@ gulp.task 'clean_scripts', (callback) ->
 
 gulp.task 'scripts', ['clean_scripts'], ->
     gulp.src paths.scripts
+        .pipe plumber()
         .pipe gulpIf isCoffee, coffee()
         .pipe gulp.dest 'public/js'
 

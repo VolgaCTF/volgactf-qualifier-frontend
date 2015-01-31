@@ -1,11 +1,12 @@
 <!DOCTYPE html>
 <html lang="en">
     <head>
-        <title>Hello, World!</title>
+        <title>VolgaCTF 2015 Quals</title>
 
         <meta name="viewport" content="width=device-width, initial-scale=1">
 
         <link rel="stylesheet" href="css/bootstrap.css">
+        <link rel="stylesheet" href="css/themis.css">
 
         <script src="js/require.js" data-main='js/themis.js'></script>
     </head>
@@ -23,36 +24,62 @@
                 </div>
                 <div id="themis-navbar" class="collapse navbar-collapse">
                     <ul class="nav navbar-nav navbar-right">
+                        <!--
                         <li class="active"><a href="/scoreboard">Scoreboard</a></li>
                         <li><a href="/tasks">Tasks</a></li>
                         <li><a href="/signin">Sign in</a></li>
+                        -->
                     </ul>
                 </div>
             </div>
         </div>
 
-        <div data-page="index">
-            <div class="container">
-                <h1>Index</h1>
+        <div class="themis-pages">
+            <div data-page="index">
+                <div class="container">
+                    <div class="jumbotron">
+                        <h1>Hello!</h1>
+                        <p>Welcome to VolgaCTF 2015 Quals!</p>
+                        <p>VolgaCTF is an inter-regional inter-university open computer security contest.</p>
+                        <p>Interested? Please register for the competition!</p>
+                        <p><a class="btn btn-primary btn-lg" href="/signup" role="button" data-push-history>Register</a></p>
+                    </div>
+                </div>
+            </div>
+
+            <div data-page="scoreboard">
+                <div class="container">
+                    <h1>Scoreboard</h1>
+                </div>
+            </div>
+
+            <div data-page="tasks">
+                <div class="container">
+                    <h1>Tasks</h1>
+                </div>
+            </div>
+
+            <div data-page="sign-in">
+                <div class="container">
+                    <h1>Sign in</h1>
+                </div>
+            </div>
+
+            <div data-page="error-not-found">
+                <div class="container">
+                    <header>
+                        <h1>Not Found</h1>
+                    </header>
+                    <section>
+                    </section>
+                </div>
             </div>
         </div>
 
-        <div data-page="scoreboard">
-            <div class="container">
-                <h1>Scoreboard</h1>
-            </div>
-        </div>
-
-        <div data-page="tasks">
-            <div class="container">
-                <h1>Tasks</h1>
-            </div>
-        </div>
-
-        <div data-page="Sign in">
-            <div class="container">
-                <h1>Sign in</h1>
-            </div>
+        <div class="themis-partials">
+            <script type="text/x-template" data-name="error-not-found">
+                <p class="lead">We are really sorry, but there is no <mark><%- urlPath %></mark> page.</p>
+            </script>
         </div>
     </body>
 </html>
