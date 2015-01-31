@@ -8,4 +8,3 @@ require.config
 
 define 'themis', ['jquery', 'underscore', 'jquery.history', 'bootstrap'], ($, _, History) ->
     $(document).ready ->
-        console.log 'Hello, World!'

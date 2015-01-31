@@ -1,8 +1,8 @@
 gulp = require 'gulp'
 del = require 'del'
-watch = require 'gulp-watch'
-buster = require 'gulp-buster'
 coffee = require 'gulp-coffee'
+gulpIf = require 'gulp-if'
+path = require 'path'
 
 paths =
     scripts: [
@@ -11,35 +11,46 @@ paths =
         'bower_components/history.js/scripts/bundled-uncompressed/html5/jquery.history.js'
         'bower_components/underscore/underscore.js'
         'bower_components/requirejs/require.js'
+        'scripts/themis.coffee'
     ]
     stylesheets: [
         'bower_components/bootstrap/dist/css/bootstrap.css'
-    ]
-    app_scripts: [
-        'scripts/themis.coffee'
     ]
     html: [
         'html/index.html'
     ]
 
-gulp.task 'clean', (callback) ->
-    del ['public/css'], callback
 
-gulp.task 'scripts', ->
+isCoffee = (file) ->
+    path.extname(file.path) is '.coffee'
+
+gulp.task 'clean_scripts', (callback) ->
+    del ['public/js/*'], callback
+
+gulp.task 'scripts', ['clean_scripts'], ->
     gulp.src paths.scripts
+        .pipe gulpIf isCoffee, coffee()
         .pipe gulp.dest 'public/js'
 
-gulp.task 'app_scripts', ->
-    gulp.src paths.app_scripts
-        .pipe coffee()
-        .pipe gulp.dest 'public/js'
 
-gulp.task 'stylesheets', ->
+gulp.task 'clean_stylesheets', (callback) ->
+    del ['public/css/*'], callback
+
+gulp.task 'stylesheets', ['clean_stylesheets'], ->
     gulp.src paths.stylesheets
         .pipe gulp.dest 'public/css'
 
-gulp.task 'html', ->
+
+gulp.task 'clean_html', (callback) ->
+    del ['public/*.html'], callback
+
+gulp.task 'html', ['clean_html'], ->
     gulp.src paths.html
         .pipe gulp.dest 'public'
 
-gulp.task 'default', ['html', 'stylesheets', 'scripts', 'app_scripts']
+gulp.task 'default', ['html', 'stylesheets', 'scripts']
+
+gulp.task 'watch', ->
+    gulp.watch paths.html, ['html']
+    gulp.watch paths.stylesheets, ['stylesheets']
+    gulp.watch paths.scripts, ['scripts']
