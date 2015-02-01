@@ -7,6 +7,7 @@ plumber = require 'gulp-plumber'
 mustache = require 'gulp-mustache'
 yaml = require 'js-yaml'
 fs = require 'fs'
+sass = require 'gulp-sass'
 
 paths =
     scripts: [
@@ -20,7 +21,7 @@ paths =
     ]
     stylesheets: [
         'bower_components/bootstrap/dist/css/bootstrap.css'
-        'stylesheets/themis.css'
+        'stylesheets/themis.sass'
     ]
     html: [
         'html/index.html'
@@ -40,11 +41,15 @@ gulp.task 'scripts', ['clean_scripts'], ->
         .pipe gulp.dest 'public/js'
 
 
+isSass = (file) ->
+    path.extname(file.path) is '.sass'
+
 gulp.task 'clean_stylesheets', (callback) ->
     del ['public/css/*'], callback
 
 gulp.task 'stylesheets', ['clean_stylesheets'], ->
     gulp.src paths.stylesheets
+        .pipe gulpIf isSass, sass indentedSyntax: yes, errLogToConsole: yes
         .pipe gulp.dest 'public/css'
 
 
