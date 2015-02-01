@@ -4,6 +4,9 @@ coffee = require 'gulp-coffee'
 gulpIf = require 'gulp-if'
 path = require 'path'
 plumber = require 'gulp-plumber'
+mustache = require 'gulp-mustache'
+yaml = require 'js-yaml'
+fs = require 'fs'
 
 paths =
     scripts: [
@@ -46,11 +49,18 @@ gulp.task 'stylesheets', ['clean_stylesheets'], ->
 
 
 gulp.task 'clean_html', (callback) ->
-    del ['public/*.html'], callback
+    del ['public/html/*'], callback
 
 gulp.task 'html', ['clean_html'], ->
+    try
+        opts = yaml.safeLoad fs.readFileSync './opts.yml', 'utf8'
+    catch e
+        console.log e
+        opts = {}
+
     gulp.src paths.html
-        .pipe gulp.dest 'public'
+        .pipe mustache opts
+        .pipe gulp.dest 'public/html'
 
 gulp.task 'default', ['html', 'stylesheets', 'scripts']
 

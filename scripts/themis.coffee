@@ -1,5 +1,4 @@
 require.config
-    baseUrl: '/js'
     shim:
         'jquery.history':
             deps: ['jquery']
