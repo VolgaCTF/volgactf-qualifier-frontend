@@ -44,7 +44,10 @@
                         <p>Welcome to VolgaCTF 2015 Quals!</p>
                         <p>VolgaCTF is an inter-regional inter-university open computer security contest.</p>
                         <p>Interested? Please register for the competition!</p>
-                        <p><a class="btn btn-primary btn-lg" href="/signup" role="button" data-push-history>Register</a></p>
+                        <p>
+                            <a class="btn btn-primary btn-lg" href="/signup" role="button" data-push-history>Sign up</a>
+                            <a class="btn btn-success" href="/signin" role="button" data-push-history>Sign in</a>
+                        </p>
                     </div>
                 </div>
             </div>
@@ -61,9 +64,22 @@
                 </div>
             </div>
 
-            <div data-page="sign-in">
+            <div data-page="signin">
                 <div class="container">
-                    <h1>Sign in</h1>
+                    <form class="themis-form-signin">
+                        <h1>Please sign in</h1>
+                        <label for="signin-teamname" class="sr-only">Team name</label>
+                        <input type="text" id="signin-teamname" class="form-control" placeholder="Team name" required autofocus>
+                        <label for="signin-password" class="sr-only">Password</label>
+                        <input type="password" id="signin-password" class="form-control" placeholder="Password" required>
+                        <button class="btn btn-lg btn-primary btn-block" type="submit">Sign in</button>
+                    </form>
+                </div>
+            </div>
+
+            <div data-page="signup">
+                <div class="container">
+                    <h1>Sign up</h1>
                 </div>
             </div>
 

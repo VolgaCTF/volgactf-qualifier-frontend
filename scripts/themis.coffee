@@ -67,7 +67,15 @@ define 'themisIndexPageView', ['themisPageView'], (ThemisPageView) ->
     IndexPageView
 
 
-define 'themisPageStore', ['underscore', 'EventEmitter', 'themisPageView', 'themisTemplateStore', 'themisIndexPageView'], (_, EventEmitter, ThemisPageView, themisTemplateStore, ThemisIndexPageView) ->
+define 'themisSigninPageView', ['themisPageView'], (ThemisPageView) ->
+    class SigninPageView extends ThemisPageView
+        constructor: ->
+            super 'VolgaCTF 2015 Quals: Sign in', '.themis-pages [data-page=signin]', /^\/signin$/
+
+    SigninPageView
+
+
+define 'themisPageStore', ['underscore', 'EventEmitter', 'themisPageView', 'themisTemplateStore', 'themisIndexPageView', 'themisSigninPageView'], (_, EventEmitter, ThemisPageView, themisTemplateStore, ThemisIndexPageView, ThemisSigninPageView) ->
     class ErrorNotFoundPageView extends ThemisPageView
         constructor: ->
             super 'Not Found', '.themis-pages [data-page=error-not-found]', null
@@ -98,6 +106,7 @@ define 'themisPageStore', ['underscore', 'EventEmitter', 'themisPageView', 'them
 
     new PageStore()
         .add new ThemisIndexPageView()
+        .add new ThemisSigninPageView()
 
 
 define 'themisViewController', ['jquery', 'themisPageStore', 'jquery.history'], ($, themisPageStore, History) ->
