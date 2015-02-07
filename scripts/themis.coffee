@@ -4,6 +4,7 @@ require.config
             deps: ['jquery']
             exports: 'History'
         bootstrap: ['jquery']
+        'bootstrap-filestyle': ['bootstrap']
 
 
 define 'themisDataStore', ['EventEmitter'], (EventEmitter) ->
@@ -75,7 +76,17 @@ define 'themisSigninPageView', ['themisPageView'], (ThemisPageView) ->
     SigninPageView
 
 
-define 'themisPageStore', ['underscore', 'EventEmitter', 'themisPageView', 'themisTemplateStore', 'themisIndexPageView', 'themisSigninPageView'], (_, EventEmitter, ThemisPageView, themisTemplateStore, ThemisIndexPageView, ThemisSigninPageView) ->
+define 'themisSignupPageView', ['themisPageView'], (ThemisPageView) ->
+    class SignupPageView extends ThemisPageView
+        constructor: ->
+            super 'VolgaCTF 2015 Quals: Sign up', '.themis-pages [data-page=signup]', /^\/signup$/
+
+    SignupPageView
+
+
+define 'themisPageStore', ['underscore', 'EventEmitter', 'themisPageView',
+                           'themisTemplateStore', 'themisIndexPageView',
+                           'themisSigninPageView', 'themisSignupPageView'], (_, EventEmitter, ThemisPageView, themisTemplateStore, ThemisIndexPageView, ThemisSigninPageView, ThemisSignupPageView) ->
     class ErrorNotFoundPageView extends ThemisPageView
         constructor: ->
             super 'Not Found', '.themis-pages [data-page=error-not-found]', null
@@ -107,6 +118,7 @@ define 'themisPageStore', ['underscore', 'EventEmitter', 'themisPageView', 'them
     new PageStore()
         .add new ThemisIndexPageView()
         .add new ThemisSigninPageView()
+        .add new ThemisSignupPageView()
 
 
 define 'themisViewController', ['jquery', 'themisPageStore', 'jquery.history'], ($, themisPageStore, History) ->
@@ -137,6 +149,6 @@ define 'themisViewController', ['jquery', 'themisPageStore', 'jquery.history'], 
 
     new ViewController()
 
-define 'themis', ['jquery', 'themisDataStore', 'themisPageStore', 'themisViewController', 'bootstrap'], ($, themisDataStore, themisViewController) ->
+define 'themis', ['jquery', 'themisDataStore', 'themisPageStore', 'themisViewController', 'bootstrap', 'bootstrap-filestyle'], ($, themisDataStore, themisViewController) ->
     $(document).ready ->
         console.log themisDataStore.identity
