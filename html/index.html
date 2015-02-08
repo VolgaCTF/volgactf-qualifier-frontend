@@ -46,7 +46,7 @@
                         <p>Interested? Please register for the competition!</p>
                         <p>
                             <a class="btn btn-primary btn-lg" href="/signup" role="button" data-push-history>Sign up</a>
-                            <a class="btn btn-success" href="/signin" role="button" data-push-history>Sign in</a>
+                            <a class="btn btn-success btn-lg" href="/signin" role="button" data-push-history>Sign in</a>
                         </p>
                     </div>
                 </div>
@@ -66,8 +66,8 @@
 
             <div data-page="signup">
                 <div class="container">
-
-                    <form class="form-horizontal themis-form-signup">
+                    {{#domains}}
+                    <form class="form-horizontal themis-form-signup" method="POST" enctype="multipart/form-data" action="//{{ api }}/team/signup">
                         <div class="form-group">
                             <div class="col-sm-offset-3 col-sm-9">
                                 <h1>Sign up</h1>
@@ -79,7 +79,7 @@
                                 Team&nbsp;<sup>*</sup>
                             </label>
                             <div class="col-sm-9">
-                                <input type="text" class="form-control" id="signup-team" placeholder="Team" required autofocus>
+                                <input type="text" class="form-control" id="signup-team" name="team" placeholder="Team" required autofocus>
                             </div>
                         </div>
 
@@ -88,7 +88,7 @@
                                 Email&nbsp;<sup>*</sup>
                             </label>
                             <div class="col-sm-9">
-                                <input type="email" class="form-control" id="signup-email" placeholder="Email" required>
+                                <input type="email" class="form-control" id="signup-email" name="email" placeholder="Email" required>
                             </div>
                         </div>
 
@@ -97,7 +97,7 @@
                                 Password&nbsp;<sup>*</sup>
                             </label>
                             <div class="col-sm-9">
-                                <input type="password" class="form-control" id="signup-password" placeholder="Password" required>
+                                <input type="password" class="form-control" id="signup-password" name="password" placeholder="Password" required>
                             </div>
                         </div>
 
@@ -115,7 +115,7 @@
                                 Logo&nbsp;<sup>*</sup>
                             </label>
                             <div class="col-sm-9">
-                                <input type="file" id="signup-logo" class="filestyle" data-buttonText="&nbsp;Choose file" data-iconName="glyphicon-picture" accept="image/jpeg,image/png,image/gif" required>
+                                <input type="file" id="signup-logo" name="logo" class="filestyle" data-buttonText="&nbsp;Choose file" data-iconName="glyphicon-picture" accept="image/jpeg,image/png,image/gif" required>
                             </div>
                         </div>
 
@@ -124,7 +124,7 @@
                                 Country
                             </label>
                             <div class="col-sm-9">
-                                <input type="text" class="form-control" id="signup-country" placeholder="Country">
+                                <input type="text" class="form-control" id="signup-country" name="country" placeholder="Country">
                             </div>
                         </div>
 
@@ -133,7 +133,7 @@
                                 Locality
                             </label>
                             <div class="col-sm-9">
-                                <input type="text" class="form-control" id="signup-locality" placeholder="Locality">
+                                <input type="text" class="form-control" id="signup-locality" name="locality" placeholder="Locality">
                             </div>
                         </div>
 
@@ -142,7 +142,7 @@
                                 Institution
                             </label>
                             <div class="col-sm-9">
-                                <input type="text" class="form-control" id="signup-institution" placeholder="Institution">
+                                <input type="text" class="form-control" id="signup-institution" name="institution" placeholder="Institution">
                             </div>
                         </div>
 
@@ -151,21 +151,23 @@
                                 <button type="submit" class="btn btn-primary btn-lg">Sign up</button>
                             </div>
                         </div>
-                </form>
-
+                    </form>
+                    {{/domains}}
                 </div>
             </div>
 
             <div data-page="signin">
                 <div class="container">
-                    <form class="themis-form-signin">
+                    {{#domains}}
+                    <form class="themis-form-signin" method="POST" action="//{{ api }}/team/signin">
                         <h1>Please sign in</h1>
                         <label for="signin-team" class="sr-only">Team</label>
-                        <input type="text" id="signin-team" class="form-control" placeholder="Team" required autofocus>
+                        <input type="text" id="signin-team" name="team" class="form-control" placeholder="Team" required autofocus>
                         <label for="signin-password" class="sr-only">Password</label>
-                        <input type="password" id="signin-password" class="form-control" placeholder="Password" required>
+                        <input type="password" id="signin-password" name="password" class="form-control" placeholder="Password" required>
                         <button class="btn btn-lg btn-primary btn-block" type="submit">Sign in</button>
                     </form>
+                    {{/domains}}
                 </div>
             </div>
 

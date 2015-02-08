@@ -13,6 +13,7 @@
     "history.js": "~1.8.0",
     "underscore": "~1.7.0",
     "requirejs": "~2.1.15",
-    "bootstrap-filestyle": "~1.1.2"
+    "bootstrap-filestyle": "~1.1.2",
+    "jquery-form": "~3.46.0"
   }
 }

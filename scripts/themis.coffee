@@ -68,18 +68,30 @@ define 'themisIndexPageView', ['themisPageView'], (ThemisPageView) ->
     IndexPageView
 
 
-define 'themisSigninPageView', ['themisPageView'], (ThemisPageView) ->
+define 'themisSigninPageView', ['jquery', 'themisPageView', 'jquery.form'], ($, ThemisPageView) ->
     class SigninPageView extends ThemisPageView
         constructor: ->
             super 'VolgaCTF 2015 Quals: Sign in', '.themis-pages [data-page=signin]', /^\/signin$/
+            $form = @container.find 'form.themis-form-signin'
+            $form.on 'submit.themis', (e) ->
+                e.preventDefault()
+                $form.ajaxSubmit
+                    success: (responseText, textStatus, jqXHR) ->
+                        console.log responseText
 
     SigninPageView
 
 
-define 'themisSignupPageView', ['themisPageView'], (ThemisPageView) ->
+define 'themisSignupPageView', ['jquery', 'themisPageView', 'jquery.form'], ($, ThemisPageView) ->
     class SignupPageView extends ThemisPageView
         constructor: ->
             super 'VolgaCTF 2015 Quals: Sign up', '.themis-pages [data-page=signup]', /^\/signup$/
+            $form = @container.find 'form.themis-form-signup'
+            $form.on 'submit.themis', (e) ->
+                e.preventDefault()
+                $form.ajaxSubmit
+                    success: (responseText, textStatus, jqXHR) ->
+                        console.log responseText
 
     SignupPageView
 
