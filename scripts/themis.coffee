@@ -78,6 +78,8 @@ define 'themisSigninPageView', ['jquery', 'themisPageView', 'jquery.form'], ($, 
                 $form.ajaxSubmit
                     success: (responseText, textStatus, jqXHR) ->
                         console.log responseText
+                    error: (jqXHR, textStatus, errorThrown) ->
+                        console.log "#{textStatus}: #{errorThrown}"
 
     SigninPageView
 
@@ -92,6 +94,8 @@ define 'themisSignupPageView', ['jquery', 'themisPageView', 'jquery.form'], ($, 
                 $form.ajaxSubmit
                     success: (responseText, textStatus, jqXHR) ->
                         console.log responseText
+                    error: (jqXHR, textStatus, errorThrown) ->
+                        console.log "#{textStatus}: #{errorThrown}"
 
     SignupPageView
 
