@@ -9,6 +9,8 @@
         <link rel="stylesheet" href="//{{ cdn }}/css/bootstrap.css">
         <link rel="stylesheet" href="//{{ cdn }}/css/themis.css">
 
+        <script type="text/x-metadata" data-name="domain-api" data-value="//{{ api }}"></script>
+
         <script src="//{{ cdn }}/js/require.js" data-main='//{{ cdn }}/js/themis.js'></script>
         {{/domains}}
     </head>
@@ -22,7 +24,7 @@
                         <span class="icon-bar"></span>
                         <span class="icon-bar"></span>
                     </button>
-                    <a href="/" class="navbar-brand">VolgaCTF Quals 2015</a>
+                    <a href="/" class="navbar-brand" data-push-history>VolgaCTF Quals 2015</a>
                 </div>
                 <div id="themis-navbar" class="collapse navbar-collapse">
                     <ul class="nav navbar-nav navbar-right">
@@ -36,8 +38,22 @@
             </div>
         </div>
 
-        <div class="themis-pages">
-            <div data-page="index">
+        <div id="main">
+        </div>
+
+        <div class="themis-partials">
+            <script type="text/x-template" data-name="not-found-view">
+                <div class="container">
+                    <header>
+                        <h1>Not Found</h1>
+                    </header>
+                    <section>
+                        <p class="lead">We are really sorry, but there is no <mark><%- urlPath %></mark> page.</p>
+                    </section>
+                </div>
+            </script>
+
+            <script type="text/x-template" data-name="index-view">
                 <div class="container">
                     <div class="jumbotron">
                         <h1>Hello!</h1>
@@ -50,21 +66,24 @@
                         </p>
                     </div>
                 </div>
-            </div>
+            </script>
 
-            <div data-page="scoreboard">
+            <script type="text/x-template" data-name="signin-view">
                 <div class="container">
-                    <h1>Scoreboard</h1>
+                    {{#domains}}
+                    <form class="themis-form-signin" method="POST" action="//{{ api }}/team/signin">
+                        <h1>Please sign in</h1>
+                        <label for="signin-team" class="sr-only">Team</label>
+                        <input type="text" id="signin-team" name="team" class="form-control" placeholder="Team" required autofocus>
+                        <label for="signin-password" class="sr-only">Password</label>
+                        <input type="password" id="signin-password" name="password" class="form-control" placeholder="Password" required>
+                        <button class="btn btn-lg btn-primary btn-block" type="submit">Sign in</button>
+                    </form>
+                    {{/domains}}
                 </div>
-            </div>
+            </script>
 
-            <div data-page="tasks">
-                <div class="container">
-                    <h1>Tasks</h1>
-                </div>
-            </div>
-
-            <div data-page="signup">
+            <script type="text/x-template" data-name="signup-view">
                 <div class="container">
                     {{#domains}}
                     <form class="form-horizontal themis-form-signup" method="POST" enctype="multipart/form-data" action="//{{ api }}/team/signup">
@@ -154,37 +173,6 @@
                     </form>
                     {{/domains}}
                 </div>
-            </div>
-
-            <div data-page="signin">
-                <div class="container">
-                    {{#domains}}
-                    <form class="themis-form-signin" method="POST" action="//{{ api }}/team/signin">
-                        <h1>Please sign in</h1>
-                        <label for="signin-team" class="sr-only">Team</label>
-                        <input type="text" id="signin-team" name="team" class="form-control" placeholder="Team" required autofocus>
-                        <label for="signin-password" class="sr-only">Password</label>
-                        <input type="password" id="signin-password" name="password" class="form-control" placeholder="Password" required>
-                        <button class="btn btn-lg btn-primary btn-block" type="submit">Sign in</button>
-                    </form>
-                    {{/domains}}
-                </div>
-            </div>
-
-            <div data-page="error-not-found">
-                <div class="container">
-                    <header>
-                        <h1>Not Found</h1>
-                    </header>
-                    <section>
-                    </section>
-                </div>
-            </div>
-        </div>
-
-        <div class="themis-partials">
-            <script type="text/x-template" data-name="error-not-found">
-                <p class="lead">We are really sorry, but there is no <mark><%- urlPath %></mark> page.</p>
             </script>
         </div>
     </body>

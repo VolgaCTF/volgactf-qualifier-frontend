@@ -7,164 +7,210 @@ require.config
         'bootstrap-filestyle': ['bootstrap']
 
 
-define 'themisDataStore', ['EventEmitter'], (EventEmitter) ->
-    class DataStore extends EventEmitter
-        constructor: ->
-            super()
-            console.log 'DataStore created!'
-
-            @identity = null
-
-    new DataStore()
+# define 'dataStore', ['jquery', 'EventEmitter', 'metadataStore'], ($, EventEmitter, metadataStore) ->
+#     class DataStore extends EventEmitter
+#         constructor: ->
+#             super()
+#             console.log 'DataStore created!'
 
 
-define 'themisPageView', ['jquery', 'EventEmitter'], ($, EventEmitter) ->
-    class PageView extends EventEmitter
-        constructor: (title, selector, urlRegex) ->
-            super()
-            @title = title
-            @container = $ selector
-            @urlRegex = urlRegex
+#         getIdentity: (callback) ->
+#             url = "#{metadataStore.getMetadata('domain-api')}/identity"
+#             $.ajax
+#                 url: url
+#                 dataType: 'json'
+#                 success: (responseText, textStatus, jqXHR) ->
+#                     callback null, responseText
+#                 error: (jqXHR, textStatus, errorThrown) ->
+#                     callback errorThrown, null
 
-        show: ->
-            @container.show()
-
-        hide: ->
-            @container.hide()
-
-        accessAllowed: ->
-            yes
-
-    PageView
+#     new DataStore()
 
 
-define 'themisTemplateStore', ['jquery', 'underscore'], ($, _) ->
-    class TemplateStore
-        constructor: ->
-            @store = null
-            @templates = {}
+# define 'metadataStore', ['jquery'], ($) ->
+#     class MetadataStore
+#         constructor: ->
+#             @metadata = {}
 
-        render: (name, params = {}) ->
-            unless @templates[name]?
-                unless @store?
-                    @store = $ '.themis-partials'
+#         getMetadata: (name) ->
+#             unless @metadata[name]?
+#                 $el = $ "script[type=\"text/x-metadata\"][data-name=\"#{name}\"]"
+#                 if $el.length > 0
+#                     @metadata[name] = $el.data 'value'
+#                 else
+#                     @metadata[name] = null
 
-                $el = @store.find "script[type=\"text/x-template\"][data-name=\"#{name}\"]"
-                if $el.length > 0
-                    @templates[name] = _.template $el.html()
-                else
-                    @templates[name] = _.template ''
+#             @metadata[name]
 
-            @templates[name] params
-
-    new TemplateStore()
+#     new MetadataStore()
 
 
-define 'themisIndexPageView', ['themisPageView'], (ThemisPageView) ->
-    class IndexPageView extends ThemisPageView
-        constructor: ->
-            super 'VolgaCTF 2015 Quals', '.themis-pages [data-page=index]', /^\/$/
+define 'renderTemplate', ['jquery', 'underscore'], ($, _) ->
+    store = null
+    templates = {}
 
-    IndexPageView
+    (name, params = {}) ->
+        unless templates[name]?
+            unless store?
+                store = $ '.themis-partials'
 
-
-define 'themisSigninPageView', ['jquery', 'themisPageView', 'jquery.form'], ($, ThemisPageView) ->
-    class SigninPageView extends ThemisPageView
-        constructor: ->
-            super 'VolgaCTF 2015 Quals: Sign in', '.themis-pages [data-page=signin]', /^\/signin$/
-            $form = @container.find 'form.themis-form-signin'
-            $form.on 'submit.themis', (e) ->
-                e.preventDefault()
-                $form.ajaxSubmit
-                    success: (responseText, textStatus, jqXHR) ->
-                        console.log responseText
-                    error: (jqXHR, textStatus, errorThrown) ->
-                        console.log "#{textStatus}: #{errorThrown}"
-
-    SigninPageView
-
-
-define 'themisSignupPageView', ['jquery', 'themisPageView', 'jquery.form'], ($, ThemisPageView) ->
-    class SignupPageView extends ThemisPageView
-        constructor: ->
-            super 'VolgaCTF 2015 Quals: Sign up', '.themis-pages [data-page=signup]', /^\/signup$/
-            $form = @container.find 'form.themis-form-signup'
-            $form.on 'submit.themis', (e) ->
-                e.preventDefault()
-                $form.ajaxSubmit
-                    success: (responseText, textStatus, jqXHR) ->
-                        console.log responseText
-                    error: (jqXHR, textStatus, errorThrown) ->
-                        console.log "#{textStatus}: #{errorThrown}"
-
-    SignupPageView
-
-
-define 'themisPageStore', ['underscore', 'EventEmitter', 'themisPageView',
-                           'themisTemplateStore', 'themisIndexPageView',
-                           'themisSigninPageView', 'themisSignupPageView'], (_, EventEmitter, ThemisPageView, themisTemplateStore, ThemisIndexPageView, ThemisSigninPageView, ThemisSignupPageView) ->
-    class ErrorNotFoundPageView extends ThemisPageView
-        constructor: ->
-            super 'Not Found', '.themis-pages [data-page=error-not-found]', null
-
-        show: ->
-            $el = @container.find 'section'
-            $el.html themisTemplateStore.render 'error-not-found', urlPath: window.location.pathname
-            super
-
-    class PageStore extends EventEmitter
-        constructor: ->
-            console.log 'PageStore created!'
-            @pages = []
-            @errorNotFoundPage = new ErrorNotFoundPageView()
-
-        add: (page) ->
-            @pages.push page
-            @
-
-        find: (hash) ->
-            found = _.find @pages, (p) ->
-                p.urlRegex.test hash
-
-            if found?
-                page = found
+            $el = store.find "script[type=\"text/x-template\"][data-name=\"#{name}\"]"
+            if $el.length > 0
+                templates[name] = _.template $el.html()
             else
-                page = @errorNotFoundPage
+                templates[name] = _.template ''
 
-    new PageStore()
-        .add new ThemisIndexPageView()
-        .add new ThemisSigninPageView()
-        .add new ThemisSignupPageView()
+        templates[name] params
 
 
-define 'themisViewController', ['jquery', 'themisPageStore', 'jquery.history'], ($, themisPageStore, History) ->
-    class ViewController
+define 'view', [], ->
+    class View
+        constructor: (urlRegex = null) ->
+            @urlRegex = urlRegex
+            @present = ->
+            @dismiss = ->
+
+        on: (name, callback) ->
+            if name == 'present'
+                @present = callback
+            else if name == 'dismiss'
+                @dismiss = callback
+            this
+
+    View
+
+
+define 'signupView', ['jquery', 'view', 'renderTemplate', 'jquery.form'], ($, View, renderTemplate) ->
+    class SignupView extends View
         constructor: ->
-            console.log 'ViewController created!'
-            @activePageView = null
-            $(document).ready =>
-                History.Adapter.bind window, 'statechange', =>
-                    data = History.getState().data
-                    unless data.urlPath?
-                        data.urlPath = window.location.pathname
-                    page = themisPageStore.find data.urlPath
+            @urlRegex = /^\/signup$/
 
-                    @activePageView?.hide()
-                    @activePageView = page
-                    @activePageView.show()
+        present: ->
+            console.log 'Signup view present'
+            $main = $ '#main'
+            $main.html renderTemplate 'signup-view'
+            $form = $main.find 'form.themis-form-signup'
+            $form.on 'submit', (e) ->
+                e.preventDefault()
+                $form.ajaxSubmit
+                    success: (responseText, textStatus, jqXHR) ->
+                        console.log responseText
+                    error: (jqXHR, textStatus, errorThrown) ->
+                        console.log "#{textStatus}: #{errorThrown}"
 
-                $(document).on 'click.themis', 'a[data-push-history]', (e) ->
-                    e.preventDefault()
-                    e.stopPropagation()
-                    urlPath = $(e.target).attr 'href'
-                    page = themisPageStore.find urlPath
 
-                    History.pushState urlPath: urlPath, page.title, urlPath
+        dismiss: ->
+            console.log 'Signup view dismiss'
+            $main = $ '#main'
+            $form = $main.find 'form.themis-form-signup'
+            $form.off 'submit'
+            $main.html ''
 
-                History.Adapter.trigger window, 'statechange'
+    new SignupView()
 
-    new ViewController()
 
-define 'themis', ['jquery', 'themisDataStore', 'themisPageStore', 'themisViewController', 'bootstrap', 'bootstrap-filestyle'], ($, themisDataStore, themisViewController) ->
+define 'signinView', ['jquery', 'view', 'renderTemplate', 'jquery.form'], ($, View, renderTemplate) ->
+    class SigninView extends View
+        constructor: ->
+            @urlRegex = /^\/signin$/
+
+        present: ->
+            console.log 'Signin view present'
+            $main = $ '#main'
+            $main.html renderTemplate 'signin-view'
+
+            $form = $main.find 'form.themis-form-signin'
+            $form.on 'submit', (e) ->
+                e.preventDefault()
+                $form.ajaxSubmit
+                    success: (responseText, textStatus, jqXHR) ->
+                        console.log responseText
+                    error: (jqXHR, textStatus, errorThrown) ->
+                        console.log "#{textStatus}: #{errorThrown}"
+
+        dismiss: ->
+            console.log 'Signin view dismiss'
+            $main = $ '#main'
+            $form = $main.find 'form.themis-form-signin'
+            $form.off 'submit'
+            $main.html ''
+
+    new SigninView()
+
+
+define 'viewControllerBase', ['underscore', 'view'], (_, View) ->
+    class ViewControllerBase
+        constructor: ->
+            @views = []
+            @activeView = null
+            @errorViews = {}
+
+        view: (param) ->
+            if $.type(param) is 'regexp'
+                view = new View param
+            else
+                view = param
+            @views.push view
+            view
+
+        errorView: (name) ->
+            view  = new View()
+            @errorViews[name] = view
+            view
+
+        findView: (urlPath) ->
+            found = _.find @views, (view) ->
+                view.urlRegex.test urlPath
+
+            found ? @errorViews['not-found']
+
+        render: (urlPath) ->
+            newView = @findView urlPath
+            @activeView?.dismiss()
+            @activeView = newView
+            @activeView.present()
+
+
+define 'viewController', ['viewControllerBase', 'renderTemplate', 'signinView', 'signupView'], (ViewControllerBase, renderTemplate, signinView, signupView) ->
+    viewController = new ViewControllerBase()
+
+    viewController.view(/^\/$/)
+        .on 'present', ->
+            $('#main').html renderTemplate 'index-view'
+        .on 'dismiss', ->
+            $('#main').html ''
+
+    viewController.view signinView
+    viewController.view signupView
+
+    viewController.errorView('not-found')
+        .on 'present', ->
+            $('#main').html renderTemplate 'not-found-view', urlPath: window.location.pathname
+        .on 'dismiss', ->
+            $('#main').html ''
+
+
+    viewController
+
+
+define 'runStateController', ['jquery', 'jquery.history', 'viewController'], ($, History, viewController) ->
+    ->
+        History.Adapter.bind window, 'statechange', ->
+            data = History.getState().data
+            unless data.urlPath?
+                data.urlPath = window.location.pathname
+            viewController.render data.urlPath
+
+        $(document).on 'click', 'a[data-push-history]', (e) ->
+            e.preventDefault()
+            e.stopPropagation()
+            urlPath = $(e.target).attr 'href'
+
+            History.pushState urlPath: urlPath, '', urlPath
+
+        History.Adapter.trigger window, 'statechange'
+
+
+define 'themis', ['jquery', 'runStateController', 'bootstrap', 'bootstrap-filestyle'], ($, runStateController) ->
     $(document).ready ->
-        console.log themisDataStore.identity
+        runStateController()
