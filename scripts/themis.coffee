@@ -138,6 +138,35 @@ define 'signinView', ['jquery', 'view', 'renderTemplate', 'jquery.form'], ($, Vi
     new SigninView()
 
 
+define 'loginView', ['jquery', 'view', 'renderTemplate', 'jquery.form'], ($, View, renderTemplate) ->
+    class LoginView extends View
+        constructor: ->
+            @urlRegex = /^\/login$/
+
+        present: ->
+            console.log 'Login view present'
+            $main = $ '#main'
+            $main.html renderTemplate 'login-view'
+
+            $form = $main.find 'form.themis-form-login'
+            $form.on 'submit', (e) ->
+                e.preventDefault()
+                $form.ajaxSubmit
+                    success: (responseText, textStatus, jqXHR) ->
+                        console.log responseText
+                    error: (jqXHR, textStatus, errorThrown) ->
+                        console.log "#{textStatus}: #{errorThrown}"
+
+        dismiss: ->
+            console.log 'Login view dismiss'
+            $main = $ '#main'
+            $form = $main.find 'form.themis-form-login'
+            $form.off 'submit'
+            $main.html ''
+
+    new LoginView()
+
+
 define 'viewControllerBase', ['underscore', 'view'], (_, View) ->
     class ViewControllerBase
         constructor: ->
@@ -171,7 +200,7 @@ define 'viewControllerBase', ['underscore', 'view'], (_, View) ->
             @activeView.present()
 
 
-define 'viewController', ['viewControllerBase', 'renderTemplate', 'signinView', 'signupView'], (ViewControllerBase, renderTemplate, signinView, signupView) ->
+define 'viewController', ['viewControllerBase', 'renderTemplate', 'signinView', 'signupView', 'loginView'], (ViewControllerBase, renderTemplate, signinView, signupView, loginView) ->
     viewController = new ViewControllerBase()
 
     viewController.view(/^\/$/)
@@ -182,6 +211,7 @@ define 'viewController', ['viewControllerBase', 'renderTemplate', 'signinView', 
 
     viewController.view signinView
     viewController.view signupView
+    viewController.view loginView
 
     viewController.errorView('not-found')
         .on 'present', ->
