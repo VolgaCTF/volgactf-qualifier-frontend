@@ -7,42 +7,41 @@ require.config
         'bootstrap-filestyle': ['bootstrap']
 
 
-# define 'dataStore', ['jquery', 'EventEmitter', 'metadataStore'], ($, EventEmitter, metadataStore) ->
-#     class DataStore extends EventEmitter
-#         constructor: ->
-#             super()
-#             console.log 'DataStore created!'
+define 'dataStore', ['jquery', 'metadataStore'], ($, metadataStore) ->
+    class DataStore
+        constructor: ->
+
+        getIdentity: (callback) ->
+            url = "#{metadataStore.getMetadata('domain-api')}/identity"
+            $.ajax
+                url: url
+                dataType: 'json'
+                xhrFields:
+                    withCredentials: yes
+                success: (responseText, textStatus, jqXHR) ->
+                    callback null, responseText
+                error: (jqXHR, textStatus, errorThrown) ->
+                    callback errorThrown, null
+
+    new DataStore()
 
 
-#         getIdentity: (callback) ->
-#             url = "#{metadataStore.getMetadata('domain-api')}/identity"
-#             $.ajax
-#                 url: url
-#                 dataType: 'json'
-#                 success: (responseText, textStatus, jqXHR) ->
-#                     callback null, responseText
-#                 error: (jqXHR, textStatus, errorThrown) ->
-#                     callback errorThrown, null
+define 'metadataStore', ['jquery'], ($) ->
+    class MetadataStore
+        constructor: ->
+            @metadata = {}
 
-#     new DataStore()
+        getMetadata: (name) ->
+            unless @metadata[name]?
+                $el = $ "script[type=\"text/x-metadata\"][data-name=\"#{name}\"]"
+                if $el.length > 0
+                    @metadata[name] = $el.data 'value'
+                else
+                    @metadata[name] = null
 
+            @metadata[name]
 
-# define 'metadataStore', ['jquery'], ($) ->
-#     class MetadataStore
-#         constructor: ->
-#             @metadata = {}
-
-#         getMetadata: (name) ->
-#             unless @metadata[name]?
-#                 $el = $ "script[type=\"text/x-metadata\"][data-name=\"#{name}\"]"
-#                 if $el.length > 0
-#                     @metadata[name] = $el.data 'value'
-#                 else
-#                     @metadata[name] = null
-
-#             @metadata[name]
-
-#     new MetadataStore()
+    new MetadataStore()
 
 
 define 'renderTemplate', ['jquery', 'underscore'], ($, _) ->
@@ -80,91 +79,133 @@ define 'view', [], ->
     View
 
 
-define 'signupView', ['jquery', 'view', 'renderTemplate', 'jquery.form'], ($, View, renderTemplate) ->
+define 'signupView', ['jquery', 'view', 'renderTemplate', 'dataStore', 'jquery.form'], ($, View, renderTemplate, dataStore) ->
     class SignupView extends View
         constructor: ->
             @urlRegex = /^\/signup$/
 
         present: ->
-            console.log 'Signup view present'
-            $main = $ '#main'
-            $main.html renderTemplate 'signup-view'
-            $form = $main.find 'form.themis-form-signup'
-            $form.on 'submit', (e) ->
-                e.preventDefault()
-                $form.ajaxSubmit
-                    success: (responseText, textStatus, jqXHR) ->
-                        console.log responseText
-                    error: (jqXHR, textStatus, errorThrown) ->
-                        console.log "#{textStatus}: #{errorThrown}"
+            dataStore.getIdentity (err, identity) ->
+                $main = $ '#main'
+                if err?
+                    $main.html renderTemplate 'internal-error'
+                    return
 
+                if identity.role == 'guest'
+                    $main.html renderTemplate 'signup-view'
+                    $form = $main.find 'form.themis-form-signup'
+                    $form.on 'submit', (e) ->
+                        e.preventDefault()
+                        $form.ajaxSubmit
+                            success: (responseText, textStatus, jqXHR) ->
+                                console.log responseText
+                            error: (jqXHR, textStatus, errorThrown) ->
+                                console.log "#{textStatus}: #{errorThrown}"
+                else
+                    $main.html renderTemplate 'already-authenticated'
 
         dismiss: ->
-            console.log 'Signup view dismiss'
             $main = $ '#main'
             $form = $main.find 'form.themis-form-signup'
-            $form.off 'submit'
+            if $form.length > 0
+                $form.off 'submit'
             $main.html ''
 
     new SignupView()
 
 
-define 'signinView', ['jquery', 'view', 'renderTemplate', 'jquery.form'], ($, View, renderTemplate) ->
+define 'signinView', ['jquery', 'view', 'renderTemplate', 'dataStore', 'jquery.form'], ($, View, renderTemplate, dataStore) ->
     class SigninView extends View
         constructor: ->
             @urlRegex = /^\/signin$/
 
         present: ->
-            console.log 'Signin view present'
-            $main = $ '#main'
-            $main.html renderTemplate 'signin-view'
+            dataStore.getIdentity (err, identity) ->
+                $main = $ '#main'
+                if err?
+                    $main.html renderTemplate 'internal-error'
+                    return
 
-            $form = $main.find 'form.themis-form-signin'
-            $form.on 'submit', (e) ->
-                e.preventDefault()
-                $form.ajaxSubmit
-                    success: (responseText, textStatus, jqXHR) ->
-                        console.log responseText
-                    error: (jqXHR, textStatus, errorThrown) ->
-                        console.log "#{textStatus}: #{errorThrown}"
+                if identity.role == 'guest'
+                    $main.html renderTemplate 'signin-view'
+
+                    $form = $main.find 'form.themis-form-signin'
+                    $form.on 'submit', (e) ->
+                        e.preventDefault()
+                        $form.ajaxSubmit
+                            success: (responseText, textStatus, jqXHR) ->
+                                console.log responseText
+                            error: (jqXHR, textStatus, errorThrown) ->
+                                console.log "#{textStatus}: #{errorThrown}"
+                else
+                    $main.html renderTemplate 'already-authenticated'
 
         dismiss: ->
-            console.log 'Signin view dismiss'
             $main = $ '#main'
             $form = $main.find 'form.themis-form-signin'
-            $form.off 'submit'
+            if $form.length > 0
+                $form.off 'submit'
             $main.html ''
 
     new SigninView()
 
 
-define 'loginView', ['jquery', 'view', 'renderTemplate', 'jquery.form'], ($, View, renderTemplate) ->
+define 'loginView', ['jquery', 'view', 'renderTemplate', 'dataStore', 'jquery.form'], ($, View, renderTemplate, dataStore) ->
     class LoginView extends View
         constructor: ->
             @urlRegex = /^\/login$/
 
         present: ->
-            console.log 'Login view present'
-            $main = $ '#main'
-            $main.html renderTemplate 'login-view'
+            dataStore.getIdentity (err, identity) ->
+                $main = $ '#main'
+                if err?
+                    $main.html renderTemplate 'internal-error'
+                    return
 
-            $form = $main.find 'form.themis-form-login'
-            $form.on 'submit', (e) ->
-                e.preventDefault()
-                $form.ajaxSubmit
-                    success: (responseText, textStatus, jqXHR) ->
-                        console.log responseText
-                    error: (jqXHR, textStatus, errorThrown) ->
-                        console.log "#{textStatus}: #{errorThrown}"
+                if identity.role == 'guest'
+                    $main.html renderTemplate 'login-view'
+
+                    $form = $main.find 'form.themis-form-login'
+                    $form.on 'submit', (e) ->
+                        e.preventDefault()
+                        $form.ajaxSubmit
+                            dataType: 'json'
+                            xhrFields:
+                                withCredentials: yes
+                            success: (responseText, textStatus, jqXHR) ->
+                                console.log responseText
+                            error: (jqXHR, textStatus, errorThrown) ->
+                                console.log "#{textStatus}: #{errorThrown}"
+                else
+                    $main.html renderTemplate 'already-authenticated'
 
         dismiss: ->
-            console.log 'Login view dismiss'
             $main = $ '#main'
             $form = $main.find 'form.themis-form-login'
-            $form.off 'submit'
+            if $form.length > 0
+                $form.off 'submit'
             $main.html ''
 
     new LoginView()
+
+
+define 'indexView', ['jquery', 'view', 'renderTemplate', 'dataStore'], ($, View, renderTemplate, dataStore) ->
+    class IndexView extends View
+        constructor: ->
+            @urlRegex = /^\/$/
+
+        present: ->
+            dataStore.getIdentity (err, identity) ->
+                $main = $ '#main'
+                if err?
+                    $main.html renderTemplate 'internal-error'
+                else
+                    $('#main').html renderTemplate 'index-view', identity: identity
+
+        dismiss: ->
+            $('#main').html ''
+
+    new IndexView()
 
 
 define 'viewControllerBase', ['underscore', 'view'], (_, View) ->
@@ -200,15 +241,10 @@ define 'viewControllerBase', ['underscore', 'view'], (_, View) ->
             @activeView.present()
 
 
-define 'viewController', ['viewControllerBase', 'renderTemplate', 'signinView', 'signupView', 'loginView'], (ViewControllerBase, renderTemplate, signinView, signupView, loginView) ->
+define 'viewController', ['viewControllerBase', 'renderTemplate', 'indexView', 'signinView', 'signupView', 'loginView'], (ViewControllerBase, renderTemplate, indexView, signinView, signupView, loginView) ->
     viewController = new ViewControllerBase()
 
-    viewController.view(/^\/$/)
-        .on 'present', ->
-            $('#main').html renderTemplate 'index-view'
-        .on 'dismiss', ->
-            $('#main').html ''
-
+    viewController.view indexView
     viewController.view signinView
     viewController.view signupView
     viewController.view loginView

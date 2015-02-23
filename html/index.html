@@ -55,6 +55,7 @@
 
             <script type="text/x-template" data-name="index-view">
                 <div class="container">
+                    <% if (identity.role === 'guest') { %>
                     <div class="jumbotron">
                         <h1>Hello!</h1>
                         <p>Welcome to VolgaCTF 2015 Quals!</p>
@@ -65,6 +66,11 @@
                             <a class="btn btn-success btn-lg" href="/signin" role="button" data-push-history>Sign in</a>
                         </p>
                     </div>
+                    <% } else if (identity.role === 'team') { %>
+                    <h1>Scoreboard</h1>
+                    <% } else if (identity.role === 'manager' || identity.role === 'admin') { %>
+                    <h1>Control</h1>
+                    <% } %>
                 </div>
             </script>
 
@@ -80,6 +86,28 @@
                         <button class="btn btn-lg btn-primary btn-block" type="submit">Sign in</button>
                     </form>
                     {{/domains}}
+                </div>
+            </script>
+
+            <script type="text/x-template" data-name="internal-error">
+                <div class="container">
+                    <header>
+                        <h1>Internal error</h1>
+                    </header>
+                    <section>
+                        <p class="lead">An internal error occured. That&#39;s all we know.</p>
+                    </section>
+                </div>
+            </script>
+
+            <script type="text/x-template" data-name="already-authenticated">
+                <div class="container">
+                    <header>
+                        <h1>Already authenticated</h1>
+                    </header>
+                    <section>
+                        <p class="lead">You have already been authenticated. Please navigate to another page.</p>
+                    </section>
                 </div>
             </script>
 
