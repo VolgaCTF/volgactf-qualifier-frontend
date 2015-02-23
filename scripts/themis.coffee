@@ -7,6 +7,24 @@ require.config
         'bootstrap-filestyle': ['bootstrap']
 
 
+define 'stateController', ['jquery', 'jquery.history', 'viewController'], ($, History, viewController) ->
+    init: ->
+        History.Adapter.bind window, 'statechange', ->
+            data = History.getState().data
+            unless data.urlPath?
+                data.urlPath = window.location.pathname
+            viewController.render data.urlPath
+
+        $(document).on 'click', 'a[data-push-history]', (e) ->
+            e.preventDefault()
+            e.stopPropagation()
+            urlPath = $(e.target).attr 'href'
+
+            History.pushState urlPath: urlPath, '', urlPath
+
+        History.Adapter.trigger window, 'statechange'
+
+
 define 'dataStore', ['jquery', 'metadataStore'], ($, metadataStore) ->
     class DataStore
         constructor: ->
@@ -79,7 +97,7 @@ define 'view', [], ->
     View
 
 
-define 'signupView', ['jquery', 'view', 'renderTemplate', 'dataStore', 'jquery.form'], ($, View, renderTemplate, dataStore) ->
+define 'signupView', ['jquery', 'view', 'renderTemplate', 'dataStore', 'navigationBar', 'jquery.form'], ($, View, renderTemplate, dataStore, navigationBar) ->
     class SignupView extends View
         constructor: ->
             @urlRegex = /^\/signup$/
@@ -89,10 +107,13 @@ define 'signupView', ['jquery', 'view', 'renderTemplate', 'dataStore', 'jquery.f
                 $main = $ '#main'
                 if err?
                     $main.html renderTemplate 'internal-error'
+                    navigationBar.present()
                     return
 
                 if identity.role == 'guest'
                     $main.html renderTemplate 'signup-view'
+                    navigationBar.present()
+
                     $form = $main.find 'form.themis-form-signup'
                     $form.on 'submit', (e) ->
                         e.preventDefault()
@@ -103,6 +124,7 @@ define 'signupView', ['jquery', 'view', 'renderTemplate', 'dataStore', 'jquery.f
                                 console.log "#{textStatus}: #{errorThrown}"
                 else
                     $main.html renderTemplate 'already-authenticated'
+                    navigationBar.present()
 
         dismiss: ->
             $main = $ '#main'
@@ -110,11 +132,12 @@ define 'signupView', ['jquery', 'view', 'renderTemplate', 'dataStore', 'jquery.f
             if $form.length > 0
                 $form.off 'submit'
             $main.html ''
+            navigationBar.dismiss()
 
     new SignupView()
 
 
-define 'signinView', ['jquery', 'view', 'renderTemplate', 'dataStore', 'jquery.form'], ($, View, renderTemplate, dataStore) ->
+define 'signinView', ['jquery', 'view', 'renderTemplate', 'dataStore', 'navigationBar', 'jquery.form'], ($, View, renderTemplate, dataStore, navigationBar) ->
     class SigninView extends View
         constructor: ->
             @urlRegex = /^\/signin$/
@@ -124,10 +147,12 @@ define 'signinView', ['jquery', 'view', 'renderTemplate', 'dataStore', 'jquery.f
                 $main = $ '#main'
                 if err?
                     $main.html renderTemplate 'internal-error'
+                    navigationBar.present()
                     return
 
                 if identity.role == 'guest'
                     $main.html renderTemplate 'signin-view'
+                    navigationBar.present active: 'signin'
 
                     $form = $main.find 'form.themis-form-signin'
                     $form.on 'submit', (e) ->
@@ -139,6 +164,7 @@ define 'signinView', ['jquery', 'view', 'renderTemplate', 'dataStore', 'jquery.f
                                 console.log "#{textStatus}: #{errorThrown}"
                 else
                     $main.html renderTemplate 'already-authenticated'
+                    navigationBar.present()
 
         dismiss: ->
             $main = $ '#main'
@@ -146,11 +172,12 @@ define 'signinView', ['jquery', 'view', 'renderTemplate', 'dataStore', 'jquery.f
             if $form.length > 0
                 $form.off 'submit'
             $main.html ''
+            navigationBar.dismiss()
 
     new SigninView()
 
 
-define 'loginView', ['jquery', 'view', 'renderTemplate', 'dataStore', 'jquery.form'], ($, View, renderTemplate, dataStore) ->
+define 'loginView', ['jquery', 'view', 'renderTemplate', 'dataStore', 'navigationBar', 'jquery.history', 'jquery.form'], ($, View, renderTemplate, dataStore, navigationBar, History) ->
     class LoginView extends View
         constructor: ->
             @urlRegex = /^\/login$/
@@ -160,10 +187,12 @@ define 'loginView', ['jquery', 'view', 'renderTemplate', 'dataStore', 'jquery.fo
                 $main = $ '#main'
                 if err?
                     $main.html renderTemplate 'internal-error'
+                    navigationBar.present()
                     return
 
                 if identity.role == 'guest'
                     $main.html renderTemplate 'login-view'
+                    navigationBar.present()
 
                     $form = $main.find 'form.themis-form-login'
                     $form.on 'submit', (e) ->
@@ -173,11 +202,12 @@ define 'loginView', ['jquery', 'view', 'renderTemplate', 'dataStore', 'jquery.fo
                             xhrFields:
                                 withCredentials: yes
                             success: (responseText, textStatus, jqXHR) ->
-                                console.log responseText
+                                History.pushState urlPath: '/', '', '/'
                             error: (jqXHR, textStatus, errorThrown) ->
                                 console.log "#{textStatus}: #{errorThrown}"
                 else
                     $main.html renderTemplate 'already-authenticated'
+                    navigationBar.present()
 
         dismiss: ->
             $main = $ '#main'
@@ -185,11 +215,12 @@ define 'loginView', ['jquery', 'view', 'renderTemplate', 'dataStore', 'jquery.fo
             if $form.length > 0
                 $form.off 'submit'
             $main.html ''
+            navigationBar.dismiss()
 
     new LoginView()
 
 
-define 'indexView', ['jquery', 'view', 'renderTemplate', 'dataStore'], ($, View, renderTemplate, dataStore) ->
+define 'indexView', ['jquery', 'view', 'renderTemplate', 'dataStore', 'navigationBar'], ($, View, renderTemplate, dataStore, navigationBar) ->
     class IndexView extends View
         constructor: ->
             @urlRegex = /^\/$/
@@ -199,11 +230,19 @@ define 'indexView', ['jquery', 'view', 'renderTemplate', 'dataStore'], ($, View,
                 $main = $ '#main'
                 if err?
                     $main.html renderTemplate 'internal-error'
+                    navigationBar.present()
                 else
                     $('#main').html renderTemplate 'index-view', identity: identity
+                    navigationBar.present
+                        show:
+                            news: yes
+                            about: yes
+                            signin: identity.role == 'guest'
+                            signout: identity.role != 'guest'
 
         dismiss: ->
             $('#main').html ''
+            navigationBar.dismiss()
 
     new IndexView()
 
@@ -259,24 +298,47 @@ define 'viewController', ['viewControllerBase', 'renderTemplate', 'indexView', '
     viewController
 
 
-define 'runStateController', ['jquery', 'jquery.history', 'viewController'], ($, History, viewController) ->
-    ->
-        History.Adapter.bind window, 'statechange', ->
-            data = History.getState().data
-            unless data.urlPath?
-                data.urlPath = window.location.pathname
-            viewController.render data.urlPath
+define 'navigationBar', ['jquery', 'underscore', 'renderTemplate', 'metadataStore', 'jquery.history'], ($, _, renderTemplate, metadataStore, History) ->
+    present: (options = {}) ->
+        defaultOptions =
+            show:
+                news: yes
+                about: yes
+                signin: yes
+                signout: no
+            urlPath: window.location.pathname
+            active: null
+        options = _.extend defaultOptions, options
 
-        $(document).on 'click', 'a[data-push-history]', (e) ->
-            e.preventDefault()
-            e.stopPropagation()
-            urlPath = $(e.target).attr 'href'
+        $navbar = $ '#themis-navbar'
+        $navbar.html renderTemplate 'navbar', options
 
-            History.pushState urlPath: urlPath, '', urlPath
+        $signout = $navbar.find 'a[data-action="signout"]'
+        if $signout.length > 0
+            $signout.on 'click', (e) ->
+                e.preventDefault()
+                e.stopPropagation()
 
-        History.Adapter.trigger window, 'statechange'
+                url = "#{metadataStore.getMetadata('domain-api')}/signout"
+                $.ajax
+                    method: 'POST'
+                    url: url
+                    dataType: 'json'
+                    xhrFields:
+                        withCredentials: yes
+                    success: (responseText, textStatus, jqXHR) ->
+                        window.location.reload()
+                    error: (jqXHR, textStatus, errorThrown) ->
+                        console.log errorThrown
 
 
-define 'themis', ['jquery', 'runStateController', 'bootstrap', 'bootstrap-filestyle'], ($, runStateController) ->
+    dismiss: ->
+        $navbar = $ '#themis-navbar'
+        $signout = $navbar.find 'a[data-action="signout"]'
+        $signout.off 'click'
+        $navbar.html ''
+
+
+define 'themis', ['jquery', 'stateController', 'bootstrap', 'bootstrap-filestyle'], ($, stateController) ->
     $(document).ready ->
-        runStateController()
+        stateController.init()

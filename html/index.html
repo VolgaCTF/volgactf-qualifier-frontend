@@ -27,13 +27,6 @@
                     <a href="/" class="navbar-brand" data-push-history>VolgaCTF Quals 2015</a>
                 </div>
                 <div id="themis-navbar" class="collapse navbar-collapse">
-                    <ul class="nav navbar-nav navbar-right">
-                        <!--
-                        <li class="active"><a href="/scoreboard">Scoreboard</a></li>
-                        <li><a href="/tasks">Tasks</a></li>
-                        <li><a href="/signin">Sign in</a></li>
-                        -->
-                    </ul>
                 </div>
             </div>
         </div>
@@ -42,6 +35,46 @@
         </div>
 
         <div class="themis-partials">
+            <script type="text/x-template" data-name="navbar">
+                <ul class="nav navbar-nav">
+                    <% if (show.news) { %>
+                    <li><a href="/news" data-push-history>News</a></li>
+                    <% } %>
+                    <% if (show.about) { %>
+                    <li><a href="/about" data-push-history>About</a></li>
+                    <% } %>
+                </ul>
+
+                <ul class="nav navbar-nav navbar-right">
+                    <% if (show.signin) { %>
+                    <li class="<% print((active === 'signin') ? 'active' : ''); %>"><a href="/signin" data-push-history>Sign in</a></li>
+                    <% } %>
+                    <% if (show.signout) { %>
+                    <li><a href="#" data-action="signout" data-push-history>Sign out</a></li>
+                    <% } %>
+                </ul>
+            </script>
+
+            <script type="text/x-template" data-name="news-view">
+                <div class="container">
+                    <header>
+                        <h1>News</h1>
+                    </header>
+                    <section>
+                    </section>
+                </div>
+            </script>
+
+            <script type="text/x-template" data-name="about-view">
+                <div class="container">
+                    <header>
+                        <h1>About</h1>
+                    </header>
+                    <section>
+                    </section>
+                </div>
+            </script>
+
             <script type="text/x-template" data-name="not-found-view">
                 <div class="container">
                     <header>
