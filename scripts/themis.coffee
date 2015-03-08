@@ -197,16 +197,27 @@ define 'loginView', ['jquery', 'view', 'renderTemplate', 'dataStore', 'navigatio
                     navigationBar.present()
 
                     $form = $main.find 'form.themis-form-login'
+
+                    $submitError = $form.find '.submit-error > p'
+                    $submitButton = $form.find 'button'
+
                     $form.on 'submit', (e) ->
                         e.preventDefault()
                         $form.ajaxSubmit
+                            beforeSubmit: ->
+                                $submitError.text ''
+                                $submitButton.prop 'disabled', yes
+                            clearForm: yes
                             dataType: 'json'
                             xhrFields:
                                 withCredentials: yes
                             success: (responseText, textStatus, jqXHR) ->
                                 History.pushState urlPath: '/', '', '/'
                             error: (jqXHR, textStatus, errorThrown) ->
-                                console.log "#{textStatus}: #{errorThrown}"
+                                if jqXHR.responseJSON?
+                                    $submitError.text jqXHR.responseJSON
+                            complete: ->
+                                $submitButton.prop 'disabled', no
                 else
                     $main.html renderTemplate 'already-authenticated'
                     navigationBar.present()
