@@ -5,14 +5,12 @@
 
         <meta name="viewport" content="width=device-width, initial-scale=1">
 
-        {{#domains}}
-        <link rel="stylesheet" href="//{{ cdn }}/css/bootstrap.css">
-        <link rel="stylesheet" href="//{{ cdn }}/css/themis.css">
+        <link rel="stylesheet" href="//cdn.{{ domain }}/css/bootstrap.css">
+        <link rel="stylesheet" href="//cdn.{{ domain }}/css/themis.css">
 
-        <script type="text/x-metadata" data-name="domain-api" data-value="//{{ api }}"></script>
+        <script type="text/x-metadata" data-name="domain-api" data-value="//api.{{ domain }}"></script>
 
-        <script src="//{{ cdn }}/js/require.js" data-main='//{{ cdn }}/js/themis.js'></script>
-        {{/domains}}
+        <script src="//cdn.{{ domain }}/js/require.js" data-main='//cdn.{{ domain }}/js/themis.js'></script>
     </head>
     <body>
         <div class="navbar navbar-default navbar-static-top">
@@ -109,8 +107,7 @@
 
             <script type="text/x-template" data-name="signin-view">
                 <div class="container">
-                    {{#domains}}
-                    <form class="themis-form-signin" method="POST" action="//{{ api }}/team/signin">
+                    <form class="themis-form-signin" method="POST" action="//api.{{ domain }}/team/signin">
                         <h1>Please sign in</h1>
                         <label for="signin-team" class="sr-only">Team</label>
                         <input type="text" id="signin-team" name="team" class="form-control" placeholder="Team" required autofocus>
@@ -118,7 +115,6 @@
                         <input type="password" id="signin-password" name="password" class="form-control" placeholder="Password" required>
                         <button class="btn btn-lg btn-primary btn-block" type="submit">Sign in</button>
                     </form>
-                    {{/domains}}
                 </div>
             </script>
 
@@ -146,8 +142,7 @@
 
             <script type="text/x-template" data-name="login-view">
                 <div class="container">
-                    {{#domains}}
-                    <form class="themis-form-login" method="POST" action="//{{ api }}/login">
+                    <form class="themis-form-login" method="POST" action="//api.{{ domain }}/login">
                         <h1>Please log in</h1>
                         <label for="login-team" class="sr-only">Username</label>
                         <input type="text" id="login-username" name="username" class="form-control" placeholder="Username" required autofocus>
@@ -158,14 +153,12 @@
                         </div>
                         <button class="btn btn-lg btn-primary btn-block" type="submit">Log in</button>
                     </form>
-                    {{/domains}}
                 </div>
             </script>
 
             <script type="text/x-template" data-name="signup-view">
                 <div class="container">
-                    {{#domains}}
-                    <form class="form-horizontal themis-form-signup" method="POST" enctype="multipart/form-data" action="//{{ api }}/team/signup">
+                    <form class="form-horizontal themis-form-signup" method="POST" enctype="multipart/form-data" action="//api.{{ domain }}/team/signup">
                         <div class="form-group">
                             <div class="col-sm-offset-3 col-sm-9">
                                 <h1>Sign up</h1>
@@ -250,7 +243,6 @@
                             </div>
                         </div>
                     </form>
-                    {{/domains}}
                 </div>
             </script>
         </div>
