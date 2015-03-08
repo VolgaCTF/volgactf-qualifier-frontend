@@ -97,7 +97,7 @@ define 'view', [], ->
     View
 
 
-define 'signupView', ['jquery', 'view', 'renderTemplate', 'dataStore', 'navigationBar', 'jquery.form'], ($, View, renderTemplate, dataStore, navigationBar) ->
+define 'signupView', ['jquery', 'view', 'renderTemplate', 'dataStore', 'navigationBar', 'jquery.form', 'bootstrap-filestyle'], ($, View, renderTemplate, dataStore, navigationBar) ->
     class SignupView extends View
         constructor: ->
             @urlRegex = /^\/signup$/
@@ -115,6 +115,7 @@ define 'signupView', ['jquery', 'view', 'renderTemplate', 'dataStore', 'navigati
                     navigationBar.present()
 
                     $form = $main.find 'form.themis-form-signup'
+                    $form.find('input:file').filestyle()
                     $form.on 'submit', (e) ->
                         e.preventDefault()
                         $form.ajaxSubmit
@@ -130,6 +131,7 @@ define 'signupView', ['jquery', 'view', 'renderTemplate', 'dataStore', 'navigati
             $main = $ '#main'
             $form = $main.find 'form.themis-form-signup'
             if $form.length > 0
+                $form.find('input:file').filestyle 'destroy'
                 $form.off 'submit'
             $main.html ''
             navigationBar.dismiss()
@@ -339,6 +341,6 @@ define 'navigationBar', ['jquery', 'underscore', 'renderTemplate', 'metadataStor
         $navbar.html ''
 
 
-define 'themis', ['jquery', 'stateController', 'bootstrap', 'bootstrap-filestyle'], ($, stateController) ->
+define 'themis', ['jquery', 'stateController', 'bootstrap'], ($, stateController) ->
     $(document).ready ->
         stateController.init()
