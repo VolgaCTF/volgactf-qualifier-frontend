@@ -27,9 +27,15 @@ paths =
         'bower_components/bootstrap/dist/fonts/*.ttf'
         'bower_components/bootstrap/dist/fonts/*.woff'
         'bower_components/bootstrap/dist/fonts/*.woff2'
+        'bower_components/fontawesome/fonts/*.eot'
+        'bower_components/fontawesome/fonts/*.svg'
+        'bower_components/fontawesome/fonts/*.ttf'
+        'bower_components/fontawesome/fonts/*.woff'
+        'bower_components/fontawesome/fonts/*.woff2'
     ]
     stylesheets: [
         'bower_components/bootstrap/dist/css/bootstrap.css'
+        'bower_components/fontawesome/css/font-awesome.css'
         'stylesheets/themis.sass'
     ]
     html: [

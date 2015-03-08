@@ -6,6 +6,7 @@
         <meta name="viewport" content="width=device-width, initial-scale=1">
 
         <link rel="stylesheet" href="//cdn.{{ domain }}/css/bootstrap.css">
+        <link rel="stylesheet" href="//cdn.{{ domain }}/css/font-awesome.css">
         <link rel="stylesheet" href="//cdn.{{ domain }}/css/themis.css">
 
         <script type="text/x-metadata" data-name="domain-api" data-value="//api.{{ domain }}"></script>
@@ -32,14 +33,28 @@
         <div id="main">
         </div>
 
+        <footer class="footer">
+            <div class="container">
+                <div class="col-sm-4">
+                    <p><i class="fa fa-copyright"></i> 2015, Alexander Pyatkin and contributors</p>
+                </div>
+                <div class="col-sm-4 col-sm-offset-4">
+                    <ul class="list-unstyled text-right">
+                        <li><a href="http://volgactf.ru" target="_blank">volgactf.ru</a>&nbsp;<i class="fa fa-info-circle"></i></li>
+                        <li><a href="https://twitter.com/VolgaCTF" target="_blank">@VolgaCTF</a>&nbsp;<i class="fa fa-twitter"></i></li>
+                    </ul>
+                </div>
+            </div>
+        </footer>
+
         <div class="themis-partials">
             <script type="text/x-template" data-name="navbar">
                 <ul class="nav navbar-nav">
                     <% if (show.news) { %>
-                    <li><a href="/news" data-push-history>News</a></li>
+                    <li class="<% print((active === 'news') ? 'active' : ''); %>"><a href="/news" data-push-history>News</a></li>
                     <% } %>
                     <% if (show.about) { %>
-                    <li><a href="/about" data-push-history>About</a></li>
+                    <li class="<% print((active === 'about') ? 'active' : ''); %>"><a href="/about" data-push-history>About</a></li>
                     <% } %>
                 </ul>
 
@@ -113,6 +128,9 @@
                         <input type="text" id="signin-team" name="team" class="form-control" placeholder="Team" required autofocus>
                         <label for="signin-password" class="sr-only">Password</label>
                         <input type="password" id="signin-password" name="password" class="form-control" placeholder="Password" required>
+                        <div class="submit-error">
+                            <p class="text-danger"></p>
+                        </div>
                         <button class="btn btn-lg btn-primary btn-block" type="submit">Sign in</button>
                     </form>
                 </div>

@@ -157,13 +157,27 @@ define 'signinView', ['jquery', 'view', 'renderTemplate', 'dataStore', 'navigati
                     navigationBar.present active: 'signin'
 
                     $form = $main.find 'form.themis-form-signin'
+
+                    $submitError = $form.find '.submit-error > p'
+                    $submitButton = $form.find 'button'
+
                     $form.on 'submit', (e) ->
                         e.preventDefault()
                         $form.ajaxSubmit
+                            beforeSubmit: ->
+                                $submitError.text ''
+                                $submitButton.prop 'disabled', yes
+                            clearForm: yes
+                            dataType: 'json'
+                            xhrFields:
+                                withCredentials: yes
                             success: (responseText, textStatus, jqXHR) ->
                                 console.log responseText
                             error: (jqXHR, textStatus, errorThrown) ->
-                                console.log "#{textStatus}: #{errorThrown}"
+                                if jqXHR.responseJSON?
+                                    $submitError.text jqXHR.responseJSON
+                            complete: ->
+                                $submitButton.prop 'disabled', no
                 else
                     $main.html renderTemplate 'already-authenticated'
                     navigationBar.present()
@@ -260,6 +274,62 @@ define 'indexView', ['jquery', 'view', 'renderTemplate', 'dataStore', 'navigatio
     new IndexView()
 
 
+define 'aboutView', ['jquery', 'view', 'renderTemplate', 'dataStore', 'navigationBar'], ($, View, renderTemplate, dataStore, navigationBar) ->
+    class AboutView extends View
+        constructor: ->
+            @urlRegex = /^\/about$/
+
+        present: ->
+            dataStore.getIdentity (err, identity) ->
+                $main = $ '#main'
+                if err?
+                    $main.html renderTemplate 'internal-error'
+                    navigationBar.present()
+                else
+                    $('#main').html renderTemplate 'about-view', identity: identity
+                    navigationBar.present
+                        show:
+                            news: yes
+                            about: yes
+                            signin: identity.role == 'guest'
+                            signout: identity.role != 'guest'
+                        active: 'about'
+
+        dismiss: ->
+            $('#main').html ''
+            navigationBar.dismiss()
+
+    new AboutView()
+
+
+define 'newsView', ['jquery', 'view', 'renderTemplate', 'dataStore', 'navigationBar'], ($, View, renderTemplate, dataStore, navigationBar) ->
+    class NewsView extends View
+        constructor: ->
+            @urlRegex = /^\/news$/
+
+        present: ->
+            dataStore.getIdentity (err, identity) ->
+                $main = $ '#main'
+                if err?
+                    $main.html renderTemplate 'internal-error'
+                    navigationBar.present()
+                else
+                    $('#main').html renderTemplate 'news-view', identity: identity
+                    navigationBar.present
+                        show:
+                            news: yes
+                            about: yes
+                            signin: identity.role == 'guest'
+                            signout: identity.role != 'guest'
+                        active: 'news'
+
+        dismiss: ->
+            $('#main').html ''
+            navigationBar.dismiss()
+
+    new NewsView()
+
+
 define 'viewControllerBase', ['underscore', 'view'], (_, View) ->
     class ViewControllerBase
         constructor: ->
@@ -293,13 +363,17 @@ define 'viewControllerBase', ['underscore', 'view'], (_, View) ->
             @activeView.present()
 
 
-define 'viewController', ['viewControllerBase', 'renderTemplate', 'indexView', 'signinView', 'signupView', 'loginView'], (ViewControllerBase, renderTemplate, indexView, signinView, signupView, loginView) ->
+define 'viewController', ['viewControllerBase', 'renderTemplate', 'indexView',
+                          'signinView', 'signupView', 'loginView', 'aboutView',
+                          'newsView'], (ViewControllerBase, renderTemplate, indexView, signinView, signupView, loginView, aboutView, newsView) ->
     viewController = new ViewControllerBase()
 
     viewController.view indexView
     viewController.view signinView
     viewController.view signupView
     viewController.view loginView
+    viewController.view aboutView
+    viewController.view newsView
 
     viewController.errorView('not-found')
         .on 'present', ->
