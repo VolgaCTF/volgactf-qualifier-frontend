@@ -264,8 +264,7 @@ define 'indexView', ['jquery', 'view', 'renderTemplate', 'dataStore', 'navigatio
                         show:
                             news: yes
                             about: yes
-                            signin: identity.role == 'guest'
-                            signout: identity.role != 'guest'
+                        identity: identity
 
         dismiss: ->
             $('#main').html ''
@@ -291,8 +290,7 @@ define 'aboutView', ['jquery', 'view', 'renderTemplate', 'dataStore', 'navigatio
                         show:
                             news: yes
                             about: yes
-                            signin: identity.role == 'guest'
-                            signout: identity.role != 'guest'
+                        identity: identity
                         active: 'about'
 
         dismiss: ->
@@ -319,8 +317,7 @@ define 'newsView', ['jquery', 'view', 'renderTemplate', 'dataStore', 'navigation
                         show:
                             news: yes
                             about: yes
-                            signin: identity.role == 'guest'
-                            signout: identity.role != 'guest'
+                        identity: identity
                         active: 'news'
 
         dismiss: ->
@@ -391,9 +388,8 @@ define 'navigationBar', ['jquery', 'underscore', 'renderTemplate', 'metadataStor
             show:
                 news: yes
                 about: yes
-                signin: yes
-                signout: no
             urlPath: window.location.pathname
+            identity: null
             active: null
         options = _.extend defaultOptions, options
 
