@@ -131,7 +131,7 @@ define 'signupView', ['jquery', 'view', 'renderTemplate', 'dataStore', 'navigati
                             xhrFields:
                                 withCredentials: yes
                             success: (responseText, textStatus, jqXHR) ->
-                                console.log responseText
+                                History.pushState urlPath: '/signin', '', '/signin'
                             error: (jqXHR, textStatus, errorThrown) ->
                                 if jqXHR.responseJSON?
                                     $submitError.text jqXHR.responseJSON
@@ -186,7 +186,7 @@ define 'signinView', ['jquery', 'view', 'renderTemplate', 'dataStore', 'navigati
                             xhrFields:
                                 withCredentials: yes
                             success: (responseText, textStatus, jqXHR) ->
-                                console.log responseText
+                                History.pushState urlPath: '/', '', '/'
                             error: (jqXHR, textStatus, errorThrown) ->
                                 if jqXHR.responseJSON?
                                     $submitError.text jqXHR.responseJSON
