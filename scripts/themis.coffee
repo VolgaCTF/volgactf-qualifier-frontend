@@ -9,8 +9,10 @@ require.config
 
 define 'stateController', ['jquery', 'jquery.history', 'viewController'], ($, History, viewController) ->
     init: ->
+        History.options.debug = true
         History.Adapter.bind window, 'statechange', ->
             data = History.getState().data
+            # console.log data
             unless data.urlPath?
                 data.urlPath = window.location.pathname
             viewController.render data.urlPath
@@ -19,10 +21,18 @@ define 'stateController', ['jquery', 'jquery.history', 'viewController'], ($, Hi
             e.preventDefault()
             e.stopPropagation()
             urlPath = $(e.target).attr 'href'
+            title = viewController.getTitle urlPath
 
-            History.pushState urlPath: urlPath, '', urlPath
+            History.pushState urlPath: urlPath, title, urlPath
 
-        History.Adapter.trigger window, 'statechange'
+        curLocation = window.location.pathname
+        windowTitle = viewController.getTitle curLocation
+        # AT: maybe it's a bug: replaceState won't call statechange
+        # event if you reload page at the same url (e.g. Cmd+R or Ctrl+F5).
+        # To workaround the problem, you can pass a unique value to state.
+        # I chose to pass unix timestamp.
+        historyData = urlPath: curLocation, tick: (new Date()).getTime()
+        History.replaceState historyData, windowTitle, curLocation
 
 
 define 'dataStore', ['jquery', 'metadataStore'], ($, metadataStore) ->
@@ -84,15 +94,13 @@ define 'view', [], ->
     class View
         constructor: (urlRegex = null) ->
             @urlRegex = urlRegex
-            @present = ->
-            @dismiss = ->
 
-        on: (name, callback) ->
-            if name == 'present'
-                @present = callback
-            else if name == 'dismiss'
-                @dismiss = callback
-            this
+        present: ->
+
+        dismiss: ->
+
+        getTitle: ->
+            ''
 
     View
 
@@ -101,6 +109,9 @@ define 'signupView', ['jquery', 'view', 'renderTemplate', 'dataStore', 'navigati
     class SignupView extends View
         constructor: ->
             @urlRegex = /^\/signup$/
+
+        getTitle: ->
+            'VolgaCTF Quals 2015 :: Sign up'
 
         present: ->
             dataStore.getIdentity (err, identity) ->
@@ -158,6 +169,9 @@ define 'signinView', ['jquery', 'view', 'renderTemplate', 'dataStore', 'navigati
         constructor: ->
             @urlRegex = /^\/signin$/
 
+        getTitle: ->
+            'VolgaCTF Quals 2015 :: Sign in'
+
         present: ->
             dataStore.getIdentity (err, identity) ->
                 $main = $ '#main'
@@ -211,6 +225,9 @@ define 'loginView', ['jquery', 'view', 'renderTemplate', 'dataStore', 'navigatio
     class LoginView extends View
         constructor: ->
             @urlRegex = /^\/login$/
+
+        getTitle: ->
+            'VolgaCTF Quals 2015 :: Login'
 
         present: ->
             dataStore.getIdentity (err, identity) ->
@@ -266,6 +283,9 @@ define 'indexView', ['jquery', 'view', 'renderTemplate', 'dataStore', 'navigatio
         constructor: ->
             @urlRegex = /^\/$/
 
+        getTitle: ->
+            'VolgaCTF Quals 2015 :: Main'
+
         present: ->
             dataStore.getIdentity (err, identity) ->
                 $main = $ '#main'
@@ -291,6 +311,9 @@ define 'aboutView', ['jquery', 'view', 'renderTemplate', 'dataStore', 'navigatio
     class AboutView extends View
         constructor: ->
             @urlRegex = /^\/about$/
+
+        getTitle: ->
+            'VolgaCTF Quals 2015 :: About'
 
         present: ->
             dataStore.getIdentity (err, identity) ->
@@ -319,6 +342,9 @@ define 'newsView', ['jquery', 'view', 'renderTemplate', 'dataStore', 'navigation
         constructor: ->
             @urlRegex = /^\/news$/
 
+        getTitle: ->
+            'VolgaCTF Quals 2015 :: News'
+
         present: ->
             dataStore.getIdentity (err, identity) ->
                 $main = $ '#main'
@@ -341,6 +367,23 @@ define 'newsView', ['jquery', 'view', 'renderTemplate', 'dataStore', 'navigation
     new NewsView()
 
 
+define 'notFoundView', ['jquery', 'view', 'renderTemplate', 'navigationBar'], ($, View, renderTemplate, navigationBar) ->
+    class NotFoundView extends View
+        constructor: ->
+            super null
+
+        getTitle: ->
+            'VolgaCTF Quals 2015 :: Not Found'
+
+        present: ->
+            $('#main').html renderTemplate 'not-found-view', urlPath: window.location.pathname
+
+        dismiss: ->
+            $('#main').html ''
+
+    new NotFoundView()
+
+
 define 'viewControllerBase', ['underscore', 'view'], (_, View) ->
     class ViewControllerBase
         constructor: ->
@@ -348,16 +391,11 @@ define 'viewControllerBase', ['underscore', 'view'], (_, View) ->
             @activeView = null
             @errorViews = {}
 
-        view: (param) ->
-            if $.type(param) is 'regexp'
-                view = new View param
-            else
-                view = param
+        view: (view) ->
             @views.push view
             view
 
-        errorView: (name) ->
-            view  = new View()
+        errorView: (name, view) ->
             @errorViews[name] = view
             view
 
@@ -366,6 +404,10 @@ define 'viewControllerBase', ['underscore', 'view'], (_, View) ->
                 view.urlRegex.test urlPath
 
             found ? @errorViews['not-found']
+
+        getTitle: (urlPath) ->
+            view = @findView urlPath
+            view.getTitle()
 
         render: (urlPath) ->
             newView = @findView urlPath
@@ -376,7 +418,7 @@ define 'viewControllerBase', ['underscore', 'view'], (_, View) ->
 
 define 'viewController', ['viewControllerBase', 'renderTemplate', 'indexView',
                           'signinView', 'signupView', 'loginView', 'aboutView',
-                          'newsView'], (ViewControllerBase, renderTemplate, indexView, signinView, signupView, loginView, aboutView, newsView) ->
+                          'newsView', 'notFoundView'], (ViewControllerBase, renderTemplate, indexView, signinView, signupView, loginView, aboutView, newsView, notFoundView) ->
     viewController = new ViewControllerBase()
 
     viewController.view indexView
@@ -386,12 +428,7 @@ define 'viewController', ['viewControllerBase', 'renderTemplate', 'indexView',
     viewController.view aboutView
     viewController.view newsView
 
-    viewController.errorView('not-found')
-        .on 'present', ->
-            $('#main').html renderTemplate 'not-found-view', urlPath: window.location.pathname
-        .on 'dismiss', ->
-            $('#main').html ''
-
+    viewController.errorView 'not-found', notFoundView
 
     viewController
 
