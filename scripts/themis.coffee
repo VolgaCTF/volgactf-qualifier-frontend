@@ -117,13 +117,13 @@ define 'view', [], ->
     View
 
 
-define 'signupView', ['jquery', 'view', 'renderTemplate', 'dataStore', 'navigationBar', 'stateController', 'jquery.form', 'bootstrap-filestyle'], ($, View, renderTemplate, dataStore, navigationBar, stateController) ->
+define 'signupView', ['jquery', 'view', 'renderTemplate', 'dataStore', 'navigationBar', 'stateController', 'metadataStore', 'jquery.form', 'bootstrap-filestyle'], ($, View, renderTemplate, dataStore, navigationBar, stateController, metadataStore) ->
     class SignupView extends View
         constructor: ->
             @urlRegex = /^\/signup$/
 
         getTitle: ->
-            'VolgaCTF Quals 2015 :: Sign up'
+            "#{metadataStore.getMetadata 'event-title' } :: Sign up"
 
         present: ->
             dataStore.getIdentity (err, identity) ->
@@ -176,13 +176,13 @@ define 'signupView', ['jquery', 'view', 'renderTemplate', 'dataStore', 'navigati
     new SignupView()
 
 
-define 'signinView', ['jquery', 'view', 'renderTemplate', 'dataStore', 'navigationBar', 'stateController', 'jquery.form'], ($, View, renderTemplate, dataStore, navigationBar, stateController) ->
+define 'signinView', ['jquery', 'view', 'renderTemplate', 'dataStore', 'navigationBar', 'stateController', 'metadataStore', 'jquery.form'], ($, View, renderTemplate, dataStore, navigationBar, stateController, metadataStore) ->
     class SigninView extends View
         constructor: ->
             @urlRegex = /^\/signin$/
 
         getTitle: ->
-            'VolgaCTF Quals 2015 :: Sign in'
+            "#{metadataStore.getMetadata 'event-title' } :: Sign in"
 
         present: ->
             dataStore.getIdentity (err, identity) ->
@@ -233,13 +233,13 @@ define 'signinView', ['jquery', 'view', 'renderTemplate', 'dataStore', 'navigati
     new SigninView()
 
 
-define 'loginView', ['jquery', 'view', 'renderTemplate', 'dataStore', 'navigationBar', 'stateController', 'jquery.form'], ($, View, renderTemplate, dataStore, navigationBar, stateController) ->
+define 'loginView', ['jquery', 'view', 'renderTemplate', 'dataStore', 'navigationBar', 'stateController', 'metadataStore', 'jquery.form'], ($, View, renderTemplate, dataStore, navigationBar, stateController, metadataStore) ->
     class LoginView extends View
         constructor: ->
             @urlRegex = /^\/login$/
 
         getTitle: ->
-            'VolgaCTF Quals 2015 :: Login'
+            "#{metadataStore.getMetadata 'event-title' } :: Login"
 
         present: ->
             dataStore.getIdentity (err, identity) ->
@@ -290,13 +290,13 @@ define 'loginView', ['jquery', 'view', 'renderTemplate', 'dataStore', 'navigatio
     new LoginView()
 
 
-define 'indexView', ['jquery', 'view', 'renderTemplate', 'dataStore', 'navigationBar'], ($, View, renderTemplate, dataStore, navigationBar) ->
+define 'indexView', ['jquery', 'view', 'renderTemplate', 'dataStore', 'navigationBar', 'metadataStore'], ($, View, renderTemplate, dataStore, navigationBar, metadataStore) ->
     class IndexView extends View
         constructor: ->
             @urlRegex = /^\/$/
 
         getTitle: ->
-            'VolgaCTF Quals 2015 :: Main'
+            "#{metadataStore.getMetadata 'event-title' } :: Main"
 
         present: ->
             dataStore.getIdentity (err, identity) ->
@@ -319,13 +319,13 @@ define 'indexView', ['jquery', 'view', 'renderTemplate', 'dataStore', 'navigatio
     new IndexView()
 
 
-define 'aboutView', ['jquery', 'view', 'renderTemplate', 'dataStore', 'navigationBar'], ($, View, renderTemplate, dataStore, navigationBar) ->
+define 'aboutView', ['jquery', 'view', 'renderTemplate', 'dataStore', 'navigationBar', 'metadataStore'], ($, View, renderTemplate, dataStore, navigationBar, metadataStore) ->
     class AboutView extends View
         constructor: ->
             @urlRegex = /^\/about$/
 
         getTitle: ->
-            'VolgaCTF Quals 2015 :: About'
+            "#{metadataStore.getMetadata 'event-title' } :: About"
 
         present: ->
             dataStore.getIdentity (err, identity) ->
@@ -349,13 +349,13 @@ define 'aboutView', ['jquery', 'view', 'renderTemplate', 'dataStore', 'navigatio
     new AboutView()
 
 
-define 'newsView', ['jquery', 'view', 'renderTemplate', 'dataStore', 'navigationBar'], ($, View, renderTemplate, dataStore, navigationBar) ->
+define 'newsView', ['jquery', 'view', 'renderTemplate', 'dataStore', 'navigationBar', 'metadataStore'], ($, View, renderTemplate, dataStore, navigationBar, metadataStore) ->
     class NewsView extends View
         constructor: ->
             @urlRegex = /^\/news$/
 
         getTitle: ->
-            'VolgaCTF Quals 2015 :: News'
+            "#{metadataStore.getMetadata 'event-title' } :: News"
 
         present: ->
             dataStore.getIdentity (err, identity) ->
@@ -379,13 +379,13 @@ define 'newsView', ['jquery', 'view', 'renderTemplate', 'dataStore', 'navigation
     new NewsView()
 
 
-define 'notFoundView', ['jquery', 'view', 'renderTemplate', 'navigationBar'], ($, View, renderTemplate, navigationBar) ->
+define 'notFoundView', ['jquery', 'view', 'renderTemplate', 'navigationBar', 'metadataStore'], ($, View, renderTemplate, navigationBar, metadataStore) ->
     class NotFoundView extends View
         constructor: ->
             super null
 
         getTitle: ->
-            'VolgaCTF Quals 2015 :: Not Found'
+            "#{metadataStore.getMetadata 'event-title' } :: Not Found"
 
         present: ->
             $('#main').html renderTemplate 'not-found-view', urlPath: window.location.pathname

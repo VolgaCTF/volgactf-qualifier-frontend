@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
     <head>
-        <title>VolgaCTF 2015 Quals :: Main</title>
+        <title>{{#event}}{{ title }}{{/event}} :: Main</title>
 
         <meta name="viewport" content="width=device-width, initial-scale=1">
 
@@ -10,6 +10,7 @@
         <link rel="stylesheet" href="//cdn.{{ domain }}/css/themis.css">
 
         <script type="text/x-metadata" data-name="domain-api" data-value="//api.{{ domain }}"></script>
+        <script type="text/x-metadata" data-name="event-title" data-value="{{#event}}{{ title }}{{/event}}"></script>
 
         <script src="//cdn.{{ domain }}/js/require.js" data-main='//cdn.{{ domain }}/js/themis.js'></script>
     </head>
@@ -23,7 +24,7 @@
                         <span class="icon-bar"></span>
                         <span class="icon-bar"></span>
                     </button>
-                    <a href="/" class="navbar-brand" data-push-history>VolgaCTF Quals 2015</a>
+                    <a href="/" class="navbar-brand" data-push-history>{{#event}}{{ title }}{{/event}}</a>
                 </div>
                 <div id="themis-navbar" class="collapse navbar-collapse">
                 </div>
@@ -117,7 +118,7 @@
                     <% if (identity.role === 'guest') { %>
                     <div class="jumbotron">
                         <h1>Hello!</h1>
-                        <p>Welcome to VolgaCTF 2015 Quals!</p>
+                        <p>Welcome to {{#event}}{{ title }}{{/event}}!</p>
                         <p>VolgaCTF is an inter-regional inter-university open computer security contest.</p>
                         <p>Interested? Please register for the competition!</p>
                         <p>
