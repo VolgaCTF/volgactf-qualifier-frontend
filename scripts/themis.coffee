@@ -138,6 +138,7 @@ define 'signupView', ['jquery', 'view', 'renderTemplate', 'dataStore', 'navigati
                     navigationBar.present()
 
                     $form = $main.find 'form.themis-form-signup'
+                    $successAlert = $main.find 'div.themis-alert-signup'
 
                     $submitError = $form.find '.submit-error > p'
                     $submitButton = $form.find 'button'
@@ -154,7 +155,8 @@ define 'signupView', ['jquery', 'view', 'renderTemplate', 'dataStore', 'navigati
                             xhrFields:
                                 withCredentials: yes
                             success: (responseText, textStatus, jqXHR) ->
-                                stateController.navigateTo '/signin'
+                                $form.hide()
+                                $successAlert.show()
                             error: (jqXHR, textStatus, errorThrown) ->
                                 if jqXHR.responseJSON?
                                     $submitError.text jqXHR.responseJSON

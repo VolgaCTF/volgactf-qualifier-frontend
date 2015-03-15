@@ -63,6 +63,11 @@
                     <% if (identity === null || identity.role === 'guest') { %>
                     <li class="<% print((active === 'signin') ? 'active' : ''); %>"><a href="/signin" data-push-history>Sign in</a></li>
                     <% } else { %>
+                    <% if (identity.role === 'team') { %>
+                    <li>
+                    <img src="//api.{{ domain }}/team/logo/<%- identity.id %>">
+                    </li>
+                    <% } %>
                     <li class="dropdown">
                         <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
                             <% if (identity.role === 'admin') { %>
@@ -279,6 +284,16 @@
                             </div>
                         </div>
                     </form>
+
+                    <div class="themis-alert-signup">
+                        <div class="col-sm-offset-3 col-sm-9">
+                            <h1>Sign up</h1>
+                        </div>
+                        <div class="col-sm-12 alert alert-success">
+                            You have successfully signed up for the contest!
+                            Now, you can <a href="/signin" data-push-history>sign in</a> to your account.
+                        </div>
+                    </div>
                 </div>
             </script>
         </div>
