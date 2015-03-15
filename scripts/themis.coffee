@@ -7,32 +7,44 @@ require.config
         'bootstrap-filestyle': ['bootstrap']
 
 
-define 'stateController', ['jquery', 'jquery.history', 'viewController'], ($, History, viewController) ->
-    init: ->
-        History.options.debug = true
-        History.Adapter.bind window, 'statechange', ->
-            data = History.getState().data
-            # console.log data
-            unless data.urlPath?
-                data.urlPath = window.location.pathname
-            viewController.render data.urlPath
+define 'stateController', ['jquery', 'jquery.history'], ($, History) ->
+    class StateController
+        constructor: ->
+            @viewController = null
 
-        $(document).on 'click', 'a[data-push-history]', (e) ->
-            e.preventDefault()
-            e.stopPropagation()
-            urlPath = $(e.target).attr 'href'
-            title = viewController.getTitle urlPath
+        getStateData: (urlPath) ->
+            # AT: maybe it's a bug: replaceState won't call statechange
+            # event if you reload page at the same url (e.g. Cmd+R or Ctrl+F5).
+            # To workaround the problem, you can pass a unique value to state.
+            # I have chosen to pass unix timestamp.
+            return urlPath: urlPath, tick: (new Date()).getTime()
 
-            History.pushState urlPath: urlPath, title, urlPath
+        init: (viewController) ->
+            @viewController = viewController
+            History.Adapter.bind window, 'statechange', =>
+                data = History.getState().data
+                unless data.urlPath?
+                    data.urlPath = window.location.pathname
+                @viewController.render data.urlPath
 
-        curLocation = window.location.pathname
-        windowTitle = viewController.getTitle curLocation
-        # AT: maybe it's a bug: replaceState won't call statechange
-        # event if you reload page at the same url (e.g. Cmd+R or Ctrl+F5).
-        # To workaround the problem, you can pass a unique value to state.
-        # I chose to pass unix timestamp.
-        historyData = urlPath: curLocation, tick: (new Date()).getTime()
-        History.replaceState historyData, windowTitle, curLocation
+            $(document).on 'click', 'a[data-push-history]', (e) =>
+                e.preventDefault()
+                e.stopPropagation()
+                urlPath = $(e.target).attr 'href'
+                title = @viewController.getTitle urlPath
+
+                History.pushState @getStateData(urlPath), title, urlPath
+
+            curLocation = window.location.pathname
+            windowTitle = @viewController.getTitle curLocation
+            historyData = urlPath: curLocation, tick: (new Date()).getTime()
+            History.replaceState @getStateData(curLocation), windowTitle, curLocation
+
+        navigateTo: (urlPath) ->
+            title = @viewController.getTitle urlPath
+            History.pushState @getStateData(urlPath), title, urlPath
+
+    new StateController()
 
 
 define 'dataStore', ['jquery', 'metadataStore'], ($, metadataStore) ->
@@ -105,7 +117,7 @@ define 'view', [], ->
     View
 
 
-define 'signupView', ['jquery', 'view', 'renderTemplate', 'dataStore', 'navigationBar', 'jquery.form', 'bootstrap-filestyle'], ($, View, renderTemplate, dataStore, navigationBar) ->
+define 'signupView', ['jquery', 'view', 'renderTemplate', 'dataStore', 'navigationBar', 'stateController', 'jquery.form', 'bootstrap-filestyle'], ($, View, renderTemplate, dataStore, navigationBar, stateController) ->
     class SignupView extends View
         constructor: ->
             @urlRegex = /^\/signup$/
@@ -142,7 +154,7 @@ define 'signupView', ['jquery', 'view', 'renderTemplate', 'dataStore', 'navigati
                             xhrFields:
                                 withCredentials: yes
                             success: (responseText, textStatus, jqXHR) ->
-                                History.pushState urlPath: '/signin', '', '/signin'
+                                stateController.navigateTo '/signin'
                             error: (jqXHR, textStatus, errorThrown) ->
                                 if jqXHR.responseJSON?
                                     $submitError.text jqXHR.responseJSON
@@ -164,7 +176,7 @@ define 'signupView', ['jquery', 'view', 'renderTemplate', 'dataStore', 'navigati
     new SignupView()
 
 
-define 'signinView', ['jquery', 'view', 'renderTemplate', 'dataStore', 'navigationBar', 'jquery.form'], ($, View, renderTemplate, dataStore, navigationBar) ->
+define 'signinView', ['jquery', 'view', 'renderTemplate', 'dataStore', 'navigationBar', 'stateController', 'jquery.form'], ($, View, renderTemplate, dataStore, navigationBar, stateController) ->
     class SigninView extends View
         constructor: ->
             @urlRegex = /^\/signin$/
@@ -200,7 +212,7 @@ define 'signinView', ['jquery', 'view', 'renderTemplate', 'dataStore', 'navigati
                             xhrFields:
                                 withCredentials: yes
                             success: (responseText, textStatus, jqXHR) ->
-                                History.pushState urlPath: '/', '', '/'
+                                stateController.navigateTo '/'
                             error: (jqXHR, textStatus, errorThrown) ->
                                 if jqXHR.responseJSON?
                                     $submitError.text jqXHR.responseJSON
@@ -221,7 +233,7 @@ define 'signinView', ['jquery', 'view', 'renderTemplate', 'dataStore', 'navigati
     new SigninView()
 
 
-define 'loginView', ['jquery', 'view', 'renderTemplate', 'dataStore', 'navigationBar', 'jquery.history', 'jquery.form'], ($, View, renderTemplate, dataStore, navigationBar, History) ->
+define 'loginView', ['jquery', 'view', 'renderTemplate', 'dataStore', 'navigationBar', 'stateController', 'jquery.form'], ($, View, renderTemplate, dataStore, navigationBar, stateController) ->
     class LoginView extends View
         constructor: ->
             @urlRegex = /^\/login$/
@@ -257,7 +269,7 @@ define 'loginView', ['jquery', 'view', 'renderTemplate', 'dataStore', 'navigatio
                             xhrFields:
                                 withCredentials: yes
                             success: (responseText, textStatus, jqXHR) ->
-                                History.pushState urlPath: '/', '', '/'
+                                stateController.navigateTo '/'
                             error: (jqXHR, textStatus, errorThrown) ->
                                 if jqXHR.responseJSON?
                                     $submitError.text jqXHR.responseJSON
@@ -433,46 +445,48 @@ define 'viewController', ['viewControllerBase', 'renderTemplate', 'indexView',
     viewController
 
 
-define 'navigationBar', ['jquery', 'underscore', 'renderTemplate', 'metadataStore', 'jquery.history'], ($, _, renderTemplate, metadataStore, History) ->
-    present: (options = {}) ->
-        defaultOptions =
-            show:
-                news: yes
-                about: yes
-            urlPath: window.location.pathname
-            identity: null
-            active: null
-        options = _.extend defaultOptions, options
+define 'navigationBar', ['jquery', 'underscore', 'renderTemplate', 'metadataStore', 'stateController'], ($, _, renderTemplate, metadataStore, stateController) ->
+    class NavigationBar
+        present: (options = {}) ->
+            defaultOptions =
+                show:
+                    news: yes
+                    about: yes
+                urlPath: window.location.pathname
+                identity: null
+                active: null
+            options = _.extend defaultOptions, options
 
-        $navbar = $ '#themis-navbar'
-        $navbar.html renderTemplate 'navbar', options
+            $navbar = $ '#themis-navbar'
+            $navbar.html renderTemplate 'navbar', options
 
-        $signout = $navbar.find 'a[data-action="signout"]'
-        if $signout.length > 0
-            $signout.on 'click', (e) ->
-                e.preventDefault()
-                e.stopPropagation()
+            $signout = $navbar.find 'a[data-action="signout"]'
+            if $signout.length > 0
+                $signout.on 'click', (e) ->
+                    e.preventDefault()
+                    e.stopPropagation()
 
-                url = "#{metadataStore.getMetadata('domain-api')}/signout"
-                $.ajax
-                    method: 'POST'
-                    url: url
-                    dataType: 'json'
-                    xhrFields:
-                        withCredentials: yes
-                    success: (responseText, textStatus, jqXHR) ->
-                        window.location.reload()
-                    error: (jqXHR, textStatus, errorThrown) ->
-                        console.log errorThrown
+                    url = "#{metadataStore.getMetadata('domain-api')}/signout"
+                    $.ajax
+                        method: 'POST'
+                        url: url
+                        dataType: 'json'
+                        xhrFields:
+                            withCredentials: yes
+                        success: (responseText, textStatus, jqXHR) ->
+                            stateController.navigateTo '/'
+                        error: (jqXHR, textStatus, errorThrown) ->
+                            console.log errorThrown
+
+        dismiss: ->
+            $navbar = $ '#themis-navbar'
+            $signout = $navbar.find 'a[data-action="signout"]'
+            $signout.off 'click'
+            $navbar.html ''
+
+    new NavigationBar()
 
 
-    dismiss: ->
-        $navbar = $ '#themis-navbar'
-        $signout = $navbar.find 'a[data-action="signout"]'
-        $signout.off 'click'
-        $navbar.html ''
-
-
-define 'themis', ['jquery', 'stateController', 'bootstrap'], ($, stateController) ->
+define 'themis', ['jquery', 'stateController', 'viewController', 'bootstrap'], ($, stateController, viewController) ->
     $(document).ready ->
-        stateController.init()
+        stateController.init viewController
