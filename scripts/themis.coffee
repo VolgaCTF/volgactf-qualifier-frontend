@@ -316,7 +316,7 @@ define 'indexView', ['jquery', 'view', 'renderTemplate', 'dataStore', 'navigatio
                     navigationBar.present
                         show:
                             news: yes
-                            about: yes
+                            about: no
                         identity: identity
 
         dismiss: ->
@@ -326,34 +326,34 @@ define 'indexView', ['jquery', 'view', 'renderTemplate', 'dataStore', 'navigatio
     new IndexView()
 
 
-define 'aboutView', ['jquery', 'view', 'renderTemplate', 'dataStore', 'navigationBar', 'metadataStore'], ($, View, renderTemplate, dataStore, navigationBar, metadataStore) ->
-    class AboutView extends View
-        constructor: ->
-            @urlRegex = /^\/about$/
+# define 'aboutView', ['jquery', 'view', 'renderTemplate', 'dataStore', 'navigationBar', 'metadataStore'], ($, View, renderTemplate, dataStore, navigationBar, metadataStore) ->
+#     class AboutView extends View
+#         constructor: ->
+#             @urlRegex = /^\/about$/
 
-        getTitle: ->
-            "#{metadataStore.getMetadata 'event-title' } :: About"
+#         getTitle: ->
+#             "#{metadataStore.getMetadata 'event-title' } :: About"
 
-        present: ->
-            dataStore.getIdentity (err, identity) ->
-                $main = $ '#main'
-                if err?
-                    $main.html renderTemplate 'internal-error'
-                    navigationBar.present()
-                else
-                    $('#main').html renderTemplate 'about-view', identity: identity
-                    navigationBar.present
-                        show:
-                            news: yes
-                            about: yes
-                        identity: identity
-                        active: 'about'
+#         present: ->
+#             dataStore.getIdentity (err, identity) ->
+#                 $main = $ '#main'
+#                 if err?
+#                     $main.html renderTemplate 'internal-error'
+#                     navigationBar.present()
+#                 else
+#                     $('#main').html renderTemplate 'about-view', identity: identity
+#                     navigationBar.present
+#                         show:
+#                             news: yes
+#                             about: yes
+#                         identity: identity
+#                         active: 'about'
 
-        dismiss: ->
-            $('#main').html ''
-            navigationBar.dismiss()
+#         dismiss: ->
+#             $('#main').html ''
+#             navigationBar.dismiss()
 
-    new AboutView()
+#     new AboutView()
 
 
 define 'newsView', ['jquery', 'view', 'renderTemplate', 'dataStore', 'navigationBar', 'metadataStore'], ($, View, renderTemplate, dataStore, navigationBar, metadataStore) ->
@@ -375,7 +375,7 @@ define 'newsView', ['jquery', 'view', 'renderTemplate', 'dataStore', 'navigation
                     navigationBar.present
                         show:
                             news: yes
-                            about: yes
+                            about: no
                         identity: identity
                         active: 'news'
 
@@ -435,16 +435,14 @@ define 'viewControllerBase', ['underscore', 'view'], (_, View) ->
             @activeView.present()
 
 
-define 'viewController', ['viewControllerBase', 'renderTemplate', 'indexView',
-                          'signinView', 'signupView', 'loginView', 'aboutView',
-                          'newsView', 'notFoundView'], (ViewControllerBase, renderTemplate, indexView, signinView, signupView, loginView, aboutView, newsView, notFoundView) ->
+define 'viewController', ['viewControllerBase', 'renderTemplate', 'indexView', 'signinView', 'signupView', 'loginView', 'newsView', 'notFoundView'], (ViewControllerBase, renderTemplate, indexView, signinView, signupView, loginView, newsView, notFoundView) ->
     viewController = new ViewControllerBase()
 
     viewController.view indexView
     viewController.view signinView
     viewController.view signupView
     viewController.view loginView
-    viewController.view aboutView
+    # viewController.view aboutView
     viewController.view newsView
 
     viewController.errorView 'not-found', notFoundView
@@ -458,7 +456,7 @@ define 'navigationBar', ['jquery', 'underscore', 'renderTemplate', 'metadataStor
             defaultOptions =
                 show:
                     news: yes
-                    about: yes
+                    about: no
                 urlPath: window.location.pathname
                 identity: null
                 active: null
