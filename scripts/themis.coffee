@@ -138,6 +138,9 @@ define 'signupView', ['jquery', 'view', 'renderTemplate', 'dataStore', 'navigati
                     navigationBar.present()
 
                     $form = $main.find 'form.themis-form-signup'
+
+                    $form.find('input[name="team"]').focus()
+
                     $successAlert = $main.find 'div.themis-alert-signup'
 
                     $submitError = $form.find '.submit-error > p'
@@ -199,6 +202,8 @@ define 'signinView', ['jquery', 'view', 'renderTemplate', 'dataStore', 'navigati
                     navigationBar.present active: 'signin'
 
                     $form = $main.find 'form.themis-form-signin'
+
+                    $form.find('input[name="team"]').focus()
 
                     $submitError = $form.find '.submit-error > p'
                     $submitButton = $form.find 'button'
