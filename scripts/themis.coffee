@@ -7,17 +7,21 @@ require.config
         'bootstrap-filestyle': ['bootstrap']
 
 
-define 'stateController', ['jquery', 'jquery.history'], ($, History) ->
+define 'stateController', ['jquery', 'jquery.history', 'query-string'], ($, History, queryString) ->
     class StateController
         constructor: ->
             @viewController = null
 
-        getStateData: (urlPath) ->
+        getStateData: (urlPath, params = {}) ->
             # AT: maybe it's a bug: replaceState won't call statechange
             # event if you reload page at the same url (e.g. Cmd+R or Ctrl+F5).
             # To workaround the problem, you can pass a unique value to state.
             # I have chosen to pass unix timestamp.
-            return urlPath: urlPath, tick: (new Date()).getTime()
+            {
+                urlPath: urlPath
+                tick: (new Date()).getTime()
+                params: params
+            }
 
         init: (viewController) ->
             @viewController = viewController
@@ -36,13 +40,14 @@ define 'stateController', ['jquery', 'jquery.history'], ($, History) ->
                 History.pushState @getStateData(urlPath), title, urlPath
 
             curLocation = window.location.pathname
+            queryParams = queryString.parse window.location.search
             windowTitle = @viewController.getTitle curLocation
             historyData = urlPath: curLocation, tick: (new Date()).getTime()
-            History.replaceState @getStateData(curLocation), windowTitle, curLocation
+            History.replaceState @getStateData(curLocation, queryParams), windowTitle, curLocation
 
-        navigateTo: (urlPath) ->
+        navigateTo: (urlPath, params = {}) ->
             title = @viewController.getTitle urlPath
-            History.pushState @getStateData(urlPath), title, urlPath
+            History.pushState @getStateData(urlPath, params), title, urlPath
 
     new StateController()
 
@@ -62,6 +67,20 @@ define 'dataStore', ['jquery', 'metadataStore'], ($, metadataStore) ->
                     callback null, responseText
                 error: (jqXHR, textStatus, errorThrown) ->
                     callback errorThrown, null
+
+        verifyEmail: (data, callback) ->
+            url = "#{metadataStore.getMetadata('domain-api')}/team/verify-email"
+            $.ajax
+                url: url
+                type: 'POST'
+                dataType: 'json'
+                data: data
+                xhrFields:
+                    withCredentials: yes
+                success: (responseText, textStatus, jqXHR) ->
+                    callback null, responseText
+                error: (jqXHR, textStatus, errorThrown) ->
+                    callback jqXHR.responseJSON, null
 
     new DataStore()
 
@@ -316,7 +335,6 @@ define 'indexView', ['jquery', 'view', 'renderTemplate', 'dataStore', 'navigatio
                     navigationBar.present
                         show:
                             news: yes
-                            about: no
                         identity: identity
 
         dismiss: ->
@@ -326,34 +344,40 @@ define 'indexView', ['jquery', 'view', 'renderTemplate', 'dataStore', 'navigatio
     new IndexView()
 
 
-# define 'aboutView', ['jquery', 'view', 'renderTemplate', 'dataStore', 'navigationBar', 'metadataStore'], ($, View, renderTemplate, dataStore, navigationBar, metadataStore) ->
-#     class AboutView extends View
-#         constructor: ->
-#             @urlRegex = /^\/about$/
+define 'verifyEmailView', ['jquery', 'view', 'renderTemplate', 'dataStore', 'navigationBar', 'metadataStore', 'jquery.history'], ($, View, renderTemplate, dataStore, navigationBar, metadataStore, History) ->
+    class VerifyEmailView extends View
+        constructor: ->
+            @urlRegex = /^\/verify-email$/
 
-#         getTitle: ->
-#             "#{metadataStore.getMetadata 'event-title' } :: About"
+        getTitle: ->
+            "#{metadataStore.getMetadata 'event-title' } :: Email verification"
 
-#         present: ->
-#             dataStore.getIdentity (err, identity) ->
-#                 $main = $ '#main'
-#                 if err?
-#                     $main.html renderTemplate 'internal-error'
-#                     navigationBar.present()
-#                 else
-#                     $('#main').html renderTemplate 'about-view', identity: identity
-#                     navigationBar.present
-#                         show:
-#                             news: yes
-#                             about: yes
-#                         identity: identity
-#                         active: 'about'
+        present: ->
+            dataStore.getIdentity (err, identity) ->
+                $main = $ '#main'
+                if err?
+                    $main.html renderTemplate 'internal-error'
+                    navigationBar.present()
+                else
+                    $main.html renderTemplate 'verify-email-view', identity: identity
+                    navigationBar.present
+                        show:
+                            news: yes
+                        identity: identity
 
-#         dismiss: ->
-#             $('#main').html ''
-#             navigationBar.dismiss()
+                    console.log History.getState().data.params
+                    dataStore.verifyEmail History.getState().data.params, (err, result) ->
+                        if err?
+                            console.log err
+                        else
+                            console.log result
 
-#     new AboutView()
+        dismiss: ->
+            $main = $ '#main'
+            $main.html ''
+            navigationBar.dismiss()
+
+    new VerifyEmailView()
 
 
 define 'newsView', ['jquery', 'view', 'renderTemplate', 'dataStore', 'navigationBar', 'metadataStore'], ($, View, renderTemplate, dataStore, navigationBar, metadataStore) ->
@@ -375,7 +399,6 @@ define 'newsView', ['jquery', 'view', 'renderTemplate', 'dataStore', 'navigation
                     navigationBar.present
                         show:
                             news: yes
-                            about: no
                         identity: identity
                         active: 'news'
 
@@ -435,15 +458,15 @@ define 'viewControllerBase', ['underscore', 'view'], (_, View) ->
             @activeView.present()
 
 
-define 'viewController', ['viewControllerBase', 'renderTemplate', 'indexView', 'signinView', 'signupView', 'loginView', 'newsView', 'notFoundView'], (ViewControllerBase, renderTemplate, indexView, signinView, signupView, loginView, newsView, notFoundView) ->
+define 'viewController', ['viewControllerBase', 'renderTemplate', 'indexView', 'signinView', 'signupView', 'loginView', 'newsView', 'verifyEmailView', 'notFoundView'], (ViewControllerBase, renderTemplate, indexView, signinView, signupView, loginView, newsView, verifyEmailView, notFoundView) ->
     viewController = new ViewControllerBase()
 
     viewController.view indexView
     viewController.view signinView
     viewController.view signupView
     viewController.view loginView
-    # viewController.view aboutView
     viewController.view newsView
+    viewController.view verifyEmailView
 
     viewController.errorView 'not-found', notFoundView
 
@@ -456,7 +479,6 @@ define 'navigationBar', ['jquery', 'underscore', 'renderTemplate', 'metadataStor
             defaultOptions =
                 show:
                     news: yes
-                    about: no
                 urlPath: window.location.pathname
                 identity: null
                 active: null

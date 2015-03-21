@@ -19,6 +19,7 @@ paths =
         'bower_components/eventEmitter/EventEmitter.js'
         'bower_components/bootstrap-filestyle/src/bootstrap-filestyle.js'
         'bower_components/jquery-form/jquery.form.js'
+        'bower_components/query-string/query-string.js'
         'scripts/themis.coffee'
     ]
     fonts: [

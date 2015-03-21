@@ -15,6 +15,7 @@
     "requirejs": "~2.1.15",
     "bootstrap-filestyle": "~1.1.2",
     "jquery-form": "~3.46.0",
-    "fontawesome": "~4.3.0"
+    "fontawesome": "~4.3.0",
+    "query-string": "~1.0.0"
   }
 }
