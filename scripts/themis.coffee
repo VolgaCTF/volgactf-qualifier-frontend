@@ -388,8 +388,58 @@ define 'profileView', ['jquery', 'view', 'renderTemplate', 'dataStore', 'navigat
                                     news: yes
                                 identity: identity
 
+                            if identity.role is 'team' and identity.id == team.id
+                                $buttonChangePassword = $main.find 'button[data-action="change-password"]'
+                                if $buttonChangePassword.length
+                                    $changePasswordModal = $ '#change-password-modal'
+                                    $changePasswordModal.modal
+                                        show: no
+
+                                    $changePasswordSubmitError = $changePasswordModal.find '.submit-error > p'
+                                    $changePasswordSubmitButton = $changePasswordModal.find 'button[data-action="complete-change-password"]'
+                                    $changePasswordForm = $changePasswordModal.find 'form'
+
+                                    $changePasswordSubmitButton.on 'click', (e) ->
+                                        $changePasswordForm.trigger 'submit'
+
+                                    $changePasswordModal.on 'show.bs.modal', (e) ->
+                                        $changePasswordSubmitError.text ''
+
+                                    $changePasswordModal.on 'shown.bs.modal', (e) ->
+                                        $('#change-pwd-current').focus()
+
+                                    $changePasswordForm.on 'submit', (e) ->
+                                        e.preventDefault()
+                                        $changePasswordForm.ajaxSubmit
+                                            beforeSubmit: ->
+                                                $changePasswordSubmitError.text ''
+                                                $changePasswordSubmitButton.prop 'disabled', yes
+                                            clearForm: yes
+                                            dataType: 'json'
+                                            xhrFields:
+                                                withCredentials: yes
+                                            success: (responseText, textStatus, jqXHR) ->
+                                                $changePasswordModal.modal 'hide'
+                                            error: (jqXHR, textStatus, errorThrown) ->
+                                                if jqXHR.responseJSON?
+                                                    $changePasswordSubmitError.text jqXHR.responseJSON
+                                            complete: ->
+                                                $changePasswordSubmitButton.prop 'disabled', no
+
+                                    $buttonChangePassword.on 'click', (e) ->
+                                        $changePasswordModal.modal 'show'
+
         dismiss: ->
             $main = $ '#main'
+            $buttonChangePassword = $main.find 'button[data-action="change-password"]'
+            if $buttonChangePassword.length
+                $buttonChangePassword.off 'click'
+            $changePasswordModal = $ '#change-password-modal'
+            $changePasswordForm = $changePasswordModal.find 'form'
+            $changePasswordForm.off 'submit'
+            $changePasswordSubmitButton = $changePasswordModal.find 'button[data-action="complete-change-password"]'
+            $changePasswordSubmitButton.off 'click'
+
             $main.html ''
             navigationBar.dismiss()
 

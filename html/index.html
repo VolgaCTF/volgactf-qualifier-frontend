@@ -198,6 +198,9 @@
                             </div>
                             <div class="pull-left info">
                                 <h4 class="text-primary"><%- team.name %></h4>
+                                <% if (identity.role === 'team' && identity.id === team.id) { %>
+
+                                <% } %>
                                 <ul class="list-unstyled">
                                     <% if (identity.role === 'team' && identity.id === team.id && 'email' in team && 'emailConfirmed' in identity) { %>
                                     <li>
@@ -206,8 +209,13 @@
                                         <span class="text-success" title="Email verified"><%- team.email %></span>
                                         <% } else { %>
                                         <span class="text-danger" title="Email not verified"><%- team.email %></span>
+                                        <br>
+                                        <button type="button" class="btn btn-primary btn-xs">Resend confirmation email</button>
+                                        <button type="button" class="btn btn-danger btn-xs">Change email</button>
                                         <% } %>
                                     </li>
+                                </ul>
+                                <ul class="list-unstyled">
                                     <% } %>
                                     <% if (team.country !== '' || (identity.role === 'team' && identity.id === team.id)) { %>
                                     <li><strong>Country:</strong> <%- team.country %></li>
@@ -218,10 +226,50 @@
                                     <% if (team.institution !== '' || (identity.role === 'team' && identity.id === team.id)) { %>
                                     <li><strong>Institution:</strong> <%- team.institution %></li>
                                     <% } %>
+                                    <% if (identity.role === 'team' && identity.id === team.id) { %>
+                                    <li>
+                                        <button type="button" class="btn btn-primary btn-xs">Edit</button>
+                                        <button type="button" class="btn btn-primary btn-xs" data-action="change-password">Change password</button>
+                                    </li>
+                                    <% } %>
                                 </ul>
                             </div>
                         </div>
                     </section>
+                </div>
+
+                <div class="modal fade" id="change-password-modal" tabindex="-1" role="dialog">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                                <h4 class="modal-title">Change password</h4>
+                            </div>
+                            <div class="modal-body">
+                                <form method="POST" action="//api.{{ domain }}/team/change-password">
+                                    <div class="form-group">
+                                        <label for="change-pwd-current" class="control-label">Current password</label>
+                                        <input type="password" class="form-control" id="change-pwd-current" name="currentPassword" required autofocus>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="change-pwd-new" class="control-label">New password</label>
+                                        <input type="password" class="form-control" id="change-pwd-new" name="newPassword" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="change-pwd-confirm-new" class="control-label">Confirm new password</label>
+                                        <input type="password" class="form-control" id="change-pwd-confirm-new" required>
+                                    </div>
+                                    <div class="submit-error">
+                                        <p class="text-danger"></p>
+                                    </div>
+                                </form>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                                <button type="button" class="btn btn-primary" data-action="complete-change-password">Change</button>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </script>
 
