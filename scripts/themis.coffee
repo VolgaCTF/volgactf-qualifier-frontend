@@ -365,12 +365,15 @@ define 'verifyEmailView', ['jquery', 'view', 'renderTemplate', 'dataStore', 'nav
                             news: yes
                         identity: identity
 
-                    console.log History.getState().data.params
+                    $progress = $main.find 'p[data-role="progress"]'
+                    $result = $main.find 'p[data-role="result"]'
+
                     dataStore.verifyEmail History.getState().data.params, (err, result) ->
+                        $progress.hide()
                         if err?
-                            console.log err
+                            $result.addClass('text-danger').text err
                         else
-                            console.log result
+                            $result.addClass('text-success').text 'Email verified! Thank you!'
 
         dismiss: ->
             $main = $ '#main'
