@@ -57,7 +57,7 @@ define 'dataStore', ['jquery', 'metadataStore'], ($, metadataStore) ->
         constructor: ->
 
         getIdentity: (callback) ->
-            url = "#{metadataStore.getMetadata('domain-api')}/identity"
+            url = "#{metadataStore.getMetadata 'domain-api' }/identity"
             $.ajax
                 url: url
                 dataType: 'json'
@@ -69,7 +69,7 @@ define 'dataStore', ['jquery', 'metadataStore'], ($, metadataStore) ->
                     callback errorThrown, null
 
         verifyEmail: (data, callback) ->
-            url = "#{metadataStore.getMetadata('domain-api')}/team/verify-email"
+            url = "#{metadataStore.getMetadata 'domain-api' }/team/verify-email"
             $.ajax
                 url: url
                 type: 'POST'
@@ -79,6 +79,18 @@ define 'dataStore', ['jquery', 'metadataStore'], ($, metadataStore) ->
                     withCredentials: yes
                 success: (responseText, textStatus, jqXHR) ->
                     callback null, responseText
+                error: (jqXHR, textStatus, errorThrown) ->
+                    callback jqXHR.responseJSON, null
+
+        getTeamProfile: (id, callback) ->
+            url = "#{metadataStore.getMetadata 'domain-api' }/team/profile/#{id}"
+            $.ajax
+                url: url
+                dataType: 'json'
+                xhrFields:
+                    withCredentials: yes
+                success: (responseJSON, textStatus, jqXHR) ->
+                    callback null, responseJSON
                 error: (jqXHR, textStatus, errorThrown) ->
                     callback jqXHR.responseJSON, null
 
@@ -344,6 +356,46 @@ define 'indexView', ['jquery', 'view', 'renderTemplate', 'dataStore', 'navigatio
     new IndexView()
 
 
+define 'profileView', ['jquery', 'view', 'renderTemplate', 'dataStore', 'navigationBar', 'metadataStore', 'jquery.history'], ($, View, renderTemplate, dataStore, navigationBar, metadataStore, History) ->
+    class ProfileView extends View
+        constructor: ->
+            @urlRegex = /^\/profile\/[0-9]+$/
+
+        getTitle: ->
+            "#{metadataStore.getMetadata 'event-title' } :: Team profile"
+
+        present: ->
+            dataStore.getIdentity (err, identity) ->
+                $main = $ '#main'
+                if err?
+                    $main.html renderTemplate 'internal-error'
+                    navigationBar.present()
+                else
+                    url = History.getState().data.urlPath
+                    urlParts = url.split '/'
+                    teamId = parseInt urlParts[urlParts.length - 1], 10
+                    dataStore.getTeamProfile teamId, (err, team) ->
+                        if err? or not team?
+                            $main.html renderTemplate 'internal-error'
+                            navigationBar.present
+                                show:
+                                    news: yes
+                                identity: identity
+                        else
+                            $main.html renderTemplate 'profile-view', identity: identity, team: team
+                            navigationBar.present
+                                show:
+                                    news: yes
+                                identity: identity
+
+        dismiss: ->
+            $main = $ '#main'
+            $main.html ''
+            navigationBar.dismiss()
+
+    new ProfileView()
+
+
 define 'verifyEmailView', ['jquery', 'view', 'renderTemplate', 'dataStore', 'navigationBar', 'metadataStore', 'jquery.history'], ($, View, renderTemplate, dataStore, navigationBar, metadataStore, History) ->
     class VerifyEmailView extends View
         constructor: ->
@@ -461,7 +513,7 @@ define 'viewControllerBase', ['underscore', 'view'], (_, View) ->
             @activeView.present()
 
 
-define 'viewController', ['viewControllerBase', 'renderTemplate', 'indexView', 'signinView', 'signupView', 'loginView', 'newsView', 'verifyEmailView', 'notFoundView'], (ViewControllerBase, renderTemplate, indexView, signinView, signupView, loginView, newsView, verifyEmailView, notFoundView) ->
+define 'viewController', ['viewControllerBase', 'renderTemplate', 'indexView', 'signinView', 'signupView', 'loginView', 'newsView', 'verifyEmailView', 'profileView', 'notFoundView'], (ViewControllerBase, renderTemplate, indexView, signinView, signupView, loginView, newsView, verifyEmailView, profileView, notFoundView) ->
     viewController = new ViewControllerBase()
 
     viewController.view indexView
@@ -470,6 +522,7 @@ define 'viewController', ['viewControllerBase', 'renderTemplate', 'indexView', '
     viewController.view loginView
     viewController.view newsView
     viewController.view verifyEmailView
+    viewController.view profileView
 
     viewController.errorView 'not-found', notFoundView
 
