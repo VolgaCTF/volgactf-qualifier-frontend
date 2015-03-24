@@ -389,6 +389,51 @@ define 'profileView', ['jquery', 'view', 'renderTemplate', 'dataStore', 'navigat
                                 identity: identity
 
                             if identity.role is 'team' and identity.id == team.id
+                                $buttonEditProfile = $main.find 'button[data-action="edit-profile"]'
+                                if $buttonEditProfile.length
+                                    $editProfileModal = $ '#edit-profile-modal'
+                                    $editProfileModal.modal
+                                        show: no
+
+                                    $editProfileSubmitError = $editProfileModal.find '.submit-error > p'
+                                    $editProfileSubmitButton = $editProfileModal.find 'button[data-action="complete-edit-profile"]'
+                                    $editProfileForm = $editProfileModal.find 'form'
+
+                                    $editProfileSubmitButton.on 'click', (e) ->
+                                        $editProfileForm.trigger 'submit'
+
+                                    $editProfileModal.on 'show.bs.modal', (e) ->
+                                        $editProfileSubmitError.text ''
+
+                                    $editProfileModal.on 'shown.bs.modal', (e) ->
+                                        $('#edit-profile-country').val(team.country).focus()
+                                        $('#edit-profile-locality').val team.locality
+                                        $('#edit-profile-institution').val team.institution
+
+                                    $editProfileForm.on 'submit', (e) ->
+                                        e.preventDefault()
+                                        $editProfileForm.ajaxSubmit
+                                            beforeSubmit: ->
+                                                $editProfileSubmitError.text ''
+                                                $editProfileSubmitButton.prop 'disabled', yes
+                                            clearForm: yes
+                                            dataType: 'json'
+                                            xhrFields:
+                                                withCredentials: yes
+                                            success: (responseText, textStatus, jqXHR) ->
+                                                $editProfileModal.modal 'hide'
+                                                window.location.reload()
+                                            error: (jqXHR, textStatus, errorThrown) ->
+                                                if jqXHR.responseJSON?
+                                                    $editProfileSubmitError.text jqXHR.responseJSON
+                                            complete: ->
+                                                $editProfileSubmitButton.prop 'disabled', no
+
+
+                                    $buttonEditProfile.on 'click', (e) ->
+                                        $editProfileModal.modal 'show'
+
+
                                 $buttonChangePassword = $main.find 'button[data-action="change-password"]'
                                 if $buttonChangePassword.length
                                     $changePasswordModal = $ '#change-password-modal'
@@ -434,11 +479,21 @@ define 'profileView', ['jquery', 'view', 'renderTemplate', 'dataStore', 'navigat
             $buttonChangePassword = $main.find 'button[data-action="change-password"]'
             if $buttonChangePassword.length
                 $buttonChangePassword.off 'click'
-            $changePasswordModal = $ '#change-password-modal'
-            $changePasswordForm = $changePasswordModal.find 'form'
-            $changePasswordForm.off 'submit'
-            $changePasswordSubmitButton = $changePasswordModal.find 'button[data-action="complete-change-password"]'
-            $changePasswordSubmitButton.off 'click'
+                $changePasswordModal = $ '#change-password-modal'
+                $changePasswordForm = $changePasswordModal.find 'form'
+                $changePasswordForm.off 'submit'
+                $changePasswordSubmitButton = $changePasswordModal.find 'button[data-action="complete-change-password"]'
+                $changePasswordSubmitButton.off 'click'
+
+            $buttonEditProfile = $main.find 'button[data-action="edit-profile"]'
+            if $buttonEditProfile.length
+                $buttonEditProfile.off 'click'
+                $editProfileModal = $ '#edit-profile-modal'
+                $editProfileForm = $editProfileModal.find 'form'
+                $editProfileForm.off 'submit'
+                $editProfileSubmitButton = $editProfileModal.find 'button[data-action="complete-edit-profile"]'
+                $editProfileSubmitButton.off 'click'
+
 
             $main.html ''
             navigationBar.dismiss()

@@ -228,7 +228,7 @@
                                     <% } %>
                                     <% if (identity.role === 'team' && identity.id === team.id) { %>
                                     <li>
-                                        <button type="button" class="btn btn-primary btn-xs">Edit</button>
+                                        <button type="button" class="btn btn-primary btn-xs" data-action="edit-profile">Edit</button>
                                         <button type="button" class="btn btn-primary btn-xs" data-action="change-password">Change password</button>
                                     </li>
                                     <% } %>
@@ -236,6 +236,40 @@
                             </div>
                         </div>
                     </section>
+                </div>
+
+                <div class="modal fade" id="edit-profile-modal" tabindex="-1" role="dialog">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                                <h4 class="modal-title">Edit profile</h4>
+                            </div>
+                            <div class="modal-body">
+                                <form method="POST" action="//api.{{ domain }}/team/edit-profile">
+                                    <div class="form-group">
+                                        <label for="edit-profile-country" class="control-label">Country</label>
+                                        <input type="text" class="form-control" id="edit-profile-country" name="country" autofocus>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="edit-profile-locality" class="control-label">Locality</label>
+                                        <input type="text" class="form-control" id="edit-profile-locality" name="locality">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="edit-profile-institution" class="control-label">Institution</label>
+                                        <input type="text" class="form-control" id="edit-profile-institution" name="institution">
+                                    </div>
+                                    <div class="submit-error">
+                                        <p class="text-danger"></p>
+                                    </div>
+                                </form>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                                <button type="button" class="btn btn-primary" data-action="complete-edit-profile">Change</button>
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
                 <div class="modal fade" id="change-password-modal" tabindex="-1" role="dialog">
