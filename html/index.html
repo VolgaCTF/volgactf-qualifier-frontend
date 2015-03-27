@@ -210,8 +210,8 @@
                                         <% } else { %>
                                         <span class="text-danger" title="Email not verified"><%- team.email %></span>
                                         <br>
-                                        <button type="button" class="btn btn-primary btn-xs">Resend confirmation email</button>
-                                        <button type="button" class="btn btn-danger btn-xs">Change email</button>
+                                        <button type="button" class="btn btn-primary btn-xs" data-action="resend-confirmation">Resend confirmation email</button>
+                                        <button type="button" class="btn btn-danger btn-xs" data-action="change-email">Change email</button>
                                         <% } %>
                                     </li>
                                 </ul>
@@ -236,6 +236,58 @@
                             </div>
                         </div>
                     </section>
+                </div>
+
+                <div class="modal fade" id="resend-confirmation-modal" tabindex="-1" role="dialog">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                                <h4 class="modal-title">Resend confirmation email</h4>
+                            </div>
+                            <div class="modal-body">
+                                <form method="POST" action="//api.{{ domain }}/team/resend-confirmation-email">
+                                    <div class="form-group">
+                                        <label for="resend-confirmation-email" class="control-label">Email</label>
+                                        <input type="email" class="form-control" id="resend-confirmation-email" disabled>
+                                    </div>
+                                    <div class="submit-error">
+                                        <p class="text-danger"></p>
+                                    </div>
+                                </form>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                                <button type="button" class="btn btn-primary" data-action="complete-resend-confirmation">Resend</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="modal fade" id="change-email-modal" tabindex="-1" role="dialog">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                                <h4 class="modal-title">Change email</h4>
+                            </div>
+                            <div class="modal-body">
+                                <form method="POST" action="//api.{{ domain }}/team/change-email">
+                                    <div class="form-group">
+                                        <label for="change-email-new" class="control-label">New email</label>
+                                        <input type="email" class="form-control" id="change-email-new" name="email" autofocus required>
+                                    </div>
+                                    <div class="submit-error">
+                                        <p class="text-danger"></p>
+                                    </div>
+                                </form>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                                <button type="button" class="btn btn-primary" data-action="complete-change-email">Change</button>
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
                 <div class="modal fade" id="edit-profile-modal" tabindex="-1" role="dialog">

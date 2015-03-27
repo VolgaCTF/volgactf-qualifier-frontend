@@ -389,6 +389,94 @@ define 'profileView', ['jquery', 'view', 'renderTemplate', 'dataStore', 'navigat
                                 identity: identity
 
                             if identity.role is 'team' and identity.id == team.id
+                                $buttonChangeEmail = $main.find 'button[data-action="change-email"]'
+                                $buttonResendConfirmation = $main.find 'button[data-action="resend-confirmation"]'
+
+                                if not identity.emailConfirmed
+                                    if $buttonResendConfirmation.length
+                                        $resendConfirmationModal = $ '#resend-confirmation-modal'
+                                        $resendConfirmationModal.modal
+                                            show: no
+
+                                        $resendConfirmationSubmitError = $resendConfirmationModal.find '.submit-error > p'
+                                        $resendConfirmationSubmitButton = $resendConfirmationModal.find 'button[data-action="complete-resend-confirmation"]'
+                                        $resendConfirmationForm = $resendConfirmationModal.find 'form'
+
+                                        $resendConfirmationSubmitButton.on 'click', (e) ->
+                                            $resendConfirmationForm.trigger 'submit'
+
+                                        $resendConfirmationModal.on 'show.bs.modal', (e) ->
+                                            $resendConfirmationSubmitError.text ''
+
+                                        $resendConfirmationModal.on 'shown.bs.modal', (e) ->
+                                            $('#resend-confirmation-email').val(team.email).focus()
+
+                                        $resendConfirmationForm.on 'submit', (e) ->
+                                            e.preventDefault()
+                                            $resendConfirmationForm.ajaxSubmit
+                                                beforeSubmit: ->
+                                                    $resendConfirmationSubmitError.text ''
+                                                    $resendConfirmationSubmitButton.prop 'disabled', yes
+                                                clearForm: yes
+                                                dataType: 'json'
+                                                xhrFields:
+                                                    withCredentials: yes
+                                                success: (responseText, textStatus, jqXHR) ->
+                                                    $resendConfirmationModal.modal 'hide'
+                                                    window.location.reload()
+                                                error: (jqXHR, textStatus, errorThrown) ->
+                                                    if jqXHR.responseJSON?
+                                                        $resendConfirmationSubmitError.text jqXHR.responseJSON
+                                                complete: ->
+                                                    $resendConfirmationSubmitButton.prop 'disabled', no
+
+
+                                        $buttonResendConfirmation.on 'click', (e) ->
+                                            $resendConfirmationModal.modal 'show'
+
+
+                                    if $buttonChangeEmail.length
+                                        $changeEmailModal = $ '#change-email-modal'
+                                        $changeEmailModal.modal
+                                            show: no
+
+                                        $changeEmailSubmitError = $changeEmailModal.find '.submit-error > p'
+                                        $changeEmailSubmitButton = $changeEmailModal.find 'button[data-action="complete-change-email"]'
+                                        $changeEmailForm = $changeEmailModal.find 'form'
+
+                                        $changeEmailSubmitButton.on 'click', (e) ->
+                                            $changeEmailForm.trigger 'submit'
+
+                                        $changeEmailModal.on 'show.bs.modal', (e) ->
+                                            $changeEmailSubmitError.text ''
+
+                                        $changeEmailModal.on 'shown.bs.modal', (e) ->
+                                            $('#change-email-new').val('').focus()
+
+                                        $changeEmailForm.on 'submit', (e) ->
+                                            e.preventDefault()
+                                            $changeEmailForm.ajaxSubmit
+                                                beforeSubmit: ->
+                                                    $changeEmailSubmitError.text ''
+                                                    $changeEmailSubmitButton.prop 'disabled', yes
+                                                clearForm: yes
+                                                dataType: 'json'
+                                                xhrFields:
+                                                    withCredentials: yes
+                                                success: (responseText, textStatus, jqXHR) ->
+                                                    $changeEmailModal.modal 'hide'
+                                                    window.location.reload()
+                                                error: (jqXHR, textStatus, errorThrown) ->
+                                                    if jqXHR.responseJSON?
+                                                        $changeEmailSubmitError.text jqXHR.responseJSON
+                                                complete: ->
+                                                    $changeEmailSubmitButton.prop 'disabled', no
+
+
+                                        $buttonChangeEmail.on 'click', (e) ->
+                                            $changeEmailModal.modal 'show'
+
+
                                 $buttonEditProfile = $main.find 'button[data-action="edit-profile"]'
                                 if $buttonEditProfile.length
                                     $editProfileModal = $ '#edit-profile-modal'
@@ -493,6 +581,25 @@ define 'profileView', ['jquery', 'view', 'renderTemplate', 'dataStore', 'navigat
                 $editProfileForm.off 'submit'
                 $editProfileSubmitButton = $editProfileModal.find 'button[data-action="complete-edit-profile"]'
                 $editProfileSubmitButton.off 'click'
+
+
+            $buttonChangeEmail = $main.find 'button[data-action="change-email"]'
+            if $buttonChangeEmail.length
+                $buttonChangeEmail.off 'click'
+                $changeEmailModal = $ '#change-email-modal'
+                $changeEmailForm = $changeEmailModal.find 'form'
+                $changeEmailForm.off 'submit'
+                $changeEmailSubmitButton = $changeEmailModal.find 'button[data-action="complete-change-email"]'
+                $changeEmailSubmitButton.off 'click'
+
+            $buttonResendConfirmation = $main.find 'button[data-action="resend-confirmation"]'
+            if $buttonResendConfirmation.length
+                $buttonResendConfirmation.off 'click'
+                $resendConfirmationModal = $ '#resend-confirmation-modal'
+                $resendConfirmationForm = $resendConfirmationModal.find 'form'
+                $resendConfirmationForm.off 'submit'
+                $resendConfirmationSubmitButton = $resendConfirmationModal.find 'button[data-action="complete-resend-confirmation"]'
+                $resendConfirmationSubmitButton.off 'click'
 
 
             $main.html ''
