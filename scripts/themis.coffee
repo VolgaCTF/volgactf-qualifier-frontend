@@ -201,12 +201,7 @@ define 'signupView', ['jquery', 'view', 'renderTemplate', 'dataStore', 'navigati
                     navigationBar.present()
 
         dismiss: ->
-            $main = $ '#main'
-            $form = $main.find 'form.themis-form-signup'
-            if $form.length > 0
-                $form.find('input:file').filestyle 'destroy'
-                $form.off 'submit'
-            $main.html ''
+            $('#main').html ''
             navigationBar.dismiss()
 
     new SignupView()
@@ -261,11 +256,7 @@ define 'signinView', ['jquery', 'view', 'renderTemplate', 'dataStore', 'navigati
                     navigationBar.present()
 
         dismiss: ->
-            $main = $ '#main'
-            $form = $main.find 'form.themis-form-signin'
-            if $form.length > 0
-                $form.off 'submit'
-            $main.html ''
+            $('#main').html ''
             navigationBar.dismiss()
 
     new SigninView()
@@ -318,11 +309,7 @@ define 'loginView', ['jquery', 'view', 'renderTemplate', 'dataStore', 'navigatio
                     navigationBar.present()
 
         dismiss: ->
-            $main = $ '#main'
-            $form = $main.find 'form.themis-form-login'
-            if $form.length > 0
-                $form.off 'submit'
-            $main.html ''
+            $('#main').html ''
             navigationBar.dismiss()
 
     new LoginView()
@@ -563,46 +550,7 @@ define 'profileView', ['jquery', 'view', 'renderTemplate', 'dataStore', 'navigat
                                         $changePasswordModal.modal 'show'
 
         dismiss: ->
-            $main = $ '#main'
-            $buttonChangePassword = $main.find 'button[data-action="change-password"]'
-            if $buttonChangePassword.length
-                $buttonChangePassword.off 'click'
-                $changePasswordModal = $ '#change-password-modal'
-                $changePasswordForm = $changePasswordModal.find 'form'
-                $changePasswordForm.off 'submit'
-                $changePasswordSubmitButton = $changePasswordModal.find 'button[data-action="complete-change-password"]'
-                $changePasswordSubmitButton.off 'click'
-
-            $buttonEditProfile = $main.find 'button[data-action="edit-profile"]'
-            if $buttonEditProfile.length
-                $buttonEditProfile.off 'click'
-                $editProfileModal = $ '#edit-profile-modal'
-                $editProfileForm = $editProfileModal.find 'form'
-                $editProfileForm.off 'submit'
-                $editProfileSubmitButton = $editProfileModal.find 'button[data-action="complete-edit-profile"]'
-                $editProfileSubmitButton.off 'click'
-
-
-            $buttonChangeEmail = $main.find 'button[data-action="change-email"]'
-            if $buttonChangeEmail.length
-                $buttonChangeEmail.off 'click'
-                $changeEmailModal = $ '#change-email-modal'
-                $changeEmailForm = $changeEmailModal.find 'form'
-                $changeEmailForm.off 'submit'
-                $changeEmailSubmitButton = $changeEmailModal.find 'button[data-action="complete-change-email"]'
-                $changeEmailSubmitButton.off 'click'
-
-            $buttonResendConfirmation = $main.find 'button[data-action="resend-confirmation"]'
-            if $buttonResendConfirmation.length
-                $buttonResendConfirmation.off 'click'
-                $resendConfirmationModal = $ '#resend-confirmation-modal'
-                $resendConfirmationForm = $resendConfirmationModal.find 'form'
-                $resendConfirmationForm.off 'submit'
-                $resendConfirmationSubmitButton = $resendConfirmationModal.find 'button[data-action="complete-resend-confirmation"]'
-                $resendConfirmationSubmitButton.off 'click'
-
-
-            $main.html ''
+            $('#main').html ''
             navigationBar.dismiss()
 
     new ProfileView()
@@ -640,8 +588,7 @@ define 'verifyEmailView', ['jquery', 'view', 'renderTemplate', 'dataStore', 'nav
                             $result.addClass('text-success').text 'Email verified! Thank you!'
 
         dismiss: ->
-            $main = $ '#main'
-            $main.html ''
+            $('#main').html ''
             navigationBar.dismiss()
 
     new VerifyEmailView()
@@ -774,10 +721,7 @@ define 'navigationBar', ['jquery', 'underscore', 'renderTemplate', 'metadataStor
                             console.log errorThrown
 
         dismiss: ->
-            $navbar = $ '#themis-navbar'
-            $signout = $navbar.find 'a[data-action="signout"]'
-            $signout.off 'click'
-            $navbar.html ''
+            $('#themis-navbar').html ''
 
     new NavigationBar()
 
