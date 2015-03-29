@@ -77,10 +77,13 @@ define 'dataStore', ['jquery', 'metadataStore'], ($, metadataStore) ->
                 data: data
                 xhrFields:
                     withCredentials: yes
-                success: (responseText, textStatus, jqXHR) ->
-                    callback null, responseText
+                success: (responseJSON, textStatus, jqXHR) ->
+                    callback null, responseJSON
                 error: (jqXHR, textStatus, errorThrown) ->
-                    callback jqXHR.responseJSON, null
+                    if jqXHR.responseJSON?
+                        callback jqXHR.responseJSON, null
+                    else
+                        callback 'Unknown error. Please try again later.', null
 
         getTeamProfile: (id, callback) ->
             url = "#{metadataStore.getMetadata 'domain-api' }/team/profile/#{id}"
@@ -92,7 +95,10 @@ define 'dataStore', ['jquery', 'metadataStore'], ($, metadataStore) ->
                 success: (responseJSON, textStatus, jqXHR) ->
                     callback null, responseJSON
                 error: (jqXHR, textStatus, errorThrown) ->
-                    callback jqXHR.responseJSON, null
+                    if jqXHR.responseJSON?
+                        callback jqXHR.responseJSON, null
+                    else
+                        callback 'Unknown error. Please try again later.', null
 
     new DataStore()
 
@@ -195,6 +201,8 @@ define 'signupView', ['jquery', 'view', 'renderTemplate', 'dataStore', 'navigati
                             error: (jqXHR, textStatus, errorThrown) ->
                                 if jqXHR.responseJSON?
                                     $submitError.text jqXHR.responseJSON
+                                else
+                                    $submitError.text 'Unknown error. Please try again later.'
                             complete: ->
                                 $submitButton.prop 'disabled', no
                 else
@@ -251,6 +259,8 @@ define 'signinView', ['jquery', 'view', 'renderTemplate', 'dataStore', 'navigati
                             error: (jqXHR, textStatus, errorThrown) ->
                                 if jqXHR.responseJSON?
                                     $submitError.text jqXHR.responseJSON
+                                else
+                                    $submitError.text 'Unknown error. Please try again later.'
                             complete: ->
                                 $submitButton.prop 'disabled', no
                 else
@@ -305,6 +315,8 @@ define 'loginView', ['jquery', 'view', 'renderTemplate', 'dataStore', 'navigatio
                             error: (jqXHR, textStatus, errorThrown) ->
                                 if jqXHR.responseJSON?
                                     $submitError.text jqXHR.responseJSON
+                                else
+                                    $submitError.text 'Unknown error. Please try again later.'
                             complete: ->
                                 $submitButton.prop 'disabled', no
                 else
@@ -417,6 +429,8 @@ define 'profileView', ['jquery', 'view', 'renderTemplate', 'dataStore', 'navigat
                                                 error: (jqXHR, textStatus, errorThrown) ->
                                                     if jqXHR.responseJSON?
                                                         $resendConfirmationSubmitError.text jqXHR.responseJSON
+                                                    else
+                                                        $resendConfirmationSubmitError.text 'Unknown error. Please try again later.'
                                                 complete: ->
                                                     $resendConfirmationSubmitButton.prop 'disabled', no
 
@@ -460,6 +474,8 @@ define 'profileView', ['jquery', 'view', 'renderTemplate', 'dataStore', 'navigat
                                                 error: (jqXHR, textStatus, errorThrown) ->
                                                     if jqXHR.responseJSON?
                                                         $changeEmailSubmitError.text jqXHR.responseJSON
+                                                    else
+                                                        $changeEmailSubmitError.text 'Unknown error. Please try again later.'
                                                 complete: ->
                                                     $changeEmailSubmitButton.prop 'disabled', no
 
@@ -506,6 +522,8 @@ define 'profileView', ['jquery', 'view', 'renderTemplate', 'dataStore', 'navigat
                                             error: (jqXHR, textStatus, errorThrown) ->
                                                 if jqXHR.responseJSON?
                                                     $editProfileSubmitError.text jqXHR.responseJSON
+                                                else
+                                                    $editProfileSubmitError.text 'Unknown error. Please try again later.'
                                             complete: ->
                                                 $editProfileSubmitButton.prop 'disabled', no
 
@@ -549,6 +567,8 @@ define 'profileView', ['jquery', 'view', 'renderTemplate', 'dataStore', 'navigat
                                             error: (jqXHR, textStatus, errorThrown) ->
                                                 if jqXHR.responseJSON?
                                                     $changePasswordSubmitError.text jqXHR.responseJSON
+                                                else
+                                                    $changePasswordSubmitError.text 'Unknown error. Please try again later.'
                                             complete: ->
                                                 $changePasswordSubmitButton.prop 'disabled', no
 
