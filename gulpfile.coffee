@@ -20,6 +20,7 @@ paths =
         'bower_components/bootstrap-filestyle/src/bootstrap-filestyle.js'
         'bower_components/jquery-form/jquery.form.js'
         'bower_components/query-string/query-string.js'
+        'bower_components/parsleyjs/dist/parsley.js'
         'scripts/themis.coffee'
     ]
     fonts: [

@@ -75,24 +75,15 @@ img.profile-image
         box-sizing: border-box
         padding: 10px
         font-size: 16px
+        margin-bottom: 10px
 
         &:focus
             z-index: 2
 
-    input[type="text"]
-        margin-bottom: -1px
-        border-bottom-right-radius: 0
-        border-bottom-left-radius: 0
-
-    input[type="password"]
-        margin-bottom: 10px
-        border-top-left-radius: 0
-        border-top-right-radius: 0
-
 .themis-form-login
     max-width: 330px
     padding: 15px
-    margin: 0 auto
+    margin: 0px auto
 
     h1
         margin-bottom: 10px
@@ -105,16 +96,28 @@ img.profile-image
         box-sizing: border-box
         padding: 10px
         font-size: 16px
+        margin-bottom: 10px
 
         &:focus
             z-index: 2
 
-    input[type="text"]
-        margin-bottom: -1px
-        border-bottom-right-radius: 0
-        border-bottom-left-radius: 0
+input.parsley-error, select.parsley-error, textarea.parsley-error
+    color: #B94A48
+    background-color: #F2DEDE
+    border: 1px solid #EED3D7
 
-    input[type="password"]
-        margin-bottom: 10px
-        border-top-left-radius: 0
-        border-top-right-radius: 0
+.parsley-errors-list
+    margin: 2px 0 3px
+    padding: 0
+    list-style-type: none
+    font-size: 0.9em
+    line-height: 0.9em
+    opacity: 0
+
+    transition: all .3s ease-in
+    -o-transition: all .3s ease-in
+    -moz-transition: all .3s ease-in
+    -webkit-transition: all .3s ease-in
+
+.parsley-errors-list.filled
+    opacity: 1

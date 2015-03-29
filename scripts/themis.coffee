@@ -148,7 +148,7 @@ define 'view', [], ->
     View
 
 
-define 'signupView', ['jquery', 'view', 'renderTemplate', 'dataStore', 'navigationBar', 'stateController', 'metadataStore', 'jquery.form', 'bootstrap-filestyle'], ($, View, renderTemplate, dataStore, navigationBar, stateController, metadataStore) ->
+define 'signupView', ['jquery', 'view', 'renderTemplate', 'dataStore', 'navigationBar', 'stateController', 'metadataStore', 'parsley', 'jquery.form', 'bootstrap-filestyle'], ($, View, renderTemplate, dataStore, navigationBar, stateController, metadataStore) ->
     class SignupView extends View
         constructor: ->
             @urlRegex = /^\/signup$/
@@ -169,6 +169,7 @@ define 'signupView', ['jquery', 'view', 'renderTemplate', 'dataStore', 'navigati
                     navigationBar.present()
 
                     $form = $main.find 'form.themis-form-signup'
+                    $form.parsley()
 
                     $form.find('input[name="team"]').focus()
 
@@ -207,7 +208,7 @@ define 'signupView', ['jquery', 'view', 'renderTemplate', 'dataStore', 'navigati
     new SignupView()
 
 
-define 'signinView', ['jquery', 'view', 'renderTemplate', 'dataStore', 'navigationBar', 'stateController', 'metadataStore', 'jquery.form'], ($, View, renderTemplate, dataStore, navigationBar, stateController, metadataStore) ->
+define 'signinView', ['jquery', 'view', 'renderTemplate', 'dataStore', 'navigationBar', 'stateController', 'metadataStore', 'parsley', 'jquery.form'], ($, View, renderTemplate, dataStore, navigationBar, stateController, metadataStore) ->
     class SigninView extends View
         constructor: ->
             @urlRegex = /^\/signin$/
@@ -228,6 +229,7 @@ define 'signinView', ['jquery', 'view', 'renderTemplate', 'dataStore', 'navigati
                     navigationBar.present active: 'signin'
 
                     $form = $main.find 'form.themis-form-signin'
+                    $form.parsley()
 
                     $form.find('input[name="team"]').focus()
 
@@ -262,7 +264,7 @@ define 'signinView', ['jquery', 'view', 'renderTemplate', 'dataStore', 'navigati
     new SigninView()
 
 
-define 'loginView', ['jquery', 'view', 'renderTemplate', 'dataStore', 'navigationBar', 'stateController', 'metadataStore', 'jquery.form'], ($, View, renderTemplate, dataStore, navigationBar, stateController, metadataStore) ->
+define 'loginView', ['jquery', 'view', 'renderTemplate', 'dataStore', 'navigationBar', 'stateController', 'metadataStore', 'parsley', 'jquery.form'], ($, View, renderTemplate, dataStore, navigationBar, stateController, metadataStore) ->
     class LoginView extends View
         constructor: ->
             @urlRegex = /^\/login$/
@@ -283,6 +285,7 @@ define 'loginView', ['jquery', 'view', 'renderTemplate', 'dataStore', 'navigatio
                     navigationBar.present()
 
                     $form = $main.find 'form.themis-form-login'
+                    $form.parsley()
 
                     $submitError = $form.find '.submit-error > p'
                     $submitButton = $form.find 'button'
@@ -343,7 +346,7 @@ define 'indexView', ['jquery', 'view', 'renderTemplate', 'dataStore', 'navigatio
     new IndexView()
 
 
-define 'profileView', ['jquery', 'view', 'renderTemplate', 'dataStore', 'navigationBar', 'metadataStore', 'jquery.history'], ($, View, renderTemplate, dataStore, navigationBar, metadataStore, History) ->
+define 'profileView', ['jquery', 'view', 'renderTemplate', 'dataStore', 'navigationBar', 'metadataStore', 'jquery.history', 'parsley', 'jquery.form'], ($, View, renderTemplate, dataStore, navigationBar, metadataStore, History) ->
     class ProfileView extends View
         constructor: ->
             @urlRegex = /^\/profile\/[0-9]+$/
@@ -430,6 +433,7 @@ define 'profileView', ['jquery', 'view', 'renderTemplate', 'dataStore', 'navigat
                                         $changeEmailSubmitError = $changeEmailModal.find '.submit-error > p'
                                         $changeEmailSubmitButton = $changeEmailModal.find 'button[data-action="complete-change-email"]'
                                         $changeEmailForm = $changeEmailModal.find 'form'
+                                        $changeEmailForm.parsley()
 
                                         $changeEmailSubmitButton.on 'click', (e) ->
                                             $changeEmailForm.trigger 'submit'
@@ -473,6 +477,7 @@ define 'profileView', ['jquery', 'view', 'renderTemplate', 'dataStore', 'navigat
                                     $editProfileSubmitError = $editProfileModal.find '.submit-error > p'
                                     $editProfileSubmitButton = $editProfileModal.find 'button[data-action="complete-edit-profile"]'
                                     $editProfileForm = $editProfileModal.find 'form'
+                                    $editProfileForm.parsley()
 
                                     $editProfileSubmitButton.on 'click', (e) ->
                                         $editProfileForm.trigger 'submit'
@@ -518,6 +523,7 @@ define 'profileView', ['jquery', 'view', 'renderTemplate', 'dataStore', 'navigat
                                     $changePasswordSubmitError = $changePasswordModal.find '.submit-error > p'
                                     $changePasswordSubmitButton = $changePasswordModal.find 'button[data-action="complete-change-password"]'
                                     $changePasswordForm = $changePasswordModal.find 'form'
+                                    $changePasswordForm.parsley()
 
                                     $changePasswordSubmitButton.on 'click', (e) ->
                                         $changePasswordForm.trigger 'submit'

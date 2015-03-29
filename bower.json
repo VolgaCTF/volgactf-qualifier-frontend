@@ -16,6 +16,7 @@
     "bootstrap-filestyle": "~1.1.2",
     "jquery-form": "~3.46.0",
     "fontawesome": "~4.3.0",
-    "query-string": "~1.0.0"
+    "query-string": "~1.0.0",
+    "parsleyjs": "~2.0.7"
   }
 }

@@ -72,7 +72,9 @@
                             <%- identity.name %>&nbsp;<span class="caret"></span>
                         </a>
                         <ul class="dropdown-menu" role="menu">
+                            <% if (identity.role === 'team') { %>
                             <li><a href="/profile/<%- identity.id %>" data-push-history>Edit profile</a></li>
+                            <% } %>
                             <li><a href="#" data-action="signout" data-push-history>Sign out</a></li>
                         </ul>
                     </li>
@@ -141,9 +143,9 @@
                     <form class="themis-form-signin" method="POST" action="//api.{{ domain }}/team/signin">
                         <h1>Please sign in</h1>
                         <label for="signin-team" class="sr-only">Team</label>
-                        <input type="text" id="signin-team" name="team" class="form-control" placeholder="Team" required autofocus>
+                        <input type="text" id="signin-team" name="team" class="form-control" placeholder="Team" required autofocus minlength="2" maxlength="100">
                         <label for="signin-password" class="sr-only">Password</label>
-                        <input type="password" id="signin-password" name="password" class="form-control" placeholder="Password" required>
+                        <input type="password" id="signin-password" name="password" class="form-control" placeholder="Password" required minlength="6" maxlength="40" pattern="^[A-Za-z0-9\x5b\x5d\x28\x29\x7b\x7d\x7e\x60\x21\x40\x23\x24\x25\x5e\x26\x2a\x2d\x5f\x3d\x2b\x27\x22\x3a\x3b\x7c\x2f\x5c\x2e\x2c\x3f\x3c\x3e]+$">
                         <div class="submit-error">
                             <p class="text-danger"></p>
                         </div>
@@ -275,7 +277,7 @@
                                 <form method="POST" action="//api.{{ domain }}/team/change-email">
                                     <div class="form-group">
                                         <label for="change-email-new" class="control-label">New email</label>
-                                        <input type="email" class="form-control" id="change-email-new" name="email" autofocus required>
+                                        <input type="email" class="form-control" id="change-email-new" name="email" required autofocus>
                                     </div>
                                     <div class="submit-error">
                                         <p class="text-danger"></p>
@@ -335,15 +337,15 @@
                                 <form method="POST" action="//api.{{ domain }}/team/change-password">
                                     <div class="form-group">
                                         <label for="change-pwd-current" class="control-label">Current password</label>
-                                        <input type="password" class="form-control" id="change-pwd-current" name="currentPassword" required autofocus>
+                                        <input type="password" class="form-control" id="change-pwd-current" name="currentPassword" required autofocus minlength="6" maxlength="40" pattern="^[A-Za-z0-9\x5b\x5d\x28\x29\x7b\x7d\x7e\x60\x21\x40\x23\x24\x25\x5e\x26\x2a\x2d\x5f\x3d\x2b\x27\x22\x3a\x3b\x7c\x2f\x5c\x2e\x2c\x3f\x3c\x3e]+$">
                                     </div>
                                     <div class="form-group">
                                         <label for="change-pwd-new" class="control-label">New password</label>
-                                        <input type="password" class="form-control" id="change-pwd-new" name="newPassword" required>
+                                        <input type="password" class="form-control" id="change-pwd-new" name="newPassword" required minlength="6" maxlength="40" pattern="^[A-Za-z0-9\x5b\x5d\x28\x29\x7b\x7d\x7e\x60\x21\x40\x23\x24\x25\x5e\x26\x2a\x2d\x5f\x3d\x2b\x27\x22\x3a\x3b\x7c\x2f\x5c\x2e\x2c\x3f\x3c\x3e]+$">
                                     </div>
                                     <div class="form-group">
                                         <label for="change-pwd-confirm-new" class="control-label">Confirm new password</label>
-                                        <input type="password" class="form-control" id="change-pwd-confirm-new" required>
+                                        <input type="password" class="form-control" id="change-pwd-confirm-new" required minlength="6" maxlength="40" pattern="^[A-Za-z0-9\x5b\x5d\x28\x29\x7b\x7d\x7e\x60\x21\x40\x23\x24\x25\x5e\x26\x2a\x2d\x5f\x3d\x2b\x27\x22\x3a\x3b\x7c\x2f\x5c\x2e\x2c\x3f\x3c\x3e]+$" data-parsley-equalto="#change-pwd-new">
                                     </div>
                                     <div class="submit-error">
                                         <p class="text-danger"></p>
@@ -364,9 +366,9 @@
                     <form class="themis-form-login" method="POST" action="//api.{{ domain }}/login">
                         <h1>Please log in</h1>
                         <label for="login-team" class="sr-only">Username</label>
-                        <input type="text" id="login-username" name="username" class="form-control" placeholder="Username" required autofocus>
+                        <input type="text" id="login-username" name="username" class="form-control" placeholder="Username" required autofocus minlength="2" maxlength="100">
                         <label for="login-password" class="sr-only">Password</label>
-                        <input type="password" id="login-password" name="password" class="form-control" placeholder="Password" required>
+                        <input type="password" id="login-password" name="password" class="form-control" placeholder="Password" required minlength="6" maxlength="40" pattern="^[A-Za-z0-9\x5b\x5d\x28\x29\x7b\x7d\x7e\x60\x21\x40\x23\x24\x25\x5e\x26\x2a\x2d\x5f\x3d\x2b\x27\x22\x3a\x3b\x7c\x2f\x5c\x2e\x2c\x3f\x3c\x3e]+$">
                         <div class="submit-error">
                             <p class="text-danger"></p>
                         </div>
@@ -389,7 +391,7 @@
                                 Team&nbsp;<sup>*</sup>
                             </label>
                             <div class="col-sm-9">
-                                <input type="text" class="form-control" id="signup-team" name="team" placeholder="Team" required autofocus>
+                                <input type="text" class="form-control" id="signup-team" name="team" placeholder="Team" required autofocus minlength="2" maxlength="100">
                             </div>
                         </div>
 
@@ -407,7 +409,7 @@
                                 Password&nbsp;<sup>*</sup>
                             </label>
                             <div class="col-sm-9">
-                                <input type="password" class="form-control" id="signup-password" name="password" placeholder="Password" required>
+                                <input type="password" class="form-control" id="signup-password" name="password" placeholder="Password" required minlength="6" maxlength="40" pattern="^[A-Za-z0-9\x5b\x5d\x28\x29\x7b\x7d\x7e\x60\x21\x40\x23\x24\x25\x5e\x26\x2a\x2d\x5f\x3d\x2b\x27\x22\x3a\x3b\x7c\x2f\x5c\x2e\x2c\x3f\x3c\x3e]+$">
                             </div>
                         </div>
 
@@ -416,7 +418,7 @@
                                 Confirm password&nbsp;<sup>*</sup>
                             </label>
                             <div class="col-sm-9">
-                                <input type="password" class="form-control" id="signup-password-confirm" placeholder="Confirm password" required>
+                                <input type="password" class="form-control" id="signup-password-confirm" placeholder="Confirm password" required minlength="6" maxlength="40" pattern="^[A-Za-z0-9\x5b\x5d\x28\x29\x7b\x7d\x7e\x60\x21\x40\x23\x24\x25\x5e\x26\x2a\x2d\x5f\x3d\x2b\x27\x22\x3a\x3b\x7c\x2f\x5c\x2e\x2c\x3f\x3c\x3e]+$" data-parsley-equalto="#signup-password">
                             </div>
                         </div>
 
