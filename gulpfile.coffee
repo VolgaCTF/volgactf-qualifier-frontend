@@ -8,6 +8,9 @@ mustache = require 'gulp-mustache'
 yaml = require 'js-yaml'
 fs = require 'fs'
 sass = require 'gulp-sass'
+uglify = require 'gulp-uglify'
+minifyCSS = require 'gulp-minify-css'
+minifyHTML = require 'gulp-minify-html'
 
 paths =
     scripts: [
@@ -45,6 +48,9 @@ paths =
     ]
 
 
+isProduction = ->
+    process.env['ENV'] == 'production'
+
 isCoffee = (file) ->
     path.extname(file.path) is '.coffee'
 
@@ -55,6 +61,7 @@ gulp.task 'scripts', ['clean_scripts'], ->
     gulp.src paths.scripts
         .pipe plumber()
         .pipe gulpIf isCoffee, coffee()
+        .pipe gulpIf isProduction, uglify()
         .pipe gulp.dest 'public/cdn/js'
 
 
@@ -67,6 +74,7 @@ gulp.task 'clean_stylesheets', (callback) ->
 gulp.task 'stylesheets', ['clean_stylesheets'], ->
     gulp.src paths.stylesheets
         .pipe gulpIf isSass, sass indentedSyntax: yes, errLogToConsole: yes
+        .pipe gulpIf isProduction, minifyCSS()
         .pipe gulp.dest 'public/cdn/css'
 
 
@@ -90,6 +98,7 @@ gulp.task 'html', ['clean_html'], ->
 
     gulp.src paths.html
         .pipe mustache opts
+        .pipe gulpIf isProduction, minifyHTML()
         .pipe gulp.dest 'public/html'
 
 gulp.task 'default', ['html', 'stylesheets', 'scripts', 'fonts']
