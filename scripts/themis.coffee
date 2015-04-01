@@ -1,4 +1,29 @@
 require.config
+    paths:
+        jquery: [
+            'http://code.jquery.com/jquery-2.1.3.min',
+            'jquery'
+        ],
+        bootstrap: [
+            'http://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/js/bootstrap.min',
+            'bootstrap'
+        ],
+        underscore: [
+            'http://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.7.0/underscore-min',
+            'underscore'
+        ],
+        'jquery.history': [
+            'http://cdnjs.cloudflare.com/ajax/libs/history.js/1.8/bundled/html5/jquery.history.min',
+            'jquery.history'
+        ],
+        'jquery.form': [
+            'http://cdnjs.cloudflare.com/ajax/libs/jquery.form/3.46/jquery.form.min',
+            'jquery.form'
+        ],
+        parsley: [
+            'http://cdnjs.cloudflare.com/ajax/libs/parsley.js/2.0.7/parsley.min',
+            'parsley'
+        ]
     shim:
         'jquery.history':
             deps: ['jquery']
