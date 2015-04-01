@@ -210,7 +210,7 @@ define 'signupView', ['jquery', 'view', 'renderTemplate', 'dataStore', 'navigati
                     navigationBar.present()
 
         dismiss: ->
-            $('#main').html ''
+            $('#main').empty()
             navigationBar.dismiss()
 
     new SignupView()
@@ -268,7 +268,7 @@ define 'signinView', ['jquery', 'view', 'renderTemplate', 'dataStore', 'navigati
                     navigationBar.present()
 
         dismiss: ->
-            $('#main').html ''
+            $('#main').empty()
             navigationBar.dismiss()
 
     new SigninView()
@@ -324,7 +324,7 @@ define 'loginView', ['jquery', 'view', 'renderTemplate', 'dataStore', 'navigatio
                     navigationBar.present()
 
         dismiss: ->
-            $('#main').html ''
+            $('#main').empty()
             navigationBar.dismiss()
 
     new LoginView()
@@ -352,7 +352,7 @@ define 'indexView', ['jquery', 'view', 'renderTemplate', 'dataStore', 'navigatio
                         identity: identity
 
         dismiss: ->
-            $('#main').html ''
+            $('#main').empty()
             navigationBar.dismiss()
 
     new IndexView()
@@ -576,7 +576,7 @@ define 'profileView', ['jquery', 'view', 'renderTemplate', 'dataStore', 'navigat
                                         $changePasswordModal.modal 'show'
 
         dismiss: ->
-            $('#main').html ''
+            $('#main').empty()
             navigationBar.dismiss()
 
     new ProfileView()
@@ -614,7 +614,7 @@ define 'verifyEmailView', ['jquery', 'view', 'renderTemplate', 'dataStore', 'nav
                             $result.addClass('text-success').text 'Email verified! Thank you!'
 
         dismiss: ->
-            $('#main').html ''
+            $('#main').empty()
             navigationBar.dismiss()
 
     new VerifyEmailView()
@@ -643,7 +643,7 @@ define 'newsView', ['jquery', 'view', 'renderTemplate', 'dataStore', 'navigation
                         active: 'news'
 
         dismiss: ->
-            $('#main').html ''
+            $('#main').empty()
             navigationBar.dismiss()
 
     new NewsView()
@@ -661,7 +661,7 @@ define 'notFoundView', ['jquery', 'view', 'renderTemplate', 'navigationBar', 'me
             $('#main').html renderTemplate 'not-found-view', urlPath: window.location.pathname
 
         dismiss: ->
-            $('#main').html ''
+            $('#main').empty()
 
     new NotFoundView()
 
@@ -747,7 +747,7 @@ define 'navigationBar', ['jquery', 'underscore', 'renderTemplate', 'metadataStor
                             console.log errorThrown
 
         dismiss: ->
-            $('#themis-navbar').html ''
+            $('#themis-navbar').empty()
 
     new NavigationBar()
 
