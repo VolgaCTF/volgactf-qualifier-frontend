@@ -383,7 +383,7 @@ define 'indexView', ['jquery', 'view', 'renderTemplate', 'dataStore', 'navigatio
     new IndexView()
 
 
-define 'profileView', ['jquery', 'view', 'renderTemplate', 'dataStore', 'navigationBar', 'metadataStore', 'jquery.history', 'parsley', 'jquery.form'], ($, View, renderTemplate, dataStore, navigationBar, metadataStore, History) ->
+define 'profileView', ['jquery', 'view', 'renderTemplate', 'dataStore', 'navigationBar', 'metadataStore', 'jquery.history', 'parsley', 'jquery.form', 'bootstrap-filestyle'], ($, View, renderTemplate, dataStore, navigationBar, metadataStore, History) ->
     class ProfileView extends View
         constructor: ->
             @urlRegex = /^\/profile\/[0-9]+$/
@@ -416,6 +416,61 @@ define 'profileView', ['jquery', 'view', 'renderTemplate', 'dataStore', 'navigat
                                 identity: identity
 
                             if identity.role is 'team' and identity.id == team.id
+                                $buttonUploadLogo = $main.find 'a[data-action="upload-logo"]'
+
+                                if $buttonUploadLogo.length
+                                    $uploadLogoModal = $ '#upload-logo-modal'
+                                    $uploadLogoModal.modal
+                                        show: no
+
+                                    $uploadLogoSubmitError = $uploadLogoModal.find '.submit-error > p'
+                                    $uploadLogoSubmitButton = $uploadLogoModal.find 'button[data-action="complete-upload-logo"]'
+                                    $uploadLogoForm = $uploadLogoModal.find 'form'
+                                    $uploadLogoForm.find('input:file').filestyle()
+                                    $uploadLogoForm.parsley()
+
+                                    $uploadLogoSubmitButton.on 'click', (e) ->
+                                        $uploadLogoForm.trigger 'submit'
+
+                                    $uploadLogoModal.on 'show.bs.modal', (e) ->
+                                        $uploadLogoForm.find('input:file').filestyle 'clear'
+
+                                    $uploadLogoForm.on 'submit', (e) ->
+                                        e.preventDefault()
+                                        $uploadLogoForm.ajaxSubmit
+                                            beforeSubmit: ->
+                                                $uploadLogoSubmitError.text ''
+                                                $uploadLogoSubmitButton.prop 'disabled', yes
+                                            clearForm: yes
+                                            dataType: 'json'
+                                            xhrFields:
+                                                withCredentials: yes
+                                            success: (responseText, textStatus, jqXHR) ->
+                                                onTimeout = ->
+                                                    $uploadLogoModal.modal 'hide'
+                                                    window.location.reload()
+
+                                                setTimeout onTimeout, 1500
+                                            error: (jqXHR, textStatus, errorThrown) ->
+                                                if jqXHR.responseJSON?
+                                                    $uploadLogoSubmitError.text jqXHR.responseJSON
+                                                else
+                                                    $uploadLogoSubmitError.text 'Unknown error. Please try again later.'
+                                            complete: ->
+                                                $uploadLogoSubmitButton.prop 'disabled', no
+
+                                $buttonUploadLogo.on 'click', (e) ->
+                                    $uploadLogoModal.modal 'show'
+                                    e.preventDefault()
+
+
+
+
+
+
+
+
+
                                 $buttonChangeEmail = $main.find 'button[data-action="change-email"]'
                                 $buttonResendConfirmation = $main.find 'button[data-action="resend-confirmation"]'
 

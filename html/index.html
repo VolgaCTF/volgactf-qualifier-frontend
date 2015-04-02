@@ -196,7 +196,9 @@
                     <section>
                         <div class="clearfix themis-profile">
                             <div class="pull-left logo">
-                                <img class="img-thumbnail" src="//api.{{ domain }}/team/logo/<%- team.id %>">
+                                <a href="#" data-action="upload-logo">
+                                    <img class="img-thumbnail" src="//api.{{ domain }}/team/logo/<%- team.id %>">
+                                </a>
                             </div>
                             <div class="pull-left info">
                                 <h4 class="text-primary"><%- team.name %></h4>
@@ -238,6 +240,32 @@
                             </div>
                         </div>
                     </section>
+                </div>
+
+                <div class="modal fade" id="upload-logo-modal" tabindex="-1" role="dialog">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                                <h4 class="modal-title">Upload logo</h4>
+                            </div>
+                            <div class="modal-body">
+                                <form method="POST" action="//api.{{ domain }}/team/upload-logo">
+                                    <div class="form-group">
+                                        <label for="upload-logo-logo" class="control-label">Logo</label>
+                                        <input type="file" id="upload-logo-logo" name="logo" class="filestyle" data-buttonText="&nbsp;Choose file" data-iconName="glyphicon-picture" accept="image/jpeg,image/png,image/gif" required>
+                                    </div>
+                                    <div class="submit-error">
+                                        <p class="text-danger"></p>
+                                    </div>
+                                </form>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                                <button type="button" class="btn btn-primary" data-action="complete-upload-logo">Upload</button>
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
                 <div class="modal fade" id="resend-confirmation-modal" tabindex="-1" role="dialog">
