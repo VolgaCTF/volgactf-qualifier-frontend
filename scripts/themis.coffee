@@ -5,11 +5,11 @@ require.config
             'jquery'
         ],
         bootstrap: [
-            'http://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/js/bootstrap.min',
+            'http://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min',
             'bootstrap'
         ],
         underscore: [
-            'http://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.7.0/underscore-min',
+            'http://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.8.3/underscore-min',
             'underscore'
         ],
         'jquery.history': [
