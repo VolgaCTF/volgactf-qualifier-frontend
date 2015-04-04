@@ -54,6 +54,9 @@
                     <% if (show.news) { %>
                     <li class="<% print((active === 'news') ? 'active' : ''); %>"><a href="/news" data-push-history>News</a></li>
                     <% } %>
+                    <% if (show.about) { %>
+                    <li class="<% print((active === 'about') ? 'active' : ''); %>"><a href="/about" data-push-history>About</a></li>
+                    <% } %>
                 </ul>
 
                 <ul class="nav navbar-nav navbar-right">
@@ -89,6 +92,17 @@
                     </header>
                     <section>
                         <p class="lead">No news yet.</p>
+                    </section>
+                </div>
+            </script>
+
+            <script type="text/x-template" data-name="about-view">
+                <div class="container">
+                    <header>
+                        <h1>About</h1>
+                    </header>
+                    <section>
+                        <p class="lead">Competition rules will be published soon. Stay tuned!</p>
                     </section>
                 </div>
             </script>

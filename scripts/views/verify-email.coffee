@@ -15,8 +15,6 @@ define 'verifyEmailView', ['jquery', 'view', 'renderTemplate', 'dataStore', 'nav
                 else
                     $main.html renderTemplate 'verify-email-view', identity: identity
                     navigationBar.present
-                        show:
-                            news: yes
                         identity: identity
 
                     $progress = $main.find 'p[data-role="progress"]'

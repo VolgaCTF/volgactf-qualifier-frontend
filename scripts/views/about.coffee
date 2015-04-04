@@ -1,14 +1,14 @@
-define 'newsView', ['jquery', 'view', 'renderTemplate', 'dataStore', 'navigationBar', 'metadataStore'], ($, View, renderTemplate, dataStore, navigationBar, metadataStore) ->
-    class NewsView extends View
+define 'aboutView', ['jquery', 'view', 'renderTemplate', 'dataStore', 'navigationBar', 'metadataStore'], ($, View, renderTemplate, dataStore, navigationBar, metadataStore) ->
+    class AboutView extends View
         constructor: ->
-            @urlRegex = /^\/news$/
+            @urlRegex = /^\/about$/
 
         getTitle: ->
-            "#{metadataStore.getMetadata 'event-title' } :: News"
+            "#{metadataStore.getMetadata 'event-title' } :: About"
 
         present: ->
             $main = $ '#main'
-            $('#main').html renderTemplate 'news-view'
+            $('#main').html renderTemplate 'about-view'
 
             dataStore.getIdentity (err, identity) ->
                 if err?
@@ -17,10 +17,10 @@ define 'newsView', ['jquery', 'view', 'renderTemplate', 'dataStore', 'navigation
                 else
                     navigationBar.present
                         identity: identity
-                        active: 'news'
+                        active: 'about'
 
         dismiss: ->
             $('#main').empty()
             navigationBar.dismiss()
 
-    new NewsView()
+    new AboutView()

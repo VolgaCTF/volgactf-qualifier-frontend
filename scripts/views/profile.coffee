@@ -20,14 +20,10 @@ define 'profileView', ['jquery', 'view', 'renderTemplate', 'dataStore', 'navigat
                         if err? or not team?
                             $main.html renderTemplate 'internal-error'
                             navigationBar.present
-                                show:
-                                    news: yes
                                 identity: identity
                         else
                             $main.html renderTemplate 'profile-view', identity: identity, team: team
                             navigationBar.present
-                                show:
-                                    news: yes
                                 identity: identity
 
                             if identity.role is 'team' and identity.id == team.id

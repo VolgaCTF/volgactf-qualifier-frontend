@@ -93,6 +93,7 @@ define 'dataStore', ['jquery', 'metadataStore'], ($, metadataStore) ->
 #= include views/profile.coffee
 #= include views/verify-email.coffee
 #= include views/news.coffee
+#= include views/about.coffee
 #= include views/not-found.coffee
 
 #= include controllers/state.coffee
@@ -105,6 +106,7 @@ define 'navigationBar', ['jquery', 'underscore', 'renderTemplate', 'metadataStor
             defaultOptions =
                 show:
                     news: yes
+                    about: yes
                 urlPath: window.location.pathname
                 identity: null
                 active: null

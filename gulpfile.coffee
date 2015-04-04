@@ -106,7 +106,13 @@ gulp.task 'html', ['clean_html'], ->
 gulp.task 'default', ['html', 'stylesheets', 'scripts', 'fonts']
 
 gulp.task 'watch', ->
+    extraScripts = [
+        'scripts/utils/*.coffee',
+        'scripts/views/*.coffee',
+        'scripts/controllers.coffee'
+    ]
+
     gulp.watch paths.html, ['html']
     gulp.watch paths.stylesheets, ['stylesheets']
-    gulp.watch paths.scripts, ['scripts']
+    gulp.watch paths.scripts.concat(extraScripts), ['scripts']
     gulp.watch paths.fonts, ['fonts']

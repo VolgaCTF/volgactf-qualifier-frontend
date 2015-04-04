@@ -15,8 +15,6 @@ define 'indexView', ['jquery', 'view', 'renderTemplate', 'dataStore', 'navigatio
                 else
                     $('#main').html renderTemplate 'index-view', identity: identity
                     navigationBar.present
-                        show:
-                            news: yes
                         identity: identity
 
         dismiss: ->
