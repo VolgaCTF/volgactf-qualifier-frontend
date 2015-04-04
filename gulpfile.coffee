@@ -11,6 +11,7 @@ sass = require 'gulp-sass'
 uglify = require 'gulp-uglify'
 minifyCSS = require 'gulp-minify-css'
 minifyHTML = require 'gulp-minify-html'
+include = require 'gulp-include'
 
 paths =
     scripts: [
@@ -60,6 +61,7 @@ gulp.task 'clean_scripts', (callback) ->
 gulp.task 'scripts', ['clean_scripts'], ->
     gulp.src paths.scripts
         .pipe plumber()
+        .pipe include()
         .pipe gulpIf isCoffee, coffee()
         .pipe gulpIf isProduction, uglify()
         .pipe gulp.dest 'public/cdn/js'
