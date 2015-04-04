@@ -1,4 +1,4 @@
-define 'viewController', ['viewControllerBase', 'renderTemplate', 'indexView', 'signinView', 'signupView', 'loginView', 'newsView', 'verifyEmailView', 'profileView', 'aboutView', 'notFoundView'], (ViewControllerBase, renderTemplate, indexView, signinView, signupView, loginView, newsView, verifyEmailView, profileView, aboutView, notFoundView) ->
+define 'viewController', ['viewControllerBase', 'renderTemplate', 'indexView', 'signinView', 'signupView', 'loginView', 'newsView', 'verifyEmailView', 'profileView', 'aboutView', 'teamsView', 'notFoundView'], (ViewControllerBase, renderTemplate, indexView, signinView, signupView, loginView, newsView, verifyEmailView, profileView, aboutView, teamsView, notFoundView) ->
     viewController = new ViewControllerBase()
 
     viewController.view indexView
@@ -9,6 +9,7 @@ define 'viewController', ['viewControllerBase', 'renderTemplate', 'indexView', '
     viewController.view verifyEmailView
     viewController.view profileView
     viewController.view aboutView
+    viewController.view teamsView
 
     viewController.errorView 'not-found', notFoundView
 

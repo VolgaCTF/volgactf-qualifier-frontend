@@ -80,6 +80,22 @@ define 'dataStore', ['jquery', 'metadataStore'], ($, metadataStore) ->
                     else
                         callback 'Unknown error. Please try again later.', null
 
+        getTeams: (callback) ->
+            url = "#{metadataStore.getMetadata 'domain-api' }/team/all"
+            $.ajax
+                url: url
+                dataType: 'json'
+                xhrFields:
+                    withCredentials: yes
+                success: (responseJSON, textStatus, jqXHR) ->
+                    callback null, responseJSON
+                error: (jqXHR, textStatus, errorThrown) ->
+                    if jqXHR.responseJSON?
+                        callback jqXHR.responseJSON, null
+                    else
+                        callback 'Unknown error. Please try again later.', null
+
+
     new DataStore()
 
 #= include utils/metadata-store.coffee
@@ -94,6 +110,7 @@ define 'dataStore', ['jquery', 'metadataStore'], ($, metadataStore) ->
 #= include views/verify-email.coffee
 #= include views/news.coffee
 #= include views/about.coffee
+#= include views/teams.coffee
 #= include views/not-found.coffee
 
 #= include controllers/state.coffee
@@ -105,6 +122,7 @@ define 'navigationBar', ['jquery', 'underscore', 'renderTemplate', 'metadataStor
         present: (options = {}) ->
             defaultOptions =
                 show:
+                    teams: yes
                     news: yes
                     about: yes
                 urlPath: window.location.pathname

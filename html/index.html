@@ -51,6 +51,9 @@
         <div class="themis-partials">
             <script type="text/x-template" data-name="navbar">
                 <ul class="nav navbar-nav">
+                    <% if (show.teams) { %>
+                    <li class="<% print((active === 'teams') ? 'active' : ''); %>"><a href="/teams" data-push-history>Teams</a></li>
+                    <% } %>
                     <% if (show.news) { %>
                     <li class="<% print((active === 'news') ? 'active' : ''); %>"><a href="/news" data-push-history>News</a></li>
                     <% } %>
@@ -83,6 +86,38 @@
                     </li>
                     <% } %>
                 </ul>
+            </script>
+
+            <script type="text/x-template" data-name="team-profile-simplified-partial">
+                <div class="clearfix themis-profile">
+                    <div class="pull-left logo">
+                        <img class="img-thumbnail" src="//api.{{ domain }}/team/logo/<%- team.id %>">
+                    </div>
+                    <div class="pull-left info">
+                        <h4 class="text-primary"><a href="/profile/<%- team.id %>" data-push-history><%- team.name %></a></h4>
+                        <ul class="list-unstyled">
+                            <% if (team.country !== '') { %>
+                            <li><strong>Country:</strong> <%- team.country %></li>
+                            <% } %>
+                            <% if (team.locality !== '') { %>
+                            <li><strong>Locality:</strong> <%- team.locality %></li>
+                            <% } %>
+                            <% if (team.institution !== '') { %>
+                            <li><strong>Institution:</strong> <%- team.institution %></li>
+                            <% } %>
+                        </ul>
+                    </div>
+                </div>
+            </script>
+
+            <script type="text/x-template" data-name="teams-view">
+                <div class="container">
+                    <header>
+                        <h1>Teams</h1>
+                    </header>
+                    <section>
+                    </section>
+                </div>
             </script>
 
             <script type="text/x-template" data-name="news-view">
@@ -202,57 +237,65 @@
                 </div>
             </script>
 
+            <script type="text/x-template" data-name="team-profile-partial">
+                <div class="clearfix themis-profile">
+                    <div class="pull-left logo">
+                        <% if (identity.role === 'team' && identity.id === team.id) { %>
+                        <a href="#" data-action="upload-logo">
+                            <img class="img-thumbnail" src="//api.{{ domain }}/team/logo/<%- team.id %>">
+                        </a>
+                        <% } else { %>
+                            <img class="img-thumbnail" src="//api.{{ domain }}/team/logo/<%- team.id %>">
+                        <% } %>
+                    </div>
+                    <div class="pull-left info">
+                        <h4 class="text-primary"><%- team.name %></h4>
+                        <% if ((identity.role === 'team' && identity.id === team.id) || _.contains(['admin', 'manager'], identity.role)) { %>
+                        <ul class="list-unstyled">
+                            <% if ('email' in team && 'emailConfirmed' in team) { %>
+                            <li>
+                                <i class="fa fa-envelope-o"></i>
+                                <% if (team.emailConfirmed) { %>
+                                <span class="text-success" title="Email verified"><%- team.email %></span>
+                                <% } else { %>
+                                <span class="text-danger" title="Email not verified"><%- team.email %></span>
+                                <% if (identity.role === 'team' && identity.id === team.id) { %>
+                                <br>
+                                <button type="button" class="btn btn-primary btn-xs" data-action="resend-confirmation">Resend confirmation email</button>
+                                <button type="button" class="btn btn-danger btn-xs" data-action="change-email">Change email</button>
+                                <% } %>
+                                <% } %>
+                            </li>
+                            <% } %>
+                        </ul>
+                        <% } %>
+                        <ul class="list-unstyled">
+                            <% if (team.country !== '' || (identity.role === 'team' && identity.id === team.id)) { %>
+                            <li><strong>Country:</strong> <%- team.country %></li>
+                            <% } %>
+                            <% if (team.locality !== '' || (identity.role === 'team' && identity.id === team.id)) { %>
+                            <li><strong>Locality:</strong> <%- team.locality %></li>
+                            <% } %>
+                            <% if (team.institution !== '' || (identity.role === 'team' && identity.id === team.id)) { %>
+                            <li><strong>Institution:</strong> <%- team.institution %></li>
+                            <% } %>
+                            <% if (identity.role === 'team' && identity.id === team.id) { %>
+                            <li>
+                                <button type="button" class="btn btn-primary btn-xs" data-action="edit-profile">Edit</button>
+                                <button type="button" class="btn btn-primary btn-xs" data-action="change-password">Change password</button>
+                            </li>
+                            <% } %>
+                        </ul>
+                    </div>
+                </div>
+            </script>
+
             <script type="text/x-template" data-name="profile-view">
                 <div class="container">
                     <header>
                         <h1>Team profile</h1>
                     </header>
                     <section>
-                        <div class="clearfix themis-profile">
-                            <div class="pull-left logo">
-                                <a href="#" data-action="upload-logo">
-                                    <img class="img-thumbnail" src="//api.{{ domain }}/team/logo/<%- team.id %>">
-                                </a>
-                            </div>
-                            <div class="pull-left info">
-                                <h4 class="text-primary"><%- team.name %></h4>
-                                <% if (identity.role === 'team' && identity.id === team.id) { %>
-
-                                <% } %>
-                                <ul class="list-unstyled">
-                                    <% if (identity.role === 'team' && identity.id === team.id && 'email' in team && 'emailConfirmed' in identity) { %>
-                                    <li>
-                                        <i class="fa fa-envelope-o"></i>
-                                        <% if (identity.emailConfirmed) { %>
-                                        <span class="text-success" title="Email verified"><%- team.email %></span>
-                                        <% } else { %>
-                                        <span class="text-danger" title="Email not verified"><%- team.email %></span>
-                                        <br>
-                                        <button type="button" class="btn btn-primary btn-xs" data-action="resend-confirmation">Resend confirmation email</button>
-                                        <button type="button" class="btn btn-danger btn-xs" data-action="change-email">Change email</button>
-                                        <% } %>
-                                    </li>
-                                </ul>
-                                <ul class="list-unstyled">
-                                    <% } %>
-                                    <% if (team.country !== '' || (identity.role === 'team' && identity.id === team.id)) { %>
-                                    <li><strong>Country:</strong> <%- team.country %></li>
-                                    <% } %>
-                                    <% if (team.locality !== '' || (identity.role === 'team' && identity.id === team.id)) { %>
-                                    <li><strong>Locality:</strong> <%- team.locality %></li>
-                                    <% } %>
-                                    <% if (team.institution !== '' || (identity.role === 'team' && identity.id === team.id)) { %>
-                                    <li><strong>Institution:</strong> <%- team.institution %></li>
-                                    <% } %>
-                                    <% if (identity.role === 'team' && identity.id === team.id) { %>
-                                    <li>
-                                        <button type="button" class="btn btn-primary btn-xs" data-action="edit-profile">Edit</button>
-                                        <button type="button" class="btn btn-primary btn-xs" data-action="change-password">Change password</button>
-                                    </li>
-                                    <% } %>
-                                </ul>
-                            </div>
-                        </div>
                     </section>
                 </div>
 

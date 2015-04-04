@@ -7,25 +7,25 @@ define 'profileView', ['jquery', 'view', 'renderTemplate', 'dataStore', 'navigat
             "#{metadataStore.getMetadata 'event-title' } :: Team profile"
 
         present: ->
+            $main = $ '#main'
+            $main.html renderTemplate 'profile-view'
+
             dataStore.getIdentity (err, identity) ->
-                $main = $ '#main'
                 if err?
                     $main.html renderTemplate 'internal-error'
                     navigationBar.present()
                 else
+                    navigationBar.present
+                        identity: identity
+
                     url = History.getState().data.urlPath
                     urlParts = url.split '/'
                     teamId = parseInt urlParts[urlParts.length - 1], 10
                     dataStore.getTeamProfile teamId, (err, team) ->
                         if err? or not team?
                             $main.html renderTemplate 'internal-error'
-                            navigationBar.present
-                                identity: identity
                         else
-                            $main.html renderTemplate 'profile-view', identity: identity, team: team
-                            navigationBar.present
-                                identity: identity
-
+                            $main.find('section').html renderTemplate 'team-profile-partial', identity: identity, team: team
                             if identity.role is 'team' and identity.id == team.id
                                 $buttonUploadLogo = $main.find 'a[data-action="upload-logo"]'
 
