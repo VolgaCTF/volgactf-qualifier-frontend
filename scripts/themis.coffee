@@ -23,6 +23,14 @@ require.config
         parsley: [
             'http://cdnjs.cloudflare.com/ajax/libs/parsley.js/2.0.7/parsley.min',
             'parsley'
+        ],
+        'markdown-it': [
+            'http://cdnjs.cloudflare.com/ajax/libs/markdown-it/4.1.0/markdown-it.min',
+            'markdown-it'
+        ],
+        'moment': [
+            'http://cdnjs.cloudflare.com/ajax/libs/moment.js/2.9.0/moment.min',
+            'moment'
         ]
     shim:
         'jquery.history':
@@ -35,6 +43,7 @@ require.config
 define 'dataStore', ['jquery', 'metadataStore'], ($, metadataStore) ->
     class DataStore
         constructor: ->
+            @eventSource = null
 
         getIdentity: (callback) ->
             url = "#{metadataStore.getMetadata 'domain-api' }/identity"
@@ -95,6 +104,60 @@ define 'dataStore', ['jquery', 'metadataStore'], ($, metadataStore) ->
                     else
                         callback 'Unknown error. Please try again later.', null
 
+        getPosts: (callback) ->
+            url = "#{metadataStore.getMetadata 'domain-api' }/post/all"
+            $.ajax
+                url: url
+                dataType: 'json'
+                xhrFields:
+                    withCredentials: yes
+                success: (responseJSON, textStatus, jqXHR) ->
+                    result = []
+                    for post in responseJSON
+                        result.push
+                            id: post.id
+                            title: post.title
+                            description: post.description
+                            createdAt: new Date post.createdAt
+                            updatedAt: new Date post.updatedAt
+
+                    callback null, result
+                error: (jqXHR, textStatus, errorThrown) ->
+                    if jqXHR.responseJSON?
+                        callback jqXHR.responseJSON, null
+                    else
+                        callback 'Unknown error. Please try again later.', null
+
+        removePost: (id, callback) ->
+            url = "#{metadataStore.getMetadata 'domain-api' }/post/#{id}/remove"
+            $.ajax
+                url: url
+                type: 'POST'
+                dataType: 'json'
+                data: {}
+                xhrFields:
+                    withCredentials: yes
+                success: (responseJSON, textStatus, jqXHR) ->
+                    callback null
+                error: (jqXHR, textStatus, errorThrown) ->
+                    if jqXHR.responseJSON?
+                        callback jqXHR.responseJSON
+                    else
+                        callback 'Unknown error. Please try again later.'
+
+        supportsRealtime: ->
+            window.EventSource?
+
+        connectRealtime: ->
+            @eventSource = new window.EventSource "#{metadataStore.getMetadata 'domain-api' }/events"
+
+        disconnectRealtime: ->
+            if @eventSource?
+                @eventSource.close()
+                @eventSource = null
+
+        getRealtimeProvider: ->
+            @eventSource
 
     new DataStore()
 

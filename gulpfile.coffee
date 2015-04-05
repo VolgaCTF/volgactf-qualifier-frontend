@@ -25,6 +25,8 @@ paths =
         'bower_components/jquery-form/jquery.form.js'
         'bower_components/query-string/query-string.js'
         'bower_components/parsleyjs/dist/parsley.js'
+        'bower_components/markdown-it/dist/markdown-it.js'
+        'bower_components/moment/moment.js'
         'scripts/themis.coffee'
     ]
     fonts: [

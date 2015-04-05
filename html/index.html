@@ -120,14 +120,124 @@
                 </div>
             </script>
 
+            <script type="text/x-template" data-name="post-simplified-partial">
+                <div class="themis-post">
+                    <header>
+                        <h3><%- title %></h3>
+                    </header>
+                    <section>
+                        <%= description %>
+                    </section>
+                    <footer>
+                        <p class="text-muted"><small>Updated on <%- updatedAt %></small></p>
+                    </footer>
+                </div>
+            </script>
+
+            <script type="text/x-template" data-name="remove-post-confirmation">
+                You are about to remove the post <mark><%- title %></mark>. Continue?
+            </script>
+
+            <script type="text/x-template" data-name="post-partial">
+                <div class="themis-post" data-id="<%- id %>">
+                    <header>
+                        <h3><%- title %></h3>
+                    </header>
+                    <section>
+                        <%= description %>
+                    </section>
+                    <footer>
+                        <p class="text-muted">
+                            <small>Updated on <%- updatedAt %></small>
+                            <% if (manageable) { %>
+                            &nbsp;
+                            <button type="button" class="btn btn-success btn-xs" data-action="edit-post">
+                                <i class="glyphicon glyphicon-pencil"></i>&nbsp;Edit
+                            </button>
+                            <button type="button" class="btn btn-danger btn-xs" data-action="remove-post" data-toggle="modal" data-target="#remove-post-modal" data-post-id="<%- id %>">
+                                <i class="glyphicon glyphicon-remove"></i>&nbsp;Remove
+                            </button>
+                            <% } %>
+                        </p>
+
+                    </footer>
+                </div>
+            </script>
+
             <script type="text/x-template" data-name="news-view">
                 <div class="container">
                     <header>
                         <h1>News</h1>
+                        <% if (identity.role === 'admin' || identity.role === 'manager') { %>
+                        <button type="button" class="btn btn-primary btn-xs" data-action="create-post" data-toggle="modal" data-target="#create-post-modal">
+                            <i class="glyphicon glyphicon-plus"></i>&nbsp;Create
+                        </button>
+                        <% } %>
                     </header>
                     <section>
-                        <p class="lead">No news yet.</p>
                     </section>
+                </div>
+
+                <div class="modal fade" id="create-post-modal" tabindex="-1" role="dialog">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                                <h4 class="modal-title">Create post</h4>
+                            </div>
+                            <div class="modal-body">
+                                <div>
+                                    <ul class="nav nav-tabs" id="create-post-tablist">
+                                        <li><a href="#create-post-data" role="tab" data-toggle="tab">Data</a></li>
+                                        <li><a href="#create-post-preview" role="tab" data-toggle="tab">Preview</a></li>
+                                    </ul>
+
+                                    <div class="tab-content">
+                                        <div role="tabpanel" class="tab-pane" id="create-post-data">
+                                            <form method="POST" action="//api.{{ domain }}/post/create">
+                                                <div class="form-group">
+                                                    <label for="create-post-title" class="control-label">Title</label>
+                                                    <input type="text" class="form-control" id="create-post-title" required minlength="2" maxlength="250" name="title">
+                                                    <label for="create-post-description" class="control-label">Description</label>
+                                                    <textarea class="form-control" id="create-post-description" required minlength="1" maxlength="4096" name="description"></textarea>
+                                                </div>
+                                                <div class="submit-error">
+                                                    <p class="text-danger"></p>
+                                                </div>
+                                            </form>
+                                        </div>
+                                        <div role="tabpanel" class="tab-pane" id="create-post-preview">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                                <button type="button" class="btn btn-primary" data-action="complete-create-post">Create</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="modal fade" id="remove-post-modal" tabindex="-1" role="dialog">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                                <h4 class="modal-title">Remove post</h4>
+                            </div>
+                            <div class="modal-body">
+                                <p class="confirmation"></p>
+                                <div class="submit-error">
+                                    <p class="text-danger"></p>
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                                <button type="button" class="btn btn-danger" data-action="complete-remove-post">Remove</button>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </script>
 
