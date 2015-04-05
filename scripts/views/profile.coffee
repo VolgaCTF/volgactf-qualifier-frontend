@@ -92,10 +92,11 @@ define 'profileView', ['jquery', 'view', 'renderTemplate', 'dataStore', 'navigat
                                             $resendConfirmationForm.trigger 'submit'
 
                                         $resendConfirmationModal.on 'show.bs.modal', (e) ->
+                                            $('#resend-confirmation-email').val team.email
                                             $resendConfirmationSubmitError.text ''
 
                                         $resendConfirmationModal.on 'shown.bs.modal', (e) ->
-                                            $('#resend-confirmation-email').val(team.email).focus()
+                                            $('#resend-confirmation-email').focus()
 
                                         $resendConfirmationForm.on 'submit', (e) ->
                                             e.preventDefault()
@@ -137,10 +138,11 @@ define 'profileView', ['jquery', 'view', 'renderTemplate', 'dataStore', 'navigat
                                             $changeEmailForm.trigger 'submit'
 
                                         $changeEmailModal.on 'show.bs.modal', (e) ->
+                                            $('#change-email-new').val ''
                                             $changeEmailSubmitError.text ''
 
                                         $changeEmailModal.on 'shown.bs.modal', (e) ->
-                                            $('#change-email-new').val('').focus()
+                                            $('#change-email-new').focus()
 
                                         $changeEmailForm.on 'submit', (e) ->
                                             e.preventDefault()
@@ -183,12 +185,13 @@ define 'profileView', ['jquery', 'view', 'renderTemplate', 'dataStore', 'navigat
                                         $editProfileForm.trigger 'submit'
 
                                     $editProfileModal.on 'show.bs.modal', (e) ->
-                                        $editProfileSubmitError.text ''
-
-                                    $editProfileModal.on 'shown.bs.modal', (e) ->
                                         $('#edit-profile-country').val(team.country).focus()
                                         $('#edit-profile-locality').val team.locality
                                         $('#edit-profile-institution').val team.institution
+                                        $editProfileSubmitError.text ''
+
+                                    $editProfileModal.on 'shown.bs.modal', (e) ->
+                                        $('#edit-profile-country').focus()
 
                                     $editProfileForm.on 'submit', (e) ->
                                         e.preventDefault()
@@ -231,6 +234,9 @@ define 'profileView', ['jquery', 'view', 'renderTemplate', 'dataStore', 'navigat
                                         $changePasswordForm.trigger 'submit'
 
                                     $changePasswordModal.on 'show.bs.modal', (e) ->
+                                        $('#change-pwd-current').val ''
+                                        $('#change-pwd-new').val ''
+                                        $('#change-pwd-confirm-new').val ''
                                         $changePasswordSubmitError.text ''
 
                                     $changePasswordModal.on 'shown.bs.modal', (e) ->
