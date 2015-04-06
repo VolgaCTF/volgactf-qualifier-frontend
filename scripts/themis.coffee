@@ -149,7 +149,7 @@ define 'dataStore', ['jquery', 'metadataStore'], ($, metadataStore) ->
             window.EventSource?
 
         connectRealtime: ->
-            @eventSource = new window.EventSource "#{metadataStore.getMetadata 'domain-api' }/events"
+            @eventSource = new window.EventSource "#{metadataStore.getMetadata 'domain-api' }/events", withCredentials: yes
 
         disconnectRealtime: ->
             if @eventSource?

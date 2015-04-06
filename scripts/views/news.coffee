@@ -4,6 +4,11 @@ define 'newsView', ['jquery', 'underscore', 'view', 'renderTemplate', 'dataStore
             @$main = null
             @posts = []
             @identity = null
+
+            @onCreatePost = null
+            @onUpdatePost = null
+            @onRemovePost = null
+
             @urlRegex = /^\/news$/
 
         getTitle: ->
@@ -122,6 +127,76 @@ define 'newsView', ['jquery', 'underscore', 'view', 'renderTemplate', 'dataStore
                         complete: ->
                             $createPostSubmitButton.prop 'disabled', no
 
+        initEditPostModal: ->
+            $buttonEditPost = @$main.find 'button[data-action="edit-post"]'
+            if $buttonEditPost.length
+                $editPostModal = $ '#edit-post-modal'
+                $editPostModal.modal
+                    show: no
+
+                $editPostSubmitError = $editPostModal.find '.submit-error > p'
+                $editPostSubmitButton = $editPostModal.find 'button[data-action="complete-edit-post"]'
+                $editPostForm = $editPostModal.find 'form'
+                $editPostForm.parsley()
+
+                $editPostSubmitButton.on 'click', (e) ->
+                    $editPostForm.trigger 'submit'
+
+                $editPostTablist = $ '#edit-post-tablist'
+                $editPostTabData = $editPostTablist.find 'a[href="#edit-post-data"]'
+                $editPostTabPreview = $editPostTablist.find 'a[href="#edit-post-preview"]'
+
+                $editPostTitle = $ '#edit-post-title'
+                $editPostDescription = $ '#edit-post-description'
+
+                $editPostPreview = $ '#edit-post-preview'
+
+                $editPostTabData.tab()
+                $editPostTabPreview.tab()
+
+                $editPostTabPreview.on 'show.bs.tab', (e) ->
+                    md = new MarkdownIt()
+                    options =
+                        title: $editPostTitle.val()
+                        description: md.render $editPostDescription.val()
+                        updatedAt: moment(new Date()).format 'lll'
+
+                    $editPostPreview.html renderTemplate 'post-simplified-partial', options
+
+                $editPostModal.on 'show.bs.modal', (e) =>
+                    $editPostTabData.tab 'show'
+                    postId = parseInt $(e.relatedTarget).data('post-id'), 10
+                    post = _.findWhere @posts, id: postId
+
+                    $editPostForm.attr 'action', "#{metadataStore.getMetadata 'domain-api' }/post/#{postId}/update"
+                    $editPostTitle.val post.title
+                    $editPostDescription.val post.description
+                    $editPostSubmitError.text ''
+
+                $editPostModal.on 'shown.bs.modal', (e) ->
+                    $editPostTitle.focus()
+
+                $editPostForm.on 'submit', (e) ->
+                    e.preventDefault()
+                    $editPostForm.ajaxSubmit
+                        beforeSubmit: ->
+                            $editPostSubmitError.text ''
+                            $editPostSubmitButton.prop 'disabled', yes
+                        clearForm: yes
+                        dataType: 'json'
+                        xhrFields:
+                            withCredentials: yes
+                        success: (responseText, textStatus, jqXHR) ->
+                            $editPostModal.modal 'hide'
+                        error: (jqXHR, textStatus, errorThrown) ->
+                            if jqXHR.responseJSON?
+                                $editPostSubmitError.text jqXHR.responseJSON
+                            else
+                                $editPostSubmitError.text 'Unknown error. Please try again later.'
+                        complete: ->
+                            $editPostSubmitButton.prop 'disabled', no
+
+
         present: ->
             @$main = $ '#main'
 
@@ -148,10 +223,12 @@ define 'newsView', ['jquery', 'underscore', 'view', 'renderTemplate', 'dataStore
                             if _.contains ['admin', 'manager'], identity.role
                                 @initCreatePostModal()
                                 @initRemovePostModal()
+                                @initEditPostModal()
 
                     if dataStore.supportsRealtime()
                         dataStore.connectRealtime()
-                        dataStore.getRealtimeProvider().addEventListener 'createPost', (e) =>
+
+                        @onCreatePost = (e) =>
                             data = JSON.parse e.data
                             post =
                                 id: data.id
@@ -163,7 +240,19 @@ define 'newsView', ['jquery', 'underscore', 'view', 'renderTemplate', 'dataStore
                             @posts.push post
                             @renderPosts()
 
-                        dataStore.getRealtimeProvider().addEventListener 'removePost', (e) =>
+                        dataStore.getRealtimeProvider().addEventListener 'createPost', @onCreatePost
+
+                        @onUpdatePost = (e) =>
+                            data = JSON.parse e.data
+                            post = _.findWhere @posts, id: data.id
+                            post.title = data.title
+                            post.description = data.description
+                            post.updatedAt = new Date data.updatedAt
+                            @renderPosts()
+
+                        dataStore.getRealtimeProvider().addEventListener 'updatePost', @onUpdatePost
+
+                        @onRemovePost = (e) =>
                             post = JSON.parse e.data
                             ndx = _.findIndex @posts, id: post.id
 
@@ -171,10 +260,20 @@ define 'newsView', ['jquery', 'underscore', 'view', 'renderTemplate', 'dataStore
                                 @posts.splice ndx, 1
                                 @renderPosts()
 
+                        dataStore.getRealtimeProvider().addEventListener 'removePost', @onRemovePost
+
+
         dismiss: ->
             if dataStore.supportsRealtime()
-                dataStore.getRealtimeProvider().removeEventListener 'createPost'
-                dataStore.getRealtimeProvider().removeEventListener 'removePost'
+                if @onCreatePost?
+                    dataStore.getRealtimeProvider().removeEventListener 'createPost', @onCreatePost
+                    @onCreatePost = null
+                if @onRemovePost?
+                    dataStore.getRealtimeProvider().removeEventListener 'removePost', @onRemovePost
+                    @onRemovePost = null
+                if @onUpdatePost?
+                    dataStore.getRealtimeProvider().removeEventListener 'updatePost', @onUpdatePost
+                    @onUpdatePost = null
                 dataStore.disconnectRealtime()
 
             @$main.empty()

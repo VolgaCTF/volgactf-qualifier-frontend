@@ -3,6 +3,7 @@
     <head>
         <title>{{#event}}{{ title }}{{/event}} :: Main</title>
 
+        <meta charset="utf8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
 
         <link rel="stylesheet" href="//cdn.{{ domain }}/css/bootstrap.css">
@@ -151,7 +152,7 @@
                             <small>Updated on <%- updatedAt %></small>
                             <% if (manageable) { %>
                             &nbsp;
-                            <button type="button" class="btn btn-success btn-xs" data-action="edit-post">
+                            <button type="button" class="btn btn-success btn-xs" data-action="edit-post" data-toggle="modal" data-target="#edit-post-modal" data-post-id="<%- id %>">
                                 <i class="glyphicon glyphicon-pencil"></i>&nbsp;Edit
                             </button>
                             <button type="button" class="btn btn-danger btn-xs" data-action="remove-post" data-toggle="modal" data-target="#remove-post-modal" data-post-id="<%- id %>">
@@ -235,6 +236,47 @@
                             <div class="modal-footer">
                                 <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
                                 <button type="button" class="btn btn-danger" data-action="complete-remove-post">Remove</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="modal fade" id="edit-post-modal" tabindex="-1" role="dialog">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                                <h4 class="modal-title">Edit post</h4>
+                            </div>
+                            <div class="modal-body">
+                                <div>
+                                    <ul class="nav nav-tabs" id="edit-post-tablist">
+                                        <li><a href="#edit-post-data" role="tab" data-toggle="tab">Data</a></li>
+                                        <li><a href="#edit-post-preview" role="tab" data-toggle="tab">Preview</a></li>
+                                    </ul>
+
+                                    <div class="tab-content">
+                                        <div role="tabpanel" class="tab-pane" id="edit-post-data">
+                                            <form method="POST">
+                                                <div class="form-group">
+                                                    <label for="edit-post-title" class="control-label">Title</label>
+                                                    <input type="text" class="form-control" id="edit-post-title" required minlength="2" maxlength="250" name="title">
+                                                    <label for="edit-post-description" class="control-label">Description</label>
+                                                    <textarea class="form-control" id="edit-post-description" required minlength="1" maxlength="4096" name="description"></textarea>
+                                                </div>
+                                                <div class="submit-error">
+                                                    <p class="text-danger"></p>
+                                                </div>
+                                            </form>
+                                        </div>
+                                        <div role="tabpanel" class="tab-pane" id="edit-post-preview">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                                <button type="button" class="btn btn-primary" data-action="complete-edit-post">Save</button>
                             </div>
                         </div>
                     </div>
