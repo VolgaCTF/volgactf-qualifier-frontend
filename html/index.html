@@ -7,7 +7,6 @@
         <meta name="viewport" content="width=device-width, initial-scale=1">
 
         <link rel="stylesheet" href="//cdn.{{ domain }}/css/bootstrap.css">
-        <link rel="stylesheet" href="//cdn.{{ domain }}/css/font-awesome.css">
         <link rel="stylesheet" href="//cdn.{{ domain }}/css/themis.css">
 
         <script type="text/x-metadata" data-name="domain-api" data-value="//api.{{ domain }}"></script>
@@ -38,12 +37,12 @@
         <footer class="footer">
             <div class="container">
                 <div class="col-sm-4">
-                    <p><i class="fa fa-copyright"></i> 2015, <a href="https://github.com/aspyatkin" target="_blank">Alexander Pyatkin</a></p>
+                    <p><span class="glyphicon glyphicon-copyright-mark"></span> 2015, <a href="https://github.com/aspyatkin" target="_blank">Alexander Pyatkin</a></p>
                 </div>
                 <div class="col-sm-4 col-sm-offset-4">
                     <ul class="list-unstyled text-right">
-                        <li><a href="http://volgactf.ru" target="_blank">volgactf.ru</a>&nbsp;<i class="fa fa-info-circle"></i></li>
-                        <li><a href="https://twitter.com/VolgaCTF" target="_blank">@VolgaCTF</a>&nbsp;<i class="fa fa-twitter"></i></li>
+                        <li><a href="http://volgactf.ru" target="_blank">volgactf.ru</a><!--&nbsp;<i class="fa fa-info-circle"></i>--></li>
+                        <li><a href="https://twitter.com/VolgaCTF" target="_blank">@VolgaCTF</a><!--&nbsp;<i class="fa fa-twitter"></i>--></li>
                     </ul>
                 </div>
             </div>
@@ -65,7 +64,7 @@
 
                 <ul class="nav navbar-nav navbar-right">
                     <% if (identity === null || identity.role === 'guest') { %>
-                    <li class="<% print((active === 'signin') ? 'active' : ''); %>"><a href="/signin" data-push-history>Sign in</a></li>
+                    <li class="<% print((active === 'signin') ? 'active' : ''); %>"><a href="/signin" data-push-history><span class="glyphicon glyphicon-log-in"></span>&nbsp;Sign in</a></li>
                     <% } else { %>
                     <li class="dropdown">
                         <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
@@ -80,9 +79,9 @@
                         </a>
                         <ul class="dropdown-menu" role="menu">
                             <% if (identity.role === 'team') { %>
-                            <li><a href="/profile/<%- identity.id %>" data-push-history>Edit profile</a></li>
+                            <li><a href="/profile/<%- identity.id %>" data-push-history><span class="glyphicon glyphicon-cog"></span>&nbsp;Edit profile</a></li>
                             <% } %>
-                            <li><a href="#" data-action="signout" data-push-history>Sign out</a></li>
+                            <li><a href="#" data-action="signout" data-push-history><span class="glyphicon glyphicon-log-out"></span>&nbsp;Sign out</a></li>
                         </ul>
                     </li>
                     <% } %>
@@ -389,7 +388,7 @@
                         <p>Interested? Please register for the competition!</p>
                         <p>
                             <a class="btn btn-primary btn-lg" href="/signup" role="button" data-push-history>Sign up</a>
-                            <a class="btn btn-success btn-lg" href="/signin" role="button" data-push-history>Sign in</a>
+                            <a class="btn btn-success btn-lg" href="/signin" role="button" data-push-history><span class="glyphicon glyphicon-log-in"></span>&nbsp;Sign in</a>
                         </p>
                     </div>
                     <% } else if (identity.role === 'team') { %>
@@ -397,7 +396,7 @@
                     <% if (!('emailConfirmed' in identity) || !identity.emailConfirmed) { %>
                     <div class="alert alert-warning" role="alert">
                         <p>
-                            You need to confirm your email address.
+                            <span class="glyphicon glyphicon-alert"></span>&nbsp;You need to confirm your email address.
                             Please check your inbox and follow the provided instructions.
                         </p>
                         <p>Note, if you do not confirm your email address, the team account will be deleted in several days.</p>
@@ -424,7 +423,7 @@
                         <div class="submit-error">
                             <p class="text-danger"></p>
                         </div>
-                        <button class="btn btn-lg btn-primary btn-block" type="submit">Sign in</button>
+                        <button class="btn btn-lg btn-primary btn-block" type="submit"><span class="glyphicon glyphicon-log-in"></span>&nbsp;Sign in</button>
                     </form>
                 </div>
             </script>
@@ -457,7 +456,7 @@
                         <h1>Email verification</h1>
                     </header>
                     <section>
-                        <p data-role="progress"><i class="fa fa-spinner fa-spin"></i>&nbsp;Processing</p>
+                        <p data-role="progress">Processing ...</p>
                         <p data-role="result"></p>
                     </section>
                 </div>
@@ -480,7 +479,7 @@
                         <ul class="list-unstyled">
                             <% if ('email' in team && 'emailConfirmed' in team) { %>
                             <li>
-                                <i class="fa fa-envelope-o"></i>
+                                <span class="glyphicon glyphicon-envelope"></span>
                                 <% if (team.emailConfirmed) { %>
                                 <span class="text-success" title="Email verified"><%- team.email %></span>
                                 <% } else { %>
@@ -507,7 +506,7 @@
                             <% } %>
                             <% if (identity.role === 'team' && identity.id === team.id) { %>
                             <li>
-                                <button type="button" class="btn btn-primary btn-xs" data-action="edit-profile">Edit</button>
+                                <button type="button" class="btn btn-primary btn-xs" data-action="edit-profile"><span class="glyphicon glyphicon-pencil"></span>&nbsp;Edit</button>
                                 <button type="button" class="btn btn-primary btn-xs" data-action="change-password">Change password</button>
                             </li>
                             <% } %>
