@@ -36,6 +36,7 @@ define 'signinView', ['jquery', 'view', 'renderTemplate', 'dataStore', 'navigati
                             dataType: 'json'
                             xhrFields:
                                 withCredentials: yes
+                            headers: { 'X-CSRF-Token': identity.token }
                             success: (responseText, textStatus, jqXHR) ->
                                 stateController.navigateTo '/'
                             error: (jqXHR, textStatus, errorThrown) ->

@@ -53,9 +53,9 @@ define 'newsView', ['jquery', 'underscore', 'view', 'renderTemplate', 'dataStore
                     $removePostModalBody.html renderTemplate 'remove-post-confirmation', title: post.title
                     $removePostSubmitError.text ''
 
-                $removePostSubmitButton.on 'click', (e) ->
+                $removePostSubmitButton.on 'click', (e) =>
                     postId = $removePostModal.data 'post-id'
-                    dataStore.removePost postId, (err) ->
+                    dataStore.removePost postId, @identity.token, (err) ->
                         if err?
                             $removePostSubmitError.text err
                         else
@@ -107,7 +107,7 @@ define 'newsView', ['jquery', 'underscore', 'view', 'renderTemplate', 'dataStore
                 $createPostModal.on 'shown.bs.modal', (e) ->
                     $createPostTitle.focus()
 
-                $createPostForm.on 'submit', (e) ->
+                $createPostForm.on 'submit', (e) =>
                     e.preventDefault()
                     $createPostForm.ajaxSubmit
                         beforeSubmit: ->
@@ -117,6 +117,7 @@ define 'newsView', ['jquery', 'underscore', 'view', 'renderTemplate', 'dataStore
                         dataType: 'json'
                         xhrFields:
                             withCredentials: yes
+                        headers: { 'X-CSRF-Token': @identity.token }
                         success: (responseText, textStatus, jqXHR) ->
                             $createPostModal.modal 'hide'
                         error: (jqXHR, textStatus, errorThrown) ->
@@ -176,7 +177,7 @@ define 'newsView', ['jquery', 'underscore', 'view', 'renderTemplate', 'dataStore
                 $editPostModal.on 'shown.bs.modal', (e) ->
                     $editPostTitle.focus()
 
-                $editPostForm.on 'submit', (e) ->
+                $editPostForm.on 'submit', (e) =>
                     e.preventDefault()
                     $editPostForm.ajaxSubmit
                         beforeSubmit: ->
@@ -186,6 +187,7 @@ define 'newsView', ['jquery', 'underscore', 'view', 'renderTemplate', 'dataStore
                         dataType: 'json'
                         xhrFields:
                             withCredentials: yes
+                        headers: { 'X-CSRF-Token': @identity.token }
                         success: (responseText, textStatus, jqXHR) ->
                             $editPostModal.modal 'hide'
                         error: (jqXHR, textStatus, errorThrown) ->
@@ -278,6 +280,9 @@ define 'newsView', ['jquery', 'underscore', 'view', 'renderTemplate', 'dataStore
 
             @$main.empty()
             @$main = null
+            @identity = null
+            @posts = []
+
             navigationBar.dismiss()
 
     new NewsView()

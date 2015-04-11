@@ -52,12 +52,15 @@ define 'dataStore', ['jquery', 'metadataStore'], ($, metadataStore) ->
                 dataType: 'json'
                 xhrFields:
                     withCredentials: yes
-                success: (responseText, textStatus, jqXHR) ->
-                    callback null, responseText
+                success: (responseJSON, textStatus, jqXHR) ->
+                    callback null, responseJSON
                 error: (jqXHR, textStatus, errorThrown) ->
-                    callback errorThrown, null
+                    if jqXHR.responseJSON?
+                        callback jqXHR.responseJSON, null
+                    else
+                        callback 'Unknown error. Please try again later.', null
 
-        verifyEmail: (data, callback) ->
+        verifyEmail: (data, token, callback) ->
             url = "#{metadataStore.getMetadata 'domain-api' }/team/verify-email"
             $.ajax
                 url: url
@@ -66,6 +69,7 @@ define 'dataStore', ['jquery', 'metadataStore'], ($, metadataStore) ->
                 data: data
                 xhrFields:
                     withCredentials: yes
+                headers: { 'X-CSRF-Token': token }
                 success: (responseJSON, textStatus, jqXHR) ->
                     callback null, responseJSON
                 error: (jqXHR, textStatus, errorThrown) ->
@@ -75,7 +79,7 @@ define 'dataStore', ['jquery', 'metadataStore'], ($, metadataStore) ->
                         callback 'Unknown error. Please try again later.', null
 
         getTeamProfile: (id, callback) ->
-            url = "#{metadataStore.getMetadata 'domain-api' }/team/profile/#{id}"
+            url = "#{metadataStore.getMetadata 'domain-api' }/team/#{id}/profile"
             $.ajax
                 url: url
                 dataType: 'json'
@@ -128,7 +132,7 @@ define 'dataStore', ['jquery', 'metadataStore'], ($, metadataStore) ->
                     else
                         callback 'Unknown error. Please try again later.', null
 
-        removePost: (id, callback) ->
+        removePost: (id, token, callback) ->
             url = "#{metadataStore.getMetadata 'domain-api' }/post/#{id}/remove"
             $.ajax
                 url: url
@@ -137,6 +141,7 @@ define 'dataStore', ['jquery', 'metadataStore'], ($, metadataStore) ->
                 data: {}
                 xhrFields:
                     withCredentials: yes
+                headers: { 'X-CSRF-Token': token }
                 success: (responseJSON, textStatus, jqXHR) ->
                     callback null
                 error: (jqXHR, textStatus, errorThrown) ->
@@ -180,7 +185,7 @@ define 'dataStore', ['jquery', 'metadataStore'], ($, metadataStore) ->
 #= include controllers/view-base.coffee
 #= include controllers/view.coffee
 
-define 'navigationBar', ['jquery', 'underscore', 'renderTemplate', 'metadataStore', 'stateController'], ($, _, renderTemplate, metadataStore, stateController) ->
+define 'navigationBar', ['jquery', 'underscore', 'renderTemplate', 'metadataStore', 'stateController', 'dataStore'], ($, _, renderTemplate, metadataStore, stateController, dataStore) ->
     class NavigationBar
         present: (options = {}) ->
             defaultOptions =
@@ -209,6 +214,7 @@ define 'navigationBar', ['jquery', 'underscore', 'renderTemplate', 'metadataStor
                         dataType: 'json'
                         xhrFields:
                             withCredentials: yes
+                        headers: { 'X-CSRF-Token': options.identity.token }
                         success: (responseText, textStatus, jqXHR) ->
                             stateController.navigateTo '/'
                         error: (jqXHR, textStatus, errorThrown) ->

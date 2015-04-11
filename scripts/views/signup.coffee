@@ -38,6 +38,7 @@ define 'signupView', ['jquery', 'view', 'renderTemplate', 'dataStore', 'navigati
                             dataType: 'json'
                             xhrFields:
                                 withCredentials: yes
+                            headers: { 'X-CSRF-Token': identity.token }
                             success: (responseText, textStatus, jqXHR) ->
                                 $form.hide()
                                 $successAlert.show()

@@ -20,7 +20,7 @@ define 'verifyEmailView', ['jquery', 'view', 'renderTemplate', 'dataStore', 'nav
                     $progress = $main.find 'p[data-role="progress"]'
                     $result = $main.find 'p[data-role="result"]'
 
-                    dataStore.verifyEmail History.getState().data.params, (err, result) ->
+                    dataStore.verifyEmail History.getState().data.params, identity.token, (err, result) ->
                         $progress.hide()
                         if err?
                             $result.addClass('text-danger').text err

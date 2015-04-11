@@ -73,7 +73,7 @@
                             <% } else if (identity.role === 'manager') { %>
                             <span class="label label-primary">M</span>
                             <% } else if (identity.role === 'team') { %>
-                            <img class="profile-image" src="//api.{{ domain }}/team/logo/<%- identity.id %>">
+                            <img class="profile-image" src="//api.{{ domain }}/team/<%- identity.id %>/logo">
                             <% } %>
                             <%- identity.name %>&nbsp;<span class="caret"></span>
                         </a>
@@ -91,7 +91,7 @@
             <script type="text/x-template" data-name="team-profile-simplified-partial">
                 <div class="clearfix themis-profile">
                     <div class="pull-left logo">
-                        <img class="img-thumbnail" src="//api.{{ domain }}/team/logo/<%- team.id %>">
+                        <img class="img-thumbnail" src="//api.{{ domain }}/team/<%- team.id %>/logo">
                     </div>
                     <div class="pull-left info">
                         <h4 class="text-primary"><a href="/profile/<%- team.id %>" data-push-history><%- team.name %></a></h4>
@@ -203,7 +203,7 @@
                                                     <label for="create-post-title" class="control-label">Title</label>
                                                     <input type="text" class="form-control" id="create-post-title" required minlength="2" maxlength="250" name="title">
                                                     <label for="create-post-description" class="control-label">Description</label>
-                                                    <textarea class="form-control" id="create-post-description" required minlength="1" maxlength="4096" name="description"></textarea>
+                                                    <textarea class="form-control themis-post-description" id="create-post-description" required minlength="1" maxlength="4096" name="description"></textarea>
                                                 </div>
                                                 <div class="submit-error">
                                                     <p class="text-danger"></p>
@@ -265,7 +265,7 @@
                                                     <label for="edit-post-title" class="control-label">Title</label>
                                                     <input type="text" class="form-control" id="edit-post-title" required minlength="2" maxlength="250" name="title">
                                                     <label for="edit-post-description" class="control-label">Description</label>
-                                                    <textarea class="form-control" id="edit-post-description" required minlength="1" maxlength="4096" name="description"></textarea>
+                                                    <textarea class="form-control themis-post-description" id="edit-post-description" required minlength="1" maxlength="4096" name="description"></textarea>
                                                 </div>
                                                 <div class="submit-error">
                                                     <p class="text-danger"></p>
@@ -470,11 +470,11 @@
                 <div class="clearfix themis-profile">
                     <div class="pull-left logo">
                         <% if (identity.role === 'team' && identity.id === team.id) { %>
-                        <a href="#" data-action="upload-logo">
-                            <img class="img-thumbnail" src="//api.{{ domain }}/team/logo/<%- team.id %>">
+                        <a href="#" data-action="upload-logo" data-toggle="modal" data-target="#upload-logo-modal">
+                            <img class="img-thumbnail" src="//api.{{ domain }}/team/<%- team.id %>/logo">
                         </a>
                         <% } else { %>
-                            <img class="img-thumbnail" src="//api.{{ domain }}/team/logo/<%- team.id %>">
+                            <img class="img-thumbnail" src="//api.{{ domain }}/team/<%- team.id %>/logo">
                         <% } %>
                     </div>
                     <div class="pull-left info">
@@ -490,8 +490,8 @@
                                 <span class="text-danger" title="Email not verified"><%- team.email %></span>
                                 <% if (identity.role === 'team' && identity.id === team.id) { %>
                                 <br>
-                                <button type="button" class="btn btn-primary btn-xs" data-action="resend-confirmation">Resend confirmation email</button>
-                                <button type="button" class="btn btn-danger btn-xs" data-action="change-email">Change email</button>
+                                <button type="button" class="btn btn-primary btn-xs" data-action="resend-confirmation" data-toggle="modal" data-target="#resend-confirmation-modal">Resend confirmation email</button>
+                                <button type="button" class="btn btn-danger btn-xs" data-action="change-email" data-toggle="modal" data-target="#change-email-modal">Change email</button>
                                 <% } %>
                                 <% } %>
                             </li>
@@ -510,8 +510,8 @@
                             <% } %>
                             <% if (identity.role === 'team' && identity.id === team.id) { %>
                             <li>
-                                <button type="button" class="btn btn-primary btn-xs" data-action="edit-profile"><span class="glyphicon glyphicon-pencil"></span>&nbsp;Edit</button>
-                                <button type="button" class="btn btn-primary btn-xs" data-action="change-password">Change password</button>
+                                <button type="button" class="btn btn-primary btn-xs" data-action="edit-profile" data-toggle="modal" data-target="#edit-profile-modal"><span class="glyphicon glyphicon-pencil"></span>&nbsp;Edit</button>
+                                <button type="button" class="btn btn-primary btn-xs" data-action="change-password" data-toggle="modal" data-target="#change-password-modal">Change password</button>
                             </li>
                             <% } %>
                         </ul>
