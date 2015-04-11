@@ -47,7 +47,7 @@ define 'signinView', ['jquery', 'view', 'renderTemplate', 'dataStore', 'navigati
                                 $submitButton.prop 'disabled', no
                 else
                     $main.html renderTemplate 'already-authenticated'
-                    navigationBar.present()
+                    navigationBar.present identity: identity
 
         dismiss: ->
             $('#main').empty()

@@ -16,7 +16,6 @@ define 'signupView', ['jquery', 'view', 'renderTemplate', 'dataStore', 'navigati
 
                 if identity.role == 'guest'
                     $main.html renderTemplate 'signup-view'
-                    navigationBar.present()
 
                     $form = $main.find 'form.themis-form-signup'
                     $form.parsley()
@@ -51,7 +50,8 @@ define 'signupView', ['jquery', 'view', 'renderTemplate', 'dataStore', 'navigati
                                 $submitButton.prop 'disabled', no
                 else
                     $main.html renderTemplate 'already-authenticated'
-                    navigationBar.present()
+
+                navigationBar.present identity: identity
 
         dismiss: ->
             $('#main').empty()
