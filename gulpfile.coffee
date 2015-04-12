@@ -25,6 +25,8 @@ paths =
         'bower_components/jquery-form/jquery.form.js'
         'bower_components/query-string/query-string.js'
         'bower_components/parsleyjs/dist/parsley.js'
+        'bower_components/markdown-it/dist/markdown-it.js'
+        'bower_components/moment/moment.js'
         'scripts/themis.coffee'
     ]
     fonts: [
@@ -33,15 +35,9 @@ paths =
         'bower_components/bootstrap/dist/fonts/*.ttf'
         'bower_components/bootstrap/dist/fonts/*.woff'
         'bower_components/bootstrap/dist/fonts/*.woff2'
-        'bower_components/fontawesome/fonts/*.eot'
-        'bower_components/fontawesome/fonts/*.svg'
-        'bower_components/fontawesome/fonts/*.ttf'
-        'bower_components/fontawesome/fonts/*.woff'
-        'bower_components/fontawesome/fonts/*.woff2'
     ]
     stylesheets: [
         'bower_components/bootstrap/dist/css/bootstrap.css'
-        'bower_components/fontawesome/css/font-awesome.css'
         'stylesheets/themis.sass'
     ]
     html: [

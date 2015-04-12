@@ -16,7 +16,6 @@ define 'loginView', ['jquery', 'view', 'renderTemplate', 'dataStore', 'navigatio
 
                 if identity.role == 'guest'
                     $main.html renderTemplate 'login-view'
-                    navigationBar.present()
 
                     $form = $main.find 'form.themis-form-login'
                     $form.parsley()
@@ -34,6 +33,7 @@ define 'loginView', ['jquery', 'view', 'renderTemplate', 'dataStore', 'navigatio
                             dataType: 'json'
                             xhrFields:
                                 withCredentials: yes
+                            headers: { 'X-CSRF-Token': identity.token }
                             success: (responseText, textStatus, jqXHR) ->
                                 stateController.navigateTo '/'
                             error: (jqXHR, textStatus, errorThrown) ->
@@ -45,7 +45,8 @@ define 'loginView', ['jquery', 'view', 'renderTemplate', 'dataStore', 'navigatio
                                 $submitButton.prop 'disabled', no
                 else
                     $main.html renderTemplate 'already-authenticated'
-                    navigationBar.present()
+
+                navigationBar.present identity: identity
 
         dismiss: ->
             $('#main').empty()

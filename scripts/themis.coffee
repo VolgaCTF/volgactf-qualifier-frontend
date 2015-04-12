@@ -23,6 +23,14 @@ require.config
         parsley: [
             'http://cdnjs.cloudflare.com/ajax/libs/parsley.js/2.0.7/parsley.min',
             'parsley'
+        ],
+        'markdown-it': [
+            'http://cdnjs.cloudflare.com/ajax/libs/markdown-it/4.1.0/markdown-it.min',
+            'markdown-it'
+        ],
+        'moment': [
+            'http://cdnjs.cloudflare.com/ajax/libs/moment.js/2.9.0/moment.min',
+            'moment'
         ]
     shim:
         'jquery.history':
@@ -35,26 +43,13 @@ require.config
 define 'dataStore', ['jquery', 'metadataStore'], ($, metadataStore) ->
     class DataStore
         constructor: ->
+            @eventSource = null
 
         getIdentity: (callback) ->
             url = "#{metadataStore.getMetadata 'domain-api' }/identity"
             $.ajax
                 url: url
                 dataType: 'json'
-                xhrFields:
-                    withCredentials: yes
-                success: (responseText, textStatus, jqXHR) ->
-                    callback null, responseText
-                error: (jqXHR, textStatus, errorThrown) ->
-                    callback errorThrown, null
-
-        verifyEmail: (data, callback) ->
-            url = "#{metadataStore.getMetadata 'domain-api' }/team/verify-email"
-            $.ajax
-                url: url
-                type: 'POST'
-                dataType: 'json'
-                data: data
                 xhrFields:
                     withCredentials: yes
                 success: (responseJSON, textStatus, jqXHR) ->
@@ -65,8 +60,26 @@ define 'dataStore', ['jquery', 'metadataStore'], ($, metadataStore) ->
                     else
                         callback 'Unknown error. Please try again later.', null
 
+        verifyEmail: (data, token, callback) ->
+            url = "#{metadataStore.getMetadata 'domain-api' }/team/verify-email"
+            $.ajax
+                url: url
+                type: 'POST'
+                dataType: 'json'
+                data: data
+                xhrFields:
+                    withCredentials: yes
+                headers: { 'X-CSRF-Token': token }
+                success: (responseJSON, textStatus, jqXHR) ->
+                    callback null, responseJSON
+                error: (jqXHR, textStatus, errorThrown) ->
+                    if jqXHR.responseJSON?
+                        callback jqXHR.responseJSON, null
+                    else
+                        callback 'Unknown error. Please try again later.', null
+
         getTeamProfile: (id, callback) ->
-            url = "#{metadataStore.getMetadata 'domain-api' }/team/profile/#{id}"
+            url = "#{metadataStore.getMetadata 'domain-api' }/team/#{id}/profile"
             $.ajax
                 url: url
                 dataType: 'json'
@@ -95,6 +108,61 @@ define 'dataStore', ['jquery', 'metadataStore'], ($, metadataStore) ->
                     else
                         callback 'Unknown error. Please try again later.', null
 
+        getPosts: (callback) ->
+            url = "#{metadataStore.getMetadata 'domain-api' }/post/all"
+            $.ajax
+                url: url
+                dataType: 'json'
+                xhrFields:
+                    withCredentials: yes
+                success: (responseJSON, textStatus, jqXHR) ->
+                    result = []
+                    for post in responseJSON
+                        result.push
+                            id: post.id
+                            title: post.title
+                            description: post.description
+                            createdAt: new Date post.createdAt
+                            updatedAt: new Date post.updatedAt
+
+                    callback null, result
+                error: (jqXHR, textStatus, errorThrown) ->
+                    if jqXHR.responseJSON?
+                        callback jqXHR.responseJSON, null
+                    else
+                        callback 'Unknown error. Please try again later.', null
+
+        removePost: (id, token, callback) ->
+            url = "#{metadataStore.getMetadata 'domain-api' }/post/#{id}/remove"
+            $.ajax
+                url: url
+                type: 'POST'
+                dataType: 'json'
+                data: {}
+                xhrFields:
+                    withCredentials: yes
+                headers: { 'X-CSRF-Token': token }
+                success: (responseJSON, textStatus, jqXHR) ->
+                    callback null
+                error: (jqXHR, textStatus, errorThrown) ->
+                    if jqXHR.responseJSON?
+                        callback jqXHR.responseJSON
+                    else
+                        callback 'Unknown error. Please try again later.'
+
+        supportsRealtime: ->
+            window.EventSource?
+
+        connectRealtime: ->
+            @eventSource = new window.EventSource "#{metadataStore.getMetadata 'domain-api' }/events", withCredentials: yes
+
+        disconnectRealtime: ->
+            if @eventSource?
+                @eventSource.close()
+                @eventSource = null
+
+        getRealtimeProvider: ->
+            @eventSource
 
     new DataStore()
 
@@ -117,7 +185,7 @@ define 'dataStore', ['jquery', 'metadataStore'], ($, metadataStore) ->
 #= include controllers/view-base.coffee
 #= include controllers/view.coffee
 
-define 'navigationBar', ['jquery', 'underscore', 'renderTemplate', 'metadataStore', 'stateController'], ($, _, renderTemplate, metadataStore, stateController) ->
+define 'navigationBar', ['jquery', 'underscore', 'renderTemplate', 'metadataStore', 'stateController', 'dataStore'], ($, _, renderTemplate, metadataStore, stateController, dataStore) ->
     class NavigationBar
         present: (options = {}) ->
             defaultOptions =
@@ -146,6 +214,7 @@ define 'navigationBar', ['jquery', 'underscore', 'renderTemplate', 'metadataStor
                         dataType: 'json'
                         xhrFields:
                             withCredentials: yes
+                        headers: { 'X-CSRF-Token': options.identity.token }
                         success: (responseText, textStatus, jqXHR) ->
                             stateController.navigateTo '/'
                         error: (jqXHR, textStatus, errorThrown) ->

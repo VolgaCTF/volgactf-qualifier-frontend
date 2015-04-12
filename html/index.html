@@ -3,10 +3,10 @@
     <head>
         <title>{{#event}}{{ title }}{{/event}} :: Main</title>
 
+        <meta charset="utf8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
 
         <link rel="stylesheet" href="//cdn.{{ domain }}/css/bootstrap.css">
-        <link rel="stylesheet" href="//cdn.{{ domain }}/css/font-awesome.css">
         <link rel="stylesheet" href="//cdn.{{ domain }}/css/themis.css">
 
         <script type="text/x-metadata" data-name="domain-api" data-value="//api.{{ domain }}"></script>
@@ -37,12 +37,12 @@
         <footer class="footer">
             <div class="container">
                 <div class="col-sm-4">
-                    <p><i class="fa fa-copyright"></i> 2015, <a href="https://github.com/aspyatkin" target="_blank">Alexander Pyatkin</a></p>
+                    <p><span class="glyphicon glyphicon-copyright-mark"></span> 2015, <a href="https://github.com/aspyatkin" target="_blank">Alexander Pyatkin</a></p>
                 </div>
                 <div class="col-sm-4 col-sm-offset-4">
                     <ul class="list-unstyled text-right">
-                        <li><a href="http://volgactf.ru" target="_blank">volgactf.ru</a>&nbsp;<i class="fa fa-info-circle"></i></li>
-                        <li><a href="https://twitter.com/VolgaCTF" target="_blank">@VolgaCTF</a>&nbsp;<i class="fa fa-twitter"></i></li>
+                        <li><a href="http://volgactf.ru" target="_blank">volgactf.ru</a><!--&nbsp;<i class="fa fa-info-circle"></i>--></li>
+                        <li><a href="https://twitter.com/VolgaCTF" target="_blank">@VolgaCTF</a><!--&nbsp;<i class="fa fa-twitter"></i>--></li>
                     </ul>
                 </div>
             </div>
@@ -64,7 +64,7 @@
 
                 <ul class="nav navbar-nav navbar-right">
                     <% if (identity === null || identity.role === 'guest') { %>
-                    <li class="<% print((active === 'signin') ? 'active' : ''); %>"><a href="/signin" data-push-history>Sign in</a></li>
+                    <li class="<% print((active === 'signin') ? 'active' : ''); %>"><a href="/signin" data-push-history><span class="glyphicon glyphicon-log-in"></span>&nbsp;Sign in</a></li>
                     <% } else { %>
                     <li class="dropdown">
                         <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
@@ -73,15 +73,15 @@
                             <% } else if (identity.role === 'manager') { %>
                             <span class="label label-primary">M</span>
                             <% } else if (identity.role === 'team') { %>
-                            <img class="profile-image" src="//api.{{ domain }}/team/logo/<%- identity.id %>">
+                            <img class="profile-image" src="//api.{{ domain }}/team/<%- identity.id %>/logo">
                             <% } %>
                             <%- identity.name %>&nbsp;<span class="caret"></span>
                         </a>
                         <ul class="dropdown-menu" role="menu">
                             <% if (identity.role === 'team') { %>
-                            <li><a href="/profile/<%- identity.id %>" data-push-history>Edit profile</a></li>
+                            <li><a href="/profile/<%- identity.id %>" data-push-history><span class="glyphicon glyphicon-cog"></span>&nbsp;Edit profile</a></li>
                             <% } %>
-                            <li><a href="#" data-action="signout" data-push-history>Sign out</a></li>
+                            <li><a href="#" data-action="signout" data-push-history><span class="glyphicon glyphicon-log-out"></span>&nbsp;Sign out</a></li>
                         </ul>
                     </li>
                     <% } %>
@@ -91,10 +91,22 @@
             <script type="text/x-template" data-name="team-profile-simplified-partial">
                 <div class="clearfix themis-profile">
                     <div class="pull-left logo">
-                        <img class="img-thumbnail" src="//api.{{ domain }}/team/logo/<%- team.id %>">
+                        <img class="img-thumbnail" src="//api.{{ domain }}/team/<%- team.id %>/logo">
                     </div>
                     <div class="pull-left info">
                         <h4 class="text-primary"><a href="/profile/<%- team.id %>" data-push-history><%- team.name %></a></h4>
+                        <ul class="list-unstyled">
+                            <% if ('email' in team && 'emailConfirmed' in team) { %>
+                            <li>
+                                <span class="glyphicon glyphicon-envelope"></span>
+                                <% if (team.emailConfirmed) { %>
+                                <span class="text-success" title="Email verified"><%- team.email %></span>
+                                <% } else { %>
+                                <span class="text-danger" title="Email not verified"><%- team.email %></span>
+                                <% } %>
+                            </li>
+                            <% } %>
+                        </ul>
                         <ul class="list-unstyled">
                             <% if (team.country !== '') { %>
                             <li><strong>Country:</strong> <%- team.country %></li>
@@ -110,13 +122,61 @@
                 </div>
             </script>
 
+            <script type="text/x-template" data-name="team-count-partial">
+                <span>&nbsp;(<%- count %>)</span>
+            </script>
+
             <script type="text/x-template" data-name="teams-view">
                 <div class="container">
                     <header>
-                        <h1>Teams</h1>
+                        <h2>Teams<span class="themis-team-count"></span></h2>
                     </header>
                     <section>
                     </section>
+                </div>
+            </script>
+
+            <script type="text/x-template" data-name="post-simplified-partial">
+                <div class="themis-post">
+                    <header>
+                        <h3><%- title %></h3>
+                    </header>
+                    <section>
+                        <%= description %>
+                    </section>
+                    <footer>
+                        <p class="text-muted"><small>Updated on <%- updatedAt %></small></p>
+                    </footer>
+                </div>
+            </script>
+
+            <script type="text/x-template" data-name="remove-post-confirmation">
+                You are about to remove the post <mark><%- title %></mark>. Continue?
+            </script>
+
+            <script type="text/x-template" data-name="post-partial">
+                <div class="themis-post" data-id="<%- id %>">
+                    <header>
+                        <h3><%- title %></h3>
+                    </header>
+                    <section>
+                        <%= description %>
+                    </section>
+                    <footer>
+                        <p class="text-muted">
+                            <small>Updated on <%- updatedAt %></small>
+                            <% if (manageable) { %>
+                            &nbsp;
+                            <button type="button" class="btn btn-success btn-xs" data-action="edit-post" data-toggle="modal" data-target="#edit-post-modal" data-post-id="<%- id %>">
+                                <i class="glyphicon glyphicon-pencil"></i>&nbsp;Edit
+                            </button>
+                            <button type="button" class="btn btn-danger btn-xs" data-action="remove-post" data-toggle="modal" data-target="#remove-post-modal" data-post-id="<%- id %>">
+                                <i class="glyphicon glyphicon-remove"></i>&nbsp;Remove
+                            </button>
+                            <% } %>
+                        </p>
+
+                    </footer>
                 </div>
             </script>
 
@@ -124,10 +184,117 @@
                 <div class="container">
                     <header>
                         <h1>News</h1>
+                        <% if (identity.role === 'admin' || identity.role === 'manager') { %>
+                        <button type="button" class="btn btn-primary btn-xs" data-action="create-post" data-toggle="modal" data-target="#create-post-modal">
+                            <i class="glyphicon glyphicon-plus"></i>&nbsp;Create
+                        </button>
+                        <% } %>
                     </header>
                     <section>
-                        <p class="lead">No news yet.</p>
                     </section>
+                </div>
+
+                <div class="modal fade" id="create-post-modal" tabindex="-1" role="dialog">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                                <h4 class="modal-title">Create post</h4>
+                            </div>
+                            <div class="modal-body">
+                                <div>
+                                    <ul class="nav nav-tabs" id="create-post-tablist">
+                                        <li><a href="#create-post-data" role="tab" data-toggle="tab">Data</a></li>
+                                        <li><a href="#create-post-preview" role="tab" data-toggle="tab">Preview</a></li>
+                                    </ul>
+
+                                    <div class="tab-content">
+                                        <div role="tabpanel" class="tab-pane" id="create-post-data">
+                                            <form method="POST" action="//api.{{ domain }}/post/create">
+                                                <div class="form-group">
+                                                    <label for="create-post-title" class="control-label">Title</label>
+                                                    <input type="text" class="form-control" id="create-post-title" required minlength="2" maxlength="250" name="title">
+                                                    <label for="create-post-description" class="control-label">Description</label>
+                                                    <textarea class="form-control themis-post-description" id="create-post-description" required minlength="1" maxlength="4096" name="description"></textarea>
+                                                </div>
+                                                <div class="submit-error">
+                                                    <p class="text-danger"></p>
+                                                </div>
+                                            </form>
+                                        </div>
+                                        <div role="tabpanel" class="tab-pane" id="create-post-preview">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                                <button type="button" class="btn btn-primary" data-action="complete-create-post">Create</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="modal fade" id="remove-post-modal" tabindex="-1" role="dialog">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                                <h4 class="modal-title">Remove post</h4>
+                            </div>
+                            <div class="modal-body">
+                                <p class="confirmation"></p>
+                                <div class="submit-error">
+                                    <p class="text-danger"></p>
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                                <button type="button" class="btn btn-danger" data-action="complete-remove-post">Remove</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="modal fade" id="edit-post-modal" tabindex="-1" role="dialog">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                                <h4 class="modal-title">Edit post</h4>
+                            </div>
+                            <div class="modal-body">
+                                <div>
+                                    <ul class="nav nav-tabs" id="edit-post-tablist">
+                                        <li><a href="#edit-post-data" role="tab" data-toggle="tab">Data</a></li>
+                                        <li><a href="#edit-post-preview" role="tab" data-toggle="tab">Preview</a></li>
+                                    </ul>
+
+                                    <div class="tab-content">
+                                        <div role="tabpanel" class="tab-pane" id="edit-post-data">
+                                            <form method="POST">
+                                                <div class="form-group">
+                                                    <label for="edit-post-title" class="control-label">Title</label>
+                                                    <input type="text" class="form-control" id="edit-post-title" required minlength="2" maxlength="250" name="title">
+                                                    <label for="edit-post-description" class="control-label">Description</label>
+                                                    <textarea class="form-control themis-post-description" id="edit-post-description" required minlength="1" maxlength="4096" name="description"></textarea>
+                                                </div>
+                                                <div class="submit-error">
+                                                    <p class="text-danger"></p>
+                                                </div>
+                                            </form>
+                                        </div>
+                                        <div role="tabpanel" class="tab-pane" id="edit-post-preview">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                                <button type="button" class="btn btn-primary" data-action="complete-edit-post">Save</button>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </script>
 
@@ -237,7 +404,7 @@
                         <p>Interested? Please register for the competition!</p>
                         <p>
                             <a class="btn btn-primary btn-lg" href="/signup" role="button" data-push-history>Sign up</a>
-                            <a class="btn btn-success btn-lg" href="/signin" role="button" data-push-history>Sign in</a>
+                            <a class="btn btn-success btn-lg" href="/signin" role="button" data-push-history><span class="glyphicon glyphicon-log-in"></span>&nbsp;Sign in</a>
                         </p>
                     </div>
                     <% } else if (identity.role === 'team') { %>
@@ -245,7 +412,7 @@
                     <% if (!('emailConfirmed' in identity) || !identity.emailConfirmed) { %>
                     <div class="alert alert-warning" role="alert">
                         <p>
-                            You need to confirm your email address.
+                            <span class="glyphicon glyphicon-alert"></span>&nbsp;You need to confirm your email address.
                             Please check your inbox and follow the provided instructions.
                         </p>
                         <p>Note, if you do not confirm your email address, the team account will be deleted in several days.</p>
@@ -272,7 +439,7 @@
                         <div class="submit-error">
                             <p class="text-danger"></p>
                         </div>
-                        <button class="btn btn-lg btn-primary btn-block" type="submit">Sign in</button>
+                        <button class="btn btn-lg btn-primary btn-block" type="submit"><span class="glyphicon glyphicon-log-in"></span>&nbsp;Sign in</button>
                     </form>
                 </div>
             </script>
@@ -305,7 +472,7 @@
                         <h1>Email verification</h1>
                     </header>
                     <section>
-                        <p data-role="progress"><i class="fa fa-spinner fa-spin"></i>&nbsp;Processing</p>
+                        <p data-role="progress">Processing ...</p>
                         <p data-role="result"></p>
                     </section>
                 </div>
@@ -315,11 +482,11 @@
                 <div class="clearfix themis-profile">
                     <div class="pull-left logo">
                         <% if (identity.role === 'team' && identity.id === team.id) { %>
-                        <a href="#" data-action="upload-logo">
-                            <img class="img-thumbnail" src="//api.{{ domain }}/team/logo/<%- team.id %>">
+                        <a href="#" data-action="upload-logo" data-toggle="modal" data-target="#upload-logo-modal">
+                            <img class="img-thumbnail" src="//api.{{ domain }}/team/<%- team.id %>/logo">
                         </a>
                         <% } else { %>
-                            <img class="img-thumbnail" src="//api.{{ domain }}/team/logo/<%- team.id %>">
+                            <img class="img-thumbnail" src="//api.{{ domain }}/team/<%- team.id %>/logo">
                         <% } %>
                     </div>
                     <div class="pull-left info">
@@ -328,15 +495,15 @@
                         <ul class="list-unstyled">
                             <% if ('email' in team && 'emailConfirmed' in team) { %>
                             <li>
-                                <i class="fa fa-envelope-o"></i>
+                                <span class="glyphicon glyphicon-envelope"></span>
                                 <% if (team.emailConfirmed) { %>
                                 <span class="text-success" title="Email verified"><%- team.email %></span>
                                 <% } else { %>
                                 <span class="text-danger" title="Email not verified"><%- team.email %></span>
                                 <% if (identity.role === 'team' && identity.id === team.id) { %>
                                 <br>
-                                <button type="button" class="btn btn-primary btn-xs" data-action="resend-confirmation">Resend confirmation email</button>
-                                <button type="button" class="btn btn-danger btn-xs" data-action="change-email">Change email</button>
+                                <button type="button" class="btn btn-primary btn-xs" data-action="resend-confirmation" data-toggle="modal" data-target="#resend-confirmation-modal">Resend confirmation email</button>
+                                <button type="button" class="btn btn-danger btn-xs" data-action="change-email" data-toggle="modal" data-target="#change-email-modal">Change email</button>
                                 <% } %>
                                 <% } %>
                             </li>
@@ -355,8 +522,8 @@
                             <% } %>
                             <% if (identity.role === 'team' && identity.id === team.id) { %>
                             <li>
-                                <button type="button" class="btn btn-primary btn-xs" data-action="edit-profile">Edit</button>
-                                <button type="button" class="btn btn-primary btn-xs" data-action="change-password">Change password</button>
+                                <button type="button" class="btn btn-primary btn-xs" data-action="edit-profile" data-toggle="modal" data-target="#edit-profile-modal"><span class="glyphicon glyphicon-pencil"></span>&nbsp;Edit</button>
+                                <button type="button" class="btn btn-primary btn-xs" data-action="change-password" data-toggle="modal" data-target="#change-password-modal">Change password</button>
                             </li>
                             <% } %>
                         </ul>

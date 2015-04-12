@@ -25,6 +25,8 @@ define 'teamsView', ['jquery', 'view', 'renderTemplate', 'dataStore', 'navigatio
                         if err?
                             $section.html $('<p></p>').addClass('lead text-danger').text err
                         else
+                            $main.find('.themis-team-count').show().html renderTemplate 'team-count-partial', count: teams.length
+
                             $content = $('<ul></ul>').addClass 'themis-teams'
                             for team in teams
                                 $content.append $('<li></li>').html renderTemplate 'team-profile-simplified-partial', identity: identity, team: team
