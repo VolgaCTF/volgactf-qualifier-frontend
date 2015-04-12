@@ -96,6 +96,18 @@
                     <div class="pull-left info">
                         <h4 class="text-primary"><a href="/profile/<%- team.id %>" data-push-history><%- team.name %></a></h4>
                         <ul class="list-unstyled">
+                            <% if ('email' in team && 'emailConfirmed' in team) { %>
+                            <li>
+                                <span class="glyphicon glyphicon-envelope"></span>
+                                <% if (team.emailConfirmed) { %>
+                                <span class="text-success" title="Email verified"><%- team.email %></span>
+                                <% } else { %>
+                                <span class="text-danger" title="Email not verified"><%- team.email %></span>
+                                <% } %>
+                            </li>
+                            <% } %>
+                        </ul>
+                        <ul class="list-unstyled">
                             <% if (team.country !== '') { %>
                             <li><strong>Country:</strong> <%- team.country %></li>
                             <% } %>
