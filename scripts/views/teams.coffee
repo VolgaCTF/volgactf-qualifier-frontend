@@ -12,7 +12,7 @@ define 'teamsView', ['jquery', 'view', 'renderTemplate', 'dataStore', 'navigatio
 
             dataStore.getIdentity (err, identity) ->
                 if err?
-                    $main.html renderTemplate 'internal-error'
+                    $main.html renderTemplate 'internal-error-view'
                     navigationBar.present()
                 else
                     navigationBar.present

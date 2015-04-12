@@ -10,7 +10,7 @@ define 'loginView', ['jquery', 'view', 'renderTemplate', 'dataStore', 'navigatio
             dataStore.getIdentity (err, identity) ->
                 $main = $ '#main'
                 if err?
-                    $main.html renderTemplate 'internal-error'
+                    $main.html renderTemplate 'internal-error-view'
                     navigationBar.present()
                     return
 
@@ -44,7 +44,7 @@ define 'loginView', ['jquery', 'view', 'renderTemplate', 'dataStore', 'navigatio
                             complete: ->
                                 $submitButton.prop 'disabled', no
                 else
-                    $main.html renderTemplate 'already-authenticated'
+                    $main.html renderTemplate 'already-authenticated-view'
 
                 navigationBar.present identity: identity
 

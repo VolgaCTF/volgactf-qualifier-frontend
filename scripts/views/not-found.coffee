@@ -12,7 +12,7 @@ define 'notFoundView', ['jquery', 'view', 'renderTemplate', 'dataStore', 'naviga
 
             dataStore.getIdentity (err, identity) ->
                 if err?
-                    $main.html renderTemplate 'internal-error'
+                    $main.html renderTemplate 'internal-error-view'
                     navigationBar.present()
                 else
                     navigationBar.present

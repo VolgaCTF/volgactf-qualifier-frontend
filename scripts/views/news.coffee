@@ -204,7 +204,7 @@ define 'newsView', ['jquery', 'underscore', 'view', 'renderTemplate', 'dataStore
 
             dataStore.getIdentity (err, identity) =>
                 if err?
-                    @$main.html renderTemplate 'internal-error'
+                    @$main.html renderTemplate 'internal-error-view'
                     navigationBar.present()
                 else
                     @identity = identity

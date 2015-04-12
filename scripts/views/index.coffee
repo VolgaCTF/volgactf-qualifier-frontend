@@ -10,7 +10,7 @@ define 'indexView', ['jquery', 'view', 'renderTemplate', 'dataStore', 'navigatio
             dataStore.getIdentity (err, identity) ->
                 $main = $ '#main'
                 if err?
-                    $main.html renderTemplate 'internal-error'
+                    $main.html renderTemplate 'internal-error-view'
                     navigationBar.present()
                 else
                     $('#main').html renderTemplate 'index-view', identity: identity

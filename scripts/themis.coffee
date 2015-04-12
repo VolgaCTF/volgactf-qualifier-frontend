@@ -179,6 +179,10 @@ define 'dataStore', ['jquery', 'metadataStore'], ($, metadataStore) ->
 #= include views/news.coffee
 #= include views/about.coffee
 #= include views/teams.coffee
+#= include views/tasks.coffee
+#= include views/scoreboard.coffee
+#= include views/control.coffee
+#= include views/logs.coffee
 #= include views/not-found.coffee
 
 #= include controllers/state.coffee
@@ -189,17 +193,13 @@ define 'navigationBar', ['jquery', 'underscore', 'renderTemplate', 'metadataStor
     class NavigationBar
         present: (options = {}) ->
             defaultOptions =
-                show:
-                    teams: yes
-                    news: yes
-                    about: yes
                 urlPath: window.location.pathname
                 identity: null
                 active: null
             options = _.extend defaultOptions, options
 
             $navbar = $ '#themis-navbar'
-            $navbar.html renderTemplate 'navbar', options
+            $navbar.html renderTemplate 'navbar-view', options
 
             $signout = $navbar.find 'a[data-action="signout"]'
             if $signout.length > 0

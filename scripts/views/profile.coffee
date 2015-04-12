@@ -244,7 +244,7 @@ define 'profileView', ['jquery', 'view', 'renderTemplate', 'dataStore', 'navigat
 
             dataStore.getIdentity (err, identity) =>
                 if err?
-                    @$main.html renderTemplate 'internal-error'
+                    @$main.html renderTemplate 'internal-error-view'
                     navigationBar.present()
                 else
                     @identity = identity
@@ -257,7 +257,7 @@ define 'profileView', ['jquery', 'view', 'renderTemplate', 'dataStore', 'navigat
                     teamId = parseInt urlParts[urlParts.length - 1], 10
                     dataStore.getTeamProfile teamId, (err, team) =>
                         if err? or not team?
-                            @$main.html renderTemplate 'internal-error'
+                            @$main.html renderTemplate 'internal-error-view'
                         else
                             @team = team
                             @$main.find('section').html renderTemplate 'team-profile-partial', identity: identity, team: team

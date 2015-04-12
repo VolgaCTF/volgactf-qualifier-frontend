@@ -10,7 +10,7 @@ define 'verifyEmailView', ['jquery', 'view', 'renderTemplate', 'dataStore', 'nav
             dataStore.getIdentity (err, identity) ->
                 $main = $ '#main'
                 if err?
-                    $main.html renderTemplate 'internal-error'
+                    $main.html renderTemplate 'internal-error-view'
                     navigationBar.present()
                 else
                     $main.html renderTemplate 'verify-email-view', identity: identity
