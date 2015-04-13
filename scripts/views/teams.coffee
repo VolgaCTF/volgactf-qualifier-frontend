@@ -1,4 +1,4 @@
-define 'teamsView', ['jquery', 'view', 'renderTemplate', 'dataStore', 'navigationBar', 'metadataStore'], ($, View, renderTemplate, dataStore, navigationBar, metadataStore) ->
+define 'teamsView', ['jquery', 'underscore', 'view', 'renderTemplate', 'dataStore', 'navigationBar', 'metadataStore'], ($, _, View, renderTemplate, dataStore, navigationBar, metadataStore) ->
     class TeamsView extends View
         constructor: ->
             @urlRegex = /^\/teams$/
@@ -25,10 +25,11 @@ define 'teamsView', ['jquery', 'view', 'renderTemplate', 'dataStore', 'navigatio
                         if err?
                             $section.html $('<p></p>').addClass('lead text-danger').text err
                         else
+                            sortedTeams = _.sortBy teams, 'createdAt'
                             $main.find('.themis-team-count').show().html renderTemplate 'team-count-partial', count: teams.length
 
                             $content = $('<ul></ul>').addClass 'themis-teams'
-                            for team in teams
+                            for team in sortedTeams
                                 $content.append $('<li></li>').html renderTemplate 'team-profile-simplified-partial', identity: identity, team: team
                             $section.html $content
 

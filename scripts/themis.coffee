@@ -40,7 +40,7 @@ require.config
         'bootstrap-filestyle': ['bootstrap']
 
 
-define 'dataStore', ['jquery', 'metadataStore'], ($, metadataStore) ->
+define 'dataStore', ['jquery', 'underscore', 'metadataStore'], ($, _, metadataStore) ->
     class DataStore
         constructor: ->
             @eventSource = null
@@ -78,6 +78,17 @@ define 'dataStore', ['jquery', 'metadataStore'], ($, metadataStore) ->
                     else
                         callback 'Unknown error. Please try again later.', null
 
+        createTeam: (options) ->
+            result =
+                id: options.id
+                name: options.name
+                country: options.country
+                locality: options.locality
+                institution: options.institution
+                createdAt: new Date options.createdAt
+                email: options.email
+                emailConfirmed: options.emailConfirmed
+
         getTeamProfile: (id, callback) ->
             url = "#{metadataStore.getMetadata 'domain-api' }/team/#{id}/profile"
             $.ajax
@@ -85,8 +96,8 @@ define 'dataStore', ['jquery', 'metadataStore'], ($, metadataStore) ->
                 dataType: 'json'
                 xhrFields:
                     withCredentials: yes
-                success: (responseJSON, textStatus, jqXHR) ->
-                    callback null, responseJSON
+                success: (responseJSON, textStatus, jqXHR) =>
+                    callback null, @createTeam responseJSON
                 error: (jqXHR, textStatus, errorThrown) ->
                     if jqXHR.responseJSON?
                         callback jqXHR.responseJSON, null
@@ -101,7 +112,7 @@ define 'dataStore', ['jquery', 'metadataStore'], ($, metadataStore) ->
                 xhrFields:
                     withCredentials: yes
                 success: (responseJSON, textStatus, jqXHR) ->
-                    callback null, responseJSON
+                    callback null, _.map responseJSON, @createTeam
                 error: (jqXHR, textStatus, errorThrown) ->
                     if jqXHR.responseJSON?
                         callback jqXHR.responseJSON, null
