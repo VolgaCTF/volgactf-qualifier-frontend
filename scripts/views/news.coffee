@@ -202,16 +202,15 @@ define 'newsView', ['jquery', 'underscore', 'view', 'renderTemplate', 'dataStore
         present: ->
             @$main = $ '#main'
 
-            dataStore.getIdentity (err, identity) =>
-                if err?
-                    @$main.html renderTemplate 'internal-error-view'
-                    navigationBar.present()
-                else
-                    @identity = identity
-                    @$main.html renderTemplate 'news-view', identity: identity
+            $
+                .when dataStore.getIdentity()
+                .done (identity) =>
                     navigationBar.present
                         identity: identity
                         active: 'news'
+
+                    @identity = identity
+                    @$main.html renderTemplate 'news-view', identity: identity, supportsRealtime: dataStore.supportsRealtime()
 
                     $section = @$main.find 'section'
 
@@ -263,7 +262,9 @@ define 'newsView', ['jquery', 'underscore', 'view', 'renderTemplate', 'dataStore
                                 @renderPosts()
 
                         dataStore.getRealtimeProvider().addEventListener 'removePost', @onRemovePost
-
+                .fail (err) =>
+                    navigationBar.present()
+                    @$main.html renderTemplate 'internal-error-view'
 
         dismiss: ->
             if dataStore.supportsRealtime()

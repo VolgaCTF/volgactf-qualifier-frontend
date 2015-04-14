@@ -10,14 +10,15 @@ define 'aboutView', ['jquery', 'view', 'renderTemplate', 'dataStore', 'navigatio
             $main = $ '#main'
             $('#main').html renderTemplate 'about-view'
 
-            dataStore.getIdentity (err, identity) ->
-                if err?
-                    $main.html renderTemplate 'internal-error-view'
-                    navigationBar.present()
-                else
+            $
+                .when dataStore.getIdentity()
+                .done (identity) ->
                     navigationBar.present
                         identity: identity
                         active: 'about'
+                .fail (err) ->
+                    navigationBar.present()
+                    $main.html renderTemplate 'internal-error-view'
 
         dismiss: ->
             $('#main').empty()

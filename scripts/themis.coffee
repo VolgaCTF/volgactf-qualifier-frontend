@@ -45,7 +45,9 @@ define 'dataStore', ['jquery', 'underscore', 'metadataStore'], ($, _, metadataSt
         constructor: ->
             @eventSource = null
 
-        getIdentity: (callback) ->
+        getIdentity: ->
+            promise = $.Deferred()
+
             url = "#{metadataStore.getMetadata 'domain-api' }/identity"
             $.ajax
                 url: url
@@ -53,12 +55,14 @@ define 'dataStore', ['jquery', 'underscore', 'metadataStore'], ($, _, metadataSt
                 xhrFields:
                     withCredentials: yes
                 success: (responseJSON, textStatus, jqXHR) ->
-                    callback null, responseJSON
+                    promise.resolve responseJSON
                 error: (jqXHR, textStatus, errorThrown) ->
                     if jqXHR.responseJSON?
-                        callback jqXHR.responseJSON, null
+                        promise.reject jqXHR.responseJSON
                     else
-                        callback 'Unknown error. Please try again later.', null
+                        promise.reject 'Unknown error. Please try again later.'
+
+            promise
 
         verifyEmail: (data, token, callback) ->
             url = "#{metadataStore.getMetadata 'domain-api' }/team/verify-email"

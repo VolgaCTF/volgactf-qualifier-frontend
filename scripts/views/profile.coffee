@@ -242,15 +242,13 @@ define 'profileView', ['jquery', 'view', 'renderTemplate', 'dataStore', 'navigat
             @$main = $ '#main'
             @$main.html renderTemplate 'profile-view'
 
-            dataStore.getIdentity (err, identity) =>
-                if err?
-                    @$main.html renderTemplate 'internal-error-view'
-                    navigationBar.present()
-                else
-                    @identity = identity
-
+            $
+                .when dataStore.getIdentity()
+                .done (identity) =>
                     navigationBar.present
                         identity: identity
+
+                    @identity = identity
 
                     url = History.getState().data.urlPath
                     urlParts = url.split '/'
@@ -270,6 +268,10 @@ define 'profileView', ['jquery', 'view', 'renderTemplate', 'dataStore', 'navigat
 
                                 @initEditProfileModal()
                                 @initChangePasswordModal()
+
+                .fail (err) =>
+                    navigationBar.present()
+                    @$main.html renderTemplate 'internal-error-view'
 
         dismiss: ->
             @$main.empty()

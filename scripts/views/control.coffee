@@ -9,19 +9,20 @@ define 'controlView', ['jquery', 'view', 'renderTemplate', 'dataStore', 'navigat
         present: ->
             $main = $ '#main'
 
-            dataStore.getIdentity (err, identity) ->
-                if err?
-                    $main.html renderTemplate 'internal-error-view'
-                    navigationBar.present()
-                else
+            $
+                .when dataStore.getIdentity()
+                .done (identity) ->
+                    navigationBar.present
+                        identity: identity
+                        active: 'control'
+
                     if identity.role == 'admin'
                         $main.html renderTemplate 'control-view'
                     else
                         $main.html renderTemplate 'access-forbidden-view', urlPath: window.location.pathname
-
-                    navigationBar.present
-                        identity: identity
-                        active: 'control'
+                .fail (err) ->
+                    navigationBar.present()
+                    $main.html renderTemplate 'internal-error-view'
 
         dismiss: ->
             $('#main').empty()

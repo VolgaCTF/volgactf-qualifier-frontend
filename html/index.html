@@ -232,6 +232,14 @@
                 <div class="container">
                     <header>
                         <h1>News</h1>
+                        <% if (!supportsRealtime) { %>
+                        <div class="alert alert-warning" role="alert">
+                            <p>
+                                <span class="glyphicon glyphicon-alert"></span>&nbsp;
+                                Your browser does not support <a href="https://developer.mozilla.org/en-US/docs/Server-sent_events" target="_blank">Server-Sent events</a>, a technology which provides realtime updates from our servers. Please consider using the latest version of your browser.
+                            </p>
+                        </div>
+                        <% } %>
                         <% if (identity.role === 'admin' || identity.role === 'manager') { %>
                         <button type="button" class="btn btn-primary btn-xs" data-action="create-post" data-toggle="modal" data-target="#create-post-modal">
                             <i class="glyphicon glyphicon-plus"></i>&nbsp;Create
