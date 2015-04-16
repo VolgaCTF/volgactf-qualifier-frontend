@@ -100,7 +100,7 @@
                     <div class="pull-left info">
                         <h4 class="text-primary"><a href="/profile/<%- team.id %>" data-push-history><%- team.name %></a></h4>
                         <ul class="list-unstyled">
-                            <% if ('email' in team && 'emailConfirmed' in team) { %>
+                            <% if ('email' in team && typeof team.email !== 'undefined' && team.email !== null) { %>
                             <li>
                                 <span class="glyphicon glyphicon-envelope"></span>
                                 <% if (team.emailConfirmed) { %>

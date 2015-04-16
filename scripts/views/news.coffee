@@ -230,7 +230,7 @@ define 'newsView', ['jquery', 'underscore', 'view', 'renderTemplate', 'dataStore
                         dataStore.connectRealtime()
 
                         @onCreatePost = (e) =>
-                            data = JSON.parse(e.data).post
+                            data = JSON.parse e.data
                             post =
                                 id: data.id
                                 title: data.title
@@ -244,7 +244,7 @@ define 'newsView', ['jquery', 'underscore', 'view', 'renderTemplate', 'dataStore
                         dataStore.getRealtimeProvider().addEventListener 'createPost', @onCreatePost
 
                         @onUpdatePost = (e) =>
-                            data = JSON.parse(e.data).post
+                            data = JSON.parse e.data
                             post = _.findWhere @posts, id: data.id
                             post.title = data.title
                             post.description = data.description
@@ -254,7 +254,7 @@ define 'newsView', ['jquery', 'underscore', 'view', 'renderTemplate', 'dataStore
                         dataStore.getRealtimeProvider().addEventListener 'updatePost', @onUpdatePost
 
                         @onRemovePost = (e) =>
-                            post = JSON.parse(e.data).post
+                            post = JSON.parse e.data
                             ndx = _.findIndex @posts, id: post.id
 
                             if ndx > -1
