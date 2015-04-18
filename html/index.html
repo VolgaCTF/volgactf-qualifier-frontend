@@ -139,14 +139,140 @@
                 </div>
             </script>
 
+            <script type="text/x-template" data-name="task-category-supervisor-partial">
+                <div class="themis-task-category">
+                    <header>
+                        <h4><%- title %></h4>
+                    </header>
+                    <section>
+                        <p><%- description %></p>
+                    </section>
+                    <footer>
+                        <p class="text-muted"><small>Updated on <%- updatedAt %></small>
+                            <% if (manageable) { %>
+                            &nbsp;
+                            <button type="button" class="btn btn-success btn-xs" data-action="edit-task-category" data-toggle="modal" data-target="#edit-task-category-modal" data-task-category-id="<%- id %>">
+                                <i class="glyphicon glyphicon-pencil"></i>&nbsp;Edit
+                            </button>
+                            <button type="button" class="btn btn-danger btn-xs" data-action="remove-task-category" data-toggle="modal" data-target="#remove-task-category-modal" data-task-category-id="<%- id %>">
+                                <i class="glyphicon glyphicon-remove"></i>&nbsp;Remove
+                            </button>
+                            <% } %>
+                        </p>
+                    </footer>
+                </div>
+            </script>
+
+            <script type="text/x-template" data-name="remove-task-category-confirmation">
+                You are about to remove the task category <mark><%- title %></mark>. Continue?
+            </script>
+
+            <script type="text/x-template" data-name="task-categories-view">
+                <div class="panel panel-info">
+                    <div class="panel-heading">
+                        <h3 class="panel-title">Task categories</h3>
+                    </div>
+                    <div class="panel-body">
+                        <% if (identity.role === 'admin') { %>
+                        <button type="button" class="btn btn-primary btn-xs" data-action="create-task-category" data-toggle="modal" data-target="#create-task-category-modal">
+                            <i class="glyphicon glyphicon-plus"></i>&nbsp;Create
+                        </button>
+                        <% } %>
+                        <div id="themis-task-categories-list"></div>
+                    </div>
+                </div>
+
+                <% if (identity.role === 'admin') { %>
+                <div class="modal fade" id="create-task-category-modal" tabindex="-1" role="dialog">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                                <h4 class="modal-title">Create task category</h4>
+                            </div>
+                            <div class="modal-body">
+                                <form method="POST" action="//api.{{ domain }}/task/category/create">
+                                    <div class="form-group">
+                                        <label for="create-task-category-title" class="control-label">Title</label>
+                                        <input type="text" class="form-control" id="create-task-category-title" name="title" autofocus required minlength="2" maxlength="20">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="create-task-category-description" class="control-label">Description</label>
+                                        <textarea class="form-control themis-task-category-description" id="create-task-category-description" minlength="0" maxlength="150" name="description"></textarea>
+                                    </div>
+                                    <div class="submit-error">
+                                        <p class="text-danger"></p>
+                                    </div>
+                                </form>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                                <button type="button" class="btn btn-primary" data-action="complete-create-task-category">Create</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="modal fade" id="remove-task-category-modal" tabindex="-1" role="dialog">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                                <h4 class="modal-title">Remove task category</h4>
+                            </div>
+                            <div class="modal-body">
+                                <p class="confirmation"></p>
+                                <div class="submit-error">
+                                    <p class="text-danger"></p>
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                                <button type="button" class="btn btn-danger" data-action="complete-remove-task-category">Remove</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="modal fade" id="edit-task-category-modal" tabindex="-1" role="dialog">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                                <h4 class="modal-title">Edit task category</h4>
+                            </div>
+                            <div class="modal-body">
+                                <form method="POST">
+                                    <div class="form-group">
+                                        <label for="edir-task-category-title" class="control-label">Title</label>
+                                        <input type="text" class="form-control" id="edit-task-category-title" name="title" autofocus required minlength="2" maxlength="20">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="edit-task-category-description" class="control-label">Description</label>
+                                        <textarea class="form-control themis-task-category-description" id="edit-task-category-description" minlength="0" maxlength="150" name="description"></textarea>
+                                    </div>
+                                    <div class="submit-error">
+                                        <p class="text-danger"></p>
+                                    </div>
+                                </form>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                                <button type="button" class="btn btn-primary" data-action="complete-edit-task-category">Save</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <% } %>
+            </script>
+
             <script type="text/x-template" data-name="tasks-view">
                 <div class="container">
                     <header>
                         <h1>Tasks</h1>
                     </header>
-                    <section>
-                        <p class="lead">Not implemented yet.</p>
-                    </section>
+                    <section id="themis-task-categories"></section>
+                    <section id="themis-tasks"></section>
                 </div>
             </script>
 
@@ -184,7 +310,6 @@
                     <i class="glyphicon glyphicon-cog"></i>
                 </a>
                 <% } %>
-
             </script>
 
             <script type="text/x-template" data-name="statusbar-view">
