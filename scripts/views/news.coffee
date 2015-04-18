@@ -1,4 +1,4 @@
-define 'newsView', ['jquery', 'underscore', 'view', 'renderTemplate', 'dataStore', 'navigationBar', 'metadataStore', 'markdown-it', 'moment', 'jquery.form', 'parsley'], ($, _, View, renderTemplate, dataStore, navigationBar, metadataStore, MarkdownIt, moment) ->
+define 'newsView', ['jquery', 'underscore', 'view', 'renderTemplate', 'dataStore', 'navigationBar', 'statusBar', 'metadataStore', 'markdown-it', 'moment', 'jquery.form', 'parsley'], ($, _, View, renderTemplate, dataStore, navigationBar, statusBar, metadataStore, MarkdownIt, moment) ->
     class NewsView extends View
         constructor: ->
             @$main = null
@@ -203,11 +203,18 @@ define 'newsView', ['jquery', 'underscore', 'view', 'renderTemplate', 'dataStore
             @$main = $ '#main'
 
             $
-                .when dataStore.getIdentity()
-                .done (identity) =>
+                .when dataStore.getIdentity(), dataStore.getContest()
+                .done (identity, contest) =>
+                    if dataStore.supportsRealtime()
+                        dataStore.connectRealtime()
+
                     navigationBar.present
                         identity: identity
                         active: 'news'
+
+                    statusBar.present
+                        identity: identity
+                        contest: contest
 
                     @identity = identity
                     @$main.html renderTemplate 'news-view', identity: identity, supportsRealtime: dataStore.supportsRealtime()
@@ -226,42 +233,40 @@ define 'newsView', ['jquery', 'underscore', 'view', 'renderTemplate', 'dataStore
                                 @initRemovePostModal()
                                 @initEditPostModal()
 
-                    if dataStore.supportsRealtime()
-                        dataStore.connectRealtime()
+                            if dataStore.supportsRealtime()
+                                @onCreatePost = (e) =>
+                                    data = JSON.parse e.data
+                                    post =
+                                        id: data.id
+                                        title: data.title
+                                        description: data.description
+                                        createdAt: new Date data.createdAt
+                                        updatedAt: new Date data.updatedAt
 
-                        @onCreatePost = (e) =>
-                            data = JSON.parse e.data
-                            post =
-                                id: data.id
-                                title: data.title
-                                description: data.description
-                                createdAt: new Date data.createdAt
-                                updatedAt: new Date data.updatedAt
+                                    @posts.push post
+                                    @renderPosts()
 
-                            @posts.push post
-                            @renderPosts()
+                                dataStore.getRealtimeProvider().addEventListener 'createPost', @onCreatePost
 
-                        dataStore.getRealtimeProvider().addEventListener 'createPost', @onCreatePost
+                                @onUpdatePost = (e) =>
+                                    data = JSON.parse e.data
+                                    post = _.findWhere @posts, id: data.id
+                                    post.title = data.title
+                                    post.description = data.description
+                                    post.updatedAt = new Date data.updatedAt
+                                    @renderPosts()
 
-                        @onUpdatePost = (e) =>
-                            data = JSON.parse e.data
-                            post = _.findWhere @posts, id: data.id
-                            post.title = data.title
-                            post.description = data.description
-                            post.updatedAt = new Date data.updatedAt
-                            @renderPosts()
+                                dataStore.getRealtimeProvider().addEventListener 'updatePost', @onUpdatePost
 
-                        dataStore.getRealtimeProvider().addEventListener 'updatePost', @onUpdatePost
+                                @onRemovePost = (e) =>
+                                    post = JSON.parse e.data
+                                    ndx = _.findIndex @posts, id: post.id
 
-                        @onRemovePost = (e) =>
-                            post = JSON.parse e.data
-                            ndx = _.findIndex @posts, id: post.id
+                                    if ndx > -1
+                                        @posts.splice ndx, 1
+                                        @renderPosts()
 
-                            if ndx > -1
-                                @posts.splice ndx, 1
-                                @renderPosts()
-
-                        dataStore.getRealtimeProvider().addEventListener 'removePost', @onRemovePost
+                                dataStore.getRealtimeProvider().addEventListener 'removePost', @onRemovePost
                 .fail (err) =>
                     navigationBar.present()
                     @$main.html renderTemplate 'internal-error-view'
@@ -277,13 +282,15 @@ define 'newsView', ['jquery', 'underscore', 'view', 'renderTemplate', 'dataStore
                 if @onUpdatePost?
                     dataStore.getRealtimeProvider().removeEventListener 'updatePost', @onUpdatePost
                     @onUpdatePost = null
-                dataStore.disconnectRealtime()
 
             @$main.empty()
             @$main = null
             @identity = null
             @posts = []
-
             navigationBar.dismiss()
+            statusBar.dismiss()
+
+            if dataStore.supportsRealtime()
+                dataStore.disconnectRealtime()
 
     new NewsView()

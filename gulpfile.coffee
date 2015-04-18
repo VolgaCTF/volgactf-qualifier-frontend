@@ -27,6 +27,7 @@ paths =
         'bower_components/parsleyjs/dist/parsley.js'
         'bower_components/markdown-it/dist/markdown-it.js'
         'bower_components/moment/moment.js'
+        'bower_components/eonasdan-bootstrap-datetimepicker/src/js/bootstrap-datetimepicker.js'
         'scripts/themis.coffee'
     ]
     fonts: [
@@ -38,6 +39,7 @@ paths =
     ]
     stylesheets: [
         'bower_components/bootstrap/dist/css/bootstrap.css'
+        'bower_components/eonasdan-bootstrap-datetimepicker/build/css/bootstrap-datetimepicker.css'
         'stylesheets/themis.sass'
     ]
     html: [

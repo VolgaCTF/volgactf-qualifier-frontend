@@ -1,4 +1,4 @@
-define 'teamsView', ['jquery', 'underscore', 'view', 'renderTemplate', 'dataStore', 'navigationBar', 'metadataStore'], ($, _, View, renderTemplate, dataStore, navigationBar, metadataStore) ->
+define 'teamsView', ['jquery', 'underscore', 'view', 'renderTemplate', 'dataStore', 'navigationBar', 'statusBar', 'metadataStore'], ($, _, View, renderTemplate, dataStore, navigationBar, statusBar, metadataStore) ->
     class TeamsView extends View
         constructor: ->
             @$main = null
@@ -32,13 +32,20 @@ define 'teamsView', ['jquery', 'underscore', 'view', 'renderTemplate', 'dataStor
             @$main = $ '#main'
 
             $
-                .when dataStore.getIdentity()
-                .done (identity) =>
-                    @identity = identity
+                .when dataStore.getIdentity(), dataStore.getContest()
+                .done (identity, contest) =>
+                    if dataStore.supportsRealtime()
+                        dataStore.connectRealtime()
+
                     navigationBar.present
                         identity: identity
                         active: 'teams'
 
+                    statusBar.present
+                        identity: identity
+                        contest: contest
+
+                    @identity = identity
                     @$main.html renderTemplate 'teams-view'
                     $section = @$main.find 'section'
 
@@ -50,8 +57,6 @@ define 'teamsView', ['jquery', 'underscore', 'view', 'renderTemplate', 'dataStor
                             @renderTeams()
 
                             if dataStore.supportsRealtime()
-                                dataStore.connectRealtime()
-
                                 @onUpdateTeamProfile = (e) =>
                                     data = JSON.parse e.data
                                     team = _.findWhere @teams, id: data.id
@@ -121,5 +126,9 @@ define 'teamsView', ['jquery', 'underscore', 'view', 'renderTemplate', 'dataStor
             @teams = []
             @identity = null
             navigationBar.dismiss()
+            statusBar.dismiss()
+
+            if dataStore.supportsRealtime()
+                dataStore.disconnectRealtime()
 
     new TeamsView()

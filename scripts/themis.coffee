@@ -31,6 +31,10 @@ require.config
         'moment': [
             'http://cdnjs.cloudflare.com/ajax/libs/moment.js/2.9.0/moment.min',
             'moment'
+        ],
+        'bootstrap-datetimepicker': [
+            'https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datetimepicker/4.7.14/js/bootstrap-datetimepicker.min',
+            'bootstrap-datetimepicker'
         ]
     shim:
         'jquery.history':
@@ -40,7 +44,27 @@ require.config
         'bootstrap-filestyle': ['bootstrap']
 
 
-define 'dataStore', ['jquery', 'underscore', 'metadataStore'], ($, _, metadataStore) ->
+define 'contestState', [], ->
+    class ContestState
+        constructor: (options) ->
+            @state = options.state
+            @startsAt = if options.startsAt? then new Date(options.startsAt) else null
+            @finishesAt = if options.finishesAt? then new Date(options.finishesAt) else null
+
+        isInitial: ->
+            @state is 1
+
+        isStarted: ->
+            @state is 2
+
+        isPaused: ->
+            @state is 3
+
+        isFinished: ->
+            @state is 3
+
+
+define 'dataStore', ['jquery', 'underscore', 'metadataStore', 'contestState'], ($, _, metadataStore, ContestState) ->
     class DataStore
         constructor: ->
             @eventSource = null
@@ -165,6 +189,25 @@ define 'dataStore', ['jquery', 'underscore', 'metadataStore'], ($, _, metadataSt
                     else
                         callback 'Unknown error. Please try again later.'
 
+        getContest: ->
+            promise = $.Deferred()
+
+            url = "#{metadataStore.getMetadata 'domain-api' }/contest"
+            $.ajax
+                url: url
+                dataType: 'json'
+                xhrFields:
+                    withCredentials: yes
+                success: (responseJSON, textStatus, jqXHR) ->
+                    promise.resolve new ContestState responseJSON
+                error: (jqXHR, textStatus, errorThrown) ->
+                    if jqXHR.responseJSON?
+                        promise.reject jqXHR.responseJSON
+                    else
+                        promise.reject 'Unknown error. Please try again later.'
+
+            promise
+
         supportsRealtime: ->
             window.EventSource?
 
@@ -196,13 +239,132 @@ define 'dataStore', ['jquery', 'underscore', 'metadataStore'], ($, _, metadataSt
 #= include views/teams.coffee
 #= include views/tasks.coffee
 #= include views/scoreboard.coffee
-#= include views/control.coffee
 #= include views/logs.coffee
 #= include views/not-found.coffee
 
 #= include controllers/state.coffee
 #= include controllers/view-base.coffee
 #= include controllers/view.coffee
+
+
+define 'statusBar', ['jquery', 'underscore', 'renderTemplate', 'dataStore', 'contestState', 'moment', 'bootstrap', 'parsley', 'bootstrap-datetimepicker'], ($, _, renderTemplate, dataStore, ContestState, moment) ->
+    class StatusBar
+        constructor: ->
+            @$container = null
+            @$stateContainer = null
+            @identity = null
+            @contest = null
+
+            @onUpdateContest = null
+
+        initUpdateContestModal: ->
+            $updateContestModal = $ '#update-contest-modal'
+            $updateContestModal.modal
+                show: no
+
+            $updateContestSubmitError = $updateContestModal.find '.submit-error > p'
+            $updateContestSubmitButton = $updateContestModal.find 'button[data-action="complete-update-contest"]'
+            $updateContestForm = $updateContestModal.find 'form'
+            $updateContestForm.parsley()
+
+            $updateContestState = $ '#update-contest-state'
+            $updateContestStartsAt = $ '#update-contest-starts'
+            $updateContestFinishesAt = $ '#update-contest-finishes'
+
+            pickerFormat = 'D MMM YYYY [at] HH:mm'
+
+            $updateContestStartsAt.datetimepicker
+                showClose: yes
+                sideBySide: yes
+                format: pickerFormat
+            $updateContestFinishesAt.datetimepicker
+                showClose: yes
+                sideBySide: yes
+                format: pickerFormat
+
+            $updateContestSubmitButton.on 'click', (e) ->
+                $updateContestForm.trigger 'submit'
+
+            $updateContestModal.on 'show.bs.modal', (e) =>
+                $updateContestState.val @contest.state
+                $updateContestStartsAt.data('DateTimePicker').date @contest.startsAt
+                $updateContestFinishesAt.data('DateTimePicker').date @contest.finishesAt
+                $updateContestSubmitError.text ''
+
+            $updateContestModal.on 'shown.bs.modal', (e) ->
+                $updateContestState.focus()
+
+            $updateContestForm.on 'submit', (e) =>
+                valStartsAt = $updateContestStartsAt.data('DateTimePicker').date()
+                valFinishesAt = $updateContestFinishesAt.data('DateTimePicker').date()
+
+                e.preventDefault()
+                $updateContestForm.ajaxSubmit
+                    beforeSubmit: ->
+                        $updateContestSubmitError.text ''
+                        $updateContestSubmitButton.prop 'disabled', yes
+                    clearForm: yes
+                    data:
+                        startsAt: if valStartsAt then valStartsAt.valueOf() else null
+                        finishesAt: if valFinishesAt then valFinishesAt.valueOf() else null
+                    dataType: 'json'
+                    xhrFields:
+                        withCredentials: yes
+                    headers: { 'X-CSRF-Token': @identity.token }
+                    success: (responseJSON, textStatus, jqXHR) ->
+                        $updateContestModal.modal 'hide'
+                    error: (jqXHR, textStatus, errorThrown) ->
+                        if jqXHR.responseJSON?
+                            $updateContestSubmitError.text jqXHR.responseJSON
+                        else
+                            $updateContestSubmitError.text 'Unknown error. Please try again later.'
+                    complete: ->
+                        $updateContestSubmitButton.prop 'disabled', no
+
+        renderContestState: ->
+            contestObj =
+                state: @contest.state
+                startsAt: moment(@contest.startsAt).format 'lll'
+            @$stateContainer.html renderTemplate 'contest-state-partial', contest: contestObj, identity: @identity
+
+        present: (options = {}) ->
+            defaultOptions =
+                identity: null
+                contest: null
+            options = _.extend defaultOptions, options
+            @identity = options.identity
+            @contest = options.contest
+
+            @$container = $ '#themis-statusbar'
+            @$container.html renderTemplate 'statusbar-view'
+            @$stateContainer = $ '#themis-contest-state'
+            @renderContestState()
+
+            if @identity.role == 'admin'
+                @initUpdateContestModal()
+
+            if dataStore.supportsRealtime()
+                @onUpdateContest = (e) =>
+                    data = JSON.parse e.data
+                    @contest = new ContestState data
+                    @renderContestState()
+
+                dataStore.getRealtimeProvider().addEventListener 'updateContest', @onUpdateContest
+
+        dismiss: ->
+            if dataStore.supportsRealtime()
+                if @onUpdateContest?
+                    dataStore.getRealtimeProvider().removeEventListener 'updateContest', @onUpdateContest
+                    @onUpdateContest = null
+
+            @$container.empty()
+            @$container = null
+            @$stateContainer = null
+            @identity = null
+            @contest = null
+
+    new StatusBar()
+
 
 define 'navigationBar', ['jquery', 'underscore', 'renderTemplate', 'metadataStore', 'stateController', 'dataStore'], ($, _, renderTemplate, metadataStore, stateController, dataStore) ->
     class NavigationBar

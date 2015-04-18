@@ -7,6 +7,7 @@
         <meta name="viewport" content="width=device-width, initial-scale=1">
 
         <link rel="stylesheet" href="//cdn.{{ domain }}/css/bootstrap.css">
+        <link rel="stylesheet" href="//cdn.{{ domain }}/css/bootstrap-datetimepicker.css">
         <link rel="stylesheet" href="//cdn.{{ domain }}/css/themis.css">
 
         <script type="text/x-metadata" data-name="domain-api" data-value="//api.{{ domain }}"></script>
@@ -15,7 +16,7 @@
         <script src="//cdn.{{ domain }}/js/require.js" data-main='//cdn.{{ domain }}/js/themis.js'></script>
     </head>
     <body>
-        <div class="navbar navbar-default navbar-static-top">
+        <div class="navbar navbar-default navbar-static-top themis-navbar">
             <div class="container">
                 <div class="navbar-header">
                     <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#themis-navbar">
@@ -29,6 +30,9 @@
                 <div id="themis-navbar" class="collapse navbar-collapse">
                 </div>
             </div>
+        </div>
+
+        <div id="themis-statusbar">
         </div>
 
         <div id="main">
@@ -56,13 +60,8 @@
                     <li class="<% print((active === 'scoreboard') ? 'active' : ''); %>"><a href="/scoreboard" data-push-history>Scoreboard</a></li>
                     <li class="<% print((active === 'tasks') ? 'active' : ''); %>"><a href="/tasks" data-push-history>Tasks</a></li>
                     <li class="<% print((active === 'about') ? 'active' : ''); %>"><a href="/about" data-push-history>About</a></li>
-                    <% if (identity) { %>
-                    <% if (identity.role === 'admin') { %>
-                    <li class="<% print((active === 'control') ? 'active' : ''); %>"><a href="/control" data-push-history>Control</a></li>
-                    <% } %>
-                    <% if (identity.role === 'admin' || identity.role === 'manager') { %>
+                    <% if (identity && (identity.role === 'admin' || identity.role === 'manager')) { %>
                     <li class="<% print((active === 'logs') ? 'active' : ''); %>"><a href="/logs" data-push-history>Logs</a></li>
-                    <% } %>
                     <% } %>
                 </ul>
 
@@ -162,14 +161,88 @@
                 </div>
             </script>
 
-            <script type="text/x-template" data-name="control-view">
-                <div class="container">
-                    <header>
-                        <h1>Control</h1>
-                    </header>
-                    <section>
-                        <p class="lead">Not implemented yet.</p>
-                    </section>
+            <script type="text/x-template" data-name="contest-state-partial">
+                <% if (contest.state === 1) { %>
+                    <span class="themis-contest-not-started">
+                        &#9679;&nbsp;Not started
+                    </span>
+                <% } else if (contest.state === 2) { %>
+                    <span class="themis-contest-started">
+                        &#9679;&nbsp;Started
+                    </span>
+                <% } else if (contest.state === 3) { %>
+                    <span class="themis-contest-paused">
+                        &#9679;&nbsp;Paused
+                    </span>
+                <% } else if (contest.state === 4) { %>
+                    <span class="themis-contest-finished">
+                        &#9679;&nbsp;Finished
+                    </span>
+                <% } %>
+                <% if (identity.role === 'admin') { %>
+                <a href="#" class="text-info" data-action="update-contest" data-toggle="modal" data-target="#update-contest-modal">
+                    <i class="glyphicon glyphicon-cog"></i>
+                </a>
+                <% } %>
+
+            </script>
+
+            <script type="text/x-template" data-name="statusbar-view">
+                <div class="container themis-statusbar">
+                    <div id="themis-contest-state">
+                    </div>
+                </div>
+
+                <div class="modal fade" id="update-contest-modal" tabindex="-1" role="dialog">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                                <h4 class="modal-title">Update contest</h4>
+                            </div>
+                            <div class="modal-body">
+                                <form method="POST" action="//api.{{ domain }}/contest/update">
+                                    <div class="form-group">
+                                        <label for="update-contest-state" class="control-label">State</label>
+                                        <select id="update-contest-state" class="form-control" name="state" autofocus required>
+                                            <option value="1">Not started</option>
+                                            <option value="2">Started</option>
+                                            <option value="3">Paused</option>
+                                            <option value="4">Finished</option>
+                                        </select>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label for="update-contest-starts" class="control-label">Starts at</label>
+                                        <div class='input-group date' id='update-contest-starts'>
+                                            <input type='text' class="form-control">
+                                            <span class="input-group-addon">
+                                                <span class="glyphicon glyphicon-calendar"></span>
+                                            </span>
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label for="update-contest-finishes" class="control-label">Finishes at</label>
+                                        <div class='input-group date' id='update-contest-finishes'>
+                                            <input type='text' class="form-control">
+                                            <span class="input-group-addon">
+                                                <span class="glyphicon glyphicon-calendar"></span>
+                                            </span>
+                                        </div>
+                                    </div>
+
+                                    <div class="submit-error">
+                                        <p class="text-danger"></p>
+                                    </div>
+                                </form>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                                <button type="button" class="btn btn-primary" data-action="complete-update-contest">Update</button>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </script>
 
