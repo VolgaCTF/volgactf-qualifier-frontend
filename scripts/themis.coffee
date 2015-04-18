@@ -74,7 +74,28 @@ define 'taskCategoryModel', [], ->
             @updatedAt = new Date options.updatedAt
 
 
-define 'dataStore', ['jquery', 'underscore', 'metadataStore', 'contestState', 'taskCategoryModel'], ($, _, metadataStore, ContestState, TaskCategoryModel) ->
+define 'teamScoreModel', [], ->
+    class TeamScoreModel
+        constructor: (options) ->
+            @team = options.team
+            @score = options.score
+            @updatedAt = if options.updatedAt? then new Date(options.updatedAt) else null
+
+
+define 'teamModel', [], ->
+    class TeamModel
+        constructor: (options) ->
+            @id = options.id
+            @name = options.name
+            @country = options.country
+            @locality = options.locality
+            @institution = options.institution
+            @createdAt = new Date options.createdAt
+            @email = if options.email? then options.email else null
+            @emailConfirmed = if options.emailConfirmed? then options.emailConfirmed else no
+
+
+define 'dataStore', ['jquery', 'underscore', 'metadataStore', 'contestState', 'taskCategoryModel', 'teamScoreModel', 'teamModel'], ($, _, metadataStore, ContestState, TaskCategoryModel, TeamScoreModel, TeamModel) ->
     class DataStore
         constructor: ->
             @eventSource = null
@@ -116,17 +137,6 @@ define 'dataStore', ['jquery', 'underscore', 'metadataStore', 'contestState', 't
                     else
                         callback 'Unknown error. Please try again later.', null
 
-        createTeam: (options) ->
-            result =
-                id: options.id
-                name: options.name
-                country: options.country
-                locality: options.locality
-                institution: options.institution
-                createdAt: new Date options.createdAt
-                email: options.email
-                emailConfirmed: options.emailConfirmed
-
         getTeamProfile: (id, callback) ->
             url = "#{metadataStore.getMetadata 'domain-api' }/team/#{id}/profile"
             $.ajax
@@ -134,8 +144,8 @@ define 'dataStore', ['jquery', 'underscore', 'metadataStore', 'contestState', 't
                 dataType: 'json'
                 xhrFields:
                     withCredentials: yes
-                success: (responseJSON, textStatus, jqXHR) =>
-                    callback null, @createTeam responseJSON
+                success: (responseJSON, textStatus, jqXHR) ->
+                    callback null, new TeamModel responseJSON
                 error: (jqXHR, textStatus, errorThrown) ->
                     if jqXHR.responseJSON?
                         callback jqXHR.responseJSON, null
@@ -143,6 +153,8 @@ define 'dataStore', ['jquery', 'underscore', 'metadataStore', 'contestState', 't
                         callback 'Unknown error. Please try again later.', null
 
         getTeams: (callback) ->
+            promise = $.Deferred()
+
             url = "#{metadataStore.getMetadata 'domain-api' }/team/all"
             $.ajax
                 url: url
@@ -150,12 +162,17 @@ define 'dataStore', ['jquery', 'underscore', 'metadataStore', 'contestState', 't
                 xhrFields:
                     withCredentials: yes
                 success: (responseJSON, textStatus, jqXHR) ->
-                    callback null, _.map responseJSON, @createTeam
+                    createTeam = (options) ->
+                        new TeamModel options
+
+                    promise.resolve _.map responseJSON, createTeam
                 error: (jqXHR, textStatus, errorThrown) ->
                     if jqXHR.responseJSON?
-                        callback jqXHR.responseJSON, null
+                        promise.reject jqXHR.responseJSON
                     else
-                        callback 'Unknown error. Please try again later.', null
+                        promise.reject 'Unknown error. Please try again later.'
+
+            promise
 
         getPosts: (callback) ->
             url = "#{metadataStore.getMetadata 'domain-api' }/post/all"
@@ -254,6 +271,27 @@ define 'dataStore', ['jquery', 'underscore', 'metadataStore', 'contestState', 't
                 headers: { 'X-CSRF-Token': token }
                 success: (responseJSON, textStatus, jqXHR) ->
                     promise.resolve()
+                error: (jqXHR, textStatus, errorThrown) ->
+                    if jqXHR.responseJSON?
+                        promise.reject jqXHR.responseJSON
+                    else
+                        promise.reject 'Unknown error. Please try again later.'
+
+            promise
+
+        getTeamScores: ->
+            promise = $.Deferred()
+
+            url = "#{metadataStore.getMetadata 'domain-api' }/contest/scores"
+            $.ajax
+                url: url
+                dataType: 'json'
+                xhrFields:
+                    withCredentials: yes
+                success: (responseJSON, textStatus, jqXHR) ->
+                    createScore = (options) ->
+                        new TeamScoreModel options
+                    promise.resolve _.map responseJSON, createScore
                 error: (jqXHR, textStatus, errorThrown) ->
                     if jqXHR.responseJSON?
                         promise.reject jqXHR.responseJSON

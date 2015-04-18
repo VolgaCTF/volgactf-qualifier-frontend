@@ -1,4 +1,4 @@
-define 'teamsView', ['jquery', 'underscore', 'view', 'renderTemplate', 'dataStore', 'navigationBar', 'statusBar', 'metadataStore'], ($, _, View, renderTemplate, dataStore, navigationBar, statusBar, metadataStore) ->
+define 'teamsView', ['jquery', 'underscore', 'view', 'renderTemplate', 'dataStore', 'navigationBar', 'statusBar', 'metadataStore', 'teamModel'], ($, _, View, renderTemplate, dataStore, navigationBar, statusBar, metadataStore, TeamModel) ->
     class TeamsView extends View
         constructor: ->
             @$main = null
@@ -49,10 +49,11 @@ define 'teamsView', ['jquery', 'underscore', 'view', 'renderTemplate', 'dataStor
                     @$main.html renderTemplate 'teams-view'
                     $section = @$main.find 'section'
 
-                    dataStore.getTeams (err, teams) =>
-                        if err?
+                    $
+                        .when dataStore.getTeams()
+                        .fail (err) ->
                             $section.html $('<p></p>').addClass('lead text-danger').text err
-                        else
+                        .done (teams) =>
                             @teams = teams
                             @renderTeams()
 
@@ -74,7 +75,7 @@ define 'teamsView', ['jquery', 'underscore', 'view', 'renderTemplate', 'dataStor
                                     if team?
                                         team.emailConfirmed = data.emailConfirmed
                                     else
-                                        team = dataStore.createTeam data
+                                        team = new TeamModel data
                                         @teams.push team
                                     @renderTeams()
 
@@ -83,7 +84,7 @@ define 'teamsView', ['jquery', 'underscore', 'view', 'renderTemplate', 'dataStor
                                 if _.contains ['admin', 'manager'], @identity.role
                                     @onCreateTeam = (e) =>
                                         data = JSON.parse e.data
-                                        team = dataStore.createTeam data
+                                        team = new TeamModel data
                                         @teams.push team
                                         @renderTeams()
 

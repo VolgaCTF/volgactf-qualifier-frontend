@@ -276,13 +276,31 @@
                 </div>
             </script>
 
+            <script type="text/x-template" data-name="scoreboard-table-row-partial">
+                <tr class="themis-scoreboard-row">
+                    <td><%- rank %></td>
+                    <td><img class="themis-scoreboard-logo" src="//api.{{ domain }}/team/<%- id %>/logo"><%- name %></td>
+                    <td><%- score %></td>
+                    <td><%- updatedAt %></td>
+                </tr>
+            </script>
+
             <script type="text/x-template" data-name="scoreboard-view">
                 <div class="container">
                     <header>
                         <h1>Scoreboard</h1>
                     </header>
                     <section>
-                        <p class="lead">Not implemented yet.</p>
+                        <table class="table">
+                            <thead>
+                                <th>#</th>
+                                <th>Team</th>
+                                <th>Score</th>
+                                <th>Last updated</th>
+                            </thead>
+                            <tbody id="themis-scoreboard-table-body">
+                            </tbody>
+                        </table>
                     </section>
                 </div>
             </script>
