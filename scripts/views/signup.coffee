@@ -46,14 +46,18 @@ define 'signupView', ['jquery', 'view', 'renderTemplate', 'dataStore', 'navigati
             @$main = $ '#main'
 
             $
-                .when dataStore.getIdentity()
-                .done (identity) =>
-                    navigationBar.present identity: identity
+                .when dataStore.getIdentity(), dataStore.getContest()
+                .done (identity, contest) =>
+                    navigationBar.present
+                        identity: identity
 
                     @identity = identity
                     if identity.role == 'guest'
-                        @$main.html renderTemplate 'signup-view'
-                        @initSignupForm()
+                        if contest.isFinished()
+                            @$main.html renderTemplate 'signup-not-available-view'
+                        else
+                            @$main.html renderTemplate 'signup-view'
+                            @initSignupForm()
                     else
                         @$main.html renderTemplate 'already-authenticated-view'
                 .fail (err) =>

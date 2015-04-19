@@ -6,6 +6,7 @@ define 'tasksView', ['jquery', 'underscore', 'view', 'renderTemplate', 'dataStor
             @$taskCategoriesList = null
 
             @identity = null
+            @contest = null
             @taskCategories = []
 
             @onCreateTaskCategory = null
@@ -139,7 +140,7 @@ define 'tasksView', ['jquery', 'underscore', 'view', 'renderTemplate', 'dataStor
             else
                 @$taskCategoriesList.empty()
                 sortedTaskCategories = _.sortBy @taskCategories, 'createdAt'
-                manageable = @identity.role is 'admin'
+                manageable = @identity.role is 'admin' and not @contest.isFinished()
                 for taskCategory in sortedTaskCategories
                     options =
                         id: taskCategory.id
@@ -160,6 +161,7 @@ define 'tasksView', ['jquery', 'underscore', 'view', 'renderTemplate', 'dataStor
                 .when dataStore.getIdentity(), dataStore.getContest(), dataStore.getTaskCategories()
                 .done (identity, contest, taskCategories) =>
                     @identity = identity
+                    @contest = contest
                     @taskCategories = taskCategories
 
                     if dataStore.supportsRealtime()
@@ -174,11 +176,11 @@ define 'tasksView', ['jquery', 'underscore', 'view', 'renderTemplate', 'dataStor
                         contest: contest
 
                     if _.contains ['admin', 'manager'], identity.role
-                        @$taskCategoriesSection.html renderTemplate 'task-categories-view', identity: identity
+                        @$taskCategoriesSection.html renderTemplate 'task-categories-view', identity: identity, contest: contest
                         @$taskCategoriesList = $ '#themis-task-categories-list'
                         @renderTaskCategories()
 
-                    if identity.role == 'admin'
+                    if identity.role == 'admin' and not contest.isFinished()
                         @initCreateTaskCategoryModal()
                         @initEditTaskCategoryModal()
                         @initRemoveTaskCategoryModal()
@@ -241,6 +243,7 @@ define 'tasksView', ['jquery', 'underscore', 'view', 'renderTemplate', 'dataStor
             statusBar.dismiss()
 
             @identity = null
+            @contest = null
             @taskCategories = []
 
             if dataStore.supportsRealtime()

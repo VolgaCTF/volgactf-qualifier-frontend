@@ -61,7 +61,7 @@ define 'contestState', [], ->
             @state is 3
 
         isFinished: ->
-            @state is 3
+            @state is 4
 
 
 define 'taskCategoryModel', [], ->

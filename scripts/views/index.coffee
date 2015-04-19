@@ -23,7 +23,7 @@ define 'indexView', ['jquery', 'view', 'renderTemplate', 'dataStore', 'navigatio
                         identity: identity
                         contest: contest
 
-                    @$main.html renderTemplate 'index-view', identity: identity
+                    @$main.html renderTemplate 'index-view', identity: identity, contest: contest
                 .fail (err) =>
                     navigationBar.present()
                     @$main.html renderTemplate 'internal-error-view'

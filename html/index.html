@@ -173,7 +173,7 @@
                         <h3 class="panel-title">Task categories</h3>
                     </div>
                     <div class="panel-body">
-                        <% if (identity.role === 'admin') { %>
+                        <% if (identity.role === 'admin' && !contest.isFinished()) { %>
                         <button type="button" class="btn btn-primary btn-xs" data-action="create-task-category" data-toggle="modal" data-target="#create-task-category-modal">
                             <i class="glyphicon glyphicon-plus"></i>&nbsp;Create
                         </button>
@@ -673,9 +673,13 @@
                         <h1>Hello!</h1>
                         <p>Welcome to {{#event}}{{ title }}{{/event}}!</p>
                         <p>VolgaCTF is an inter-regional inter-university open computer security contest.</p>
+                        <% if (!contest.isFinished()) { %>
                         <p>Interested? Please register for the competition!</p>
+                        <% } %>
                         <p>
+                            <% if (!contest.isFinished()) { %>
                             <a class="btn btn-primary btn-lg" href="/signup" role="button" data-push-history>Sign up</a>
+                            <% } %>
                             <a class="btn btn-success btn-lg" href="/signin" role="button" data-push-history><span class="glyphicon glyphicon-log-in"></span>&nbsp;Sign in</a>
                         </p>
                     </div>
@@ -747,6 +751,17 @@
                     </header>
                     <section>
                         <p class="lead">We are really sorry, but you are not authorized to access <mark><%- urlPath %></mark> page.</p>
+                    </section>
+                </div>
+            </script>
+
+            <script type="text/x-template" data-name="signup-not-available-view">
+                <div class="container">
+                    <header>
+                        <h1>Signup not available</h1>
+                    </header>
+                    <section>
+                        <p class="lead">We are really sorry, but the contest has finished.</p>
                     </section>
                 </div>
             </script>
