@@ -95,7 +95,27 @@ define 'teamModel', [], ->
             @emailConfirmed = if options.emailConfirmed? then options.emailConfirmed else no
 
 
-define 'dataStore', ['jquery', 'underscore', 'metadataStore', 'contestState', 'taskCategoryModel', 'teamScoreModel', 'teamModel'], ($, _, metadataStore, ContestState, TaskCategoryModel, TeamScoreModel, TeamModel) ->
+define 'taskPreviewModel', [], ->
+    class TaskPreviewModel
+        constructor: (options) ->
+            @id = options.id
+            @title = options.title
+            @value = options.value
+            @createdAt = new Date options.createdAt
+            @updatedAt = new Date options.updatedAt
+            @categories = options.categories
+            @state = options.state
+
+
+define 'taskModel', ['taskPreviewModel'], (TaskPreviewModel) ->
+    class TaskModel extends TaskPreviewModel
+        constructor: (options) ->
+            super options
+            @description = options.description
+            @hints = options.hints
+
+
+define 'dataStore', ['jquery', 'underscore', 'metadataStore', 'contestState', 'taskCategoryModel', 'teamScoreModel', 'teamModel', 'taskPreviewModel', 'taskModel'], ($, _, metadataStore, ContestState, TaskCategoryModel, TeamScoreModel, TeamModel, TaskPreviewModel, TaskModel) ->
     class DataStore
         constructor: ->
             @eventSource = null
@@ -292,6 +312,47 @@ define 'dataStore', ['jquery', 'underscore', 'metadataStore', 'contestState', 't
                     createScore = (options) ->
                         new TeamScoreModel options
                     promise.resolve _.map responseJSON, createScore
+                error: (jqXHR, textStatus, errorThrown) ->
+                    if jqXHR.responseJSON?
+                        promise.reject jqXHR.responseJSON
+                    else
+                        promise.reject 'Unknown error. Please try again later.'
+
+            promise
+
+        getTaskPreviews: ->
+            promise = $.Deferred()
+
+            url = "#{metadataStore.getMetadata 'domain-api' }/task/all"
+            $.ajax
+                url: url
+                dataType: 'json'
+                xhrFields:
+                    withCredentials: yes
+                success: (responseJSON, textStatus, jqXHR) ->
+                    createPreview = (options) ->
+                        new TaskPreviewModel options
+
+                    promise.resolve _.map responseJSON, createPreview
+                error: (jqXHR, textStatus, errorThrown) ->
+                    if jqXHR.responseJSON?
+                        promise.reject jqXHR.responseJSON
+                    else
+                        promise.reject 'Unknown error. Please try again later.'
+
+            promise
+
+        getTask: (taskId) ->
+            promise = $.Deferred()
+
+            url = "#{metadataStore.getMetadata 'domain-api' }/task/#{taskId}"
+            $.ajax
+                url: url
+                dataType: 'json'
+                xhrFields:
+                    withCredentials: yes
+                success: (responseJSON, textStatus, jqXHR) ->
+                    promise.resolve new TaskModel responseJSON
                 error: (jqXHR, textStatus, errorThrown) ->
                     if jqXHR.responseJSON?
                         promise.reject jqXHR.responseJSON

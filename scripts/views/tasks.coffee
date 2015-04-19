@@ -1,13 +1,16 @@
-define 'tasksView', ['jquery', 'underscore', 'view', 'renderTemplate', 'dataStore', 'navigationBar', 'statusBar', 'metadataStore', 'moment', 'taskCategoryModel'], ($, _, View, renderTemplate, dataStore, navigationBar, statusBar, metadataStore, moment, TaskCategoryModel) ->
+define 'tasksView', ['jquery', 'underscore', 'view', 'renderTemplate', 'dataStore', 'navigationBar', 'statusBar', 'metadataStore', 'moment', 'taskCategoryModel', 'markdown-it', 'bootstrap', 'jquery.form', 'parsley'], ($, _, View, renderTemplate, dataStore, navigationBar, statusBar, metadataStore, moment, TaskCategoryModel, MarkdownIt) ->
     class TasksView extends View
         constructor: ->
             @$main = null
             @$taskCategoriesSection = null
             @$taskCategoriesList = null
 
+            @$taskPreviewsList = null
+
             @identity = null
             @contest = null
             @taskCategories = []
+            @taskPreviews = []
 
             @onCreateTaskCategory = null
             @onUpdateTaskCategory = null
@@ -133,6 +136,203 @@ define 'tasksView', ['jquery', 'underscore', 'view', 'renderTemplate', 'dataStor
                     .fail (err) ->
                         $removeTaskCategorySubmitError.text err
 
+        initCreateTaskModal: ->
+            $createTaskModal = $ '#create-task-modal'
+            $createTaskModal.modal
+                show: no
+
+            $createTaskSubmitError = $createTaskModal.find '.submit-error > p'
+            $createTaskSubmitButton = $createTaskModal.find 'button[data-action="complete-create-task"]'
+            $createTaskForm = $createTaskModal.find 'form'
+            $createTaskForm.parsley()
+
+            $createTaskSubmitButton.on 'click', (e) ->
+                $createTaskForm.trigger 'submit'
+
+            $createTaskTablist = $ '#create-task-tablist'
+            $createTaskTabData = $createTaskTablist.find 'a[href="#create-task-data"]'
+            $createTaskTabPreview = $createTaskTablist.find 'a[href="#create-task-preview"]'
+
+            $createTaskTitle = $ '#create-task-title'
+            $createTaskDescription = $ '#create-task-description'
+            $createTaskValue = $ '#create-task-value'
+            $createTaskCategories = $ '#create-task-categories'
+
+            $createTaskHints = $ '#create-task-hints'
+            $createTaskHintList = $ '#create-task-hint-list'
+
+            $createTaskAnswers = $ '#create-task-answers'
+            $createTaskAnswerList = $ '#create-task-answer-list'
+
+            $createTaskCaseSensitive = $ '#create-task-case-sensitive'
+
+            $createTaskPreview = $ '#create-task-preview'
+
+            $createTaskTabData.tab()
+            $createTaskTabPreview.tab()
+
+            $createTaskHints.find('a[data-action="create-task-hint"]').on 'click', (e) =>
+                e.preventDefault()
+                number = $createTaskHintList.children().length + 1
+                $createTaskHintList.append $ renderTemplate 'create-task-hint-textarea-partial', number: number
+
+            $createTaskHintList.on 'click', 'a[data-action="remove-task-hint"]', (e) =>
+                e.preventDefault()
+                number = $(e.target).closest('a').attr('data-number')
+                $("#create-task-hint-#{number}").remove()
+                hints = []
+                $createTaskHintList.find('textarea[name="hints"]').each ->
+                    hints.push $(this).val()
+                $createTaskHintList.empty()
+                _.each hints, (hint, ndx) ->
+                    $createTaskHintList.append $ renderTemplate 'create-task-hint-textarea-partial', number: ndx + 1
+                    $("#create-task-hint-#{ndx + 1} textarea").val hint
+
+            $createTaskAnswers.find('a[data-action="create-task-answer"]').on 'click', (e) =>
+                e.preventDefault()
+                number = $createTaskAnswerList.children().length + 1
+                $createTaskAnswerList.append $ renderTemplate 'create-task-answer-input-partial', number: number
+
+            $createTaskAnswerList.on 'click', 'a[data-action="remove-task-answer"]', (e) =>
+                e.preventDefault()
+                number = $(e.target).closest('a').attr('data-number')
+                $("#create-task-answer-#{number}").remove()
+                answers = []
+                $createTaskAnswerList.find('input[name="answers"]').each ->
+                    answers.push $(this).val()
+                $createTaskAnswerList.empty()
+                _.each answers, (answer, ndx) ->
+                    $createTaskAnswerList.append $ renderTemplate 'create-task-answer-input-partial', number: ndx + 1
+                    $("#create-task-answer-#{ndx + 1} input").val answer
+
+            $createTaskTabPreview.on 'show.bs.tab', (e) ->
+                md = new MarkdownIt()
+                hintsFormatted = []
+                $createTaskHintList.find('textarea[name="hints"]').each ->
+                    hintsFormatted.push md.render $(this).val()
+                options =
+                    title: $createTaskTitle.val()
+                    description: md.render $createTaskDescription.val()
+                    hints: hintsFormatted
+
+                $createTaskPreview.html renderTemplate 'task-content-partial', options
+
+            $createTaskModal.on 'show.bs.modal', (e) =>
+                $createTaskTabData.tab 'show'
+                $createTaskTitle.val ''
+                $createTaskDescription.val ''
+                $createTaskValue.val ''
+
+                $createTaskCategories.empty()
+                _.each @taskCategories, (taskCategory) =>
+                    $createTaskCategories.append $('<option></option>').attr('value', taskCategory.id).text taskCategory.title
+
+                $createTaskHintList.empty()
+                $createTaskAnswerList.empty()
+
+                $createTaskCaseSensitive.val 'true'
+
+                $createTaskSubmitError.text ''
+
+            $createTaskModal.on 'shown.bs.modal', (e) ->
+                $createTaskTitle.focus()
+
+            $createTaskForm.on 'submit', (e) =>
+                e.preventDefault()
+                $createTaskForm.ajaxSubmit
+                    beforeSubmit: ->
+                        $createTaskSubmitError.text ''
+                        $createTaskSubmitButton.prop 'disabled', yes
+                    clearForm: yes
+                    dataType: 'json'
+                    xhrFields:
+                        withCredentials: yes
+                    headers: { 'X-CSRF-Token': @identity.token }
+                    success: (responseText, textStatus, jqXHR) ->
+                        $createTaskModal.modal 'hide'
+                    error: (jqXHR, textStatus, errorThrown) ->
+                        if jqXHR.responseJSON?
+                            $createTaskSubmitError.text jqXHR.responseJSON
+                        else
+                            $createTaskSubmitError.text 'Unknown error. Please try again later.'
+                    complete: ->
+                        $createTaskSubmitButton.prop 'disabled', no
+
+        initReviseTaskModal: ->
+            $reviseTaskModal = $ '#revise-task-modal'
+            $reviseTaskModal.modal
+                show: no
+
+            $reviseTaskSubmitError = $reviseTaskModal.find '.submit-error > p'
+            $reviseTaskSubmitSuccess = $reviseTaskModal.find '.submit-success > p'
+            $reviseTaskSubmitButton = $reviseTaskModal.find 'button[data-action="complete-revise-task"]'
+            $reviseTaskForm = $reviseTaskModal.find 'form'
+            $reviseTaskForm.parsley()
+
+            $reviseTaskSubmitButton.on 'click', (e) ->
+                $reviseTaskForm.trigger 'submit'
+
+            $reviseTaskAnswer = $ '#revise-task-answer'
+            $reviseTaskContents = $reviseTaskModal.find '.themis-task-contents'
+
+            $reviseTaskModal.on 'show.bs.modal', (e) ->
+                taskId = parseInt $(e.relatedTarget).data('task-id'), 10
+                $reviseTaskModal.data 'task-id', taskId
+
+                $reviseTaskForm.parsley().reset()
+                $reviseTaskForm.attr 'action', "#{metadataStore.getMetadata 'domain-api' }/task/#{taskId}/revise"
+
+                $reviseTaskContents.empty()
+                $reviseTaskAnswer.val ''
+                $reviseTaskSubmitError.text ''
+                $reviseTaskSubmitSuccess.text ''
+                $reviseTaskSubmitButton.prop 'disabled', yes
+
+                $
+                    .when dataStore.getTask taskId
+                    .done (task) ->
+                        md = new MarkdownIt()
+                        hintsFormatted = []
+                        _.each task.hints, (hint) ->
+                            hintsFormatted.push md.render hint
+                        options =
+                            title: task.title
+                            description: md.render task.description
+                            hints: hintsFormatted
+                        $reviseTaskContents.html renderTemplate 'task-content-partial', options
+                        $reviseTaskSubmitButton.prop 'disabled', no
+                    .fail (err) ->
+                        $reviseTaskSubmitError.text err
+
+            $reviseTaskModal.on 'shown.bs.modal', (e) ->
+                $reviseTaskAnswer.focus()
+
+            $reviseTaskForm.on 'submit', (e) =>
+                e.preventDefault()
+                $reviseTaskForm.ajaxSubmit
+                    beforeSubmit: ->
+                        $reviseTaskSubmitError.text ''
+                        $reviseTaskSubmitSuccess.text ''
+                        $reviseTaskSubmitButton.prop 'disabled', yes
+                    clearForm: yes
+                    dataType: 'json'
+                    xhrFields:
+                        withCredentials: yes
+                    headers: { 'X-CSRF-Token': @identity.token }
+                    success: (responseText, textStatus, jqXHR) ->
+                        $reviseTaskSubmitSuccess.text 'Answer is correct!'
+                        hideModal = ->
+                            $reviseTaskModal.modal 'hide'
+                        setTimeout hideModal, 1000
+                    error: (jqXHR, textStatus, errorThrown) ->
+                        if jqXHR.responseJSON?
+                            $reviseTaskSubmitError.text jqXHR.responseJSON
+                        else
+                            $reviseTaskSubmitError.text 'Unknown error. Please try again later.'
+                    complete: ->
+                        $reviseTaskSubmitButton.prop 'disabled', no
+
+
         renderTaskCategories: ->
             if @taskCategories.length == 0
                 @$taskCategoriesList.empty()
@@ -151,18 +351,41 @@ define 'tasksView', ['jquery', 'underscore', 'view', 'renderTemplate', 'dataStor
 
                     @$taskCategoriesList.append $ renderTemplate 'task-category-supervisor-partial', options
 
+        renderTaskPreviews: ->
+            if @taskPreviews.length == 0
+                @$taskPreviewsList.empty()
+                @$taskPreviewsList.html $('<p></p>').addClass('lead').text 'No tasks yet.'
+            else
+                @$taskPreviewsList.empty()
+                sortedTaskPreviews = _.sortBy @taskPreviews, 'createdAt'
+                for taskPreview in sortedTaskPreviews
+                    categoriesList = ''
+                    for categoryId in taskPreview.categories
+                        taskCategory = _.findWhere @taskCategories, id: categoryId
+                        if taskCategory?
+                            categoriesList += renderTemplate 'task-category-partial', title: taskCategory.title, description: taskCategory.description
+
+                    options =
+                        id: taskPreview.id
+                        title: taskPreview.title
+                        value: taskPreview.value
+                        state: taskPreview.state
+                        categoriesList: categoriesList
+
+                    @$taskPreviewsList.append $ renderTemplate 'task-preview-partial', options
+
         present: ->
             @$main = $ '#main'
-            @$main.html renderTemplate 'tasks-view'
-
-            @$taskCategoriesSection = $ '#themis-task-categories'
-
             $
-                .when dataStore.getIdentity(), dataStore.getContest(), dataStore.getTaskCategories()
-                .done (identity, contest, taskCategories) =>
+                .when dataStore.getIdentity(), dataStore.getContest(), dataStore.getTaskPreviews(), dataStore.getTaskCategories()
+                .done (identity, contest, taskPreviews, taskCategories) =>
+                    @$main.html renderTemplate 'tasks-view', identity: identity, contest: contest
+                    @$taskCategoriesSection = $ '#themis-task-categories'
+
                     @identity = identity
                     @contest = contest
                     @taskCategories = taskCategories
+                    @taskPreviews = taskPreviews
 
                     if dataStore.supportsRealtime()
                         dataStore.connectRealtime()
@@ -178,12 +401,19 @@ define 'tasksView', ['jquery', 'underscore', 'view', 'renderTemplate', 'dataStor
                     if _.contains ['admin', 'manager'], identity.role
                         @$taskCategoriesSection.html renderTemplate 'task-categories-view', identity: identity, contest: contest
                         @$taskCategoriesList = $ '#themis-task-categories-list'
+
                         @renderTaskCategories()
+                        @initReviseTaskModal()
 
                     if identity.role == 'admin' and not contest.isFinished()
                         @initCreateTaskCategoryModal()
                         @initEditTaskCategoryModal()
                         @initRemoveTaskCategoryModal()
+
+                        @initCreateTaskModal()
+
+                    @$taskPreviewsList = $ '#themis-task-previews'
+                    @renderTaskPreviews()
 
                     if dataStore.supportsRealtime()
                         @onCreateTaskCategory = (e) =>
@@ -239,12 +469,14 @@ define 'tasksView', ['jquery', 'underscore', 'view', 'renderTemplate', 'dataStor
             @$main = null
             @$taskCategoriesSection = null
             @$taskCategoriesList = null
+            @$taskPreviewsList = null
             navigationBar.dismiss()
             statusBar.dismiss()
 
             @identity = null
             @contest = null
             @taskCategories = []
+            @taskPreviews = []
 
             if dataStore.supportsRealtime()
                 dataStore.disconnectRealtime()
