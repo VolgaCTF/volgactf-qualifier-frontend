@@ -182,7 +182,7 @@
                     </div>
                 </div>
 
-                <% if (identity.role === 'admin') { %>
+                <% if (identity.role === 'admin' && !contest.isFinished()) { %>
                 <div class="modal fade" id="create-task-category-modal" tabindex="-1" role="dialog">
                     <div class="modal-dialog">
                         <div class="modal-content">
@@ -320,29 +320,49 @@
             </script>
 
             <script type="text/x-template" data-name="task-preview-partial">
-                <div class="col-sm-4 themis-task-preview-container" data-task-id="<%- id %>" data-toggle="modal" data-target="#revise-task-modal">
-                    <% if (state === 1) { %>
+                <% if (identity.role === 'admin' || identity.role === 'manager') { %>
+                <div class="col-sm-4 themis-task-preview-container" data-task-id="<%- task.id %>">
+                <% } else { %>
+                <div class="col-sm-3 themis-task-preview-container" data-task-id="<%- task.id %>">
+                <% } %>
+                    <% if (task.isInitial()) { %>
                     <div class="panel panel-default">
-                    <% } else if (state === 2) { %>
+                    <% } else if (task.isOpened()) { %>
                     <div class="panel panel-primary">
-                    <% } else if (state === 3) { %>
+                    <% } else if (task.isClosed()) { %>
                     <div class="panel panel-warning">
                     <% } %>
                         <div class="panel-heading">
-                            <h4 class="panel-title themis-task-title"><%- title %></h4>
+                            <h4 class="panel-title themis-task-title">
+                                <%- task.title %>
+                                <% if (identity.role === 'admin') { %>
+                                <% if (contest.isStarted()) { %>
+                                &nbsp;
+                                <% if (task.isInitial()) { %>
+                                <a href="#" data-action="open-task" data-toggle="modal" data-target="#open-task-modal" data-task-id="<%- task.id %>"><span class="glyphicon glyphicon-share"></span></a>
+                                <% } else if (task.isOpened) { %>
+                                <a href="#" data-action="close-task" data-toggle="modal" data-target="#close-task-modal" data-task-id="<%- task.id %>"><span class="glyphicon glyphicon-lock"></span></a>
+                                <% } %>
+                                <% } %>
+                                <% } %>
+                            </h4>
                         </div>
-                        <div class="panel-body">
+                        <div class="panel-body" data-task-id="<%- task.id %>" data-toggle="modal" data-target="#revise-task-modal">
                             <div class="themis-task-value">
-                                <%- value %>
+                                <%- task.value %>
                             </div>
                         </div>
-                        <div class="panel-footer">
+                        <div class="panel-footer" data-task-id="<%- task.id %>" data-toggle="modal" data-target="#revise-task-modal">
                             <div class="themis-task-categories">
                                 <%= categoriesList %>
                             </div>
                         </div>
                     </div>
                 </div>
+            </script>
+
+            <script type="text/x-template" data-name="open-task-confirmation">
+                You are about to open the task <mark><%- title %></mark>. Continue?
             </script>
 
             <script type="text/x-template" data-name="tasks-view">
@@ -395,6 +415,29 @@
                             <div class="modal-footer">
                                 <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
                                 <button type="button" class="btn btn-primary" data-action="complete-revise-task">Check</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <% } %>
+
+                <% if (identity.role === 'admin' && contest.isStarted()) { %>
+                <div class="modal fade" id="open-task-modal" tabindex="-1" role="dialog">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                                <h4 class="modal-title">Open task</h4>
+                            </div>
+                            <div class="modal-body">
+                                <p class="confirmation"></p>
+                                <div class="submit-error">
+                                    <p class="text-danger"></p>
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                                <button type="button" class="btn btn-primary" data-action="complete-open-task">Open</button>
                             </div>
                         </div>
                     </div>

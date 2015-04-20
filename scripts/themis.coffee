@@ -106,6 +106,15 @@ define 'taskPreviewModel', [], ->
             @categories = options.categories
             @state = options.state
 
+        isInitial: ->
+            @state is 1
+
+        isOpened: ->
+            @state is 2
+
+        isClosed: ->
+            @state is 3
+
 
 define 'taskModel', ['taskPreviewModel'], (TaskPreviewModel) ->
     class TaskModel extends TaskPreviewModel
@@ -353,6 +362,28 @@ define 'dataStore', ['jquery', 'underscore', 'metadataStore', 'contestState', 't
                     withCredentials: yes
                 success: (responseJSON, textStatus, jqXHR) ->
                     promise.resolve new TaskModel responseJSON
+                error: (jqXHR, textStatus, errorThrown) ->
+                    if jqXHR.responseJSON?
+                        promise.reject jqXHR.responseJSON
+                    else
+                        promise.reject 'Unknown error. Please try again later.'
+
+            promise
+
+        openTask: (id, token, callback) ->
+            promise = $.Deferred()
+
+            url = "#{metadataStore.getMetadata 'domain-api' }/task/#{id}/open"
+            $.ajax
+                url: url
+                type: 'POST'
+                dataType: 'json'
+                data: {}
+                xhrFields:
+                    withCredentials: yes
+                headers: { 'X-CSRF-Token': token }
+                success: (responseJSON, textStatus, jqXHR) ->
+                    promise.resolve()
                 error: (jqXHR, textStatus, errorThrown) ->
                     if jqXHR.responseJSON?
                         promise.reject jqXHR.responseJSON
