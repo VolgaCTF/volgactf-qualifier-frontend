@@ -412,9 +412,33 @@ define 'tasksView', ['jquery', 'underscore', 'view', 'renderTemplate', 'dataStor
                 @$taskPreviewsList.empty()
                 @$taskPreviewsList.html $('<p></p>').addClass('lead').text 'No tasks yet.'
             else
+                getSortResultByKey = (a, b, getValueFunc) ->
+                    valA = getValueFunc a
+                    valB = getValueFunc b
+                    if a < b
+                        return -1
+                    else if a > b
+                        return 1
+                    else
+                        return 0
+
+                sortTaskPreviewsFunc = (a, b) ->
+                    if a.state == b.state
+                        return getSortResultByKey a, b, (v) -> v.updatedAt.getTime()
+                    else
+                        if a.isOpened()
+                            return -1
+                        if b.isOpened()
+                            return 1
+                        if a.isClosed() and b.isInitial()
+                            return -1
+                        if a.isInitial() and b.isClosed()
+                            return 1
+                        return 0
+
                 @$taskPreviewsList.empty()
-                sortedTaskPreviews = _.sortBy @taskPreviews, 'createdAt'
-                for taskPreview in sortedTaskPreviews
+                @taskPreviews.sort sortTaskPreviewsFunc
+                for taskPreview in @taskPreviews
                     categoriesList = ''
                     for categoryId in taskPreview.categories
                         taskCategory = _.findWhere @taskCategories, id: categoryId
