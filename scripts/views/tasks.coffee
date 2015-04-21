@@ -40,6 +40,7 @@ define 'tasksView', ['jquery', 'underscore', 'view', 'renderTemplate', 'dataStor
 
             $createTaskCategoryModal.on 'show.bs.modal', (e) =>
                 $createTaskCategorySubmitError.text ''
+                $createTaskCategoryForm.parsley().reset()
 
             $createTaskCategoryModal.on 'shown.bs.modal', (e) ->
                 $('#create-task-category-title').focus()
@@ -90,6 +91,7 @@ define 'tasksView', ['jquery', 'underscore', 'view', 'renderTemplate', 'dataStor
                 $editTaskCategoryTitle.val taskCategory.title
                 $editTaskCategoryDescription.val taskCategory.description
                 $editTaskCategorySubmitError.text ''
+                $editTaskCategoryForm.parsley().reset()
 
             $editTaskCategoryModal.on 'shown.bs.modal', (e) ->
                 $editTaskCategoryTitle.focus()
@@ -237,6 +239,7 @@ define 'tasksView', ['jquery', 'underscore', 'view', 'renderTemplate', 'dataStor
                 $createTaskCaseSensitive.val 'true'
 
                 $createTaskSubmitError.text ''
+                $createTaskForm.parsley().reset()
 
             $createTaskModal.on 'shown.bs.modal', (e) ->
                 $createTaskTitle.focus()

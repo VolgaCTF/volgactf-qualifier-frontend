@@ -103,6 +103,7 @@ define 'newsView', ['jquery', 'underscore', 'view', 'renderTemplate', 'dataStore
                     $createPostTitle.val ''
                     $createPostDescription.val ''
                     $createPostSubmitError.text ''
+                    $createPostForm.parsley().reset()
 
                 $createPostModal.on 'shown.bs.modal', (e) ->
                     $createPostTitle.focus()
@@ -173,6 +174,7 @@ define 'newsView', ['jquery', 'underscore', 'view', 'renderTemplate', 'dataStore
                     $editPostTitle.val post.title
                     $editPostDescription.val post.description
                     $editPostSubmitError.text ''
+                    $editPostForm.parsley().reset()
 
                 $editPostModal.on 'shown.bs.modal', (e) ->
                     $editPostTitle.focus()

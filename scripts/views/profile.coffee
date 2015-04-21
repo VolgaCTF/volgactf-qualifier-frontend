@@ -29,6 +29,7 @@ define 'profileView', ['jquery', 'view', 'renderTemplate', 'dataStore', 'navigat
 
                 $uploadLogoModal.on 'show.bs.modal', (e) ->
                     $uploadLogoForm.find('input:file').filestyle 'clear'
+                    $uploadLogoForm.parsley().reset()
 
                 $uploadLogoForm.on 'submit', (e) =>
                     e.preventDefault()
@@ -74,6 +75,7 @@ define 'profileView', ['jquery', 'view', 'renderTemplate', 'dataStore', 'navigat
                 $changeEmailModal.on 'show.bs.modal', (e) ->
                     $('#change-email-new').val ''
                     $changeEmailSubmitError.text ''
+                    $changeEmailForm.parsley().reset()
 
                 $changeEmailModal.on 'shown.bs.modal', (e) ->
                     $('#change-email-new').focus()
@@ -212,6 +214,7 @@ define 'profileView', ['jquery', 'view', 'renderTemplate', 'dataStore', 'navigat
                     $('#change-pwd-new').val ''
                     $('#change-pwd-confirm-new').val ''
                     $changePasswordSubmitError.text ''
+                    $changePasswordForm.parsley().reset()
 
                 $changePasswordModal.on 'shown.bs.modal', (e) ->
                     $('#change-pwd-current').focus()

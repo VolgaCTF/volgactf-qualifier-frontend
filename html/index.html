@@ -1138,7 +1138,9 @@
                                 <form method="POST" action="//api.{{ domain }}/team/upload-logo">
                                     <div class="form-group">
                                         <label for="upload-logo-logo" class="control-label">Logo</label>
-                                        <input type="file" id="upload-logo-logo" name="logo" class="filestyle" data-buttonText="&nbsp;Choose file" data-iconName="glyphicon-picture" accept="image/jpeg,image/png,image/gif" required>
+                                        <input type="file" id="upload-logo-logo" name="logo" class="filestyle" data-buttonText="&nbsp;Choose file" data-iconName="glyphicon-picture" accept="image/jpeg,image/png,image/gif" required data-parsley-errors-container="#upload-logo-errors">
+                                        <div id="upload-logo-errors">
+                                        </div>
                                     </div>
                                     <div class="submit-error">
                                         <p class="text-danger"></p>
