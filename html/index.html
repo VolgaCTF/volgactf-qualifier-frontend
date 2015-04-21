@@ -330,7 +330,7 @@
                     <% } else if (task.isOpened()) { %>
                     <div class="panel panel-primary">
                     <% } else if (task.isClosed()) { %>
-                    <div class="panel panel-warning">
+                    <div class="panel panel-danger">
                     <% } %>
                         <div class="panel-heading">
                             <h4 class="panel-title themis-task-title">
@@ -340,7 +340,7 @@
                                 &nbsp;
                                 <% if (task.isInitial()) { %>
                                 <a href="#" data-action="open-task" data-toggle="modal" data-target="#open-task-modal" data-task-id="<%- task.id %>"><span class="glyphicon glyphicon-share"></span></a>
-                                <% } else if (task.isOpened) { %>
+                                <% } else if (task.isOpened()) { %>
                                 <a href="#" data-action="close-task" data-toggle="modal" data-target="#close-task-modal" data-task-id="<%- task.id %>"><span class="glyphicon glyphicon-lock"></span></a>
                                 <% } %>
                                 <% } %>
@@ -362,7 +362,14 @@
             </script>
 
             <script type="text/x-template" data-name="open-task-confirmation">
-                You are about to open the task <mark><%- title %></mark>. Continue?
+                You are about to open the task <mark><%- title %></mark>.
+                Teams will be able to submit answers for the task. Continue?
+            </script>
+
+            <script type="text/x-template" data-name="close-task-confirmation">
+                You are about to close the task <mark><%- title %></mark>.
+                Teams will not be able to submit answers for the task though
+                scores earned will not be recalculated. Continue?
             </script>
 
             <script type="text/x-template" data-name="tasks-view">
@@ -421,7 +428,7 @@
                 </div>
                 <% } %>
 
-                <% if (identity.role === 'admin' && contest.isStarted()) { %>
+                <% if (identity.role === 'admin') { %>
                 <div class="modal fade" id="open-task-modal" tabindex="-1" role="dialog">
                     <div class="modal-dialog">
                         <div class="modal-content">
@@ -436,8 +443,31 @@
                                 </div>
                             </div>
                             <div class="modal-footer">
-                                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                                <button type="button" class="btn btn-primary" data-action="complete-open-task">Open</button>
+                                <button type="button" class="btn btn-default" data-dismiss="modal">No</button>
+                                <button type="button" class="btn btn-success" data-action="complete-open-task">Yes</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <% } %>
+
+                <% if (identity.role === 'admin') { %>
+                <div class="modal fade" id="close-task-modal" tabindex="-1" role="dialog">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                                <h4 class="modal-title">Close task</h4>
+                            </div>
+                            <div class="modal-body">
+                                <p class="confirmation"></p>
+                                <div class="submit-error">
+                                    <p class="text-danger"></p>
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-default" data-dismiss="modal">No</button>
+                                <button type="button" class="btn btn-danger" data-action="complete-close-task">Yes</button>
                             </div>
                         </div>
                     </div>

@@ -18,6 +18,7 @@ define 'tasksView', ['jquery', 'underscore', 'view', 'renderTemplate', 'dataStor
 
             @onCreateTask = null
             @onOpenTask = null
+            @onCloseTask = null
 
             @urlRegex = /^\/tasks$/
 
@@ -360,6 +361,31 @@ define 'tasksView', ['jquery', 'underscore', 'view', 'renderTemplate', 'dataStor
                     .fail (err) ->
                         $openTaskSubmitError.text err
 
+        initCloseTaskModal: ->
+            $closeTaskModal = $ '#close-task-modal'
+            $closeTaskModal.modal
+                show: no
+
+            $closeTaskModalBody = $closeTaskModal.find '.modal-body p.confirmation'
+            $closeTaskSubmitError = $closeTaskModal.find '.submit-error > p'
+            $closeTaskSubmitButton = $closeTaskModal.find 'button[data-action="complete-close-task"]'
+
+            $closeTaskModal.on 'show.bs.modal', (e) =>
+                taskId = parseInt $(e.relatedTarget).data('task-id'), 10
+                $closeTaskModal.data 'task-id', taskId
+                taskPreview = _.findWhere @taskPreviews, id: taskId
+                $closeTaskModalBody.html renderTemplate 'close-task-confirmation', title: taskPreview.title
+                $closeTaskSubmitError.text ''
+
+            $closeTaskSubmitButton.on 'click', (e) =>
+                taskId = $closeTaskModal.data 'task-id'
+                $
+                    .when dataStore.closeTask taskId, @identity.token
+                    .done ->
+                        $closeTaskModal.modal 'hide'
+                    .fail (err) ->
+                        $closeTaskSubmitError.text err
+
         renderTaskCategories: ->
             if @taskCategories.length == 0
                 @$taskCategoriesList.empty()
@@ -440,8 +466,8 @@ define 'tasksView', ['jquery', 'underscore', 'view', 'renderTemplate', 'dataStor
                         @initRemoveTaskCategoryModal()
 
                         @initCreateTaskModal()
-                        if contest.isStarted()
-                            @initOpenTaskModal()
+                        @initOpenTaskModal()
+                        @initCloseTaskModal()
 
                     @$taskPreviewsList = $ '#themis-task-previews'
                     @renderTaskPreviews()
@@ -503,6 +529,17 @@ define 'tasksView', ['jquery', 'underscore', 'view', 'renderTemplate', 'dataStor
 
                         dataStore.getRealtimeProvider().addEventListener 'openTask', @onOpenTask
 
+                        @onCloseTask = (e) =>
+                            data = JSON.parse e.data
+                            taskPreview = _.findWhere @taskPreviews, id: data.id
+
+                            if taskPreview?
+                                taskPreview.state = data.state
+                                taskPreview.updatedAt = new Date data.updatedAt
+                                @renderTaskPreviews()
+
+                        dataStore.getRealtimeProvider().addEventListener 'closeTask', @onCloseTask
+
                 .fail (err) =>
                     navigationBar.present()
                     @$main.html renderTemplate 'internal-error-view'
@@ -524,6 +561,9 @@ define 'tasksView', ['jquery', 'underscore', 'view', 'renderTemplate', 'dataStor
                 if @onOpenTask?
                     dataStore.getRealtimeProvider().removeEventListener 'openTask', @onOpenTask
                     @onOpenTask = null
+                if @onCloseTask?
+                    dataStore.getRealtimeProvider().removeEventListener 'closeTask', @onCloseTask
+                    @onCloseTask = null
 
             @$main.empty()
             @$main = null

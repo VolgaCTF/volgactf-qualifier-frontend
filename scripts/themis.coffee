@@ -392,6 +392,28 @@ define 'dataStore', ['jquery', 'underscore', 'metadataStore', 'contestState', 't
 
             promise
 
+        closeTask: (id, token, callback) ->
+            promise = $.Deferred()
+
+            url = "#{metadataStore.getMetadata 'domain-api' }/task/#{id}/close"
+            $.ajax
+                url: url
+                type: 'POST'
+                dataType: 'json'
+                data: {}
+                xhrFields:
+                    withCredentials: yes
+                headers: { 'X-CSRF-Token': token }
+                success: (responseJSON, textStatus, jqXHR) ->
+                    promise.resolve()
+                error: (jqXHR, textStatus, errorThrown) ->
+                    if jqXHR.responseJSON?
+                        promise.reject jqXHR.responseJSON
+                    else
+                        promise.reject 'Unknown error. Please try again later.'
+
+            promise
+
         supportsRealtime: ->
             window.EventSource?
 
