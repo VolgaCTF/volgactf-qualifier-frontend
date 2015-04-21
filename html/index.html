@@ -347,12 +347,24 @@
                                 <% } %>
                             </h4>
                         </div>
+                        <% if (identity.role === 'admin' || identity.role === 'manager') { %>
                         <div class="panel-body" data-task-id="<%- task.id %>" data-toggle="modal" data-target="#revise-task-modal">
+                        <% } else if (identity.role === 'team') { %>
+                        <div class="panel-body" data-task-id="<%- task.id %>" data-toggle="modal" data-target="#submit-task-modal">
+                        <% } else { %>
+                        <div class="panel-body">
+                        <% } %>
                             <div class="themis-task-value">
                                 <%- task.value %>
                             </div>
                         </div>
+                        <% if (identity.role === 'admin' || identity.role === 'manager') { %>
                         <div class="panel-footer" data-task-id="<%- task.id %>" data-toggle="modal" data-target="#revise-task-modal">
+                        <% } else if (identity.role === 'team') { %>
+                        <div class="panel-footer" data-task-id="<%- task.id %>" data-toggle="modal" data-target="#submit-task-modal">
+                        <% } else { %>
+                        <div class="panel-footer">
+                        <% } %>
                             <div class="themis-task-categories">
                                 <%= categoriesList %>
                             </div>
@@ -392,6 +404,41 @@
                     <section class="col-sm-4" id="themis-task-categories"></section>
                     <% } %>
                 </div>
+
+                <% if (identity.role === 'team') { %>
+                <div class="modal fade" id="submit-task-modal" tabindex="-1" role="dialog">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                                <h4 class="modal-title">Submit task</h4>
+                            </div>
+                            <div class="modal-body">
+                                <div class="themis-task-contents">
+                                </div>
+                            </div>
+                            <div class="modal-body">
+                                <form method="POST">
+                                    <div class="form-group" id="submit-task-answer-group">
+                                        <label for="submit-task-answer" class="control-label">Answer</label>
+                                        <input type="text" class="form-control" id="submit-task-answer" name="answer" required data-parsley-length="[2,256]">
+                                    </div>
+                                    <div class="submit-error">
+                                        <p class="text-danger"></p>
+                                    </div>
+                                    <div class="submit-success">
+                                        <p class="text-success"></p>
+                                    </div>
+                                </form>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                                <button type="button" class="btn btn-primary" data-action="complete-submit-task">Submit</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <% } %>
 
                 <% if (identity.role === 'admin' || identity.role === 'manager') { %>
                 <div class="modal fade" id="revise-task-modal" tabindex="-1" role="dialog">

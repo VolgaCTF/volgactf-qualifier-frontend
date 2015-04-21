@@ -389,6 +389,93 @@ define 'tasksView', ['jquery', 'underscore', 'view', 'renderTemplate', 'dataStor
                     .fail (err) ->
                         $closeTaskSubmitError.text err
 
+        initSubmitTaskModal: ->
+            $submitTaskModal = $ '#submit-task-modal'
+            $submitTaskModal.modal
+                show: no
+
+            $submitTaskSubmitError = $submitTaskModal.find '.submit-error > p'
+            $submitTaskSubmitSuccess = $submitTaskModal.find '.submit-success > p'
+            $submitTaskSubmitButton = $submitTaskModal.find 'button[data-action="complete-submit-task"]'
+            $submitTaskForm = $submitTaskModal.find 'form'
+            $submitTaskForm.parsley()
+
+            $submitTaskSubmitButton.on 'click', (e) ->
+                $submitTaskForm.trigger 'submit'
+
+            $submitTaskAnswerGroup = $ '#submit-task-answer-group'
+            $submitTaskAnswer = $ '#submit-task-answer'
+            $submitTaskContents = $submitTaskModal.find '.themis-task-contents'
+
+            $submitTaskModal.on 'show.bs.modal', (e) =>
+                taskId = parseInt $(e.relatedTarget).data('task-id'), 10
+                taskPreview = _.findWhere @taskPreviews, id: taskId
+                if taskPreview?
+                    if taskPreview.isOpened()
+                        $submitTaskAnswerGroup.show()
+                        $submitTaskSubmitButton.show()
+                    else
+                        $submitTaskAnswerGroup.hide()
+                        $submitTaskSubmitButton.hide()
+                else
+                    $submitTaskAnswerGroup.hide()
+                    $submitTaskSubmitButton.hide()
+
+                $submitTaskModal.data 'task-id', taskId
+
+                $submitTaskForm.parsley().reset()
+                $submitTaskForm.attr 'action', "#{metadataStore.getMetadata 'domain-api' }/task/#{taskId}/submit"
+
+                $submitTaskContents.empty()
+                $submitTaskAnswer.val ''
+                $submitTaskSubmitError.text ''
+                $submitTaskSubmitSuccess.text ''
+                $submitTaskSubmitButton.prop 'disabled', yes
+
+                $
+                    .when dataStore.getTask taskId
+                    .done (task) ->
+                        md = new MarkdownIt()
+                        hintsFormatted = []
+                        _.each task.hints, (hint) ->
+                            hintsFormatted.push md.render hint
+                        options =
+                            title: task.title
+                            description: md.render task.description
+                            hints: hintsFormatted
+                        $submitTaskContents.html renderTemplate 'task-content-partial', options
+                        $submitTaskSubmitButton.prop 'disabled', no
+                    .fail (err) ->
+                        $submitTaskSubmitError.text err
+
+            $submitTaskModal.on 'shown.bs.modal', (e) ->
+                $submitTaskAnswer.focus()
+
+            $submitTaskForm.on 'submit', (e) =>
+                e.preventDefault()
+                $submitTaskForm.ajaxSubmit
+                    beforeSubmit: ->
+                        $submitTaskSubmitError.text ''
+                        $submitTaskSubmitSuccess.text ''
+                        $submitTaskSubmitButton.prop 'disabled', yes
+                    clearForm: yes
+                    dataType: 'json'
+                    xhrFields:
+                        withCredentials: yes
+                    headers: { 'X-CSRF-Token': @identity.token }
+                    success: (responseText, textStatus, jqXHR) ->
+                        $submitTaskSubmitSuccess.text 'Answer is correct!'
+                        hideModal = ->
+                            $submitTaskModal.modal 'hide'
+                        setTimeout hideModal, 1000
+                    error: (jqXHR, textStatus, errorThrown) ->
+                        if jqXHR.responseJSON?
+                            $submitTaskSubmitError.text jqXHR.responseJSON
+                        else
+                            $submitTaskSubmitError.text 'Unknown error. Please try again later.'
+                    complete: ->
+                        $submitTaskSubmitButton.prop 'disabled', no
+
         renderTaskCategories: ->
             if @taskCategories.length == 0
                 @$taskCategoriesList.empty()
@@ -468,6 +555,7 @@ define 'tasksView', ['jquery', 'underscore', 'view', 'renderTemplate', 'dataStor
 
                     isAdmin = identity.role is 'admin'
                     isSupervisor = _.contains ['admin', 'manager'], identity.role
+                    isTeam = identity.role is 'team'
 
                     if dataStore.supportsRealtime()
                         dataStore.connectRealtime()
@@ -495,6 +583,9 @@ define 'tasksView', ['jquery', 'underscore', 'view', 'renderTemplate', 'dataStor
                         @initCreateTaskModal()
                         @initOpenTaskModal()
                         @initCloseTaskModal()
+
+                    if isTeam
+                        @initSubmitTaskModal()
 
                     @$taskPreviewsList = $ '#themis-task-previews'
                     @renderTaskPreviews()
