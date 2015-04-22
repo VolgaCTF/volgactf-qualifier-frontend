@@ -44,84 +44,12 @@ require.config
         'bootstrap-filestyle': ['bootstrap']
 
 
-define 'contestState', [], ->
-    class ContestState
-        constructor: (options) ->
-            @state = options.state
-            @startsAt = if options.startsAt? then new Date(options.startsAt) else null
-            @finishesAt = if options.finishesAt? then new Date(options.finishesAt) else null
-
-        isInitial: ->
-            @state is 1
-
-        isStarted: ->
-            @state is 2
-
-        isPaused: ->
-            @state is 3
-
-        isFinished: ->
-            @state is 4
-
-
-define 'taskCategoryModel', [], ->
-    class TaskCategoryModel
-        constructor: (options) ->
-            @id = options.id
-            @title = options.title
-            @description = options.description
-            @createdAt = new Date options.createdAt
-            @updatedAt = new Date options.updatedAt
-
-
-define 'teamScoreModel', [], ->
-    class TeamScoreModel
-        constructor: (options) ->
-            @team = options.team
-            @score = options.score
-            @updatedAt = if options.updatedAt? then new Date(options.updatedAt) else null
-
-
-define 'teamModel', [], ->
-    class TeamModel
-        constructor: (options) ->
-            @id = options.id
-            @name = options.name
-            @country = options.country
-            @locality = options.locality
-            @institution = options.institution
-            @createdAt = new Date options.createdAt
-            @email = if options.email? then options.email else null
-            @emailConfirmed = if options.emailConfirmed? then options.emailConfirmed else no
-
-
-define 'taskPreviewModel', [], ->
-    class TaskPreviewModel
-        constructor: (options) ->
-            @id = options.id
-            @title = options.title
-            @value = options.value
-            @createdAt = new Date options.createdAt
-            @updatedAt = new Date options.updatedAt
-            @categories = options.categories
-            @state = options.state
-
-        isInitial: ->
-            @state is 1
-
-        isOpened: ->
-            @state is 2
-
-        isClosed: ->
-            @state is 3
-
-
-define 'taskModel', ['taskPreviewModel'], (TaskPreviewModel) ->
-    class TaskModel extends TaskPreviewModel
-        constructor: (options) ->
-            super options
-            @description = options.description
-            @hints = options.hints
+#= include models/contest-state.coffee
+#= include models/task-category.coffee
+#= include models/team-score.coffee
+#= include models/team.coffee
+#= include models/task-preview.coffee
+#= include models/task.coffee
 
 
 define 'dataStore', ['jquery', 'underscore', 'metadataStore', 'contestState', 'taskCategoryModel', 'teamScoreModel', 'teamModel', 'taskPreviewModel', 'taskModel'], ($, _, metadataStore, ContestState, TaskCategoryModel, TeamScoreModel, TeamModel, TaskPreviewModel, TaskModel) ->
