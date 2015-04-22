@@ -1,40 +1,44 @@
 require.config
     paths:
         jquery: [
-            'http://code.jquery.com/jquery-2.1.3.min',
+            'http://code.jquery.com/jquery-2.1.3.min'
             'jquery'
         ],
         bootstrap: [
-            'http://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min',
+            'http://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min'
             'bootstrap'
         ],
         underscore: [
-            'http://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.8.3/underscore-min',
+            'http://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.8.3/underscore-min'
             'underscore'
         ],
         'jquery.history': [
-            'http://cdnjs.cloudflare.com/ajax/libs/history.js/1.8/bundled/html5/jquery.history.min',
+            'http://cdnjs.cloudflare.com/ajax/libs/history.js/1.8/bundled/html5/jquery.history.min'
             'jquery.history'
         ],
         'jquery.form': [
-            'http://cdnjs.cloudflare.com/ajax/libs/jquery.form/3.46/jquery.form.min',
+            'http://cdnjs.cloudflare.com/ajax/libs/jquery.form/3.46/jquery.form.min'
             'jquery.form'
         ],
         parsley: [
-            'http://cdnjs.cloudflare.com/ajax/libs/parsley.js/2.0.7/parsley.min',
+            'http://cdnjs.cloudflare.com/ajax/libs/parsley.js/2.0.7/parsley.min'
             'parsley'
         ],
         'markdown-it': [
-            'http://cdnjs.cloudflare.com/ajax/libs/markdown-it/4.1.0/markdown-it.min',
+            'http://cdnjs.cloudflare.com/ajax/libs/markdown-it/4.1.0/markdown-it.min'
             'markdown-it'
         ],
         'moment': [
-            'http://cdnjs.cloudflare.com/ajax/libs/moment.js/2.9.0/moment.min',
+            'http://cdnjs.cloudflare.com/ajax/libs/moment.js/2.9.0/moment.min'
             'moment'
         ],
         'bootstrap-datetimepicker': [
-            'https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datetimepicker/4.7.14/js/bootstrap-datetimepicker.min',
+            'https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datetimepicker/4.7.14/js/bootstrap-datetimepicker.min'
             'bootstrap-datetimepicker'
+        ],
+        'EventEmitter': [
+            'http://cdnjs.cloudflare.com/ajax/libs/EventEmitter/4.2.11/EventEmitter.min'
+            'EventEmitter'
         ]
     shim:
         'jquery.history':
@@ -50,6 +54,7 @@ require.config
 #= include models/team.coffee
 #= include models/task-preview.coffee
 #= include models/task.coffee
+#= include models/post.coffee
 
 
 define 'dataStore', ['jquery', 'underscore', 'metadataStore', 'contestState', 'taskCategoryModel', 'teamScoreModel', 'teamModel', 'taskPreviewModel', 'taskModel'], ($, _, metadataStore, ContestState, TaskCategoryModel, TeamScoreModel, TeamModel, TaskPreviewModel, TaskModel) ->
@@ -130,30 +135,6 @@ define 'dataStore', ['jquery', 'underscore', 'metadataStore', 'contestState', 't
                         promise.reject 'Unknown error. Please try again later.'
 
             promise
-
-        getPosts: (callback) ->
-            url = "#{metadataStore.getMetadata 'domain-api' }/post/all"
-            $.ajax
-                url: url
-                dataType: 'json'
-                xhrFields:
-                    withCredentials: yes
-                success: (responseJSON, textStatus, jqXHR) ->
-                    result = []
-                    for post in responseJSON
-                        result.push
-                            id: post.id
-                            title: post.title
-                            description: post.description
-                            createdAt: new Date post.createdAt
-                            updatedAt: new Date post.updatedAt
-
-                    callback null, result
-                error: (jqXHR, textStatus, errorThrown) ->
-                    if jqXHR.responseJSON?
-                        callback jqXHR.responseJSON, null
-                    else
-                        callback 'Unknown error. Please try again later.', null
 
         removePost: (id, token, callback) ->
             url = "#{metadataStore.getMetadata 'domain-api' }/post/#{id}/remove"
@@ -360,6 +341,8 @@ define 'dataStore', ['jquery', 'underscore', 'metadataStore', 'contestState', 't
 
 #= include utils/metadata-store.coffee
 #= include utils/render-template.coffee
+
+#= include providers/post.coffee
 
 #= include views/base.coffee
 #= include views/signup.coffee
