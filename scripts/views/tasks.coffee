@@ -228,7 +228,7 @@ define 'tasksView', ['jquery', 'underscore', 'view', 'renderTemplate', 'dataStor
                 $createTaskValue.val ''
 
                 $createTaskCategories.empty()
-                _.each @taskCategories, (taskCategory) =>
+                _.each taskCategoryProvider.getTaskCategories(), (taskCategory) =>
                     $createTaskCategories.append $('<option></option>').attr('value', taskCategory.id).text taskCategory.title
 
                 $createTaskHintList.empty()
