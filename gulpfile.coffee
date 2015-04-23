@@ -105,9 +105,7 @@ gulp.task 'default', ['html', 'stylesheets', 'scripts', 'fonts']
 
 gulp.task 'watch', ->
     extraScripts = [
-        'scripts/utils/*.coffee',
-        'scripts/views/*.coffee',
-        'scripts/controllers.coffee'
+        'scripts/**/*.coffee'
     ]
 
     gulp.watch paths.html, ['html']

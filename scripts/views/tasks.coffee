@@ -1,4 +1,4 @@
-define 'tasksView', ['jquery', 'underscore', 'view', 'renderTemplate', 'dataStore', 'navigationBar', 'statusBar', 'metadataStore', 'moment', 'taskCategoryModel', 'taskPreviewModel', 'markdown-it', 'bootstrap', 'jquery.form', 'parsley'], ($, _, View, renderTemplate, dataStore, navigationBar, statusBar, metadataStore, moment, TaskCategoryModel, TaskPreviewModel, MarkdownIt) ->
+define 'tasksView', ['jquery', 'underscore', 'view', 'renderTemplate', 'dataStore', 'navigationBar', 'statusBar', 'metadataStore', 'moment', 'taskCategoryModel', 'taskPreviewModel', 'taskCategoryProvider', 'markdown-it', 'bootstrap', 'jquery.form', 'parsley'], ($, _, View, renderTemplate, dataStore, navigationBar, statusBar, metadataStore, moment, TaskCategoryModel, TaskPreviewModel, taskCategoryProvider, MarkdownIt) ->
     class TasksView extends View
         constructor: ->
             @$main = null
@@ -9,7 +9,6 @@ define 'tasksView', ['jquery', 'underscore', 'view', 'renderTemplate', 'dataStor
 
             @identity = null
             @contest = null
-            @taskCategories = []
             @taskPreviews = []
 
             @onCreateTaskCategory = null
@@ -58,7 +57,6 @@ define 'tasksView', ['jquery', 'underscore', 'view', 'renderTemplate', 'dataStor
                     headers: { 'X-CSRF-Token': @identity.token }
                     success: (responseText, textStatus, jqXHR) ->
                         $createTaskCategoryModal.modal 'hide'
-                        # window.location.reload()
                     error: (jqXHR, textStatus, errorThrown) ->
                         if jqXHR.responseJSON?
                             $createTaskCategorySubmitError.text jqXHR.responseJSON
@@ -83,9 +81,9 @@ define 'tasksView', ['jquery', 'underscore', 'view', 'renderTemplate', 'dataStor
             $editTaskCategoryTitle = $ '#edit-task-category-title'
             $editTaskCategoryDescription = $ '#edit-task-category-description'
 
-            $editTaskCategoryModal.on 'show.bs.modal', (e) =>
+            $editTaskCategoryModal.on 'show.bs.modal', (e) ->
                 taskCategoryId = parseInt $(e.relatedTarget).data('task-category-id'), 10
-                taskCategory = _.findWhere @taskCategories, id: taskCategoryId
+                taskCategory = _.findWhere taskCategoryProvider.getTaskCategories(), id: taskCategoryId
 
                 $editTaskCategoryForm.attr 'action', "#{metadataStore.getMetadata 'domain-api' }/task/category/#{taskCategoryId}/update"
                 $editTaskCategoryTitle.val taskCategory.title
@@ -129,14 +127,14 @@ define 'tasksView', ['jquery', 'underscore', 'view', 'renderTemplate', 'dataStor
             $removeTaskCategoryModal.on 'show.bs.modal', (e) =>
                 taskCategoryId = parseInt $(e.relatedTarget).data('task-category-id'), 10
                 $removeTaskCategoryModal.data 'task-category-id', taskCategoryId
-                taskCategory = _.findWhere @taskCategories, id: taskCategoryId
+                taskCategory = _.findWhere taskCategoryProvider.getTaskCategories(), id: taskCategoryId
                 $removeTaskCategoryModalBody.html renderTemplate 'remove-task-category-confirmation', title: taskCategory.title
                 $removeTaskCategorySubmitError.text ''
 
             $removeTaskCategorySubmitButton.on 'click', (e) =>
                 taskCategoryId = $removeTaskCategoryModal.data 'task-category-id'
                 $
-                    .when dataStore.removeTaskCategory taskCategoryId, @identity.token
+                    .when taskCategoryProvider.removeTaskCategory taskCategoryId, @identity.token
                     .done ->
                         $removeTaskCategoryModal.modal 'hide'
                     .fail (err) ->
@@ -477,12 +475,13 @@ define 'tasksView', ['jquery', 'underscore', 'view', 'renderTemplate', 'dataStor
                         $submitTaskSubmitButton.prop 'disabled', no
 
         renderTaskCategories: ->
-            if @taskCategories.length == 0
+            taskCategories = taskCategoryProvider.getTaskCategories()
+            if taskCategories.length == 0
                 @$taskCategoriesList.empty()
                 @$taskCategoriesList.html $('<p></p>').addClass('lead').text 'No task categories yet.'
             else
                 @$taskCategoriesList.empty()
-                sortedTaskCategories = _.sortBy @taskCategories, 'createdAt'
+                sortedTaskCategories = _.sortBy taskCategories, 'createdAt'
                 manageable = @identity.role is 'admin' and not @contest.isFinished()
                 for taskCategory in sortedTaskCategories
                     options =
@@ -523,12 +522,14 @@ define 'tasksView', ['jquery', 'underscore', 'view', 'renderTemplate', 'dataStor
                             return 1
                         return 0
 
+                taskCategories = taskCategoryProvider.getTaskCategories()
+
                 @$taskPreviewsList.empty()
                 @taskPreviews.sort sortTaskPreviewsFunc
                 for taskPreview in @taskPreviews
                     categoriesList = ''
                     for categoryId in taskPreview.categories
-                        taskCategory = _.findWhere @taskCategories, id: categoryId
+                        taskCategory = _.findWhere taskCategories, id: categoryId
                         if taskCategory?
                             categoriesList += renderTemplate 'task-category-partial', title: taskCategory.title, description: taskCategory.description
 
@@ -543,14 +544,13 @@ define 'tasksView', ['jquery', 'underscore', 'view', 'renderTemplate', 'dataStor
         present: ->
             @$main = $ '#main'
             $
-                .when dataStore.getIdentity(), dataStore.getContest(), dataStore.getTaskPreviews(), dataStore.getTaskCategories()
+                .when dataStore.getIdentity(), dataStore.getContest(), dataStore.getTaskPreviews(), taskCategoryProvider.fetchTaskCategories()
                 .done (identity, contest, taskPreviews, taskCategories) =>
                     @$main.html renderTemplate 'tasks-view', identity: identity, contest: contest
                     @$taskCategoriesSection = $ '#themis-task-categories'
 
                     @identity = identity
                     @contest = contest
-                    @taskCategories = taskCategories
                     @taskPreviews = taskPreviews
 
                     isAdmin = identity.role is 'admin'
@@ -590,40 +590,24 @@ define 'tasksView', ['jquery', 'underscore', 'view', 'renderTemplate', 'dataStor
                     @$taskPreviewsList = $ '#themis-task-previews'
                     @renderTaskPreviews()
 
+                    @onCreateTaskCategory = (taskCategory) =>
+                        @renderTaskCategories() if isSupervisor
+                        false
+
+                    @onUpdateTaskCategory = (taskCategory) =>
+                        @renderTaskCategories() if isSupervisor
+                        false
+
+                    @onRemoveTaskCategory = (taskCategoryId) =>
+                        @renderTaskCategories() if isSupervisor
+                        false
+
+                    taskCategoryProvider.subscribe()
+                    taskCategoryProvider.on 'createTaskCategory', @onCreateTaskCategory
+                    taskCategoryProvider.on 'updateTaskCategory', @onUpdateTaskCategory
+                    taskCategoryProvider.on 'removeTaskCategory', @onRemoveTaskCategory
+
                     if dataStore.supportsRealtime()
-                        @onCreateTaskCategory = (e) =>
-                            data = JSON.parse e.data
-                            taskCategory = new TaskCategoryModel data
-                            @taskCategories.push taskCategory
-                            if isSupervisor
-                                @renderTaskCategories()
-
-                        dataStore.getRealtimeProvider().addEventListener 'createTaskCategory', @onCreateTaskCategory
-
-                        @onUpdateTaskCategory = (e) =>
-                            data = JSON.parse e.data
-                            taskCategory = _.findWhere @taskCategories, id: data.id
-
-                            if taskCategory?
-                                taskCategory.title = data.title
-                                taskCategory.description = data.description
-                                taskCategory.updatedAt = new Date data.updatedAt
-                                if isSupervisor
-                                    @renderTaskCategories()
-
-                        dataStore.getRealtimeProvider().addEventListener 'updateTaskCategory', @onUpdateTaskCategory
-
-                        @onRemoveTaskCategory = (e) =>
-                            taskCategory = JSON.parse e.data
-                            ndx = _.findIndex @taskCategories, id: taskCategory.id
-
-                            if ndx > -1
-                                @taskCategories.splice ndx, 1
-                                if isSupervisor
-                                    @renderTaskCategories()
-
-                        dataStore.getRealtimeProvider().addEventListener 'removeTaskCategory', @onRemoveTaskCategory
-
                         if isSupervisor
                             @onCreateTask = (e) =>
                                 data = JSON.parse e.data
@@ -663,16 +647,18 @@ define 'tasksView', ['jquery', 'underscore', 'view', 'renderTemplate', 'dataStor
                     @$main.html renderTemplate 'internal-error-view'
 
         dismiss: ->
+            if @onCreateTaskCategory?
+                taskCategoryProvider.off 'createTaskCategory', @onCreateTaskCategory
+                @onCreateTaskCategory = null
+            if @onUpdateTaskCategory?
+                taskCategoryProvider.off 'updateTaskCategory', @onUpdateTaskCategory
+                @onUpdateTaskCategory = null
+            if @onRemoveTaskCategory?
+                taskCategoryProvider.off 'removeTaskCategory', @onRemoveTaskCategory
+                @onRemoveTaskCategory = null
+            taskCategoryProvider.unsubscribe()
+
             if dataStore.supportsRealtime()
-                if @onCreateTaskCategory?
-                    dataStore.getRealtimeProvider().removeEventListener 'createTaskCategory', @onCreateTaskCategory
-                    @onCreateTaskCategory = null
-                if @onUpdateTaskCategory?
-                    dataStore.getRealtimeProvider().removeEventListener 'updateTaskCategory', @onUpdateTaskCategory
-                    @onUpdateTaskCategory = null
-                if @onRemoveTaskCategory?
-                    dataStore.getRealtimeProvider().removeEventListener 'removeTaskCategory', @onRemoveTaskCategory
-                    @onRemoveTaskCategory = null
                 if @onCreateTask?
                     dataStore.getRealtimeProvider().removeEventListener 'createTask', @onCreateTask
                     @onCreateTask = null
@@ -693,7 +679,6 @@ define 'tasksView', ['jquery', 'underscore', 'view', 'renderTemplate', 'dataStor
 
             @identity = null
             @contest = null
-            @taskCategories = []
             @taskPreviews = []
 
             if dataStore.supportsRealtime()

@@ -52,11 +52,12 @@ define 'newsView', ['jquery', 'underscore', 'view', 'renderTemplate', 'dataStore
 
             $removePostSubmitButton.on 'click', (e) =>
                 postId = $removePostModal.data 'post-id'
-                dataStore.removePost postId, @identity.token, (err) ->
-                    if err?
-                        $removePostSubmitError.text err
-                    else
+                $
+                    .when postProvider.removePost postId, @identity.token
+                    .done ->
                         $removePostModal.modal 'hide'
+                    .fail (err) ->
+                        $removePostSubmitError.text err
 
         initCreatePostModal: ->
             $createPostModal = $ '#create-post-modal'
@@ -224,14 +225,17 @@ define 'newsView', ['jquery', 'underscore', 'view', 'renderTemplate', 'dataStore
                         .done =>
                             @renderPosts()
 
-                            @onCreatePost = =>
+                            @onCreatePost = (post) =>
                                 @renderPosts()
+                                false
 
-                            @onUpdatePost = =>
+                            @onUpdatePost = (post) =>
                                 @renderPosts()
+                                false
 
-                            @onRemovePost = =>
+                            @onRemovePost = (postId) =>
                                 @renderPosts()
+                                false
 
                             postProvider.subscribe()
                             postProvider.on 'createPost', @onCreatePost

@@ -136,24 +136,6 @@ define 'dataStore', ['jquery', 'underscore', 'metadataStore', 'contestState', 't
 
             promise
 
-        removePost: (id, token, callback) ->
-            url = "#{metadataStore.getMetadata 'domain-api' }/post/#{id}/remove"
-            $.ajax
-                url: url
-                type: 'POST'
-                dataType: 'json'
-                data: {}
-                xhrFields:
-                    withCredentials: yes
-                headers: { 'X-CSRF-Token': token }
-                success: (responseJSON, textStatus, jqXHR) ->
-                    callback null
-                error: (jqXHR, textStatus, errorThrown) ->
-                    if jqXHR.responseJSON?
-                        callback jqXHR.responseJSON
-                    else
-                        callback 'Unknown error. Please try again later.'
-
         getContest: ->
             promise = $.Deferred()
 
@@ -165,50 +147,6 @@ define 'dataStore', ['jquery', 'underscore', 'metadataStore', 'contestState', 't
                     withCredentials: yes
                 success: (responseJSON, textStatus, jqXHR) ->
                     promise.resolve new ContestState responseJSON
-                error: (jqXHR, textStatus, errorThrown) ->
-                    if jqXHR.responseJSON?
-                        promise.reject jqXHR.responseJSON
-                    else
-                        promise.reject 'Unknown error. Please try again later.'
-
-            promise
-
-        getTaskCategories: ->
-            promise = $.Deferred()
-
-            url = "#{metadataStore.getMetadata 'domain-api' }/task/category/all"
-            $.ajax
-                url: url
-                dataType: 'json'
-                xhrFields:
-                    withCredentials: yes
-                success: (responseJSON, textStatus, jqXHR) ->
-                    createCategory = (options) ->
-                        new TaskCategoryModel options
-
-                    promise.resolve _.map responseJSON, createCategory
-                error: (jqXHR, textStatus, errorThrown) ->
-                    if jqXHR.responseJSON?
-                        promise.reject jqXHR.responseJSON
-                    else
-                        promise.reject 'Unknown error. Please try again later.'
-
-            promise
-
-        removeTaskCategory: (id, token, callback) ->
-            promise = $.Deferred()
-
-            url = "#{metadataStore.getMetadata 'domain-api' }/task/category/#{id}/remove"
-            $.ajax
-                url: url
-                type: 'POST'
-                dataType: 'json'
-                data: {}
-                xhrFields:
-                    withCredentials: yes
-                headers: { 'X-CSRF-Token': token }
-                success: (responseJSON, textStatus, jqXHR) ->
-                    promise.resolve()
                 error: (jqXHR, textStatus, errorThrown) ->
                     if jqXHR.responseJSON?
                         promise.reject jqXHR.responseJSON
@@ -343,6 +281,7 @@ define 'dataStore', ['jquery', 'underscore', 'metadataStore', 'contestState', 't
 #= include utils/render-template.coffee
 
 #= include providers/post.coffee
+#= include providers/task-category.coffee
 
 #= include views/base.coffee
 #= include views/signup.coffee

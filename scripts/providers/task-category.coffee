@@ -1,15 +1,15 @@
-define 'postProvider', ['jquery', 'underscore', 'dataStore', 'EventEmitter', 'metadataStore', 'postModel'], ($, _, dataStore, EventEmitter, metadataStore, PostModel) ->
-    class PostProvider extends EventEmitter
+define 'taskCategoryProvider', ['jquery', 'underscore', 'dataStore', 'metadataStore', 'EventEmitter', 'taskCategoryModel'], ($, _, dataStore, metadataStore, EventEmitter, TaskCategoryModel) ->
+    class TaskCategoryProvider extends EventEmitter
         constructor: ->
             super()
-            @posts = []
+            @taskCategories = []
 
             @onCreate = null
             @onUpdate = null
             @onRemove = null
 
-        getPosts: ->
-            @posts
+        getTaskCategories: ->
+            @taskCategories
 
         subscribe: ->
             return unless dataStore.supportsRealtime()
@@ -17,62 +17,64 @@ define 'postProvider', ['jquery', 'underscore', 'dataStore', 'EventEmitter', 'me
 
             @onCreate = (e) =>
                 options = JSON.parse e.data
-                post = new PostModel options
-                @posts.push post
-                @trigger 'createPost', [post]
+                taskCategory = new TaskCategoryModel options
+                @taskCategories.push taskCategory
+                @trigger 'createTaskCategory', [taskCategory]
 
-            realtimeProvider.addEventListener 'createPost', @onCreate
+            realtimeProvider.addEventListener 'createTaskCategory', @onCreate
 
             @onUpdate = (e) =>
                 options = JSON.parse e.data
-                post = new PostModel options
-                ndx = _.findIndex @posts, id: options.id
+                taskCategory = new TaskCategoryModel options
+                ndx = _.findIndex @taskCategories, id: taskCategory.id
                 if ndx > -1
-                    @posts.splice ndx, 1
-                @posts.push post
-                @trigger 'updatePost', [post]
+                    @taskCategories.splice ndx, 1
+                @taskCategories.push taskCategory
+                @trigger 'updateTaskCategory', [taskCategory]
 
-            realtimeProvider.addEventListener 'updatePost', @onUpdate
+            realtimeProvider.addEventListener 'updateTaskCategory', @onUpdate
 
             @onRemove = (e) =>
                 options = JSON.parse e.data
-                ndx = _.findIndex @posts, id: options.id
-                if ndx > -1
-                    @posts.splice ndx, 1
-                    @trigger 'removePost', [options.id]
+                ndx = _.findIndex @taskCategories, id: options.id
 
-            realtimeProvider.addEventListener 'removePost', @onRemove
+                if ndx > -1
+                    @taskCategories.splice ndx, 1
+                    @trigger 'removeTaskCategory', [options.id]
+
+            realtimeProvider.addEventListener 'removeTaskCategory', @onRemove
 
         unsubscribe: ->
             return unless dataStore.supportsRealtime()
             realtimeProvider = dataStore.getRealtimeProvider()
 
             if @onCreate
-                realtimeProvider.removeEventListener 'createPost', @onCreate
+                realtimeProvider.removeEventListener 'createTaskCategory', @onCreate
                 @onCreate = null
 
             if @onUpdate
-                realtimeProvider.removeEventListener 'updatePost', @onUpdate
+                realtimeProvider.removeEventListener 'updateTaskCategory', @onUpdate
                 @onUpdate = null
 
             if @onRemove
-                realtimeProvider.removeEventListener 'removePost', @onRemove
+                realtimeProvider.removeEventListener 'removeTaskCategory', @onRemove
                 @onRemove = null
 
-            @posts = []
+            @taskCategories = []
 
-        fetchPosts: ->
+        fetchTaskCategories: ->
             promise = $.Deferred()
-            url = "#{metadataStore.getMetadata 'domain-api' }/post/all"
+
+            url = "#{metadataStore.getMetadata 'domain-api' }/task/category/all"
             $.ajax
                 url: url
                 dataType: 'json'
                 xhrFields:
                     withCredentials: yes
                 success: (responseJSON, textStatus, jqXHR) =>
-                    @posts = _.map responseJSON, (options) ->
-                        new PostModel options
-                    promise.resolve @posts
+                    @taskCategories = _.map responseJSON, (options) ->
+                        new TaskCategoryModel options
+                    promise.resolve @taskCategories
                 error: (jqXHR, textStatus, errorThrown) ->
                     if jqXHR.responseJSON?
                         promise.reject jqXHR.responseJSON
@@ -81,9 +83,10 @@ define 'postProvider', ['jquery', 'underscore', 'dataStore', 'EventEmitter', 'me
 
             promise
 
-        removePost: (id, token) ->
+        removeTaskCategory: (id, token) ->
             promise = $.Deferred()
-            url = "#{metadataStore.getMetadata 'domain-api' }/post/#{id}/remove"
+
+            url = "#{metadataStore.getMetadata 'domain-api' }/task/category/#{id}/remove"
             $.ajax
                 url: url
                 type: 'POST'
@@ -100,5 +103,7 @@ define 'postProvider', ['jquery', 'underscore', 'dataStore', 'EventEmitter', 'me
                     else
                         promise.reject 'Unknown error. Please try again later.'
 
+            promise
 
-    new PostProvider()
+
+    new TaskCategoryProvider()
