@@ -48,7 +48,7 @@ require.config
         'bootstrap-filestyle': ['bootstrap']
 
 
-#= include models/contest-state.coffee
+#= include models/contest.coffee
 #= include models/task-category.coffee
 #= include models/team-score.coffee
 #= include models/team.coffee
@@ -57,7 +57,7 @@ require.config
 #= include models/post.coffee
 
 
-define 'dataStore', ['jquery', 'underscore', 'metadataStore', 'contestState', 'taskCategoryModel', 'teamScoreModel', 'teamModel', 'taskPreviewModel', 'taskModel'], ($, _, metadataStore, ContestState, TaskCategoryModel, TeamScoreModel, TeamModel, TaskPreviewModel, TaskModel) ->
+define 'dataStore', ['jquery', 'underscore', 'metadataStore', 'teamModel'], ($, _, metadataStore, TeamModel) ->
     class DataStore
         constructor: ->
             @eventSource = null
@@ -136,131 +136,6 @@ define 'dataStore', ['jquery', 'underscore', 'metadataStore', 'contestState', 't
 
             promise
 
-        getContest: ->
-            promise = $.Deferred()
-
-            url = "#{metadataStore.getMetadata 'domain-api' }/contest"
-            $.ajax
-                url: url
-                dataType: 'json'
-                xhrFields:
-                    withCredentials: yes
-                success: (responseJSON, textStatus, jqXHR) ->
-                    promise.resolve new ContestState responseJSON
-                error: (jqXHR, textStatus, errorThrown) ->
-                    if jqXHR.responseJSON?
-                        promise.reject jqXHR.responseJSON
-                    else
-                        promise.reject 'Unknown error. Please try again later.'
-
-            promise
-
-        getTeamScores: ->
-            promise = $.Deferred()
-
-            url = "#{metadataStore.getMetadata 'domain-api' }/contest/scores"
-            $.ajax
-                url: url
-                dataType: 'json'
-                xhrFields:
-                    withCredentials: yes
-                success: (responseJSON, textStatus, jqXHR) ->
-                    createScore = (options) ->
-                        new TeamScoreModel options
-                    promise.resolve _.map responseJSON, createScore
-                error: (jqXHR, textStatus, errorThrown) ->
-                    if jqXHR.responseJSON?
-                        promise.reject jqXHR.responseJSON
-                    else
-                        promise.reject 'Unknown error. Please try again later.'
-
-            promise
-
-        getTaskPreviews: ->
-            promise = $.Deferred()
-
-            url = "#{metadataStore.getMetadata 'domain-api' }/task/all"
-            $.ajax
-                url: url
-                dataType: 'json'
-                xhrFields:
-                    withCredentials: yes
-                success: (responseJSON, textStatus, jqXHR) ->
-                    createPreview = (options) ->
-                        new TaskPreviewModel options
-
-                    promise.resolve _.map responseJSON, createPreview
-                error: (jqXHR, textStatus, errorThrown) ->
-                    if jqXHR.responseJSON?
-                        promise.reject jqXHR.responseJSON
-                    else
-                        promise.reject 'Unknown error. Please try again later.'
-
-            promise
-
-        getTask: (taskId) ->
-            promise = $.Deferred()
-
-            url = "#{metadataStore.getMetadata 'domain-api' }/task/#{taskId}"
-            $.ajax
-                url: url
-                dataType: 'json'
-                xhrFields:
-                    withCredentials: yes
-                success: (responseJSON, textStatus, jqXHR) ->
-                    promise.resolve new TaskModel responseJSON
-                error: (jqXHR, textStatus, errorThrown) ->
-                    if jqXHR.responseJSON?
-                        promise.reject jqXHR.responseJSON
-                    else
-                        promise.reject 'Unknown error. Please try again later.'
-
-            promise
-
-        openTask: (id, token, callback) ->
-            promise = $.Deferred()
-
-            url = "#{metadataStore.getMetadata 'domain-api' }/task/#{id}/open"
-            $.ajax
-                url: url
-                type: 'POST'
-                dataType: 'json'
-                data: {}
-                xhrFields:
-                    withCredentials: yes
-                headers: { 'X-CSRF-Token': token }
-                success: (responseJSON, textStatus, jqXHR) ->
-                    promise.resolve()
-                error: (jqXHR, textStatus, errorThrown) ->
-                    if jqXHR.responseJSON?
-                        promise.reject jqXHR.responseJSON
-                    else
-                        promise.reject 'Unknown error. Please try again later.'
-
-            promise
-
-        closeTask: (id, token, callback) ->
-            promise = $.Deferred()
-
-            url = "#{metadataStore.getMetadata 'domain-api' }/task/#{id}/close"
-            $.ajax
-                url: url
-                type: 'POST'
-                dataType: 'json'
-                data: {}
-                xhrFields:
-                    withCredentials: yes
-                headers: { 'X-CSRF-Token': token }
-                success: (responseJSON, textStatus, jqXHR) ->
-                    promise.resolve()
-                error: (jqXHR, textStatus, errorThrown) ->
-                    if jqXHR.responseJSON?
-                        promise.reject jqXHR.responseJSON
-                    else
-                        promise.reject 'Unknown error. Please try again later.'
-
-            promise
-
         supportsRealtime: ->
             window.EventSource?
 
@@ -282,6 +157,8 @@ define 'dataStore', ['jquery', 'underscore', 'metadataStore', 'contestState', 't
 
 #= include providers/post.coffee
 #= include providers/task-category.coffee
+#= include providers/task.coffee
+#= include providers/contest.coffee
 
 #= include views/base.coffee
 #= include views/signup.coffee
@@ -303,13 +180,12 @@ define 'dataStore', ['jquery', 'underscore', 'metadataStore', 'contestState', 't
 #= include controllers/view.coffee
 
 
-define 'statusBar', ['jquery', 'underscore', 'renderTemplate', 'dataStore', 'contestState', 'moment', 'bootstrap', 'parsley', 'bootstrap-datetimepicker'], ($, _, renderTemplate, dataStore, ContestState, moment) ->
+define 'statusBar', ['jquery', 'underscore', 'renderTemplate', 'dataStore', 'moment', 'contestProvider', 'bootstrap', 'parsley', 'bootstrap-datetimepicker'], ($, _, renderTemplate, dataStore, moment, contestProvider) ->
     class StatusBar
         constructor: ->
             @$container = null
             @$stateContainer = null
             @identity = null
-            @contest = null
 
             @onUpdateContest = null
 
@@ -341,10 +217,11 @@ define 'statusBar', ['jquery', 'underscore', 'renderTemplate', 'dataStore', 'con
             $updateContestSubmitButton.on 'click', (e) ->
                 $updateContestForm.trigger 'submit'
 
-            $updateContestModal.on 'show.bs.modal', (e) =>
-                $updateContestState.val @contest.state
-                $updateContestStartsAt.data('DateTimePicker').date @contest.startsAt
-                $updateContestFinishesAt.data('DateTimePicker').date @contest.finishesAt
+            $updateContestModal.on 'show.bs.modal', (e) ->
+                contest = contestProvider.getContest()
+                $updateContestState.val contest.state
+                $updateContestStartsAt.data('DateTimePicker').date contest.startsAt
+                $updateContestFinishesAt.data('DateTimePicker').date contest.finishesAt
                 $updateContestSubmitError.text ''
 
             $updateContestModal.on 'shown.bs.modal', (e) ->
@@ -378,9 +255,10 @@ define 'statusBar', ['jquery', 'underscore', 'renderTemplate', 'dataStore', 'con
                         $updateContestSubmitButton.prop 'disabled', no
 
         renderContestState: ->
+            contest = contestProvider.getContest()
             contestObj =
-                state: @contest.state
-                startsAt: moment(@contest.startsAt).format 'lll'
+                state: contest.state
+                startsAt: moment(contest.startsAt).format 'lll'
             @$stateContainer.html renderTemplate 'contest-state-partial', contest: contestObj, identity: @identity
 
         present: (options = {}) ->
@@ -389,7 +267,6 @@ define 'statusBar', ['jquery', 'underscore', 'renderTemplate', 'dataStore', 'con
                 contest: null
             options = _.extend defaultOptions, options
             @identity = options.identity
-            @contest = options.contest
 
             @$container = $ '#themis-statusbar'
             @$container.html renderTemplate 'statusbar-view'
@@ -399,26 +276,24 @@ define 'statusBar', ['jquery', 'underscore', 'renderTemplate', 'dataStore', 'con
             if @identity.role == 'admin'
                 @initUpdateContestModal()
 
-            if dataStore.supportsRealtime()
-                @onUpdateContest = (e) =>
-                    data = JSON.parse e.data
-                    @contest = new ContestState data
-                    @renderContestState()
+            @onUpdateContest = (e) =>
+                @renderContestState()
+                false
 
-                dataStore.getRealtimeProvider().addEventListener 'updateContest', @onUpdateContest
+            contestProvider.subscribe()
+            contestProvider.on 'updateContest', @onUpdateContest
 
         dismiss: ->
-            if dataStore.supportsRealtime()
-                if @onUpdateContest?
-                    dataStore.getRealtimeProvider().removeEventListener 'updateContest', @onUpdateContest
-                    @onUpdateContest = null
+            if @onUpdateContest?
+                contestProvider.off 'updateContest', @onUpdateContest
+                @onUpdateContest = null
+            contestProvider.unsubscribe()
 
             if @$container?.length
                 @$container.empty()
                 @$container = null
             @$stateContainer = null
             @identity = null
-            @contest = null
 
     new StatusBar()
 

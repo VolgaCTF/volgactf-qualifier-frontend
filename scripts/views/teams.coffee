@@ -1,4 +1,4 @@
-define 'teamsView', ['jquery', 'underscore', 'view', 'renderTemplate', 'dataStore', 'navigationBar', 'statusBar', 'metadataStore', 'teamModel'], ($, _, View, renderTemplate, dataStore, navigationBar, statusBar, metadataStore, TeamModel) ->
+define 'teamsView', ['jquery', 'underscore', 'view', 'renderTemplate', 'dataStore', 'navigationBar', 'statusBar', 'metadataStore', 'teamModel', 'contestProvider'], ($, _, View, renderTemplate, dataStore, navigationBar, statusBar, metadataStore, TeamModel, contestProvider) ->
     class TeamsView extends View
         constructor: ->
             @$main = null
@@ -32,7 +32,7 @@ define 'teamsView', ['jquery', 'underscore', 'view', 'renderTemplate', 'dataStor
             @$main = $ '#main'
 
             $
-                .when dataStore.getIdentity(), dataStore.getContest()
+                .when dataStore.getIdentity(), contestProvider.fetchContest()
                 .done (identity, contest) =>
                     if dataStore.supportsRealtime()
                         dataStore.connectRealtime()

@@ -1,4 +1,4 @@
-define 'scoreboardView', ['jquery', 'underscore', 'view', 'renderTemplate', 'dataStore', 'navigationBar', 'statusBar', 'metadataStore', 'moment'], ($, _, View, renderTemplate, dataStore, navigationBar, statusBar, metadataStore, moment) ->
+define 'scoreboardView', ['jquery', 'underscore', 'view', 'renderTemplate', 'dataStore', 'navigationBar', 'statusBar', 'metadataStore', 'moment', 'contestProvider'], ($, _, View, renderTemplate, dataStore, navigationBar, statusBar, metadataStore, moment, contestProvider) ->
     class ScoreboardView extends View
         constructor: ->
             @$main = null
@@ -12,7 +12,7 @@ define 'scoreboardView', ['jquery', 'underscore', 'view', 'renderTemplate', 'dat
             @$main.html renderTemplate 'scoreboard-view'
 
             $
-                .when dataStore.getIdentity(), dataStore.getContest(), dataStore.getTeams(), dataStore.getTeamScores()
+                .when dataStore.getIdentity(), contestProvider.fetchContest(), dataStore.getTeams(), contestProvider.fetchTeamScores()
                 .done (identity, contest, teams, teamScores) ->
                     if dataStore.supportsRealtime()
                         dataStore.connectRealtime()

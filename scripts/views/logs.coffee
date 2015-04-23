@@ -1,4 +1,4 @@
-define 'logsView', ['jquery', 'underscore', 'view', 'renderTemplate', 'dataStore', 'navigationBar', 'statusBar', 'metadataStore'], ($, _, View, renderTemplate, dataStore, navigationBar, statusBar, metadataStore) ->
+define 'logsView', ['jquery', 'underscore', 'view', 'renderTemplate', 'dataStore', 'navigationBar', 'statusBar', 'metadataStore', 'contestProvider'], ($, _, View, renderTemplate, dataStore, navigationBar, statusBar, metadataStore, contestProvider) ->
     class LogsView extends View
         constructor: ->
             @$main = null
@@ -11,7 +11,7 @@ define 'logsView', ['jquery', 'underscore', 'view', 'renderTemplate', 'dataStore
             @$main = $ '#main'
 
             $
-                .when dataStore.getIdentity(), dataStore.getContest()
+                .when dataStore.getIdentity(), contestProvider.fetchContest()
                 .done (identity, contest) =>
                     if dataStore.supportsRealtime()
                         dataStore.connectRealtime()
@@ -22,7 +22,6 @@ define 'logsView', ['jquery', 'underscore', 'view', 'renderTemplate', 'dataStore
 
                     statusBar.present
                         identity: identity
-                        contest: contest
 
                     if _.contains ['admin', 'manager'], identity.role
                         @$main.html renderTemplate 'logs-view'

@@ -1,4 +1,4 @@
-define 'signupView', ['jquery', 'view', 'renderTemplate', 'dataStore', 'navigationBar', 'stateController', 'metadataStore', 'parsley', 'jquery.form', 'bootstrap-filestyle'], ($, View, renderTemplate, dataStore, navigationBar, stateController, metadataStore) ->
+define 'signupView', ['jquery', 'view', 'renderTemplate', 'dataStore', 'navigationBar', 'stateController', 'metadataStore', 'contestProvider', 'parsley', 'jquery.form', 'bootstrap-filestyle'], ($, View, renderTemplate, dataStore, navigationBar, stateController, metadataStore, contestProvider) ->
     class SignupView extends View
         constructor: ->
             @$main = null
@@ -46,7 +46,7 @@ define 'signupView', ['jquery', 'view', 'renderTemplate', 'dataStore', 'navigati
             @$main = $ '#main'
 
             $
-                .when dataStore.getIdentity(), dataStore.getContest()
+                .when dataStore.getIdentity(), contestProvider.fetchContest()
                 .done (identity, contest) =>
                     navigationBar.present
                         identity: identity

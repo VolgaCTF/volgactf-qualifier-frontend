@@ -1,4 +1,4 @@
-define 'aboutView', ['jquery', 'view', 'renderTemplate', 'dataStore', 'navigationBar', 'statusBar', 'metadataStore'], ($, View, renderTemplate, dataStore, navigationBar, statusBar, metadataStore) ->
+define 'aboutView', ['jquery', 'view', 'renderTemplate', 'dataStore', 'navigationBar', 'statusBar', 'metadataStore', 'contestProvider'], ($, View, renderTemplate, dataStore, navigationBar, statusBar, metadataStore, contestProvider) ->
     class AboutView extends View
         constructor: ->
             @$main = null
@@ -12,7 +12,7 @@ define 'aboutView', ['jquery', 'view', 'renderTemplate', 'dataStore', 'navigatio
             @$main.html renderTemplate 'about-view'
 
             $
-                .when dataStore.getIdentity(), dataStore.getContest()
+                .when dataStore.getIdentity(), contestProvider.fetchContest()
                 .done (identity, contest) ->
                     if dataStore.supportsRealtime()
                         dataStore.connectRealtime()
@@ -23,7 +23,6 @@ define 'aboutView', ['jquery', 'view', 'renderTemplate', 'dataStore', 'navigatio
 
                     statusBar.present
                         identity: identity
-                        contest: contest
                 .fail (err) ->
                     navigationBar.present()
                     $main.html renderTemplate 'internal-error-view'

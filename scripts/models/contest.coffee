@@ -1,5 +1,5 @@
-define 'contestState', [], ->
-    class ContestState
+define 'contestModel', [], ->
+    class ContestModel
         constructor: (options) ->
             @state = options.state
             @startsAt = if options.startsAt? then new Date(options.startsAt) else null

@@ -1,4 +1,4 @@
-define 'newsView', ['jquery', 'underscore', 'view', 'renderTemplate', 'dataStore', 'navigationBar', 'statusBar', 'metadataStore', 'markdown-it', 'moment', 'postProvider', 'jquery.form', 'parsley'], ($, _, View, renderTemplate, dataStore, navigationBar, statusBar, metadataStore, MarkdownIt, moment, postProvider) ->
+define 'newsView', ['jquery', 'underscore', 'view', 'renderTemplate', 'dataStore', 'navigationBar', 'statusBar', 'metadataStore', 'markdown-it', 'moment', 'postProvider', 'contestProvider', 'jquery.form', 'parsley'], ($, _, View, renderTemplate, dataStore, navigationBar, statusBar, metadataStore, MarkdownIt, moment, postProvider, contestProvider) ->
     class NewsView extends View
         constructor: ->
             @$main = null
@@ -197,7 +197,7 @@ define 'newsView', ['jquery', 'underscore', 'view', 'renderTemplate', 'dataStore
             @$main = $ '#main'
 
             $
-                .when dataStore.getIdentity(), dataStore.getContest()
+                .when dataStore.getIdentity(), contestProvider.fetchContest()
                 .done (identity, contest) =>
                     if dataStore.supportsRealtime()
                         dataStore.connectRealtime()
@@ -208,7 +208,6 @@ define 'newsView', ['jquery', 'underscore', 'view', 'renderTemplate', 'dataStore
 
                     statusBar.present
                         identity: identity
-                        contest: contest
 
                     @identity = identity
                     @$main.html renderTemplate 'news-view', identity: identity, supportsRealtime: dataStore.supportsRealtime()

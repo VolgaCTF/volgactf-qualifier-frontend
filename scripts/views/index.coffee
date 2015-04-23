@@ -1,4 +1,4 @@
-define 'indexView', ['jquery', 'view', 'renderTemplate', 'dataStore', 'navigationBar', 'statusBar', 'metadataStore'], ($, View, renderTemplate, dataStore, navigationBar, statusBar, metadataStore) ->
+define 'indexView', ['jquery', 'view', 'renderTemplate', 'dataStore', 'navigationBar', 'statusBar', 'metadataStore', 'contestProvider'], ($, View, renderTemplate, dataStore, navigationBar, statusBar, metadataStore, contestProvider) ->
     class IndexView extends View
         constructor: ->
             @$main = null
@@ -11,7 +11,7 @@ define 'indexView', ['jquery', 'view', 'renderTemplate', 'dataStore', 'navigatio
             @$main = $ '#main'
 
             $
-                .when dataStore.getIdentity(), dataStore.getContest()
+                .when dataStore.getIdentity(), contestProvider.fetchContest()
                 .done (identity, contest) =>
                     if dataStore.supportsRealtime()
                         dataStore.connectRealtime()
@@ -21,7 +21,6 @@ define 'indexView', ['jquery', 'view', 'renderTemplate', 'dataStore', 'navigatio
 
                     statusBar.present
                         identity: identity
-                        contest: contest
 
                     @$main.html renderTemplate 'index-view', identity: identity, contest: contest
                 .fail (err) =>
