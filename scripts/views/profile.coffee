@@ -1,4 +1,4 @@
-define 'profileView', ['jquery', 'view', 'renderTemplate', 'dataStore', 'navigationBar', 'metadataStore', 'identityProvider', 'jquery.history', 'parsley', 'jquery.form', 'bootstrap-filestyle'], ($, View, renderTemplate, dataStore, navigationBar, metadataStore, identityProvider, History) ->
+define 'profileView', ['jquery', 'view', 'renderTemplate', 'dataStore', 'navigationBar', 'metadataStore', 'identityProvider', 'teamProvider', 'jquery.history', 'parsley', 'jquery.form', 'bootstrap-filestyle'], ($, View, renderTemplate, dataStore, navigationBar, metadataStore, identityProvider, teamProvider, History) ->
     class ProfileView extends View
         constructor: ->
             @$main = null
@@ -253,10 +253,9 @@ define 'profileView', ['jquery', 'view', 'renderTemplate', 'dataStore', 'navigat
                     url = History.getState().data.urlPath
                     urlParts = url.split '/'
                     teamId = parseInt urlParts[urlParts.length - 1], 10
-                    dataStore.getTeamProfile teamId, (err, team) =>
-                        if err? or not team?
-                            @$main.html renderTemplate 'internal-error-view'
-                        else
+                    $
+                        .when teamProvider.fetchTeamProfile teamId
+                        .done (team) =>
                             @team = team
                             @$main.find('section').html renderTemplate 'team-profile-partial', identity: identity, team: team
                             if identity.role is 'team' and identity.id == team.id
@@ -268,6 +267,8 @@ define 'profileView', ['jquery', 'view', 'renderTemplate', 'dataStore', 'navigat
 
                                 @initEditProfileModal()
                                 @initChangePasswordModal()
+                        .fail (err) =>
+                            @$main.html renderTemplate 'internal-error-view'
 
                 .fail (err) =>
                     navigationBar.present()

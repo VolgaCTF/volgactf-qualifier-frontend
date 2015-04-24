@@ -1,9 +1,7 @@
-define 'teamsView', ['jquery', 'underscore', 'view', 'renderTemplate', 'dataStore', 'navigationBar', 'statusBar', 'metadataStore', 'teamModel', 'contestProvider', 'identityProvider'], ($, _, View, renderTemplate, dataStore, navigationBar, statusBar, metadataStore, TeamModel, contestProvider, identityProvider) ->
+define 'teamsView', ['jquery', 'underscore', 'view', 'renderTemplate', 'dataStore', 'navigationBar', 'statusBar', 'metadataStore', 'teamModel', 'contestProvider', 'identityProvider', 'teamProvider'], ($, _, View, renderTemplate, dataStore, navigationBar, statusBar, metadataStore, TeamModel, contestProvider, identityProvider, teamProvider) ->
     class TeamsView extends View
         constructor: ->
             @$main = null
-
-            @teams = []
 
             @onUpdateTeamProfile = null
             @onCreateTeam = null
@@ -16,8 +14,8 @@ define 'teamsView', ['jquery', 'underscore', 'view', 'renderTemplate', 'dataStor
             "#{metadataStore.getMetadata 'event-title' } :: Teams"
 
         renderTeams: ->
-            sortedTeams = _.sortBy @teams, 'createdAt'
-            @$main.find('.themis-team-count').show().html renderTemplate 'team-count-partial', count: @teams.length
+            sortedTeams = _.sortBy teamProvider.getTeams(), 'createdAt'
+            @$main.find('.themis-team-count').show().html renderTemplate 'team-count-partial', count: sortedTeams.length
 
             $section = @$main.find 'section'
             $section.empty()
@@ -45,82 +43,61 @@ define 'teamsView', ['jquery', 'underscore', 'view', 'renderTemplate', 'dataStor
                     $section = @$main.find 'section'
 
                     $
-                        .when dataStore.getTeams()
+                        .when teamProvider.fetchTeams()
                         .fail (err) ->
                             $section.html $('<p></p>').addClass('lead text-danger').text err
                         .done (teams) =>
-                            @teams = teams
                             @renderTeams()
 
-                            if dataStore.supportsRealtime()
-                                @onUpdateTeamProfile = (e) =>
-                                    data = JSON.parse e.data
-                                    team = _.findWhere @teams, id: data.id
-                                    if team?
-                                        team.country = data.country
-                                        team.locality = data.locality
-                                        team.institution = data.institution
-                                        @renderTeams()
+                            teamProvider.subscribe()
 
-                                dataStore.getRealtimeProvider().addEventListener 'updateTeamProfile', @onUpdateTeamProfile
+                            @onUpdateTeamProfile = (team) =>
+                                @renderTeams()
+                                false
 
-                                @onQualifyTeam = (e) =>
-                                    data = JSON.parse e.data
-                                    team = _.findWhere @teams, id: data.id
-                                    if team?
-                                        team.emailConfirmed = data.emailConfirmed
-                                    else
-                                        team = new TeamModel data
-                                        @teams.push team
+                            teamProvider.on 'updateTeamProfile', @onUpdateTeamProfile
+
+                            @onQualifyTeam = (team) =>
+                                @renderTeams()
+                                false
+
+                            teamProvider.on 'qualifyTeam', @onQualifyTeam
+
+                            if _.contains ['admin', 'manager'], identity.role
+                                @onCreateTeam = (team) =>
                                     @renderTeams()
+                                    false
 
-                                dataStore.getRealtimeProvider().addEventListener 'qualifyTeam', @onQualifyTeam
+                                teamProvider.on 'createTeam', @onCreateTeam
 
-                                if _.contains ['admin', 'manager'], identity.role
-                                    @onCreateTeam = (e) =>
-                                        data = JSON.parse e.data
-                                        team = new TeamModel data
-                                        @teams.push team
-                                        @renderTeams()
+                                @onChangeTeamEmail = (team) =>
+                                    @renderTeams()
+                                    false
 
-                                    dataStore.getRealtimeProvider().addEventListener 'createTeam', @onCreateTeam
-
-                                    @onChangeTeamEmail = (e) =>
-                                        data = JSON.parse e.data
-                                        team = _.findWhere @teams, id: data.id
-                                        if team?
-                                            team.email = data.email
-                                            team.emailConfirmed = data.emailConfirmed
-                                            @renderTeams()
-
-                                    dataStore.getRealtimeProvider().addEventListener 'changeTeamEmail', @onChangeTeamEmail
-
+                                teamProvider.on 'changeTeamEmail', @onChangeTeamEmail
                 .fail (err) =>
                     navigationBar.present()
                     @$main.html renderTemplate 'internal-error-view'
 
         dismiss: ->
             identityProvider.unsubscribe()
-            if dataStore.supportsRealtime()
-                if @onUpdateTeamProfile?
-                    dataStore.getRealtimeProvider().removeEventListener 'updateTeamProfile', @onUpdateTeamProfile
-                    @onUpdateTeamProfile = null
 
-                if @onCreateTeam?
-                    dataStore.getRealtimeProvider().removeEventListener 'createTeam', @onCreateTeam
-                    @onCreateTeam = null
-
-                if @onChangeTeamEmail?
-                    dataStore.getRealtimeProvider().removeEventListener 'changeTeamEmail', @onChangeTeamEmail
-                    @onChangeTeamEmail = null
-
-                if @onQualifyTeam?
-                    dataStore.getRealtimeProvider().removeEventListener 'qualifyTeam', @onQualifyTeam
-                    @onQualifyTeam = null
+            if @onUpdateTeamProfile?
+                teamProvider.off 'updateTeamProfile', @onUpdateTeamProfile
+                @onUpdateTeamProfile = null
+            if @onCreateTeam?
+                teamProvider.off 'createTeam', @onCreateTeam
+                @onCreateTeam = null
+            if @onChangeTeamEmail?
+                teamProvider.off 'changeTeamEmail', @onChangeTeamEmail
+                @onChangeTeamEmail = null
+            if @onQualifyTeam?
+                teamProvider.off 'qualifyTeam', @onQualifyTeam
+                @onQualifyTeam = null
+            teamProvider.unsubscribe()
 
             @$main.empty()
             @$main = null
-            @teams = []
             navigationBar.dismiss()
             statusBar.dismiss()
 

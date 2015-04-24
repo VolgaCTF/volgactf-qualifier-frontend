@@ -80,43 +80,6 @@ define 'dataStore', ['jquery', 'underscore', 'metadataStore', 'teamModel'], ($, 
                     else
                         callback 'Unknown error. Please try again later.', null
 
-        getTeamProfile: (id, callback) ->
-            url = "#{metadataStore.getMetadata 'domain-api' }/team/#{id}/profile"
-            $.ajax
-                url: url
-                dataType: 'json'
-                xhrFields:
-                    withCredentials: yes
-                success: (responseJSON, textStatus, jqXHR) ->
-                    callback null, new TeamModel responseJSON
-                error: (jqXHR, textStatus, errorThrown) ->
-                    if jqXHR.responseJSON?
-                        callback jqXHR.responseJSON, null
-                    else
-                        callback 'Unknown error. Please try again later.', null
-
-        getTeams: (callback) ->
-            promise = $.Deferred()
-
-            url = "#{metadataStore.getMetadata 'domain-api' }/team/all"
-            $.ajax
-                url: url
-                dataType: 'json'
-                xhrFields:
-                    withCredentials: yes
-                success: (responseJSON, textStatus, jqXHR) ->
-                    createTeam = (options) ->
-                        new TeamModel options
-
-                    promise.resolve _.map responseJSON, createTeam
-                error: (jqXHR, textStatus, errorThrown) ->
-                    if jqXHR.responseJSON?
-                        promise.reject jqXHR.responseJSON
-                    else
-                        promise.reject 'Unknown error. Please try again later.'
-
-            promise
-
         supportsRealtime: ->
             window.EventSource?
 
@@ -141,6 +104,7 @@ define 'dataStore', ['jquery', 'underscore', 'metadataStore', 'teamModel'], ($, 
 #= include providers/task-category.coffee
 #= include providers/task.coffee
 #= include providers/contest.coffee
+#= include providers/team.coffee
 
 #= include views/base.coffee
 #= include views/signup.coffee
