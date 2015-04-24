@@ -1,4 +1,4 @@
-define 'scoreboardView', ['jquery', 'underscore', 'view', 'renderTemplate', 'dataStore', 'navigationBar', 'statusBar', 'metadataStore', 'moment', 'contestProvider'], ($, _, View, renderTemplate, dataStore, navigationBar, statusBar, metadataStore, moment, contestProvider) ->
+define 'scoreboardView', ['jquery', 'underscore', 'view', 'renderTemplate', 'dataStore', 'navigationBar', 'statusBar', 'metadataStore', 'moment', 'contestProvider', 'identityProvider'], ($, _, View, renderTemplate, dataStore, navigationBar, statusBar, metadataStore, moment, contestProvider, identityProvider) ->
     class ScoreboardView extends View
         constructor: ->
             @$main = null
@@ -12,19 +12,14 @@ define 'scoreboardView', ['jquery', 'underscore', 'view', 'renderTemplate', 'dat
             @$main.html renderTemplate 'scoreboard-view'
 
             $
-                .when dataStore.getIdentity(), contestProvider.fetchContest(), dataStore.getTeams(), contestProvider.fetchTeamScores()
+                .when identityProvider.fetchIdentity(), contestProvider.fetchContest(), dataStore.getTeams(), contestProvider.fetchTeamScores()
                 .done (identity, contest, teams, teamScores) ->
+                    identityProvider.subscribe()
                     if dataStore.supportsRealtime()
                         dataStore.connectRealtime()
 
-                    navigationBar.present
-                        identity: identity
-                        active: 'scoreboard'
-
-                    statusBar.present
-                        identity: identity
-                        contest: contest
-
+                    navigationBar.present active: 'scoreboard'
+                    statusBar.present()
 
                     rankFunc = (a, b) ->
                         if a.score > b.score
@@ -65,6 +60,7 @@ define 'scoreboardView', ['jquery', 'underscore', 'view', 'renderTemplate', 'dat
                     @$main.html renderTemplate 'internal-error-view'
 
         dismiss: ->
+            identityProvider.unsubscribe()
             @$main.empty()
             @$main = null
             navigationBar.dismiss()

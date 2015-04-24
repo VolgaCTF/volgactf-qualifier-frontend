@@ -1,8 +1,7 @@
-define 'loginView', ['jquery', 'view', 'renderTemplate', 'dataStore', 'navigationBar', 'stateController', 'metadataStore', 'parsley', 'jquery.form'], ($, View, renderTemplate, dataStore, navigationBar, stateController, metadataStore) ->
+define 'loginView', ['jquery', 'view', 'renderTemplate', 'dataStore', 'navigationBar', 'stateController', 'metadataStore', 'identityProvider', 'parsley', 'jquery.form'], ($, View, renderTemplate, dataStore, navigationBar, stateController, metadataStore, identityProvider) ->
     class LoginView extends View
         constructor: ->
             @$main = null
-            @identity = null
             @urlRegex = /^\/login$/
 
         getTitle: ->
@@ -25,7 +24,7 @@ define 'loginView', ['jquery', 'view', 'renderTemplate', 'dataStore', 'navigatio
                     dataType: 'json'
                     xhrFields:
                         withCredentials: yes
-                    headers: { 'X-CSRF-Token': @identity.token }
+                    headers: { 'X-CSRF-Token': identityProvider.getIdentity().token }
                     success: (responseText, textStatus, jqXHR) ->
                         stateController.navigateTo '/'
                     error: (jqXHR, textStatus, errorThrown) ->
@@ -40,10 +39,10 @@ define 'loginView', ['jquery', 'view', 'renderTemplate', 'dataStore', 'navigatio
             @$main = $ '#main'
 
             $
-                .when dataStore.getIdentity()
+                .when identityProvider.fetchIdentity()
                 .done (identity) =>
-                    navigationBar.present identity: identity
-                    @identity = identity
+                    identityProvider.subscribe()
+                    navigationBar.present()
                     if identity.role == 'guest'
                         @$main.html renderTemplate 'login-view'
                         @initLoginForm()
@@ -54,9 +53,9 @@ define 'loginView', ['jquery', 'view', 'renderTemplate', 'dataStore', 'navigatio
                     @$main.html renderTemplate 'internal-error-view'
 
         dismiss: ->
+            identityProvider.unsubscribe()
             @$main.empty()
             @$main = null
-            @identity = null
             navigationBar.dismiss()
 
     new LoginView()

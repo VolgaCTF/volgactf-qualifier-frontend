@@ -1,4 +1,4 @@
-define 'tasksView', ['jquery', 'underscore', 'view', 'renderTemplate', 'dataStore', 'navigationBar', 'statusBar', 'metadataStore', 'moment', 'taskCategoryModel', 'taskPreviewModel', 'taskCategoryProvider', 'taskProvider', 'contestProvider', 'markdown-it', 'bootstrap', 'jquery.form', 'parsley'], ($, _, View, renderTemplate, dataStore, navigationBar, statusBar, metadataStore, moment, TaskCategoryModel, TaskPreviewModel, taskCategoryProvider, taskProvider, contestProvider, MarkdownIt) ->
+define 'tasksView', ['jquery', 'underscore', 'view', 'renderTemplate', 'dataStore', 'navigationBar', 'statusBar', 'metadataStore', 'moment', 'taskCategoryModel', 'taskPreviewModel', 'taskCategoryProvider', 'taskProvider', 'contestProvider', 'identityProvider', 'markdown-it', 'bootstrap', 'jquery.form', 'parsley'], ($, _, View, renderTemplate, dataStore, navigationBar, statusBar, metadataStore, moment, TaskCategoryModel, TaskPreviewModel, taskCategoryProvider, taskProvider, contestProvider, identityProvider, MarkdownIt) ->
     class TasksView extends View
         constructor: ->
             @$main = null
@@ -7,7 +7,6 @@ define 'tasksView', ['jquery', 'underscore', 'view', 'renderTemplate', 'dataStor
 
             @$taskPreviewsList = null
 
-            @identity = null
             @contest = null
 
             @onCreateTaskCategory = null
@@ -53,7 +52,7 @@ define 'tasksView', ['jquery', 'underscore', 'view', 'renderTemplate', 'dataStor
                     dataType: 'json'
                     xhrFields:
                         withCredentials: yes
-                    headers: { 'X-CSRF-Token': @identity.token }
+                    headers: { 'X-CSRF-Token': identityProvider.getIdentity().token }
                     success: (responseText, textStatus, jqXHR) ->
                         $createTaskCategoryModal.modal 'hide'
                     error: (jqXHR, textStatus, errorThrown) ->
@@ -103,7 +102,7 @@ define 'tasksView', ['jquery', 'underscore', 'view', 'renderTemplate', 'dataStor
                     dataType: 'json'
                     xhrFields:
                         withCredentials: yes
-                    headers: { 'X-CSRF-Token': @identity.token }
+                    headers: { 'X-CSRF-Token': identityProvider.getIdentity().token }
                     success: (responseText, textStatus, jqXHR) ->
                         $editTaskCategoryModal.modal 'hide'
                     error: (jqXHR, textStatus, errorThrown) ->
@@ -133,7 +132,7 @@ define 'tasksView', ['jquery', 'underscore', 'view', 'renderTemplate', 'dataStor
             $removeTaskCategorySubmitButton.on 'click', (e) =>
                 taskCategoryId = $removeTaskCategoryModal.data 'task-category-id'
                 $
-                    .when taskCategoryProvider.removeTaskCategory taskCategoryId, @identity.token
+                    .when taskCategoryProvider.removeTaskCategory taskCategoryId, identityProvider.getIdentity().token
                     .done ->
                         $removeTaskCategoryModal.modal 'hide'
                     .fail (err) ->
@@ -251,7 +250,7 @@ define 'tasksView', ['jquery', 'underscore', 'view', 'renderTemplate', 'dataStor
                     dataType: 'json'
                     xhrFields:
                         withCredentials: yes
-                    headers: { 'X-CSRF-Token': @identity.token }
+                    headers: { 'X-CSRF-Token': identityProvider.getIdentity().token }
                     success: (responseText, textStatus, jqXHR) ->
                         $createTaskModal.modal 'hide'
                     error: (jqXHR, textStatus, errorThrown) ->
@@ -322,7 +321,7 @@ define 'tasksView', ['jquery', 'underscore', 'view', 'renderTemplate', 'dataStor
                     dataType: 'json'
                     xhrFields:
                         withCredentials: yes
-                    headers: { 'X-CSRF-Token': @identity.token }
+                    headers: { 'X-CSRF-Token': identityProvider.getIdentity().token }
                     success: (responseText, textStatus, jqXHR) ->
                         $reviseTaskSubmitSuccess.text 'Answer is correct!'
                         hideModal = ->
@@ -355,7 +354,7 @@ define 'tasksView', ['jquery', 'underscore', 'view', 'renderTemplate', 'dataStor
             $openTaskSubmitButton.on 'click', (e) =>
                 taskId = $openTaskModal.data 'task-id'
                 $
-                    .when taskProvider.openTask taskId, @identity.token
+                    .when taskProvider.openTask taskId, identityProvider.getIdentity().token
                     .done ->
                         $openTaskModal.modal 'hide'
                     .fail (err) ->
@@ -380,7 +379,7 @@ define 'tasksView', ['jquery', 'underscore', 'view', 'renderTemplate', 'dataStor
             $closeTaskSubmitButton.on 'click', (e) =>
                 taskId = $closeTaskModal.data 'task-id'
                 $
-                    .when taskProvider.closeTask taskId, @identity.token
+                    .when taskProvider.closeTask taskId, identityProvider.getIdentity().token
                     .done ->
                         $closeTaskModal.modal 'hide'
                     .fail (err) ->
@@ -459,7 +458,7 @@ define 'tasksView', ['jquery', 'underscore', 'view', 'renderTemplate', 'dataStor
                     dataType: 'json'
                     xhrFields:
                         withCredentials: yes
-                    headers: { 'X-CSRF-Token': @identity.token }
+                    headers: { 'X-CSRF-Token': identityProvider.getIdentity().token }
                     success: (responseText, textStatus, jqXHR) ->
                         $submitTaskSubmitSuccess.text 'Answer is correct!'
                         hideModal = ->
@@ -481,7 +480,7 @@ define 'tasksView', ['jquery', 'underscore', 'view', 'renderTemplate', 'dataStor
             else
                 @$taskCategoriesList.empty()
                 sortedTaskCategories = _.sortBy taskCategories, 'createdAt'
-                manageable = @identity.role is 'admin' and not @contest.isFinished()
+                manageable = identityProvider.getIdentity().role is 'admin' and not @contest.isFinished()
                 for taskCategory in sortedTaskCategories
                     options =
                         id: taskCategory.id
@@ -526,6 +525,7 @@ define 'tasksView', ['jquery', 'underscore', 'view', 'renderTemplate', 'dataStor
 
                 @$taskPreviewsList.empty()
                 taskPreviews.sort sortTaskPreviewsFunc
+                identity = identityProvider.getIdentity()
                 for taskPreview in taskPreviews
                     categoriesList = ''
                     for categoryId in taskPreview.categories
@@ -536,7 +536,7 @@ define 'tasksView', ['jquery', 'underscore', 'view', 'renderTemplate', 'dataStor
                     options =
                         task: taskPreview
                         categoriesList: categoriesList
-                        identity: @identity
+                        identity: identity
                         contest: @contest
 
                     @$taskPreviewsList.append $ renderTemplate 'task-preview-partial', options
@@ -544,12 +544,12 @@ define 'tasksView', ['jquery', 'underscore', 'view', 'renderTemplate', 'dataStor
         present: ->
             @$main = $ '#main'
             $
-                .when dataStore.getIdentity(), contestProvider.fetchContest(), taskProvider.fetchTaskPreviews(), taskCategoryProvider.fetchTaskCategories()
+                .when identityProvider.fetchIdentity(), contestProvider.fetchContest(), taskProvider.fetchTaskPreviews(), taskCategoryProvider.fetchTaskCategories()
                 .done (identity, contest, taskPreviews, taskCategories) =>
+                    identityProvider.subscribe()
                     @$main.html renderTemplate 'tasks-view', identity: identity, contest: contest
                     @$taskCategoriesSection = $ '#themis-task-categories'
 
-                    @identity = identity
                     @contest = contest
 
                     isAdmin = identity.role is 'admin'
@@ -559,13 +559,8 @@ define 'tasksView', ['jquery', 'underscore', 'view', 'renderTemplate', 'dataStor
                     if dataStore.supportsRealtime()
                         dataStore.connectRealtime()
 
-                    navigationBar.present
-                        identity: identity
-                        active: 'tasks'
-
-                    statusBar.present
-                        identity: identity
-                        contest: contest
+                    navigationBar.present active: 'tasks'
+                    statusBar.present()
 
                     if isSupervisor
                         @$taskCategoriesSection.html renderTemplate 'task-categories-view', identity: identity, contest: contest
@@ -618,7 +613,7 @@ define 'tasksView', ['jquery', 'underscore', 'view', 'renderTemplate', 'dataStor
                         @renderTaskPreviews()
                         false
 
-                    taskProvider.subscribe @identity
+                    taskProvider.subscribe()
                     if isSupervisor
                         taskProvider.on 'createTask', @onCreateTask
                     taskProvider.on 'openTask', @onOpenTask
@@ -628,6 +623,7 @@ define 'tasksView', ['jquery', 'underscore', 'view', 'renderTemplate', 'dataStor
                     @$main.html renderTemplate 'internal-error-view'
 
         dismiss: ->
+            identityProvider.unsubscribe()
             if @onCreateTaskCategory?
                 taskCategoryProvider.off 'createTaskCategory', @onCreateTaskCategory
                 @onCreateTaskCategory = null
@@ -658,7 +654,6 @@ define 'tasksView', ['jquery', 'underscore', 'view', 'renderTemplate', 'dataStor
             navigationBar.dismiss()
             statusBar.dismiss()
 
-            @identity = null
             @contest = null
 
             if dataStore.supportsRealtime()

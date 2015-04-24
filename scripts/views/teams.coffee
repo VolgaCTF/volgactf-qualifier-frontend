@@ -1,10 +1,9 @@
-define 'teamsView', ['jquery', 'underscore', 'view', 'renderTemplate', 'dataStore', 'navigationBar', 'statusBar', 'metadataStore', 'teamModel', 'contestProvider'], ($, _, View, renderTemplate, dataStore, navigationBar, statusBar, metadataStore, TeamModel, contestProvider) ->
+define 'teamsView', ['jquery', 'underscore', 'view', 'renderTemplate', 'dataStore', 'navigationBar', 'statusBar', 'metadataStore', 'teamModel', 'contestProvider', 'identityProvider'], ($, _, View, renderTemplate, dataStore, navigationBar, statusBar, metadataStore, TeamModel, contestProvider, identityProvider) ->
     class TeamsView extends View
         constructor: ->
             @$main = null
 
             @teams = []
-            @identity = null
 
             @onUpdateTeamProfile = null
             @onCreateTeam = null
@@ -24,28 +23,24 @@ define 'teamsView', ['jquery', 'underscore', 'view', 'renderTemplate', 'dataStor
             $section.empty()
 
             $content = $('<ul></ul>').addClass 'themis-teams list-unstyled'
+            identity = identityProvider.getIdentity()
             for team in sortedTeams
-                $content.append $('<li></li>').html renderTemplate 'team-profile-simplified-partial', identity: @identity, team: team
+                $content.append $('<li></li>').html renderTemplate 'team-profile-simplified-partial', identity: identity, team: team
             $section.html $content
 
         present: ->
             @$main = $ '#main'
 
             $
-                .when dataStore.getIdentity(), contestProvider.fetchContest()
+                .when identityProvider.fetchIdentity(), contestProvider.fetchContest()
                 .done (identity, contest) =>
+                    identityProvider.subscribe()
                     if dataStore.supportsRealtime()
                         dataStore.connectRealtime()
 
-                    navigationBar.present
-                        identity: identity
-                        active: 'teams'
+                    navigationBar.present active: 'teams'
+                    statusBar.present()
 
-                    statusBar.present
-                        identity: identity
-                        contest: contest
-
-                    @identity = identity
                     @$main.html renderTemplate 'teams-view'
                     $section = @$main.find 'section'
 
@@ -81,7 +76,7 @@ define 'teamsView', ['jquery', 'underscore', 'view', 'renderTemplate', 'dataStor
 
                                 dataStore.getRealtimeProvider().addEventListener 'qualifyTeam', @onQualifyTeam
 
-                                if _.contains ['admin', 'manager'], @identity.role
+                                if _.contains ['admin', 'manager'], identity.role
                                     @onCreateTeam = (e) =>
                                         data = JSON.parse e.data
                                         team = new TeamModel data
@@ -105,6 +100,7 @@ define 'teamsView', ['jquery', 'underscore', 'view', 'renderTemplate', 'dataStor
                     @$main.html renderTemplate 'internal-error-view'
 
         dismiss: ->
+            identityProvider.unsubscribe()
             if dataStore.supportsRealtime()
                 if @onUpdateTeamProfile?
                     dataStore.getRealtimeProvider().removeEventListener 'updateTeamProfile', @onUpdateTeamProfile
@@ -125,7 +121,6 @@ define 'teamsView', ['jquery', 'underscore', 'view', 'renderTemplate', 'dataStor
             @$main.empty()
             @$main = null
             @teams = []
-            @identity = null
             navigationBar.dismiss()
             statusBar.dismiss()
 

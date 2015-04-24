@@ -62,25 +62,6 @@ define 'dataStore', ['jquery', 'underscore', 'metadataStore', 'teamModel'], ($, 
         constructor: ->
             @eventSource = null
 
-        getIdentity: ->
-            promise = $.Deferred()
-
-            url = "#{metadataStore.getMetadata 'domain-api' }/identity"
-            $.ajax
-                url: url
-                dataType: 'json'
-                xhrFields:
-                    withCredentials: yes
-                success: (responseJSON, textStatus, jqXHR) ->
-                    promise.resolve responseJSON
-                error: (jqXHR, textStatus, errorThrown) ->
-                    if jqXHR.responseJSON?
-                        promise.reject jqXHR.responseJSON
-                    else
-                        promise.reject 'Unknown error. Please try again later.'
-
-            promise
-
         verifyEmail: (data, token, callback) ->
             url = "#{metadataStore.getMetadata 'domain-api' }/team/verify-email"
             $.ajax
@@ -155,6 +136,7 @@ define 'dataStore', ['jquery', 'underscore', 'metadataStore', 'teamModel'], ($, 
 #= include utils/metadata-store.coffee
 #= include utils/render-template.coffee
 
+#= include providers/identity.coffee
 #= include providers/post.coffee
 #= include providers/task-category.coffee
 #= include providers/task.coffee
@@ -180,12 +162,11 @@ define 'dataStore', ['jquery', 'underscore', 'metadataStore', 'teamModel'], ($, 
 #= include controllers/view.coffee
 
 
-define 'statusBar', ['jquery', 'underscore', 'renderTemplate', 'dataStore', 'moment', 'contestProvider', 'bootstrap', 'parsley', 'bootstrap-datetimepicker'], ($, _, renderTemplate, dataStore, moment, contestProvider) ->
+define 'statusBar', ['jquery', 'underscore', 'renderTemplate', 'dataStore', 'moment', 'contestProvider', 'identityProvider', 'bootstrap', 'parsley', 'bootstrap-datetimepicker'], ($, _, renderTemplate, dataStore, moment, contestProvider, identityProvider) ->
     class StatusBar
         constructor: ->
             @$container = null
             @$stateContainer = null
-            @identity = null
 
             @onUpdateContest = null
 
@@ -243,7 +224,7 @@ define 'statusBar', ['jquery', 'underscore', 'renderTemplate', 'dataStore', 'mom
                     dataType: 'json'
                     xhrFields:
                         withCredentials: yes
-                    headers: { 'X-CSRF-Token': @identity.token }
+                    headers: { 'X-CSRF-Token': identityProvider.getIdentity().token }
                     success: (responseJSON, textStatus, jqXHR) ->
                         $updateContestModal.modal 'hide'
                     error: (jqXHR, textStatus, errorThrown) ->
@@ -259,21 +240,15 @@ define 'statusBar', ['jquery', 'underscore', 'renderTemplate', 'dataStore', 'mom
             contestObj =
                 state: contest.state
                 startsAt: moment(contest.startsAt).format 'lll'
-            @$stateContainer.html renderTemplate 'contest-state-partial', contest: contestObj, identity: @identity
+            @$stateContainer.html renderTemplate 'contest-state-partial', contest: contestObj, identity: identityProvider.getIdentity()
 
-        present: (options = {}) ->
-            defaultOptions =
-                identity: null
-                contest: null
-            options = _.extend defaultOptions, options
-            @identity = options.identity
-
+        present: ->
             @$container = $ '#themis-statusbar'
             @$container.html renderTemplate 'statusbar-view'
             @$stateContainer = $ '#themis-contest-state'
             @renderContestState()
 
-            if @identity.role == 'admin'
+            if identityProvider.getIdentity().role == 'admin'
                 @initUpdateContestModal()
 
             @onUpdateContest = (e) =>
@@ -293,18 +268,18 @@ define 'statusBar', ['jquery', 'underscore', 'renderTemplate', 'dataStore', 'mom
                 @$container.empty()
                 @$container = null
             @$stateContainer = null
-            @identity = null
+
 
     new StatusBar()
 
 
-define 'navigationBar', ['jquery', 'underscore', 'renderTemplate', 'metadataStore', 'stateController', 'dataStore'], ($, _, renderTemplate, metadataStore, stateController, dataStore) ->
+define 'navigationBar', ['jquery', 'underscore', 'renderTemplate', 'metadataStore', 'stateController', 'dataStore', 'identityProvider'], ($, _, renderTemplate, metadataStore, stateController, dataStore, identityProvider) ->
     class NavigationBar
         present: (options = {}) ->
             defaultOptions =
                 urlPath: window.location.pathname
-                identity: null
                 active: null
+                identity: identityProvider.getIdentity()
             options = _.extend defaultOptions, options
 
             $navbar = $ '#themis-navbar'
@@ -323,7 +298,7 @@ define 'navigationBar', ['jquery', 'underscore', 'renderTemplate', 'metadataStor
                         dataType: 'json'
                         xhrFields:
                             withCredentials: yes
-                        headers: { 'X-CSRF-Token': options.identity.token }
+                        headers: { 'X-CSRF-Token': identityProvider.getIdentity().token }
                         success: (responseText, textStatus, jqXHR) ->
                             stateController.navigateTo '/'
                         error: (jqXHR, textStatus, errorThrown) ->
@@ -331,6 +306,7 @@ define 'navigationBar', ['jquery', 'underscore', 'renderTemplate', 'metadataStor
 
         dismiss: ->
             $('#themis-navbar').empty()
+
 
     new NavigationBar()
 

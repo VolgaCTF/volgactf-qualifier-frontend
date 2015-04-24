@@ -1,8 +1,7 @@
-define 'profileView', ['jquery', 'view', 'renderTemplate', 'dataStore', 'navigationBar', 'metadataStore', 'jquery.history', 'parsley', 'jquery.form', 'bootstrap-filestyle'], ($, View, renderTemplate, dataStore, navigationBar, metadataStore, History) ->
+define 'profileView', ['jquery', 'view', 'renderTemplate', 'dataStore', 'navigationBar', 'metadataStore', 'identityProvider', 'jquery.history', 'parsley', 'jquery.form', 'bootstrap-filestyle'], ($, View, renderTemplate, dataStore, navigationBar, metadataStore, identityProvider, History) ->
     class ProfileView extends View
         constructor: ->
             @$main = null
-            @identity = null
             @team = null
 
             @urlRegex = /^\/profile\/[0-9]+$/
@@ -41,7 +40,7 @@ define 'profileView', ['jquery', 'view', 'renderTemplate', 'dataStore', 'navigat
                         dataType: 'json'
                         xhrFields:
                             withCredentials: yes
-                        headers: { 'X-CSRF-Token': @identity.token }
+                        headers: { 'X-CSRF-Token': identityProvider.getIdentity().token }
                         success: (responseText, textStatus, jqXHR) ->
                             onTimeout = ->
                                 $uploadLogoModal.modal 'hide'
@@ -90,7 +89,7 @@ define 'profileView', ['jquery', 'view', 'renderTemplate', 'dataStore', 'navigat
                         dataType: 'json'
                         xhrFields:
                             withCredentials: yes
-                        headers: { 'X-CSRF-Token': @identity.token }
+                        headers: { 'X-CSRF-Token': identityProvider.getIdentity().token }
                         success: (responseText, textStatus, jqXHR) ->
                             $changeEmailModal.modal 'hide'
                             window.location.reload()
@@ -134,7 +133,7 @@ define 'profileView', ['jquery', 'view', 'renderTemplate', 'dataStore', 'navigat
                         dataType: 'json'
                         xhrFields:
                             withCredentials: yes
-                        headers: { 'X-CSRF-Token': @identity.token }
+                        headers: { 'X-CSRF-Token': identityProvider.getIdentity().token }
                         success: (responseText, textStatus, jqXHR) ->
                             $resendConfirmationModal.modal 'hide'
                             window.location.reload()
@@ -181,7 +180,7 @@ define 'profileView', ['jquery', 'view', 'renderTemplate', 'dataStore', 'navigat
                         dataType: 'json'
                         xhrFields:
                             withCredentials: yes
-                        headers: { 'X-CSRF-Token': @identity.token }
+                        headers: { 'X-CSRF-Token': identityProvider.getIdentity().token }
                         success: (responseText, textStatus, jqXHR) ->
                             $editProfileModal.modal 'hide'
                             window.location.reload()
@@ -229,7 +228,7 @@ define 'profileView', ['jquery', 'view', 'renderTemplate', 'dataStore', 'navigat
                         dataType: 'json'
                         xhrFields:
                             withCredentials: yes
-                        headers: { 'X-CSRF-Token': @identity.token }
+                        headers: { 'X-CSRF-Token': identityProvider.getIdentity().token }
                         success: (responseText, textStatus, jqXHR) ->
                             $changePasswordModal.modal 'hide'
                         error: (jqXHR, textStatus, errorThrown) ->
@@ -246,12 +245,10 @@ define 'profileView', ['jquery', 'view', 'renderTemplate', 'dataStore', 'navigat
             @$main.html renderTemplate 'profile-view'
 
             $
-                .when dataStore.getIdentity()
+                .when identityProvider.fetchIdentity()
                 .done (identity) =>
-                    navigationBar.present
-                        identity: identity
-
-                    @identity = identity
+                    identityProvider.subscribe()
+                    navigationBar.present()
 
                     url = History.getState().data.urlPath
                     urlParts = url.split '/'
@@ -277,11 +274,10 @@ define 'profileView', ['jquery', 'view', 'renderTemplate', 'dataStore', 'navigat
                     @$main.html renderTemplate 'internal-error-view'
 
         dismiss: ->
+            identityProvider.unsubscribe()
             @$main.empty()
             @$main = null
-            @identity = null
             @team = null
-
             navigationBar.dismiss()
 
 

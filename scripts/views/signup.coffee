@@ -1,8 +1,7 @@
-define 'signupView', ['jquery', 'view', 'renderTemplate', 'dataStore', 'navigationBar', 'stateController', 'metadataStore', 'contestProvider', 'parsley', 'jquery.form', 'bootstrap-filestyle'], ($, View, renderTemplate, dataStore, navigationBar, stateController, metadataStore, contestProvider) ->
+define 'signupView', ['jquery', 'view', 'renderTemplate', 'dataStore', 'navigationBar', 'stateController', 'metadataStore', 'contestProvider', 'identityProvider', 'parsley', 'jquery.form', 'bootstrap-filestyle'], ($, View, renderTemplate, dataStore, navigationBar, stateController, metadataStore, contestProvider, identityProvider) ->
     class SignupView extends View
         constructor: ->
             @$main = null
-            @identity = null
             @urlRegex = /^\/signup$/
 
         getTitle: ->
@@ -30,7 +29,7 @@ define 'signupView', ['jquery', 'view', 'renderTemplate', 'dataStore', 'navigati
                     dataType: 'json'
                     xhrFields:
                         withCredentials: yes
-                    headers: { 'X-CSRF-Token': @identity.token }
+                    headers: { 'X-CSRF-Token': identityProvider.getIdentity().token }
                     success: (responseText, textStatus, jqXHR) ->
                         $form.hide()
                         $successAlert.show()
@@ -46,12 +45,11 @@ define 'signupView', ['jquery', 'view', 'renderTemplate', 'dataStore', 'navigati
             @$main = $ '#main'
 
             $
-                .when dataStore.getIdentity(), contestProvider.fetchContest()
+                .when identityProvider.fetchIdentity(), contestProvider.fetchContest()
                 .done (identity, contest) =>
-                    navigationBar.present
-                        identity: identity
+                    identityProvider.subscribe()
+                    navigationBar.present()
 
-                    @identity = identity
                     if identity.role == 'guest'
                         if contest.isFinished()
                             @$main.html renderTemplate 'signup-not-available-view'
@@ -65,9 +63,9 @@ define 'signupView', ['jquery', 'view', 'renderTemplate', 'dataStore', 'navigati
                     @$main.html renderTemplate 'internal-error-view'
 
         dismiss: ->
+            identityProvider.unsubscribe()
             @$main.empty()
             @$main = null
-            @identity = null
             navigationBar.dismiss()
 
     new SignupView()

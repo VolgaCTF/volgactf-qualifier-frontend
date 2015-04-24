@@ -1,8 +1,7 @@
-define 'signinView', ['jquery', 'view', 'renderTemplate', 'dataStore', 'navigationBar', 'stateController', 'metadataStore', 'parsley', 'jquery.form'], ($, View, renderTemplate, dataStore, navigationBar, stateController, metadataStore) ->
+define 'signinView', ['jquery', 'view', 'renderTemplate', 'dataStore', 'navigationBar', 'stateController', 'metadataStore', 'identityProvider', 'parsley', 'jquery.form'], ($, View, renderTemplate, dataStore, navigationBar, stateController, metadataStore, identityProvider) ->
     class SigninView extends View
         constructor: ->
             @$main = null
-            @identity = null
             @urlRegex = /^\/signin$/
 
         getTitle: ->
@@ -27,7 +26,7 @@ define 'signinView', ['jquery', 'view', 'renderTemplate', 'dataStore', 'navigati
                     dataType: 'json'
                     xhrFields:
                         withCredentials: yes
-                    headers: { 'X-CSRF-Token': @identity.token }
+                    headers: { 'X-CSRF-Token': identityProvider.getIdentity().token }
                     success: (responseText, textStatus, jqXHR) ->
                         stateController.navigateTo '/'
                     error: (jqXHR, textStatus, errorThrown) ->
@@ -42,13 +41,12 @@ define 'signinView', ['jquery', 'view', 'renderTemplate', 'dataStore', 'navigati
             @$main = $ '#main'
 
             $
-                .when dataStore.getIdentity()
+                .when identityProvider.fetchIdentity()
                 .done (identity) =>
-                    navigationBar.present
-                        identity: identity
-                        active: 'signin'
+                    identityProvider.subscribe()
 
-                    @identity = identity
+                    navigationBar.present active: 'signin'
+
                     if identity.role == 'guest'
                         @$main.html renderTemplate 'signin-view'
                         @initSigninForm()
@@ -59,9 +57,9 @@ define 'signinView', ['jquery', 'view', 'renderTemplate', 'dataStore', 'navigati
                     @$main.html renderTemplate 'internal-error-view'
 
         dismiss: ->
+            identityProvider.unsubscribe()
             @$main.empty()
             @$main = null
-            @identity = null
             navigationBar.dismiss()
 
     new SigninView()

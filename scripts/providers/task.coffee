@@ -1,4 +1,4 @@
-define 'taskProvider', ['jquery', 'underscore', 'EventEmitter', 'dataStore', 'metadataStore', 'taskPreviewModel', 'taskModel'], ($, _, EventEmitter, dataStore, metadataStore, TaskPreviewModel, TaskModel) ->
+define 'taskProvider', ['jquery', 'underscore', 'EventEmitter', 'dataStore', 'metadataStore', 'taskPreviewModel', 'taskModel', 'identityProvider'], ($, _, EventEmitter, dataStore, metadataStore, TaskPreviewModel, TaskModel, identityProvider) ->
     class TaskProvider extends EventEmitter
         constructor: ->
             super()
@@ -11,11 +11,11 @@ define 'taskProvider', ['jquery', 'underscore', 'EventEmitter', 'dataStore', 'me
         getTaskPreviews: ->
             @taskPreviews
 
-        subscribe: (identity) ->
+        subscribe: ->
             return unless dataStore.supportsRealtime()
             realtimeProvider = dataStore.getRealtimeProvider()
 
-            isSupervisor = _.contains ['admin', 'manager'], identity.role
+            isSupervisor = _.contains ['admin', 'manager'], identityProvider.getIdentity().role
             if isSupervisor
                 @onCreate = (e) =>
                     options = JSON.parse e.data

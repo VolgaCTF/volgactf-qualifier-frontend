@@ -1,4 +1,4 @@
-define 'notFoundView', ['jquery', 'view', 'renderTemplate', 'dataStore', 'navigationBar', 'metadataStore'], ($, View, renderTemplate, dataStore, navigationBar, metadataStore) ->
+define 'notFoundView', ['jquery', 'view', 'renderTemplate', 'dataStore', 'navigationBar', 'metadataStore', 'identityProvider'], ($, View, renderTemplate, dataStore, navigationBar, metadataStore, identityProvider) ->
     class NotFoundView extends View
         constructor: ->
             @$main = null
@@ -11,16 +11,17 @@ define 'notFoundView', ['jquery', 'view', 'renderTemplate', 'dataStore', 'naviga
             @$main = $ '#main'
 
             $
-                .when dataStore.getIdentity()
+                .when identityProvider.fetchIdentity()
                 .done (identity) =>
-                    navigationBar.present
-                        identity: identity
+                    identityProvider.subscribe()
+                    navigationBar.present()
                     @$main.html renderTemplate 'not-found-view', urlPath: window.location.pathname
                 .fail (err) =>
                     navigationBar.present()
                     @$main.html renderTemplate 'internal-error-view'
 
         dismiss: ->
+            identityProvider.unsubscribe()
             @$main.empty()
             @$main = null
             navigationBar.dismiss()

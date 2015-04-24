@@ -1,4 +1,4 @@
-define 'aboutView', ['jquery', 'view', 'renderTemplate', 'dataStore', 'navigationBar', 'statusBar', 'metadataStore', 'contestProvider'], ($, View, renderTemplate, dataStore, navigationBar, statusBar, metadataStore, contestProvider) ->
+define 'aboutView', ['jquery', 'view', 'renderTemplate', 'dataStore', 'navigationBar', 'statusBar', 'metadataStore', 'contestProvider', 'identityProvider'], ($, View, renderTemplate, dataStore, navigationBar, statusBar, metadataStore, contestProvider, identityProvider) ->
     class AboutView extends View
         constructor: ->
             @$main = null
@@ -12,22 +12,22 @@ define 'aboutView', ['jquery', 'view', 'renderTemplate', 'dataStore', 'navigatio
             @$main.html renderTemplate 'about-view'
 
             $
-                .when dataStore.getIdentity(), contestProvider.fetchContest()
+                .when identityProvider.fetchIdentity(), contestProvider.fetchContest()
                 .done (identity, contest) ->
+                    identityProvider.subscribe()
+
                     if dataStore.supportsRealtime()
                         dataStore.connectRealtime()
 
-                    navigationBar.present
-                        identity: identity
-                        active: 'about'
-
-                    statusBar.present
-                        identity: identity
+                    navigationBar.present active: 'about'
+                    statusBar.present()
                 .fail (err) ->
                     navigationBar.present()
                     $main.html renderTemplate 'internal-error-view'
 
         dismiss: ->
+            identityProvider.unsubscribe()
+
             @$main.empty()
             navigationBar.dismiss()
             statusBar.dismiss()

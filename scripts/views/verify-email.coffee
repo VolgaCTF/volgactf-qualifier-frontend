@@ -1,4 +1,4 @@
-define 'verifyEmailView', ['jquery', 'view', 'renderTemplate', 'dataStore', 'navigationBar', 'metadataStore', 'jquery.history'], ($, View, renderTemplate, dataStore, navigationBar, metadataStore, History) ->
+define 'verifyEmailView', ['jquery', 'view', 'renderTemplate', 'dataStore', 'navigationBar', 'metadataStore', 'identityProvider', 'jquery.history'], ($, View, renderTemplate, dataStore, navigationBar, metadataStore, identityProvider, History) ->
     class VerifyEmailView extends View
         constructor: ->
             @$main = null
@@ -11,10 +11,10 @@ define 'verifyEmailView', ['jquery', 'view', 'renderTemplate', 'dataStore', 'nav
             @$main = $ '#main'
 
             $
-                .when dataStore.getIdentity()
+                .when identityProvider.fetchIdentity()
                 .done (identity) =>
-                    navigationBar.present
-                        identity: identity
+                    identityProvider.subscribe()
+                    navigationBar.present()
 
                     @$main.html renderTemplate 'verify-email-view', identity: identity
 
@@ -32,6 +32,7 @@ define 'verifyEmailView', ['jquery', 'view', 'renderTemplate', 'dataStore', 'nav
                     @$main.html renderTemplate 'internal-error-view'
 
         dismiss: ->
+            identityProvider.unsubscribe()
             @$main.empty()
             @$main = null
             navigationBar.dismiss()

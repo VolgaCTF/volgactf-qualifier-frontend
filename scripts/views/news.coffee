@@ -1,8 +1,7 @@
-define 'newsView', ['jquery', 'underscore', 'view', 'renderTemplate', 'dataStore', 'navigationBar', 'statusBar', 'metadataStore', 'markdown-it', 'moment', 'postProvider', 'contestProvider', 'jquery.form', 'parsley'], ($, _, View, renderTemplate, dataStore, navigationBar, statusBar, metadataStore, MarkdownIt, moment, postProvider, contestProvider) ->
+define 'newsView', ['jquery', 'underscore', 'view', 'renderTemplate', 'dataStore', 'navigationBar', 'statusBar', 'metadataStore', 'markdown-it', 'moment', 'postProvider', 'contestProvider', 'identityProvider', 'jquery.form', 'parsley'], ($, _, View, renderTemplate, dataStore, navigationBar, statusBar, metadataStore, MarkdownIt, moment, postProvider, contestProvider, identityProvider) ->
     class NewsView extends View
         constructor: ->
             @$main = null
-            @identity = null
 
             @onCreatePost = null
             @onUpdatePost = null
@@ -23,7 +22,7 @@ define 'newsView', ['jquery', 'underscore', 'view', 'renderTemplate', 'dataStore
                 $section.empty()
                 md = new MarkdownIt()
                 sortedPosts = _.sortBy(posts, 'createdAt').reverse()
-                manageable = _.contains ['admin', 'manager'], @identity.role
+                manageable = _.contains ['admin', 'manager'], identityProvider.getIdentity().role
                 for post in sortedPosts
                     options =
                         id: post.id
@@ -53,7 +52,7 @@ define 'newsView', ['jquery', 'underscore', 'view', 'renderTemplate', 'dataStore
             $removePostSubmitButton.on 'click', (e) =>
                 postId = $removePostModal.data 'post-id'
                 $
-                    .when postProvider.removePost postId, @identity.token
+                    .when postProvider.removePost postId, identityProvider.getIdentity().token
                     .done ->
                         $removePostModal.modal 'hide'
                     .fail (err) ->
@@ -103,7 +102,7 @@ define 'newsView', ['jquery', 'underscore', 'view', 'renderTemplate', 'dataStore
             $createPostModal.on 'shown.bs.modal', (e) ->
                 $createPostTitle.focus()
 
-            $createPostForm.on 'submit', (e) =>
+            $createPostForm.on 'submit', (e) ->
                 e.preventDefault()
                 $createPostForm.ajaxSubmit
                     beforeSubmit: ->
@@ -113,7 +112,7 @@ define 'newsView', ['jquery', 'underscore', 'view', 'renderTemplate', 'dataStore
                     dataType: 'json'
                     xhrFields:
                         withCredentials: yes
-                    headers: { 'X-CSRF-Token': @identity.token }
+                    headers: { 'X-CSRF-Token': identityProvider.getIdentity().token }
                     success: (responseText, textStatus, jqXHR) ->
                         $createPostModal.modal 'hide'
                     error: (jqXHR, textStatus, errorThrown) ->
@@ -172,7 +171,7 @@ define 'newsView', ['jquery', 'underscore', 'view', 'renderTemplate', 'dataStore
             $editPostModal.on 'shown.bs.modal', (e) ->
                 $editPostTitle.focus()
 
-            $editPostForm.on 'submit', (e) =>
+            $editPostForm.on 'submit', (e) ->
                 e.preventDefault()
                 $editPostForm.ajaxSubmit
                     beforeSubmit: ->
@@ -182,7 +181,7 @@ define 'newsView', ['jquery', 'underscore', 'view', 'renderTemplate', 'dataStore
                     dataType: 'json'
                     xhrFields:
                         withCredentials: yes
-                    headers: { 'X-CSRF-Token': @identity.token }
+                    headers: { 'X-CSRF-Token': identityProvider.getIdentity().token }
                     success: (responseText, textStatus, jqXHR) ->
                         $editPostModal.modal 'hide'
                     error: (jqXHR, textStatus, errorThrown) ->
@@ -197,21 +196,16 @@ define 'newsView', ['jquery', 'underscore', 'view', 'renderTemplate', 'dataStore
             @$main = $ '#main'
 
             $
-                .when dataStore.getIdentity(), contestProvider.fetchContest()
+                .when identityProvider.fetchIdentity(), contestProvider.fetchContest()
                 .done (identity, contest) =>
+                    identityProvider.subscribe()
                     if dataStore.supportsRealtime()
                         dataStore.connectRealtime()
 
-                    navigationBar.present
-                        identity: identity
-                        active: 'news'
+                    navigationBar.present active: 'news'
+                    statusBar.present()
 
-                    statusBar.present
-                        identity: identity
-
-                    @identity = identity
                     @$main.html renderTemplate 'news-view', identity: identity, supportsRealtime: dataStore.supportsRealtime()
-
                     $section = @$main.find 'section'
 
                     if _.contains ['admin', 'manager'], identity.role
@@ -248,6 +242,8 @@ define 'newsView', ['jquery', 'underscore', 'view', 'renderTemplate', 'dataStore
                     @$main.html renderTemplate 'internal-error-view'
 
         dismiss: ->
+            identityProvider.unsubscribe()
+
             if @onCreatePost?
                 postProvider.off 'createPost', @onCreatePost
                 @onCreatePost = null
@@ -261,7 +257,6 @@ define 'newsView', ['jquery', 'underscore', 'view', 'renderTemplate', 'dataStore
 
             @$main.empty()
             @$main = null
-            @identity = null
             navigationBar.dismiss()
             statusBar.dismiss()
 
