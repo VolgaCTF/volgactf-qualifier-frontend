@@ -1,9 +1,10 @@
-define 'contestProvider', ['jquery', 'underscore', 'EventEmitter', 'dataStore', 'metadataStore', 'contestModel', 'teamScoreModel', 'teamProvider'], ($, _, EventEmitter, dataStore, metadataStore, ContestModel, TeamScoreModel, teamProvider) ->
+define 'contestProvider', ['jquery', 'underscore', 'EventEmitter', 'dataStore', 'metadataStore', 'contestModel', 'teamScoreModel', 'teamProvider', 'teamTaskProgressModel', 'identityProvider'], ($, _, EventEmitter, dataStore, metadataStore, ContestModel, TeamScoreModel, teamProvider, TeamTaskProgressModel, identityProvider) ->
     class ContestProvider extends EventEmitter
         constructor: ->
             super()
             @contest = null
             @teamScores = []
+            @teamTaskProgressEntries = []
 
             @onUpdate = null
             @onUpdateTeamScore = null
@@ -14,6 +15,9 @@ define 'contestProvider', ['jquery', 'underscore', 'EventEmitter', 'dataStore', 
 
         getTeamScores: ->
             @teamScores
+
+        getTeamTaskProgressEntries: ->
+            @teamTaskProgressEntries
 
         subscribe: ->
             return unless dataStore.supportsRealtime()
@@ -67,6 +71,7 @@ define 'contestProvider', ['jquery', 'underscore', 'EventEmitter', 'dataStore', 
 
             @contest = null
             @teamScores = []
+            @teamTaskProgressEntries = []
 
         fetchContest: ->
             promise = $.Deferred()
@@ -105,6 +110,35 @@ define 'contestProvider', ['jquery', 'underscore', 'EventEmitter', 'dataStore', 
                         promise.reject jqXHR.responseJSON
                     else
                         promise.reject 'Unknown error. Please try again later.'
+
+            promise
+
+        fetchTeamTaskProgressEntries: ->
+            promise = $.Deferred()
+
+            identity = identityProvider.getIdentity()
+            if _.contains ['admin', 'manager'], identity.role
+                url = "#{metadataStore.getMetadata 'domain-api' }/contest/progress"
+            else if identity.role is 'team'
+                url = "#{metadataStore.getMetadata 'domain-api' }/contest/team/#{identity.id}/progress"
+            else
+                promise.reject 'Unknown error. Please try again later.'
+
+            if _.contains ['admin', 'manager', 'team'], identity.role
+                $.ajax
+                    url: url
+                    dataType: 'json'
+                    xhrFields:
+                        withCredentials: yes
+                    success: (responseJSON, textStatus, jqXHR) =>
+                        @teamTaskProgressEntries = _.map responseJSON, (options) ->
+                            new TeamTaskProgressModel options
+                        promise.resolve @teamTaskProgressEntries
+                    error: (jqXHR, textStatus, errorThrown) ->
+                        if jqXHR.responseJSON?
+                            promise.reject jqXHR.responseJSON
+                        else
+                            promise.reject 'Unknown error. Please try again later.'
 
             promise
 

@@ -327,10 +327,12 @@
                 <% } %>
                     <% if (task.isInitial()) { %>
                     <div class="panel panel-default">
-                    <% } else if (task.isOpened()) { %>
+                    <% } else if (task.isOpened() && !taskIsSolved) { %>
                     <div class="panel panel-primary">
-                    <% } else if (task.isClosed()) { %>
+                    <% } else if (task.isClosed() && !taskIsSolved) { %>
                     <div class="panel panel-danger">
+                    <% } else if ((task.isOpened() || task.isClosed()) && taskIsSolved) { %>
+                    <div class="panel panel-success">
                     <% } %>
                         <div class="panel-heading">
                             <h4 class="panel-title themis-task-title">
@@ -390,7 +392,7 @@
                         <h1>Tasks</h1>
                     </header>
                     <section class="<% print((identity.role === 'admin' || identity.role === 'manager') ? 'col-sm-8 themis-no-side-gaps': ''); %>">
-                        <% if (identity.role === 'admin' && !contest.isFinished()) { %>
+                        <% if (identity.role === 'admin') { %>
                         <div class="themis-task-controls">
                             <button type="button" class="btn btn-primary btn-xs" data-action="create-task" data-toggle="modal" data-target="#create-task-modal">
                                 <i class="glyphicon glyphicon-plus"></i>&nbsp;Create
@@ -521,7 +523,7 @@
                 </div>
                 <% } %>
 
-                <% if (identity.role === 'admin' && !contest.isFinished()) { %>
+                <% if (identity.role === 'admin') { %>
                 <div class="modal fade" id="create-task-modal" tabindex="-1" role="dialog">
                     <div class="modal-dialog modal-lg">
                         <div class="modal-content">

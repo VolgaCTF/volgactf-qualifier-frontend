@@ -7,8 +7,6 @@ define 'tasksView', ['jquery', 'underscore', 'view', 'renderTemplate', 'dataStor
 
             @$taskPreviewsList = null
 
-            @contest = null
-
             @onCreateTaskCategory = null
             @onUpdateTaskCategory = null
             @onRemoveTaskCategory = null
@@ -410,14 +408,33 @@ define 'tasksView', ['jquery', 'underscore', 'view', 'renderTemplate', 'dataStor
 
             $submitTaskModal.on 'show.bs.modal', (e) =>
                 taskId = parseInt $(e.relatedTarget).data('task-id'), 10
+
+                $submitTaskContents.empty()
+                $submitTaskAnswer.val ''
+                $submitTaskSubmitError.text ''
+                $submitTaskSubmitSuccess.text ''
+                $submitTaskSubmitButton.prop 'disabled', yes
+
                 taskPreview = _.findWhere taskProvider.getTaskPreviews(), id: taskId
                 if taskPreview?
-                    if taskPreview.isOpened()
+                    taskIsSolved = no
+                    taskProgress = null
+                    identity = identityProvider.getIdentity()
+                    if identity.role is 'team'
+                        taskProgress = _.findWhere contestProvider.getTeamTaskProgressEntries(), teamId: identity.id, taskId: taskId
+                        if taskProgress?
+                            taskIsSolved = yes
+
+                    if taskPreview.isOpened() and not taskIsSolved
                         $submitTaskAnswerGroup.show()
                         $submitTaskSubmitButton.show()
                     else
                         $submitTaskAnswerGroup.hide()
                         $submitTaskSubmitButton.hide()
+                        if taskPreview.isClosed()
+                            $submitTaskSubmitError.text 'Task has been closed by the event organizers.'
+                        if taskIsSolved
+                            $submitTaskSubmitSuccess.text "Your team has solved the task on #{moment(taskProgress).format 'lll' }!"
                 else
                     $submitTaskAnswerGroup.hide()
                     $submitTaskSubmitButton.hide()
@@ -426,12 +443,6 @@ define 'tasksView', ['jquery', 'underscore', 'view', 'renderTemplate', 'dataStor
 
                 $submitTaskForm.parsley().reset()
                 $submitTaskForm.attr 'action', "#{metadataStore.getMetadata 'domain-api' }/task/#{taskId}/submit"
-
-                $submitTaskContents.empty()
-                $submitTaskAnswer.val ''
-                $submitTaskSubmitError.text ''
-                $submitTaskSubmitSuccess.text ''
-                $submitTaskSubmitButton.prop 'disabled', yes
 
                 $
                     .when taskProvider.fetchTask taskId
@@ -487,7 +498,7 @@ define 'tasksView', ['jquery', 'underscore', 'view', 'renderTemplate', 'dataStor
             else
                 @$taskCategoriesList.empty()
                 sortedTaskCategories = _.sortBy taskCategories, 'createdAt'
-                manageable = identityProvider.getIdentity().role is 'admin' and not @contest.isFinished()
+                manageable = identityProvider.getIdentity().role is 'admin' and not contestProvider.getContest().isFinished()
                 for taskCategory in sortedTaskCategories
                     options =
                         id: taskCategory.id
@@ -504,6 +515,13 @@ define 'tasksView', ['jquery', 'underscore', 'view', 'renderTemplate', 'dataStor
                 @$taskPreviewsList.empty()
                 @$taskPreviewsList.html $('<p></p>').addClass('lead').text 'No tasks yet.'
             else
+                identity = identityProvider.getIdentity()
+                if identity.role is 'team'
+                    taskProgressEntries = _.where contestProvider.getTeamTaskProgressEntries(), teamId: identity.id
+                    solvedTaskIds = _.map taskProgressEntries, (taskProgress) -> taskProgress.taskId
+                else
+                    solvedTaskIds = []
+
                 getSortResultByKey = (a, b, getValueFunc) ->
                     valA = getValueFunc a
                     valB = getValueFunc b
@@ -516,7 +534,16 @@ define 'tasksView', ['jquery', 'underscore', 'view', 'renderTemplate', 'dataStor
 
                 sortTaskPreviewsFunc = (a, b) ->
                     if a.state == b.state
-                        return getSortResultByKey a, b, (v) -> v.updatedAt.getTime()
+                        solvedA = _.contains solvedTaskIds, a.id
+                        solvedB = _.contains solvedTaskIds, b.id
+                        if not solvedA and not solvedB
+                            return getSortResultByKey a, b, (v) -> v.updatedAt.getTime()
+                        else if solvedA and not solvedB
+                            return 1
+                        else if not solvedA and solvedB
+                            return -1
+                        else
+                            return getSortResultByKey a, b, (v) -> v.updatedAt.getTime()
                     else
                         if a.isOpened()
                             return -1
@@ -532,7 +559,7 @@ define 'tasksView', ['jquery', 'underscore', 'view', 'renderTemplate', 'dataStor
 
                 @$taskPreviewsList.empty()
                 taskPreviews.sort sortTaskPreviewsFunc
-                identity = identityProvider.getIdentity()
+                contest = contestProvider.getContest()
                 for taskPreview in taskPreviews
                     categoriesList = ''
                     for categoryId in taskPreview.categories
@@ -540,91 +567,103 @@ define 'tasksView', ['jquery', 'underscore', 'view', 'renderTemplate', 'dataStor
                         if taskCategory?
                             categoriesList += renderTemplate 'task-category-partial', title: taskCategory.title, description: taskCategory.description
 
+                    taskIsSolved = identity.role is 'team' and _.contains solvedTaskIds, taskPreview.id
+
                     options =
                         task: taskPreview
                         categoriesList: categoriesList
                         identity: identity
-                        contest: @contest
+                        contest: contest
+                        taskIsSolved: taskIsSolved
 
                     @$taskPreviewsList.append $ renderTemplate 'task-preview-partial', options
 
         present: ->
             @$main = $ '#main'
-            $
-                .when identityProvider.fetchIdentity(), contestProvider.fetchContest(), taskProvider.fetchTaskPreviews(), taskCategoryProvider.fetchTaskCategories()
-                .done (identity, contest, taskPreviews, taskCategories) =>
-                    identityProvider.subscribe()
-                    @$main.html renderTemplate 'tasks-view', identity: identity, contest: contest
-                    @$taskCategoriesSection = $ '#themis-task-categories'
 
-                    @contest = contest
+            $
+                .when identityProvider.fetchIdentity(), contestProvider.fetchContest()
+                .done (identity, contest) =>
+                    identityProvider.subscribe()
+                    @$main.html renderTemplate 'tasks-view', identity: identity
+
+                    if dataStore.supportsRealtime()
+                        dataStore.connectRealtime()
 
                     isAdmin = identity.role is 'admin'
                     isSupervisor = _.contains ['admin', 'manager'], identity.role
                     isTeam = identity.role is 'team'
 
-                    if dataStore.supportsRealtime()
-                        dataStore.connectRealtime()
-
                     navigationBar.present active: 'tasks'
-                    statusBar.present()
 
-                    if isSupervisor
-                        @$taskCategoriesSection.html renderTemplate 'task-categories-view', identity: identity, contest: contest
-                        @$taskCategoriesList = $ '#themis-task-categories-list'
+                    if identity.role is 'team'
+                        promise = $.when taskProvider.fetchTaskPreviews(), taskCategoryProvider.fetchTaskCategories(), contestProvider.fetchTeamTaskProgressEntries()
+                    else
+                        promise = $.when taskProvider.fetchTaskPreviews(), taskCategoryProvider.fetchTaskCategories()
 
-                        @renderTaskCategories()
-                        @initReviseTaskModal()
+                    promise
+                        .done (taskPreviews, taskCategories) =>
+                            @$taskCategoriesSection = $ '#themis-task-categories'
+                            statusBar.present()
 
-                    if isAdmin and not contest.isFinished()
-                        @initCreateTaskCategoryModal()
-                        @initEditTaskCategoryModal()
-                        @initRemoveTaskCategoryModal()
+                            if isSupervisor
+                                @$taskCategoriesSection.html renderTemplate 'task-categories-view', identity: identity, contest: contest
+                                @$taskCategoriesList = $ '#themis-task-categories-list'
 
-                        @initCreateTaskModal()
-                        @initOpenTaskModal()
-                        @initCloseTaskModal()
+                                @renderTaskCategories()
+                                @initReviseTaskModal()
 
-                    if isTeam
-                        @initSubmitTaskModal()
+                            if isAdmin
+                                @initCreateTaskCategoryModal()
+                                @initEditTaskCategoryModal()
+                                @initRemoveTaskCategoryModal()
 
-                    @$taskPreviewsList = $ '#themis-task-previews'
-                    @renderTaskPreviews()
+                                @initCreateTaskModal()
+                                @initOpenTaskModal()
+                                @initCloseTaskModal()
 
-                    @onCreateTaskCategory = (taskCategory) =>
-                        @renderTaskCategories() if isSupervisor
-                        false
+                            if isTeam
+                                @initSubmitTaskModal()
 
-                    @onUpdateTaskCategory = (taskCategory) =>
-                        @renderTaskCategories() if isSupervisor
-                        false
+                            @$taskPreviewsList = $ '#themis-task-previews'
+                            @renderTaskPreviews()
 
-                    @onRemoveTaskCategory = (taskCategoryId) =>
-                        @renderTaskCategories() if isSupervisor
-                        false
+                            @onCreateTaskCategory = (taskCategory) =>
+                                @renderTaskCategories() if isSupervisor
+                                false
 
-                    taskCategoryProvider.subscribe()
-                    taskCategoryProvider.on 'createTaskCategory', @onCreateTaskCategory
-                    taskCategoryProvider.on 'updateTaskCategory', @onUpdateTaskCategory
-                    taskCategoryProvider.on 'removeTaskCategory', @onRemoveTaskCategory
+                            @onUpdateTaskCategory = (taskCategory) =>
+                                @renderTaskCategories() if isSupervisor
+                                false
 
-                    @onCreateTask = (taskPreview) =>
-                        @renderTaskPreviews()
-                        false
+                            @onRemoveTaskCategory = (taskCategoryId) =>
+                                @renderTaskCategories() if isSupervisor
+                                false
 
-                    @onOpenTask = (taskPreview) =>
-                        @renderTaskPreviews()
-                        false
+                            taskCategoryProvider.subscribe()
+                            taskCategoryProvider.on 'createTaskCategory', @onCreateTaskCategory
+                            taskCategoryProvider.on 'updateTaskCategory', @onUpdateTaskCategory
+                            taskCategoryProvider.on 'removeTaskCategory', @onRemoveTaskCategory
 
-                    @onCloseTask = (taskPreview) =>
-                        @renderTaskPreviews()
-                        false
+                            @onCreateTask = (taskPreview) =>
+                                @renderTaskPreviews()
+                                false
 
-                    taskProvider.subscribe()
-                    if isSupervisor
-                        taskProvider.on 'createTask', @onCreateTask
-                    taskProvider.on 'openTask', @onOpenTask
-                    taskProvider.on 'closeTask', @onCloseTask
+                            @onOpenTask = (taskPreview) =>
+                                @renderTaskPreviews()
+                                false
+
+                            @onCloseTask = (taskPreview) =>
+                                @renderTaskPreviews()
+                                false
+
+                            taskProvider.subscribe()
+                            if isSupervisor
+                                taskProvider.on 'createTask', @onCreateTask
+                            taskProvider.on 'openTask', @onOpenTask
+                            taskProvider.on 'closeTask', @onCloseTask
+                        .fail (err) =>
+                            @$main.html renderTemplate 'internal-error-view'
                 .fail (err) =>
                     navigationBar.present()
                     @$main.html renderTemplate 'internal-error-view'
@@ -660,8 +699,6 @@ define 'tasksView', ['jquery', 'underscore', 'view', 'renderTemplate', 'dataStor
             @$taskPreviewsList = null
             navigationBar.dismiss()
             statusBar.dismiss()
-
-            @contest = null
 
             if dataStore.supportsRealtime()
                 dataStore.disconnectRealtime()
