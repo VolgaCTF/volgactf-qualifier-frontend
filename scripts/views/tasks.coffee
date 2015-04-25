@@ -275,6 +275,7 @@ define 'tasksView', ['jquery', 'underscore', 'view', 'renderTemplate', 'dataStor
             $reviseTaskSubmitButton.on 'click', (e) ->
                 $reviseTaskForm.trigger 'submit'
 
+            $reviseTaskAnswerGroup = $ '#revise-task-answer-group'
             $reviseTaskAnswer = $ '#revise-task-answer'
             $reviseTaskContents = $reviseTaskModal.find '.themis-task-contents'
 
@@ -286,6 +287,8 @@ define 'tasksView', ['jquery', 'underscore', 'view', 'renderTemplate', 'dataStor
                 $reviseTaskForm.attr 'action', "#{metadataStore.getMetadata 'domain-api' }/task/#{taskId}/revise"
 
                 $reviseTaskContents.empty()
+                $reviseTaskAnswerGroup.show()
+                $reviseTaskSubmitButton.show()
                 $reviseTaskAnswer.val ''
                 $reviseTaskSubmitError.text ''
                 $reviseTaskSubmitSuccess.text ''
@@ -323,6 +326,8 @@ define 'tasksView', ['jquery', 'underscore', 'view', 'renderTemplate', 'dataStor
                         withCredentials: yes
                     headers: { 'X-CSRF-Token': identityProvider.getIdentity().token }
                     success: (responseText, textStatus, jqXHR) ->
+                        $reviseTaskAnswerGroup.hide()
+                        $reviseTaskSubmitButton.hide()
                         $reviseTaskSubmitSuccess.text 'Answer is correct!'
                         hideModal = ->
                             $reviseTaskModal.modal 'hide'
@@ -460,6 +465,8 @@ define 'tasksView', ['jquery', 'underscore', 'view', 'renderTemplate', 'dataStor
                         withCredentials: yes
                     headers: { 'X-CSRF-Token': identityProvider.getIdentity().token }
                     success: (responseText, textStatus, jqXHR) ->
+                        $submitTaskAnswerGroup.hide()
+                        $submitTaskSubmitButton.hide()
                         $submitTaskSubmitSuccess.text 'Answer is correct!'
                         hideModal = ->
                             $submitTaskModal.modal 'hide'
