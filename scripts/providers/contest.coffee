@@ -1,4 +1,4 @@
-define 'contestProvider', ['jquery', 'underscore', 'EventEmitter', 'dataStore', 'metadataStore', 'contestModel', 'teamScoreModel'], ($, _, EventEmitter, dataStore, metadataStore, ContestModel, TeamScoreModel) ->
+define 'contestProvider', ['jquery', 'underscore', 'EventEmitter', 'dataStore', 'metadataStore', 'contestModel', 'teamScoreModel', 'teamProvider'], ($, _, EventEmitter, dataStore, metadataStore, ContestModel, TeamScoreModel, teamProvider) ->
     class ContestProvider extends EventEmitter
         constructor: ->
             super()
@@ -6,6 +6,8 @@ define 'contestProvider', ['jquery', 'underscore', 'EventEmitter', 'dataStore', 
             @teamScores = []
 
             @onUpdate = null
+            @onUpdateTeamScore = null
+            @onQualifyTeam = null
 
         getContest: ->
             @contest
@@ -24,6 +26,29 @@ define 'contestProvider', ['jquery', 'underscore', 'EventEmitter', 'dataStore', 
 
             realtimeProvider.addEventListener 'updateContest', @onUpdate
 
+            @onUpdateTeamScore = (e) =>
+                options = JSON.parse e.data
+                teamScore = new TeamScoreModel options
+                ndx = _.findIndex @teamScores, teamId: options.teamId
+                if ndx > -1
+                    @teamScores.splice ndx, 1
+                @teamScores.push teamScore
+                @trigger 'updateTeamScore', [teamScore]
+
+            realtimeProvider.addEventListener 'updateTeamScore', @onUpdateTeamScore
+
+            @onQualifyTeam = (team) =>
+                ndx = _.findIndex @teamScores, teamId: team.id
+                if ndx == -1
+                    teamScore = new TeamScoreModel
+                        teamId: team.id
+                        score: 0
+                        updatedAt: null
+                    @teamScores.push teamScore
+                    @trigger 'updateTeamScore', [teamScore]
+
+            teamProvider.on 'qualifyTeam', @onQualifyTeam
+
         unsubscribe: ->
             return unless dataStore.supportsRealtime()
             realtimeProvider = dataStore.getRealtimeProvider()
@@ -31,6 +56,14 @@ define 'contestProvider', ['jquery', 'underscore', 'EventEmitter', 'dataStore', 
             if @onUpdate?
                 realtimeProvider.removeEventListener 'updateContest', @onUpdate
                 @onUpdate = null
+
+            if @onUpdateTeamScore?
+                realtimeProvider.removeEventListener 'updateTeamScore', @onUpdateTeamScore
+                @onUpdateTeamScore = null
+
+            if @onQualifyTeam?
+                teamProvider.off 'qualifyTeam', @onQualifyTeam
+                @onQualifyTeam = null
 
             @contest = null
             @teamScores = []
