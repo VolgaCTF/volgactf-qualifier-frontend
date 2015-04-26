@@ -1,4 +1,4 @@
-define 'tasksView', ['jquery', 'underscore', 'view', 'renderTemplate', 'dataStore', 'navigationBar', 'statusBar', 'metadataStore', 'moment', 'taskCategoryModel', 'taskPreviewModel', 'taskCategoryProvider', 'taskProvider', 'contestProvider', 'identityProvider', 'markdown-it', 'bootstrap', 'jquery.form', 'parsley'], ($, _, View, renderTemplate, dataStore, navigationBar, statusBar, metadataStore, moment, TaskCategoryModel, TaskPreviewModel, taskCategoryProvider, taskProvider, contestProvider, identityProvider, MarkdownIt) ->
+define 'tasksView', ['jquery', 'underscore', 'view', 'renderTemplate', 'dataStore', 'navigationBar', 'statusBar', 'metadataStore', 'moment', 'taskCategoryModel', 'taskPreviewModel', 'taskCategoryProvider', 'taskProvider', 'contestProvider', 'identityProvider', 'teamProvider', 'markdown-it', 'bootstrap', 'jquery.form', 'parsley'], ($, _, View, renderTemplate, dataStore, navigationBar, statusBar, metadataStore, moment, TaskCategoryModel, TaskPreviewModel, taskCategoryProvider, taskProvider, contestProvider, identityProvider, teamProvider, MarkdownIt) ->
     class TasksView extends View
         constructor: ->
             @$main = null
@@ -16,6 +16,7 @@ define 'tasksView', ['jquery', 'underscore', 'view', 'renderTemplate', 'dataStor
             @onCloseTask = null
 
             @onCreateTeamTaskProgress = null
+            @onUpdateContest = null
 
             @urlRegex = /^\/tasks$/
 
@@ -268,6 +269,7 @@ define 'tasksView', ['jquery', 'underscore', 'view', 'renderTemplate', 'dataStor
 
             $reviseTaskSubmitError = $reviseTaskModal.find '.submit-error > p'
             $reviseTaskSubmitSuccess = $reviseTaskModal.find '.submit-success > p'
+            $reviseTaskStatus = $reviseTaskModal.find '#revise-task-status'
             $reviseTaskSubmitButton = $reviseTaskModal.find 'button[data-action="complete-revise-task"]'
             $reviseTaskForm = $reviseTaskModal.find 'form'
             $reviseTaskForm.parsley()
@@ -292,6 +294,7 @@ define 'tasksView', ['jquery', 'underscore', 'view', 'renderTemplate', 'dataStor
                 $reviseTaskAnswer.val ''
                 $reviseTaskSubmitError.text ''
                 $reviseTaskSubmitSuccess.text ''
+                $reviseTaskStatus.text ''
                 $reviseTaskSubmitButton.prop 'disabled', yes
 
                 $
@@ -306,6 +309,14 @@ define 'tasksView', ['jquery', 'underscore', 'view', 'renderTemplate', 'dataStor
                             description: md.render task.description
                             hints: hintsFormatted
                         $reviseTaskContents.html renderTemplate 'task-content-partial', options
+
+                        teamTaskProgressEntries = contestProvider.getTeamTaskProgressEntries()
+                        teamIds = _.map _.where(teamTaskProgressEntries, taskId: task.id), (entry) -> entry.teamId
+                        teams = _.filter teamProvider.getTeams(), (team) ->
+                            _.contains teamIds, team.id
+                        teamNames = _.map teams, (team) -> team.name
+                        $reviseTaskStatus.html renderTemplate 'revise-task-status-partial', teamNames: teamNames
+
                         $reviseTaskSubmitButton.prop 'disabled', no
                     .fail (err) ->
                         $reviseTaskSubmitError.text err
@@ -396,6 +407,7 @@ define 'tasksView', ['jquery', 'underscore', 'view', 'renderTemplate', 'dataStor
                 show: no
 
             $submitTaskSubmitError = $submitTaskModal.find '.submit-error > p'
+            $submitTaskInfo = $submitTaskModal.find '.submit-info > p'
             $submitTaskSubmitSuccess = $submitTaskModal.find '.submit-success > p'
             $submitTaskSubmitButton = $submitTaskModal.find 'button[data-action="complete-submit-task"]'
             $submitTaskForm = $submitTaskModal.find 'form'
@@ -414,6 +426,7 @@ define 'tasksView', ['jquery', 'underscore', 'view', 'renderTemplate', 'dataStor
                 $submitTaskContents.empty()
                 $submitTaskAnswer.val ''
                 $submitTaskSubmitError.text ''
+                $submitTaskInfo.text ''
                 $submitTaskSubmitSuccess.text ''
                 $submitTaskSubmitButton.prop 'disabled', yes
 
@@ -450,8 +463,8 @@ define 'tasksView', ['jquery', 'underscore', 'view', 'renderTemplate', 'dataStor
                 $submitTaskForm.attr 'action', "#{metadataStore.getMetadata 'domain-api' }/task/#{taskId}/submit"
 
                 $
-                    .when taskProvider.fetchTask taskId
-                    .done (task) ->
+                    .when taskProvider.fetchTask(taskId), contestProvider.fetchSolvedTeamCountByTask(taskId)
+                    .done (task, solvedTeamCount) ->
                         md = new MarkdownIt()
                         hintsFormatted = []
                         _.each task.hints, (hint) ->
@@ -461,6 +474,9 @@ define 'tasksView', ['jquery', 'underscore', 'view', 'renderTemplate', 'dataStor
                             description: md.render task.description
                             hints: hintsFormatted
                         $submitTaskContents.html renderTemplate 'task-content-partial', options
+
+                        $submitTaskInfo.text renderTemplate 'submit-task-status-partial', solvedTeamCount: solvedTeamCount
+
                         $submitTaskSubmitButton.prop 'disabled', no
                     .fail (err) ->
                         $submitTaskSubmitError.text err
@@ -601,8 +617,10 @@ define 'tasksView', ['jquery', 'underscore', 'view', 'renderTemplate', 'dataStor
 
                     navigationBar.present active: 'tasks'
 
-                    if identity.role is 'team'
+                    if isTeam
                         promise = $.when taskProvider.fetchTaskPreviews(), taskCategoryProvider.fetchTaskCategories(), contestProvider.fetchTeamTaskProgressEntries()
+                    else if isSupervisor
+                        promise = $.when taskProvider.fetchTaskPreviews(), taskCategoryProvider.fetchTaskCategories(), contestProvider.fetchTeamTaskProgressEntries(), teamProvider.fetchTeams()
                     else
                         promise = $.when taskProvider.fetchTaskPreviews(), taskCategoryProvider.fetchTaskCategories()
 
@@ -639,10 +657,12 @@ define 'tasksView', ['jquery', 'underscore', 'view', 'renderTemplate', 'dataStor
 
                             @onUpdateTaskCategory = (taskCategory) =>
                                 @renderTaskCategories() if isSupervisor
+                                @renderTaskPreviews()
                                 false
 
                             @onRemoveTaskCategory = (taskCategoryId) =>
                                 @renderTaskCategories() if isSupervisor
+                                @renderTaskPreviews()
                                 false
 
                             taskCategoryProvider.subscribe()
@@ -676,6 +696,14 @@ define 'tasksView', ['jquery', 'underscore', 'view', 'renderTemplate', 'dataStor
 
                                 contestProvider.on 'createTeamTaskProgress', @onCreateTeamTaskProgress
 
+                            @onUpdateContest = (contest) =>
+                                @renderTaskCategories()
+                                @renderTaskPreviews()
+                                false
+
+                            contestProvider.on 'updateContest', @onUpdateContest
+
+                            teamProvider.subscribe()
                         .fail (err) =>
                             @$main.html renderTemplate 'internal-error-view'
                 .fail (err) =>
@@ -710,6 +738,12 @@ define 'tasksView', ['jquery', 'underscore', 'view', 'renderTemplate', 'dataStor
                 taskProvider.off 'closeTask', @onCloseTask
                 @onCloseTask = null
             taskProvider.unsubscribe()
+
+            teamProvider.unsubscribe()
+
+            if @onUpdateContest?
+                contestProvider.off 'updateContest', @onUpdateContest
+                @onUpdateContest = null
 
             @$main.empty()
             @$main = null

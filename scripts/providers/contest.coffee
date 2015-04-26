@@ -131,6 +131,24 @@ define 'contestProvider', ['jquery', 'underscore', 'EventEmitter', 'dataStore', 
 
             promise
 
+        fetchSolvedTeamCountByTask: (taskId) ->
+            promise = $.Deferred()
+            url = "#{metadataStore.getMetadata 'domain-api' }/contest/task/#{taskId}/progress"
+            $.ajax
+                url: url
+                dataType: 'json'
+                xhrFields:
+                    withCredentials: yes
+                success: (responseJSON, textStatus, jqXHR) =>
+                    promise.resolve responseJSON
+                error: (jqXHR, textStatus, errorThrown) ->
+                    if jqXHR.responseJSON?
+                        promise.reject jqXHR.responseJSON
+                    else
+                        promise.reject 'Unknown error. Please try again later.'
+
+            promise
+
         fetchTeamTaskProgressEntries: ->
             promise = $.Deferred()
 
