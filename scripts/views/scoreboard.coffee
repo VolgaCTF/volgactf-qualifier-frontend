@@ -61,7 +61,6 @@ define 'scoreboardView', ['jquery', 'underscore', 'view', 'renderTemplate', 'dat
                         dataStore.connectRealtime()
 
                     teamProvider.subscribe()
-                    contestProvider.subscribe()
 
                     navigationBar.present active: 'scoreboard'
                     statusBar.present()
@@ -83,7 +82,6 @@ define 'scoreboardView', ['jquery', 'underscore', 'view', 'renderTemplate', 'dat
             if @onUpdateTeamScore?
                 contestProvider.off 'updateTeamScore', @onUpdateTeamScore
                 @onUpdateTeamScore = null
-            contestProvider.unsubscribe()
 
             @$main.empty()
             @$main = null

@@ -15,6 +15,8 @@ define 'tasksView', ['jquery', 'underscore', 'view', 'renderTemplate', 'dataStor
             @onOpenTask = null
             @onCloseTask = null
 
+            @onCreateTeamTaskProgress = null
+
             @urlRegex = /^\/tasks$/
 
         getTitle: ->
@@ -434,7 +436,7 @@ define 'tasksView', ['jquery', 'underscore', 'view', 'renderTemplate', 'dataStor
                         if taskPreview.isClosed()
                             $submitTaskSubmitError.text 'Task has been closed by the event organizers.'
                         if taskIsSolved
-                            $submitTaskSubmitSuccess.text "Your team has solved the task on #{moment(taskProgress).format 'lll' }!"
+                            $submitTaskSubmitSuccess.text "Your team has solved the task on #{moment(taskProgress.createdAt).format 'lll' }!"
                 else
                     $submitTaskAnswerGroup.hide()
                     $submitTaskSubmitButton.hide()
@@ -645,10 +647,6 @@ define 'tasksView', ['jquery', 'underscore', 'view', 'renderTemplate', 'dataStor
                             taskCategoryProvider.on 'updateTaskCategory', @onUpdateTaskCategory
                             taskCategoryProvider.on 'removeTaskCategory', @onRemoveTaskCategory
 
-                            @onCreateTask = (taskPreview) =>
-                                @renderTaskPreviews()
-                                false
-
                             @onOpenTask = (taskPreview) =>
                                 @renderTaskPreviews()
                                 false
@@ -659,9 +657,22 @@ define 'tasksView', ['jquery', 'underscore', 'view', 'renderTemplate', 'dataStor
 
                             taskProvider.subscribe()
                             if isSupervisor
+                                @onCreateTask = (taskPreview) =>
+                                    @renderTaskPreviews()
+                                    false
+
                                 taskProvider.on 'createTask', @onCreateTask
+
                             taskProvider.on 'openTask', @onOpenTask
                             taskProvider.on 'closeTask', @onCloseTask
+
+                            if isTeam
+                                @onCreateTeamTaskProgress = (teamTaskProgress) =>
+                                    @renderTaskPreviews()
+                                    false
+
+                                contestProvider.on 'createTeamTaskProgress', @onCreateTeamTaskProgress
+
                         .fail (err) =>
                             @$main.html renderTemplate 'internal-error-view'
                 .fail (err) =>
@@ -670,6 +681,11 @@ define 'tasksView', ['jquery', 'underscore', 'view', 'renderTemplate', 'dataStor
 
         dismiss: ->
             identityProvider.unsubscribe()
+
+            if @onCreateTeamTaskProgress?
+                contestProvider.off 'createTeamTaskProgress', @onCreateTeamTaskProgress
+                @onCreateTeamTaskProgress = null
+
             if @onCreateTaskCategory?
                 taskCategoryProvider.off 'createTaskCategory', @onCreateTaskCategory
                 @onCreateTaskCategory = null

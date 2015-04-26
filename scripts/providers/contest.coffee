@@ -10,6 +10,8 @@ define 'contestProvider', ['jquery', 'underscore', 'EventEmitter', 'dataStore', 
             @onUpdateTeamScore = null
             @onQualifyTeam = null
 
+            @onCreateTeamTaskProgress = null
+
         getContest: ->
             @contest
 
@@ -24,8 +26,8 @@ define 'contestProvider', ['jquery', 'underscore', 'EventEmitter', 'dataStore', 
             realtimeProvider = dataStore.getRealtimeProvider()
 
             @onUpdate = (e) =>
-                data = JSON.parse e.data
-                @contest = new ContestModel data
+                options = JSON.parse e.data
+                @contest = new ContestModel options
                 @trigger 'updateContest', [@contest]
 
             realtimeProvider.addEventListener 'updateContest', @onUpdate
@@ -53,6 +55,18 @@ define 'contestProvider', ['jquery', 'underscore', 'EventEmitter', 'dataStore', 
 
             teamProvider.on 'qualifyTeam', @onQualifyTeam
 
+            identity = identityProvider.getIdentity()
+            if identity.role is 'team'
+                @onCreateTeamTaskProgress = (e) =>
+                    options = JSON.parse e.data
+                    teamTaskProgress = new TeamTaskProgressModel options
+                    ndx = _.findIndex @teamTaskProgressEntries, teamId: options.teamId, taskId: options.taskId
+                    if teamTaskProgress.teamId == identity.id and ndx == -1
+                        @teamTaskProgressEntries.push teamTaskProgress
+                        @trigger 'createTeamTaskProgress', [teamTaskProgress]
+
+                realtimeProvider.addEventListener 'createTeamTaskProgress', @onCreateTeamTaskProgress, false
+
         unsubscribe: ->
             return unless dataStore.supportsRealtime()
             realtimeProvider = dataStore.getRealtimeProvider()
@@ -68,6 +82,10 @@ define 'contestProvider', ['jquery', 'underscore', 'EventEmitter', 'dataStore', 
             if @onQualifyTeam?
                 teamProvider.off 'qualifyTeam', @onQualifyTeam
                 @onQualifyTeam = null
+
+            if @onCreateTeamTaskProgress?
+                realtimeProvider.removeEventListener 'createTeamTaskProgress', @onCreateTeamTaskProgress
+                @onCreateTeamTaskProgress = null
 
             @contest = null
             @teamScores = []
