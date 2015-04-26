@@ -422,17 +422,20 @@ define 'tasksView', ['jquery', 'underscore', 'view', 'renderTemplate', 'dataStor
                     taskIsSolved = no
                     taskProgress = null
                     identity = identityProvider.getIdentity()
+                    contest = contestProvider.getContest()
                     if identity.role is 'team'
                         taskProgress = _.findWhere contestProvider.getTeamTaskProgressEntries(), teamId: identity.id, taskId: taskId
                         if taskProgress?
                             taskIsSolved = yes
 
-                    if taskPreview.isOpened() and not taskIsSolved
+                    if taskPreview.isOpened() and not taskIsSolved and contest.isStarted()
                         $submitTaskAnswerGroup.show()
                         $submitTaskSubmitButton.show()
                     else
                         $submitTaskAnswerGroup.hide()
                         $submitTaskSubmitButton.hide()
+                        if contest.isPaused() and not taskIsSolved
+                            $submitTaskSubmitError.text 'Contest has been paused.'
                         if taskPreview.isClosed()
                             $submitTaskSubmitError.text 'Task has been closed by the event organizers.'
                         if taskIsSolved
