@@ -266,6 +266,20 @@
                 <% } %>
             </script>
 
+            <script type="text/x-template" data-name="edit-task-hint-textarea-partial">
+                <div id="edit-task-hint-<%- number %>">
+                    <h5>
+                        Hint #<%- number %>
+                        <% if (editable) { %>
+                        <a href="#" data-action="remove-task-hint" data-number="<%- number %>">
+                            <i class="glyphicon glyphicon-remove"></i>
+                        </a>
+                        <% } %>
+                    </h5>
+                    <textarea name="hints" class="form-control" required data-parsley-length="[2,1024]"<% print(editable ? '' : ' disabled'); %>></textarea>
+                </div>
+            </script>
+
             <script type="text/x-template" data-name="create-task-hint-textarea-partial">
                 <div id="create-task-hint-<%- number %>">
                     <h5>
@@ -275,6 +289,24 @@
                         </a>
                     </h5>
                     <textarea name="hints" class="form-control" required data-parsley-length="[2,1024]"></textarea>
+                </div>
+            </script>
+
+            <script type="text/x-template" data-name="edit-task-answer-input-partial">
+                <div id="edit-task-answer-<%- number %>">
+                    <div class="input-group themis-task-answer-group" >
+                        <div class="input-group-addon"><%- number %></div>
+                        <input type="text" name="answers" class="form-control" required data-parsley-errors-container="#edit-task-answer-errors-<%- number %>" data-parsley-length="[2,256]"<% print(editable ? '' : ' disabled'); %>>
+                        <% if (editable) { %>
+                        <div class="input-group-addon">
+                            <a href="#" data-action="remove-task-answer" data-number="<%- number %>">
+                                <i class="glyphicon glyphicon-remove"></i>
+                            </a>
+                        </div>
+                        <% } %>
+                    </div>
+                    <div id="edit-task-answer-errors-<%- number %>">
+                    </div>
                 </div>
             </script>
 
@@ -337,15 +369,18 @@
                         <div class="panel-heading">
                             <h4 class="panel-title themis-task-title">
                                 <%- task.title %>
-                                <% if (identity.role === 'admin') { %>
-                                <% if (contest.isStarted()) { %>
                                 &nbsp;
-                                <% if (task.isInitial()) { %>
-                                <a href="#" data-action="open-task" data-toggle="modal" data-target="#open-task-modal" data-task-id="<%- task.id %>"><span class="glyphicon glyphicon-share"></span></a>
-                                <% } else if (task.isOpened()) { %>
-                                <a href="#" data-action="close-task" data-toggle="modal" data-target="#close-task-modal" data-task-id="<%- task.id %>"><span class="glyphicon glyphicon-lock"></span></a>
-                                <% } %>
-                                <% } %>
+                                <% if (identity.role === 'admin') { %>
+                                    <% if (!task.isClosed()) { %>
+                                    <a href="#" data-action="edit-task" data-toggle="modal" data-target="#edit-task-modal" data-task-id="<%- task.id %>"><span class="glyphicon glyphicon-pencil"></span></a>
+                                    <% } %>
+                                    <% if (contest.isStarted()) { %>
+                                        <% if (task.isInitial()) { %>
+                                        <a href="#" data-action="open-task" data-toggle="modal" data-target="#open-task-modal" data-task-id="<%- task.id %>"><span class="glyphicon glyphicon-share"></span></a>
+                                        <% } else if (task.isOpened()) { %>
+                                        <a href="#" data-action="close-task" data-toggle="modal" data-target="#close-task-modal" data-task-id="<%- task.id %>"><span class="glyphicon glyphicon-lock"></span></a>
+                                        <% } %>
+                                    <% } %>
                                 <% } %>
                             </h4>
                         </div>
@@ -609,6 +644,94 @@
                             <div class="modal-footer">
                                 <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
                                 <button type="button" class="btn btn-primary" data-action="complete-create-task">Create</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <% } %>
+
+                <% if (identity.role === 'admin') { %>
+                <div class="modal fade" id="edit-task-modal" tabindex="-1" role="dialog">
+                    <div class="modal-dialog modal-lg">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                                <h4 class="modal-title">Edit task</h4>
+                            </div>
+                            <div class="modal-body">
+                                <div>
+                                    <ul class="nav nav-tabs" id="edit-task-tablist">
+                                        <li><a href="#edit-task-data" role="tab" data-toggle="tab">Data</a></li>
+                                        <li><a href="#edit-task-preview" role="tab" data-toggle="tab">Preview</a></li>
+                                    </ul>
+
+                                    <div class="tab-content">
+                                        <div role="tabpanel" class="tab-pane" id="edit-task-data">
+                                            <form method="POST">
+                                                <div class="container-fluid">
+                                                    <div class="col-sm-6">
+                                                        <div class="form-group">
+                                                            <label for="edit-task-title" class="control-label">Title</label>
+                                                            <input type="text" class="form-control" id="edit-task-title" required minlength="2" maxlength="50" name="title" disabled>
+                                                        </div>
+                                                        <div class="form-group">
+                                                            <label for="edit-task-description" class="control-label">Description</label>
+                                                            <textarea class="form-control themis-task-description" id="edit-task-description" required minlength="2" maxlength="4096" name="description"></textarea>
+                                                        </div>
+                                                        <div class="form-group">
+                                                            <label for="edit-task-value" class="control-label">Value</label>
+                                                            <input type="number" class="form-control" id="edit-task-value" name="value" required data-parsley-type="integer" data-parsley-min="10" data-parsley-max="1000" disabled>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-sm-6">
+                                                        <div class="form-group">
+                                                            <label for="edit-task-categories" class="control-label">Categories</label>
+                                                            <select class="form-control" multiple size="4" id="edit-task-categories" required name="categories"></select>
+                                                        </div>
+                                                        <div class="form-group" id="edit-task-hints">
+                                                            <label class="control-label">
+                                                                Hints
+                                                                &nbsp;
+                                                                <a href="#" data-action="create-task-hint">
+                                                                    <i class="glyphicon glyphicon-plus"></i>
+                                                                </a>
+                                                            </label>
+                                                            <div id="edit-task-hint-list">
+                                                            </div>
+                                                        </div>
+                                                        <div class="form-group" id="edit-task-answers">
+                                                            <label class="control-label">
+                                                                Answers
+                                                                &nbsp;
+                                                                <a href="#" data-action="create-task-answer">
+                                                                    <i class="glyphicon glyphicon-plus"></i>
+                                                                </a>
+                                                            </label>
+                                                            <div id="edit-task-answer-list">
+                                                            </div>
+                                                        </div>
+                                                        <div class="form-group">
+                                                            <label for="edit-task-case-sensitive" class="control-label">Answers are case sensitive</label>
+                                                            <select class="form-control" id="edit-task-case-sensitive" required name="caseSensitive" disabled>
+                                                                <option value="true">yes</option>
+                                                                <option value="false">no</option>
+                                                            </select>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="submit-error">
+                                                    <p class="text-danger"></p>
+                                                </div>
+                                            </form>
+                                        </div>
+                                        <div role="tabpanel" class="tab-pane" id="edit-task-preview">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                                <button type="button" class="btn btn-primary" data-action="complete-edit-task">Update</button>
                             </div>
                         </div>
                     </div>

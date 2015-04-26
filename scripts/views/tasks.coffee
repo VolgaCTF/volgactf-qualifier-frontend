@@ -14,6 +14,7 @@ define 'tasksView', ['jquery', 'underscore', 'view', 'renderTemplate', 'dataStor
             @onCreateTask = null
             @onOpenTask = null
             @onCloseTask = null
+            @onUpdateTask = null
 
             @onCreateTeamTaskProgress = null
             @onUpdateContest = null
@@ -261,6 +262,168 @@ define 'tasksView', ['jquery', 'underscore', 'view', 'renderTemplate', 'dataStor
                             $createTaskSubmitError.text 'Unknown error. Please try again later.'
                     complete: ->
                         $createTaskSubmitButton.prop 'disabled', no
+
+        initEditTaskModal: ->
+            $editTaskModal = $ '#edit-task-modal'
+            $editTaskModal.modal
+                show: no
+
+            $editTaskSubmitError = $editTaskModal.find '.submit-error > p'
+            $editTaskSubmitButton = $editTaskModal.find 'button[data-action="complete-edit-task"]'
+            $editTaskForm = $editTaskModal.find 'form'
+            $editTaskForm.parsley()
+
+            $editTaskSubmitButton.on 'click', (e) ->
+                $editTaskForm.trigger 'submit'
+
+            $editTaskTablist = $ '#edit-task-tablist'
+            $editTaskTabData = $editTaskTablist.find 'a[href="#edit-task-data"]'
+            $editTaskTabPreview = $editTaskTablist.find 'a[href="#edit-task-preview"]'
+
+            $editTaskTitle = $ '#edit-task-title'
+            $editTaskDescription = $ '#edit-task-description'
+            $editTaskValue = $ '#edit-task-value'
+            $editTaskCategories = $ '#edit-task-categories'
+
+            $editTaskHints = $ '#edit-task-hints'
+            $editTaskHintList = $ '#edit-task-hint-list'
+
+            $editTaskAnswers = $ '#edit-task-answers'
+            $editTaskAnswerList = $ '#edit-task-answer-list'
+
+            $editTaskCaseSensitive = $ '#edit-task-case-sensitive'
+
+            $editTaskPreview = $ '#edit-task-preview'
+
+            $editTaskTabData.tab()
+            $editTaskTabPreview.tab()
+
+            $editTaskHints.find('a[data-action="create-task-hint"]').on 'click', (e) =>
+                e.preventDefault()
+                number = $editTaskHintList.children().length + 1
+                $editTaskHintList.append $ renderTemplate 'edit-task-hint-textarea-partial', number: number, editable: yes
+
+            $editTaskHintList.on 'click', 'a[data-action="remove-task-hint"]', (e) =>
+                e.preventDefault()
+                number = $(e.target).closest('a').attr('data-number')
+                $("#edit-task-hint-#{number}").remove()
+                hintParams = []
+                $editTaskHintList.find('textarea[name="hints"]').each ->
+                    $el = $ @
+                    hintParams.push
+                        value: $el.val()
+                        editable: not $el.prop 'disabled'
+                $editTaskHintList.empty()
+                _.each hintParams, (hintParam, ndx) ->
+                    $editTaskHintList.append $ renderTemplate 'edit-task-hint-textarea-partial', number: ndx + 1, editable: hintParam.editable
+                    $("#edit-task-hint-#{ndx + 1} textarea").val hintParam.value
+
+            $editTaskAnswers.find('a[data-action="create-task-answer"]').on 'click', (e) =>
+                e.preventDefault()
+                number = $editTaskAnswerList.children().length + 1
+                $editTaskAnswerList.append $ renderTemplate 'edit-task-answer-input-partial', number: number, editable: yes
+
+            $editTaskAnswerList.on 'click', 'a[data-action="remove-task-answer"]', (e) =>
+                e.preventDefault()
+                number = $(e.target).closest('a').attr('data-number')
+                $("#edit-task-answer-#{number}").remove()
+                answerParams = []
+                $editTaskAnswerList.find('input[name="answers"]').each ->
+                    $el = $ @
+                    answerParams.push
+                        value: $el.val()
+                        editable: not $el.prop 'disabled'
+
+                $editTaskAnswerList.empty()
+                _.each answerParams, (answerParam, ndx) ->
+                    $editTaskAnswerList.append $ renderTemplate 'edit-task-answer-input-partial', number: ndx + 1, editable: answerParam.editable
+                    $("#edit-task-answer-#{ndx + 1} input").val answerParam.value
+
+            $editTaskTabPreview.on 'show.bs.tab', (e) ->
+                md = new MarkdownIt()
+                hintsFormatted = []
+                $editTaskHintList.find('textarea[name="hints"]').each ->
+                    hintsFormatted.push md.render $(this).val()
+                options =
+                    title: $editTaskTitle.val()
+                    description: md.render $editTaskDescription.val()
+                    hints: hintsFormatted
+
+                $editTaskPreview.html renderTemplate 'task-content-partial', options
+
+            $editTaskModal.on 'show.bs.modal', (e) =>
+                taskId = parseInt $(e.relatedTarget).data('task-id'), 10
+                $editTaskModal.data 'task-id', taskId
+
+                $editTaskTabData.tab 'show'
+                $editTaskTitle.val ''
+                $editTaskDescription.val ''
+                $editTaskValue.val ''
+
+                $editTaskCategories.empty()
+                _.each taskCategoryProvider.getTaskCategories(), (taskCategory) =>
+                    $editTaskCategories.append $('<option></option>').attr('value', taskCategory.id).text taskCategory.title
+
+                $editTaskHintList.empty()
+                $editTaskAnswerList.empty()
+
+                $editTaskCaseSensitive.val 'true'
+
+                $editTaskSubmitError.text ''
+                $editTaskForm.parsley().reset()
+                $editTaskForm.attr 'action', "#{metadataStore.getMetadata 'domain-api' }/task/#{taskId}/update"
+
+                $editTaskSubmitButton.prop 'disabled', yes
+
+                $
+                    .when taskProvider.fetchTask taskId, full: yes
+                    .done (task) ->
+                        $editTaskSubmitButton.prop 'disabled', no
+
+                        $editTaskTitle.val task.title
+                        $editTaskDescription.val task.description
+                        $editTaskValue.val task.value
+                        $editTaskCategories.val task.categories
+                        $editTaskCaseSensitive.val task.caseSensitive.toString()
+
+                        $editTaskHintList.empty()
+                        _.each task.hints, (hint, ndx) ->
+                            $editTaskHintList.append $ renderTemplate 'edit-task-hint-textarea-partial', number: ndx + 1, editable: no
+                            $("#edit-task-hint-#{ndx + 1} textarea").val hint
+
+                        $editTaskAnswerList.empty()
+                        _.each task.answers, (answer, ndx) ->
+                            $editTaskAnswerList.append $ renderTemplate 'edit-task-answer-input-partial', number: ndx + 1, editable: no
+                            $("#edit-task-answer-#{ndx + 1} input").val answer
+
+
+                    .fail (err) ->
+                        $editTaskSubmitError.text err
+
+
+            $editTaskModal.on 'shown.bs.modal', (e) ->
+                $editTaskTitle.focus()
+
+            $editTaskForm.on 'submit', (e) =>
+                e.preventDefault()
+                $editTaskForm.ajaxSubmit
+                    beforeSubmit: ->
+                        $editTaskSubmitError.text ''
+                        $editTaskSubmitButton.prop 'disabled', yes
+                    clearForm: yes
+                    dataType: 'json'
+                    xhrFields:
+                        withCredentials: yes
+                    headers: { 'X-CSRF-Token': identityProvider.getIdentity().token }
+                    success: (responseText, textStatus, jqXHR) ->
+                        $editTaskModal.modal 'hide'
+                    error: (jqXHR, textStatus, errorThrown) ->
+                        if jqXHR.responseJSON?
+                            $editTaskSubmitError.text jqXHR.responseJSON
+                        else
+                            $editTaskSubmitError.text 'Unknown error. Please try again later.'
+                    complete: ->
+                        $editTaskSubmitButton.prop 'disabled', no
 
         initReviseTaskModal: ->
             $reviseTaskModal = $ '#revise-task-modal'
@@ -644,6 +807,7 @@ define 'tasksView', ['jquery', 'underscore', 'view', 'renderTemplate', 'dataStor
                                 @initCreateTaskModal()
                                 @initOpenTaskModal()
                                 @initCloseTaskModal()
+                                @initEditTaskModal()
 
                             if isTeam
                                 @initSubmitTaskModal()
@@ -670,14 +834,6 @@ define 'tasksView', ['jquery', 'underscore', 'view', 'renderTemplate', 'dataStor
                             taskCategoryProvider.on 'updateTaskCategory', @onUpdateTaskCategory
                             taskCategoryProvider.on 'removeTaskCategory', @onRemoveTaskCategory
 
-                            @onOpenTask = (taskPreview) =>
-                                @renderTaskPreviews()
-                                false
-
-                            @onCloseTask = (taskPreview) =>
-                                @renderTaskPreviews()
-                                false
-
                             taskProvider.subscribe()
                             if isSupervisor
                                 @onCreateTask = (taskPreview) =>
@@ -686,8 +842,23 @@ define 'tasksView', ['jquery', 'underscore', 'view', 'renderTemplate', 'dataStor
 
                                 taskProvider.on 'createTask', @onCreateTask
 
+                            @onOpenTask = (taskPreview) =>
+                                @renderTaskPreviews()
+                                false
+
                             taskProvider.on 'openTask', @onOpenTask
+
+                            @onCloseTask = (taskPreview) =>
+                                @renderTaskPreviews()
+                                false
+
                             taskProvider.on 'closeTask', @onCloseTask
+
+                            @onUpdateTask = (taskPreview) =>
+                                @renderTaskPreviews()
+                                false
+
+                            taskProvider.on 'updateTask', @onUpdateTask
 
                             if isTeam
                                 @onCreateTeamTaskProgress = (teamTaskProgress) =>
@@ -737,6 +908,9 @@ define 'tasksView', ['jquery', 'underscore', 'view', 'renderTemplate', 'dataStor
             if @onCloseTask?
                 taskProvider.off 'closeTask', @onCloseTask
                 @onCloseTask = null
+            if @onUpdateTask?
+                taskProvider.off 'updateTask', @onUpdateTask
+                @onUpdateTask = null
             taskProvider.unsubscribe()
 
             teamProvider.unsubscribe()

@@ -1,12 +1,13 @@
-define 'taskProvider', ['jquery', 'underscore', 'EventEmitter', 'dataStore', 'metadataStore', 'taskPreviewModel', 'taskModel', 'identityProvider'], ($, _, EventEmitter, dataStore, metadataStore, TaskPreviewModel, TaskModel, identityProvider) ->
+define 'taskProvider', ['jquery', 'underscore', 'EventEmitter', 'dataStore', 'metadataStore', 'taskPreviewModel', 'taskModel', 'identityProvider', 'taskFullModel'], ($, _, EventEmitter, dataStore, metadataStore, TaskPreviewModel, TaskModel, identityProvider, TaskFullModel) ->
     class TaskProvider extends EventEmitter
         constructor: ->
             super()
             @taskPreviews = []
 
-            @onCreate = null
-            @onOpen = null
-            @onClose = null
+            @onCreateTask = null
+            @onOpenTask = null
+            @onCloseTask = null
+            @onUpdateTask = null
 
         getTaskPreviews: ->
             @taskPreviews
@@ -17,15 +18,15 @@ define 'taskProvider', ['jquery', 'underscore', 'EventEmitter', 'dataStore', 'me
 
             isSupervisor = _.contains ['admin', 'manager'], identityProvider.getIdentity().role
             if isSupervisor
-                @onCreate = (e) =>
+                @onCreateTask = (e) =>
                     options = JSON.parse e.data
                     taskPreview = new TaskPreviewModel options
                     @taskPreviews.push taskPreview
                     @trigger 'createTask', [taskPreview]
 
-                realtimeProvider.addEventListener 'createTask', @onCreate
+                realtimeProvider.addEventListener 'createTask', @onCreateTask
 
-            @onOpen = (e) =>
+            @onOpenTask = (e) =>
                 options = JSON.parse e.data
                 taskPreview = new TaskPreviewModel options
                 ndx = _.findIndex @taskPreviews, id: options.id
@@ -34,9 +35,9 @@ define 'taskProvider', ['jquery', 'underscore', 'EventEmitter', 'dataStore', 'me
                 @taskPreviews.push taskPreview
                 @trigger 'openTask', [taskPreview]
 
-            realtimeProvider.addEventListener 'openTask', @onOpen
+            realtimeProvider.addEventListener 'openTask', @onOpenTask
 
-            @onClose = (e) =>
+            @onCloseTask = (e) =>
                 options = JSON.parse e.data
                 taskPreview = new TaskPreviewModel options
                 ndx = _.findIndex @taskPreviews, id: options.id
@@ -45,7 +46,18 @@ define 'taskProvider', ['jquery', 'underscore', 'EventEmitter', 'dataStore', 'me
                 @taskPreviews.push taskPreview
                 @trigger 'closeTask', [taskPreview]
 
-            realtimeProvider.addEventListener 'closeTask', @onClose
+            realtimeProvider.addEventListener 'closeTask', @onCloseTask
+
+            @onUpdateTask = (e) =>
+                options = JSON.parse e.data
+                taskPreview = new TaskPreviewModel options
+                ndx = _.findIndex @taskPreviews, id: options.id
+                if ndx > -1
+                    @taskPreviews.splice ndx, 1
+                @taskPreviews.push taskPreview
+                @trigger 'updateTask', [taskPreview]
+
+            realtimeProvider.addEventListener 'updateTask', @onUpdateTask
 
         unsubscribe: ->
             return unless dataStore.supportsRealtime()
@@ -60,6 +72,9 @@ define 'taskProvider', ['jquery', 'underscore', 'EventEmitter', 'dataStore', 'me
             if @onCloseTask?
                 realtimeProvider.removeEventListener 'closeTask', @onClose
                 @onCloseTask = null
+            if @onUpdateTask?
+                realtimeProvider.removeEventListener 'updateTask', @onUpdate
+                @onUpdateTask = null
 
             @taskPreviews = []
 
@@ -84,17 +99,27 @@ define 'taskProvider', ['jquery', 'underscore', 'EventEmitter', 'dataStore', 'me
 
             promise
 
-        fetchTask: (taskId) ->
+        fetchTask: (taskId, options = {}) ->
+            defaultOptions = full: no
+            options = _.extend defaultOptions, options
             promise = $.Deferred()
 
-            url = "#{metadataStore.getMetadata 'domain-api' }/task/#{taskId}"
+            if options.full
+                url = "#{metadataStore.getMetadata 'domain-api' }/task/#{taskId}/full"
+            else
+                url = "#{metadataStore.getMetadata 'domain-api' }/task/#{taskId}"
+
             $.ajax
                 url: url
                 dataType: 'json'
                 xhrFields:
                     withCredentials: yes
                 success: (responseJSON, textStatus, jqXHR) ->
-                    promise.resolve new TaskModel responseJSON
+                    if options.full
+                        res = new TaskFullModel responseJSON
+                    else
+                        res = new TaskModel responseJSON
+                    promise.resolve res
                 error: (jqXHR, textStatus, errorThrown) ->
                     if jqXHR.responseJSON?
                         promise.reject jqXHR.responseJSON
