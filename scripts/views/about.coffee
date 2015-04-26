@@ -1,26 +1,39 @@
-define 'aboutView', ['jquery', 'view', 'renderTemplate', 'dataStore', 'navigationBar', 'metadataStore'], ($, View, renderTemplate, dataStore, navigationBar, metadataStore) ->
+define 'aboutView', ['jquery', 'view', 'renderTemplate', 'dataStore', 'navigationBar', 'statusBar', 'metadataStore', 'contestProvider', 'identityProvider'], ($, View, renderTemplate, dataStore, navigationBar, statusBar, metadataStore, contestProvider, identityProvider) ->
     class AboutView extends View
         constructor: ->
+            @$main = null
             @urlRegex = /^\/about$/
 
         getTitle: ->
             "#{metadataStore.getMetadata 'event-title' } :: About"
 
         present: ->
-            $main = $ '#main'
-            $('#main').html renderTemplate 'about-view'
+            @$main = $ '#main'
+            @$main.html renderTemplate 'about-view'
 
-            dataStore.getIdentity (err, identity) ->
-                if err?
-                    $main.html renderTemplate 'internal-error'
+            $
+                .when identityProvider.fetchIdentity(), contestProvider.fetchContest()
+                .done (identity, contest) ->
+                    identityProvider.subscribe()
+
+                    if dataStore.supportsRealtime()
+                        dataStore.connectRealtime()
+
+                    navigationBar.present active: 'about'
+                    statusBar.present()
+                .fail (err) ->
                     navigationBar.present()
-                else
-                    navigationBar.present
-                        identity: identity
-                        active: 'about'
+                    $main.html renderTemplate 'internal-error-view'
 
         dismiss: ->
-            $('#main').empty()
+            identityProvider.unsubscribe()
+
+            @$main.empty()
             navigationBar.dismiss()
+            statusBar.dismiss()
+
+            if dataStore.supportsRealtime()
+                dataStore.disconnectRealtime()
+
 
     new AboutView()

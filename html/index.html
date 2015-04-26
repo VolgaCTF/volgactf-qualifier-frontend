@@ -7,6 +7,7 @@
         <meta name="viewport" content="width=device-width, initial-scale=1">
 
         <link rel="stylesheet" href="//cdn.{{ domain }}/css/bootstrap.css">
+        <link rel="stylesheet" href="//cdn.{{ domain }}/css/bootstrap-datetimepicker.css">
         <link rel="stylesheet" href="//cdn.{{ domain }}/css/themis.css">
 
         <script type="text/x-metadata" data-name="domain-api" data-value="//api.{{ domain }}"></script>
@@ -15,7 +16,7 @@
         <script src="//cdn.{{ domain }}/js/require.js" data-main='//cdn.{{ domain }}/js/themis.js'></script>
     </head>
     <body>
-        <div class="navbar navbar-default navbar-static-top">
+        <div class="navbar navbar-default navbar-static-top themis-navbar">
             <div class="container">
                 <div class="navbar-header">
                     <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#themis-navbar">
@@ -31,34 +32,36 @@
             </div>
         </div>
 
+        <div id="themis-statusbar">
+        </div>
+
         <div id="main">
         </div>
 
         <footer class="footer">
             <div class="container">
-                <div class="col-sm-4">
+                <div class="pull-left">
                     <p><span class="glyphicon glyphicon-copyright-mark"></span> 2015, <a href="https://github.com/aspyatkin" target="_blank">Alexander Pyatkin</a></p>
                 </div>
-                <div class="col-sm-4 col-sm-offset-4">
+                <div class="pull-right">
                     <ul class="list-unstyled text-right">
-                        <li><a href="http://volgactf.ru" target="_blank">volgactf.ru</a><!--&nbsp;<i class="fa fa-info-circle"></i>--></li>
-                        <li><a href="https://twitter.com/VolgaCTF" target="_blank">@VolgaCTF</a><!--&nbsp;<i class="fa fa-twitter"></i>--></li>
+                        <li><a href="http://volgactf.ru" target="_blank">volgactf.ru</a></li>
+                        <li><a href="https://twitter.com/VolgaCTF" target="_blank">@VolgaCTF</a></li>
                     </ul>
                 </div>
             </div>
         </footer>
 
         <div class="themis-partials">
-            <script type="text/x-template" data-name="navbar">
+            <script type="text/x-template" data-name="navbar-view">
                 <ul class="nav navbar-nav">
-                    <% if (show.teams) { %>
                     <li class="<% print((active === 'teams') ? 'active' : ''); %>"><a href="/teams" data-push-history>Teams</a></li>
-                    <% } %>
-                    <% if (show.news) { %>
                     <li class="<% print((active === 'news') ? 'active' : ''); %>"><a href="/news" data-push-history>News</a></li>
-                    <% } %>
-                    <% if (show.about) { %>
+                    <li class="<% print((active === 'scoreboard') ? 'active' : ''); %>"><a href="/scoreboard" data-push-history>Scoreboard</a></li>
+                    <li class="<% print((active === 'tasks') ? 'active' : ''); %>"><a href="/tasks" data-push-history>Tasks</a></li>
                     <li class="<% print((active === 'about') ? 'active' : ''); %>"><a href="/about" data-push-history>About</a></li>
+                    <% if (identity && (identity.role === 'admin' || identity.role === 'manager')) { %>
+                    <li class="<% print((active === 'logs') ? 'active' : ''); %>"><a href="/logs" data-push-history>Logs</a></li>
                     <% } %>
                 </ul>
 
@@ -96,7 +99,7 @@
                     <div class="pull-left info">
                         <h4 class="text-primary"><a href="/profile/<%- team.id %>" data-push-history><%- team.name %></a></h4>
                         <ul class="list-unstyled">
-                            <% if ('email' in team && 'emailConfirmed' in team) { %>
+                            <% if ('email' in team && typeof team.email !== 'undefined' && team.email !== null) { %>
                             <li>
                                 <span class="glyphicon glyphicon-envelope"></span>
                                 <% if (team.emailConfirmed) { %>
@@ -136,6 +139,730 @@
                 </div>
             </script>
 
+            <script type="text/x-template" data-name="task-category-supervisor-partial">
+                <div class="themis-task-category">
+                    <header>
+                        <h4><%- title %></h4>
+                    </header>
+                    <section>
+                        <p><%- description %></p>
+                    </section>
+                    <footer>
+                        <p class="text-muted"><small>Updated on <%- updatedAt %></small>
+                            <% if (manageable) { %>
+                            &nbsp;
+                            <button type="button" class="btn btn-success btn-xs" data-action="edit-task-category" data-toggle="modal" data-target="#edit-task-category-modal" data-task-category-id="<%- id %>">
+                                <i class="glyphicon glyphicon-pencil"></i>&nbsp;Edit
+                            </button>
+                            <button type="button" class="btn btn-danger btn-xs" data-action="remove-task-category" data-toggle="modal" data-target="#remove-task-category-modal" data-task-category-id="<%- id %>">
+                                <i class="glyphicon glyphicon-remove"></i>&nbsp;Remove
+                            </button>
+                            <% } %>
+                        </p>
+                    </footer>
+                </div>
+            </script>
+
+            <script type="text/x-template" data-name="remove-task-category-confirmation">
+                You are about to remove the task category <mark><%- title %></mark>. Continue?
+            </script>
+
+            <script type="text/x-template" data-name="task-categories-view">
+                <div class="panel panel-info">
+                    <div class="panel-heading">
+                        <h3 class="panel-title">Task categories</h3>
+                    </div>
+                    <div class="panel-body">
+                        <% if (identity.role === 'admin' && !contest.isFinished()) { %>
+                        <button type="button" class="btn btn-primary btn-xs" data-action="create-task-category" data-toggle="modal" data-target="#create-task-category-modal">
+                            <i class="glyphicon glyphicon-plus"></i>&nbsp;Create
+                        </button>
+                        <% } %>
+                        <div id="themis-task-categories-list"></div>
+                    </div>
+                </div>
+
+                <% if (identity.role === 'admin' && !contest.isFinished()) { %>
+                <div class="modal fade" id="create-task-category-modal" tabindex="-1" role="dialog">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                                <h4 class="modal-title">Create task category</h4>
+                            </div>
+                            <div class="modal-body">
+                                <form method="POST" action="//api.{{ domain }}/task/category/create">
+                                    <div class="form-group">
+                                        <label for="create-task-category-title" class="control-label">Title</label>
+                                        <input type="text" class="form-control" id="create-task-category-title" name="title" autofocus required minlength="2" maxlength="20">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="create-task-category-description" class="control-label">Description</label>
+                                        <textarea class="form-control themis-task-category-description" id="create-task-category-description" minlength="0" maxlength="150" name="description"></textarea>
+                                    </div>
+                                    <div class="submit-error">
+                                        <p class="text-danger"></p>
+                                    </div>
+                                </form>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                                <button type="button" class="btn btn-primary" data-action="complete-create-task-category">Create</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="modal fade" id="remove-task-category-modal" tabindex="-1" role="dialog">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                                <h4 class="modal-title">Remove task category</h4>
+                            </div>
+                            <div class="modal-body">
+                                <p class="confirmation"></p>
+                                <div class="submit-error">
+                                    <p class="text-danger"></p>
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                                <button type="button" class="btn btn-danger" data-action="complete-remove-task-category">Remove</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="modal fade" id="edit-task-category-modal" tabindex="-1" role="dialog">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                                <h4 class="modal-title">Edit task category</h4>
+                            </div>
+                            <div class="modal-body">
+                                <form method="POST">
+                                    <div class="form-group">
+                                        <label for="edir-task-category-title" class="control-label">Title</label>
+                                        <input type="text" class="form-control" id="edit-task-category-title" name="title" autofocus required minlength="2" maxlength="20">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="edit-task-category-description" class="control-label">Description</label>
+                                        <textarea class="form-control themis-task-category-description" id="edit-task-category-description" minlength="0" maxlength="150" name="description"></textarea>
+                                    </div>
+                                    <div class="submit-error">
+                                        <p class="text-danger"></p>
+                                    </div>
+                                </form>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                                <button type="button" class="btn btn-primary" data-action="complete-edit-task-category">Save</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <% } %>
+            </script>
+
+            <script type="text/x-template" data-name="edit-task-hint-textarea-partial">
+                <div id="edit-task-hint-<%- number %>">
+                    <h5>
+                        Hint #<%- number %>
+                        <% if (editable) { %>
+                        <a href="#" data-action="remove-task-hint" data-number="<%- number %>">
+                            <i class="glyphicon glyphicon-remove"></i>
+                        </a>
+                        <% } %>
+                    </h5>
+                    <textarea name="hints" class="form-control" required data-parsley-length="[2,1024]"<% print(editable ? '' : ' disabled'); %>></textarea>
+                </div>
+            </script>
+
+            <script type="text/x-template" data-name="create-task-hint-textarea-partial">
+                <div id="create-task-hint-<%- number %>">
+                    <h5>
+                        Hint #<%- number %>
+                        <a href="#" data-action="remove-task-hint" data-number="<%- number %>">
+                            <i class="glyphicon glyphicon-remove"></i>
+                        </a>
+                    </h5>
+                    <textarea name="hints" class="form-control" required data-parsley-length="[2,1024]"></textarea>
+                </div>
+            </script>
+
+            <script type="text/x-template" data-name="edit-task-answer-input-partial">
+                <div id="edit-task-answer-<%- number %>">
+                    <div class="input-group themis-task-answer-group" >
+                        <div class="input-group-addon"><%- number %></div>
+                        <input type="text" name="answers" class="form-control" required data-parsley-errors-container="#edit-task-answer-errors-<%- number %>" data-parsley-length="[2,256]"<% print(editable ? '' : ' disabled'); %>>
+                        <% if (editable) { %>
+                        <div class="input-group-addon">
+                            <a href="#" data-action="remove-task-answer" data-number="<%- number %>">
+                                <i class="glyphicon glyphicon-remove"></i>
+                            </a>
+                        </div>
+                        <% } %>
+                    </div>
+                    <div id="edit-task-answer-errors-<%- number %>">
+                    </div>
+                </div>
+            </script>
+
+            <script type="text/x-template" data-name="create-task-answer-input-partial">
+                <div id="create-task-answer-<%- number %>">
+                    <div class="input-group themis-task-answer-group" >
+                        <div class="input-group-addon"><%- number %></div>
+                        <input type="text" name="answers" class="form-control" required data-parsley-errors-container="#create-task-answer-errors-<%- number %>" data-parsley-length="[2,256]">
+                        <div class="input-group-addon">
+                            <a href="#" data-action="remove-task-answer" data-number="<%- number %>">
+                                <i class="glyphicon glyphicon-remove"></i>
+                            </a>
+                        </div>
+                    </div>
+                    <div id="create-task-answer-errors-<%- number %>">
+                    </div>
+                </div>
+            </script>
+
+            <script type="text/x-template" data-name="task-category-partial">
+                <span class="label label-default" title="<%- description %>"><span class="glyphicon glyphicon-tag"></span>&nbsp;<%- title %></span>
+            </script>
+
+            <script type="text/x-template" data-name="task-content-partial">
+                <div>
+                    <header>
+                        <h4><%- title %></h4>
+                    </header>
+                    <section>
+                        <%= description %>
+                    </section>
+                    <% if (hints.length > 0) { %>
+                    <section>
+                        <h5>Hints</h5>
+                        <ol>
+                            <% for (var i=0; i<hints.length; ++i) { %>
+                            <li><%= hints[i] %>
+                            <% } %>
+                        </ol>
+                    </section>
+                    <% } %>
+                </div>
+            </script>
+
+            <script type="text/x-template" data-name="task-preview-partial">
+                <% if (identity.role === 'admin' || identity.role === 'manager') { %>
+                <div class="col-sm-4 themis-task-preview-container" data-task-id="<%- task.id %>">
+                <% } else { %>
+                <div class="col-sm-3 themis-task-preview-container" data-task-id="<%- task.id %>">
+                <% } %>
+                    <% if (task.isInitial()) { %>
+                    <div class="panel panel-default">
+                    <% } else if (task.isOpened() && !taskIsSolved) { %>
+                    <div class="panel panel-primary">
+                    <% } else if (task.isClosed() && !taskIsSolved) { %>
+                    <div class="panel panel-danger">
+                    <% } else if ((task.isOpened() || task.isClosed()) && taskIsSolved) { %>
+                    <div class="panel panel-success">
+                    <% } %>
+                        <div class="panel-heading">
+                            <h4 class="panel-title themis-task-title">
+                                <%- task.title %>
+                                &nbsp;
+                                <% if (identity.role === 'admin') { %>
+                                    <% if (!task.isClosed()) { %>
+                                    <a href="#" data-action="edit-task" data-toggle="modal" data-target="#edit-task-modal" data-task-id="<%- task.id %>"><span class="glyphicon glyphicon-pencil"></span></a>
+                                    <% } %>
+                                    <% if (contest.isStarted()) { %>
+                                        <% if (task.isInitial()) { %>
+                                        <a href="#" data-action="open-task" data-toggle="modal" data-target="#open-task-modal" data-task-id="<%- task.id %>"><span class="glyphicon glyphicon-share"></span></a>
+                                        <% } else if (task.isOpened()) { %>
+                                        <a href="#" data-action="close-task" data-toggle="modal" data-target="#close-task-modal" data-task-id="<%- task.id %>"><span class="glyphicon glyphicon-lock"></span></a>
+                                        <% } %>
+                                    <% } %>
+                                <% } %>
+                            </h4>
+                        </div>
+                        <% if (identity.role === 'admin' || identity.role === 'manager') { %>
+                        <div class="panel-body" data-task-id="<%- task.id %>" data-toggle="modal" data-target="#revise-task-modal">
+                        <% } else if (identity.role === 'team') { %>
+                        <div class="panel-body" data-task-id="<%- task.id %>" data-toggle="modal" data-target="#submit-task-modal">
+                        <% } else { %>
+                        <div class="panel-body">
+                        <% } %>
+                            <div class="themis-task-value">
+                                <%- task.value %>
+                            </div>
+                        </div>
+                        <% if (identity.role === 'admin' || identity.role === 'manager') { %>
+                        <div class="panel-footer" data-task-id="<%- task.id %>" data-toggle="modal" data-target="#revise-task-modal">
+                        <% } else if (identity.role === 'team') { %>
+                        <div class="panel-footer" data-task-id="<%- task.id %>" data-toggle="modal" data-target="#submit-task-modal">
+                        <% } else { %>
+                        <div class="panel-footer">
+                        <% } %>
+                            <div class="themis-task-categories">
+                                <%= categoriesList %>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </script>
+
+            <script type="text/x-template" data-name="open-task-confirmation">
+                You are about to open the task <mark><%- title %></mark>.
+                Teams will be able to submit answers for the task. Continue?
+            </script>
+
+            <script type="text/x-template" data-name="close-task-confirmation">
+                You are about to close the task <mark><%- title %></mark>.
+                Teams will not be able to submit answers for the task though
+                scores earned will not be recalculated. Continue?
+            </script>
+
+            <script type="text/x-template" data-name="tasks-view">
+                <div class="container">
+                    <header>
+                        <h1>Tasks</h1>
+                    </header>
+                    <section class="<% print((identity.role === 'admin' || identity.role === 'manager') ? 'col-sm-8 themis-no-side-gaps': ''); %>">
+                        <% if (identity.role === 'admin') { %>
+                        <div class="themis-task-controls">
+                            <button type="button" class="btn btn-primary btn-xs" data-action="create-task" data-toggle="modal" data-target="#create-task-modal">
+                                <i class="glyphicon glyphicon-plus"></i>&nbsp;Create
+                            </button>
+                        </div>
+                        <% } %>
+                        <div id="themis-task-previews" class="clearfix">
+                        </div>
+                    </section>
+                    <% if (identity.role === 'admin' || identity.role === 'manager') { %>
+                    <section class="col-sm-4" id="themis-task-categories"></section>
+                    <% } %>
+                </div>
+
+                <% if (identity.role === 'team') { %>
+                <div class="modal fade" id="submit-task-modal" tabindex="-1" role="dialog">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                                <h4 class="modal-title">Submit task</h4>
+                            </div>
+                            <div class="modal-body">
+                                <div class="themis-task-contents">
+                                </div>
+                            </div>
+                            <div class="modal-body">
+                                <form method="POST">
+                                    <div class="form-group" id="submit-task-answer-group">
+                                        <label for="submit-task-answer" class="control-label">Answer</label>
+                                        <input type="text" class="form-control" id="submit-task-answer" name="answer" required data-parsley-length="[2,256]">
+                                    </div>
+                                    <div class="submit-error">
+                                        <p class="text-danger"></p>
+                                    </div>
+                                    <div class="submit-info">
+                                        <p class="text-info"></p>
+                                    </div>
+                                    <div class="submit-success">
+                                        <p class="text-success"></p>
+                                    </div>
+                                </form>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                                <button type="button" class="btn btn-primary" data-action="complete-submit-task">Submit</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <% } %>
+
+                <% if (identity.role === 'admin' || identity.role === 'manager') { %>
+                <div class="modal fade" id="revise-task-modal" tabindex="-1" role="dialog">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                                <h4 class="modal-title">Revise task</h4>
+                            </div>
+                            <div class="modal-body">
+                                <div class="themis-task-contents">
+                                </div>
+                            </div>
+                            <div class="modal-body">
+                                <form method="POST">
+                                    <div class="form-group" id="revise-task-answer-group">
+                                        <label for="revise-task-answer" class="control-label">Answer</label>
+                                        <input type="text" class="form-control" id="revise-task-answer" name="answer" required data-parsley-length="[2,256]">
+                                        <span class="help-block" id="revise-task-status"></span>
+                                    </div>
+                                    <div class="submit-error">
+                                        <p class="text-danger"></p>
+                                    </div>
+                                    <div class="submit-success">
+                                        <p class="text-success"></p>
+                                    </div>
+                                </form>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                                <button type="button" class="btn btn-primary" data-action="complete-revise-task">Check</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <% } %>
+
+                <% if (identity.role === 'admin') { %>
+                <div class="modal fade" id="open-task-modal" tabindex="-1" role="dialog">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                                <h4 class="modal-title">Open task</h4>
+                            </div>
+                            <div class="modal-body">
+                                <p class="confirmation"></p>
+                                <div class="submit-error">
+                                    <p class="text-danger"></p>
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-default" data-dismiss="modal">No</button>
+                                <button type="button" class="btn btn-success" data-action="complete-open-task">Yes</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <% } %>
+
+                <% if (identity.role === 'admin') { %>
+                <div class="modal fade" id="close-task-modal" tabindex="-1" role="dialog">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                                <h4 class="modal-title">Close task</h4>
+                            </div>
+                            <div class="modal-body">
+                                <p class="confirmation"></p>
+                                <div class="submit-error">
+                                    <p class="text-danger"></p>
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-default" data-dismiss="modal">No</button>
+                                <button type="button" class="btn btn-danger" data-action="complete-close-task">Yes</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <% } %>
+
+                <% if (identity.role === 'admin') { %>
+                <div class="modal fade" id="create-task-modal" tabindex="-1" role="dialog">
+                    <div class="modal-dialog modal-lg">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                                <h4 class="modal-title">Create task</h4>
+                            </div>
+                            <div class="modal-body">
+                                <div>
+                                    <ul class="nav nav-tabs" id="create-task-tablist">
+                                        <li><a href="#create-task-data" role="tab" data-toggle="tab">Data</a></li>
+                                        <li><a href="#create-task-preview" role="tab" data-toggle="tab">Preview</a></li>
+                                    </ul>
+
+                                    <div class="tab-content">
+                                        <div role="tabpanel" class="tab-pane" id="create-task-data">
+                                            <form method="POST" action="//api.{{ domain }}/task/create">
+                                                <div class="container-fluid">
+                                                    <div class="col-sm-6">
+                                                        <div class="form-group">
+                                                            <label for="create-task-title" class="control-label">Title</label>
+                                                            <input type="text" class="form-control" id="create-task-title" required minlength="2" maxlength="50" name="title">
+                                                        </div>
+                                                        <div class="form-group">
+                                                            <label for="create-task-description" class="control-label">Description</label>
+                                                            <textarea class="form-control themis-task-description" id="create-task-description" required minlength="2" maxlength="4096" name="description"></textarea>
+                                                        </div>
+                                                        <div class="form-group">
+                                                            <label for="create-task-value" class="control-label">Value</label>
+                                                            <input type="number" class="form-control" id="create-task-value" name="value" required data-parsley-type="integer" data-parsley-min="10" data-parsley-max="1000">
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-sm-6">
+                                                        <div class="form-group">
+                                                            <label for="create-task-categories" class="control-label">Categories</label>
+                                                            <select class="form-control" multiple size="4" id="create-task-categories" required name="categories"></select>
+                                                        </div>
+                                                        <div class="form-group" id="create-task-hints">
+                                                            <label class="control-label">
+                                                                Hints
+                                                                &nbsp;
+                                                                <a href="#" data-action="create-task-hint">
+                                                                    <i class="glyphicon glyphicon-plus"></i>
+                                                                </a>
+                                                            </label>
+                                                            <div id="create-task-hint-list">
+                                                            </div>
+                                                        </div>
+                                                        <div class="form-group" id="create-task-answers">
+                                                            <label class="control-label">
+                                                                Answers
+                                                                &nbsp;
+                                                                <a href="#" data-action="create-task-answer">
+                                                                    <i class="glyphicon glyphicon-plus"></i>
+                                                                </a>
+                                                            </label>
+                                                            <div id="create-task-answer-list">
+                                                            </div>
+                                                        </div>
+                                                        <div class="form-group">
+                                                            <label for="create-task-case-sensitive" class="control-label">Answers are case sensitive</label>
+                                                            <select class="form-control" id="create-task-case-sensitive" required name="caseSensitive">
+                                                                <option value="true">yes</option>
+                                                                <option value="false">no</option>
+                                                            </select>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="submit-error">
+                                                    <p class="text-danger"></p>
+                                                </div>
+                                            </form>
+                                        </div>
+                                        <div role="tabpanel" class="tab-pane" id="create-task-preview">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                                <button type="button" class="btn btn-primary" data-action="complete-create-task">Create</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <% } %>
+
+                <% if (identity.role === 'admin') { %>
+                <div class="modal fade" id="edit-task-modal" tabindex="-1" role="dialog">
+                    <div class="modal-dialog modal-lg">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                                <h4 class="modal-title">Edit task</h4>
+                            </div>
+                            <div class="modal-body">
+                                <div>
+                                    <ul class="nav nav-tabs" id="edit-task-tablist">
+                                        <li><a href="#edit-task-data" role="tab" data-toggle="tab">Data</a></li>
+                                        <li><a href="#edit-task-preview" role="tab" data-toggle="tab">Preview</a></li>
+                                    </ul>
+
+                                    <div class="tab-content">
+                                        <div role="tabpanel" class="tab-pane" id="edit-task-data">
+                                            <form method="POST">
+                                                <div class="container-fluid">
+                                                    <div class="col-sm-6">
+                                                        <div class="form-group">
+                                                            <label for="edit-task-title" class="control-label">Title</label>
+                                                            <input type="text" class="form-control" id="edit-task-title" required minlength="2" maxlength="50" name="title" disabled>
+                                                        </div>
+                                                        <div class="form-group">
+                                                            <label for="edit-task-description" class="control-label">Description</label>
+                                                            <textarea class="form-control themis-task-description" id="edit-task-description" required minlength="2" maxlength="4096" name="description"></textarea>
+                                                        </div>
+                                                        <div class="form-group">
+                                                            <label for="edit-task-value" class="control-label">Value</label>
+                                                            <input type="number" class="form-control" id="edit-task-value" name="value" required data-parsley-type="integer" data-parsley-min="10" data-parsley-max="1000" disabled>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-sm-6">
+                                                        <div class="form-group">
+                                                            <label for="edit-task-categories" class="control-label">Categories</label>
+                                                            <select class="form-control" multiple size="4" id="edit-task-categories" required name="categories"></select>
+                                                        </div>
+                                                        <div class="form-group" id="edit-task-hints">
+                                                            <label class="control-label">
+                                                                Hints
+                                                                &nbsp;
+                                                                <a href="#" data-action="create-task-hint">
+                                                                    <i class="glyphicon glyphicon-plus"></i>
+                                                                </a>
+                                                            </label>
+                                                            <div id="edit-task-hint-list">
+                                                            </div>
+                                                        </div>
+                                                        <div class="form-group" id="edit-task-answers">
+                                                            <label class="control-label">
+                                                                Answers
+                                                                &nbsp;
+                                                                <a href="#" data-action="create-task-answer">
+                                                                    <i class="glyphicon glyphicon-plus"></i>
+                                                                </a>
+                                                            </label>
+                                                            <div id="edit-task-answer-list">
+                                                            </div>
+                                                        </div>
+                                                        <div class="form-group">
+                                                            <label for="edit-task-case-sensitive" class="control-label">Answers are case sensitive</label>
+                                                            <select class="form-control" id="edit-task-case-sensitive" required name="caseSensitive" disabled>
+                                                                <option value="true">yes</option>
+                                                                <option value="false">no</option>
+                                                            </select>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="submit-error">
+                                                    <p class="text-danger"></p>
+                                                </div>
+                                            </form>
+                                        </div>
+                                        <div role="tabpanel" class="tab-pane" id="edit-task-preview">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                                <button type="button" class="btn btn-primary" data-action="complete-edit-task">Update</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <% } %>
+            </script>
+
+            <script type="text/x-template" data-name="scoreboard-table-row-partial">
+                <tr class="themis-scoreboard-row">
+                    <td><%- rank %></td>
+                    <td><img class="themis-scoreboard-logo" src="//api.{{ domain }}/team/<%- id %>/logo"><%- name %></td>
+                    <td><%- score %></td>
+                    <td><%- updatedAt %></td>
+                </tr>
+            </script>
+
+            <script type="text/x-template" data-name="scoreboard-view">
+                <div class="container">
+                    <header>
+                        <h1>Scoreboard</h1>
+                    </header>
+                    <section>
+                        <table class="table table-condensed">
+                            <thead>
+                                <th>#</th>
+                                <th>Team</th>
+                                <th>Score</th>
+                                <th>Last updated</th>
+                            </thead>
+                            <tbody id="themis-scoreboard-table-body">
+                            </tbody>
+                        </table>
+                    </section>
+                </div>
+            </script>
+
+            <script type="text/x-template" data-name="contest-state-partial">
+                <% if (contest.state === 1) { %>
+                    <span class="themis-contest-not-started">
+                        &#9679;&nbsp;Not started
+                    </span>
+                <% } else if (contest.state === 2) { %>
+                    <span class="themis-contest-started">
+                        &#9679;&nbsp;Started
+                    </span>
+                <% } else if (contest.state === 3) { %>
+                    <span class="themis-contest-paused">
+                        &#9679;&nbsp;Paused
+                    </span>
+                <% } else if (contest.state === 4) { %>
+                    <span class="themis-contest-finished">
+                        &#9679;&nbsp;Finished
+                    </span>
+                <% } %>
+                <% if (identity.role === 'admin') { %>
+                <a href="#" class="text-info" data-action="update-contest" data-toggle="modal" data-target="#update-contest-modal">
+                    <i class="glyphicon glyphicon-cog"></i>
+                </a>
+                <% } %>
+            </script>
+
+            <script type="text/x-template" data-name="statusbar-view">
+                <div class="container themis-statusbar">
+                    <div id="themis-contest-state">
+                    </div>
+                </div>
+
+                <div class="modal fade" id="update-contest-modal" tabindex="-1" role="dialog">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                                <h4 class="modal-title">Update contest</h4>
+                            </div>
+                            <div class="modal-body">
+                                <form method="POST" action="//api.{{ domain }}/contest/update">
+                                    <div class="form-group">
+                                        <label for="update-contest-state" class="control-label">State</label>
+                                        <select id="update-contest-state" class="form-control" name="state" autofocus required>
+                                            <option value="1">Not started</option>
+                                            <option value="2">Started</option>
+                                            <option value="3">Paused</option>
+                                            <option value="4">Finished</option>
+                                        </select>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label for="update-contest-starts" class="control-label">Starts at</label>
+                                        <div class='input-group date' id='update-contest-starts'>
+                                            <input type='text' class="form-control">
+                                            <span class="input-group-addon">
+                                                <span class="glyphicon glyphicon-calendar"></span>
+                                            </span>
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label for="update-contest-finishes" class="control-label">Finishes at</label>
+                                        <div class='input-group date' id='update-contest-finishes'>
+                                            <input type='text' class="form-control">
+                                            <span class="input-group-addon">
+                                                <span class="glyphicon glyphicon-calendar"></span>
+                                            </span>
+                                        </div>
+                                    </div>
+
+                                    <div class="submit-error">
+                                        <p class="text-danger"></p>
+                                    </div>
+                                </form>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                                <button type="button" class="btn btn-primary" data-action="complete-update-contest">Update</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </script>
+
+            <script type="text/x-template" data-name="logs-view">
+                <div class="container">
+                    <header>
+                        <h1>Logs</h1>
+                    </header>
+                    <section>
+                        <p class="lead">Not implemented yet.</p>
+                    </section>
+                </div>
+            </script>
+
             <script type="text/x-template" data-name="post-simplified-partial">
                 <div class="themis-post">
                     <header>
@@ -152,6 +879,25 @@
 
             <script type="text/x-template" data-name="remove-post-confirmation">
                 You are about to remove the post <mark><%- title %></mark>. Continue?
+            </script>
+
+            <script type="text/x-template" data-name="revise-task-status-partial">
+                <% if (teamNames.length === 0) { %>
+                Nobody has solved this task.
+                <% } else { %>
+                This task has been solved by the following teams:
+                <% for (var i=0; i<teamNames.length; ++i) { %>
+                    <i><%- teamNames[i] %></i><% if (i < teamNames.length - 1) { %>, <% } else { %>.<% } %>
+                <% } %>
+                <% } %>
+            </script>
+
+            <script type="text/x-template" data-name="submit-task-status-partial">
+                <% if (solvedTeamCount === 0) { %>
+                Nobody has solved this task. Be the first!
+                <% } else { %>
+                This task has been solved by <%- solvedTeamCount %> <% print((solvedTeamCount > 1) ? 'teams' : 'team'); %>.
+                <% } %>
             </script>
 
             <script type="text/x-template" data-name="post-partial">
@@ -184,6 +930,14 @@
                 <div class="container">
                     <header>
                         <h1>News</h1>
+                        <% if (!supportsRealtime) { %>
+                        <div class="alert alert-warning" role="alert">
+                            <p>
+                                <span class="glyphicon glyphicon-alert"></span>&nbsp;
+                                Your browser does not support <a href="https://developer.mozilla.org/en-US/docs/Server-sent_events" target="_blank">Server-Sent events</a>, a technology which provides realtime updates from our servers. Please consider using the latest version of your browser.
+                            </p>
+                        </div>
+                        <% } %>
                         <% if (identity.role === 'admin' || identity.role === 'manager') { %>
                         <button type="button" class="btn btn-primary btn-xs" data-action="create-post" data-toggle="modal" data-target="#create-post-modal">
                             <i class="glyphicon glyphicon-plus"></i>&nbsp;Create
@@ -314,7 +1068,7 @@
                                         You should use only actual e-mail while registration, so Administrators can contact the team if necessary. If the e-mail registration is failed, you should go to the team personal account and request for another e-mail confirmation and/or change e-mail.
                                     </li>
                                     <li>
-                                        It&#39;s obligatory to attach team&#39;s logo. It&#39;s allowed to attach square logo of any size >=48px. In the scoreboard all the logos will be forced to minimize to 48x48px. 
+                                        It&#39;s obligatory to attach team&#39;s logo. It&#39;s allowed to attach square logo of any size >=48px. In the scoreboard all the logos will be forced to minimize to 48x48px.
                                     </li>
                                 </ol>
                             </li>
@@ -331,13 +1085,13 @@
                                 The team will get exact number of points shown near the task while solving it.
                             </li>
                             <li>
-                                Technical team and Jury of the competition is one and the same authority that performs both the functions of Jury and the functions of Technical team. 
+                                Technical team and Jury of the competition is one and the same authority that performs both the functions of Jury and the functions of Technical team.
                             </li>
                             <li>
                                 Technical team of the competition reserves the right to open any task of their own choice at any point of the competition, informing the teams about it in the News on the site for 5 minutes before the opening.
                             </li>
                             <li>
-                                In case of solving the task successfully the team gets a code line (flag) which they should insert in the online-form given on the server of the competition. 
+                                In case of solving the task successfully the team gets a code line (flag) which they should insert in the online-form given on the server of the competition.
                             </li>
                             <li>
                                 Technical team reserves the right to close a task with mistake. In case of closing such a task, the scores on the team&#39;s account are not recounted.
@@ -346,10 +1100,10 @@
                                 Jury is checking the solved tasks during the competition. Technical team makes a table of results of the competition.
                             </li>
                             <li>
-                                Technical team develops the tasks of the competition and the system of checking the solved tasks as well and keeps it private before the start of the competition. 
+                                Technical team develops the tasks of the competition and the system of checking the solved tasks as well and keeps it private before the start of the competition.
                             </li>
                             <li>
-                                During the competition the teams can use any quantity of necessary computers and network equipment. 
+                                During the competition the teams can use any quantity of necessary computers and network equipment.
                             </li>
                             <li>
                                 While solving the tasks it&#39;s forbidden for all the participants of the competition to fulfill the following actions:
@@ -362,7 +1116,7 @@
                                 During the competition the Jury will post News and hints to the tasks. The only official place for viewing the News is the site of the competition.
                             </li>
                             <li>
-                                The Jury reserves the right to make any changes in this technical order before the start of the competition. 
+                                The Jury reserves the right to make any changes in this technical order before the start of the competition.
                             </li>
                             <li>
                                 The connection with the Technical team is performed via IRC-channel.
@@ -371,10 +1125,10 @@
                                 The team may be disqualified by the decision of the Jury for breaching this technical order or breaking the process of competition in any different way.
                             </li>
                             <li>
-                                5 teams of higher education institutions from the Volga Federal District, 3 teams of higher education institutions from other districts of Russian Federation and 2 teams of higher education institutions from the Commonwealth of Independent States will take part in the final of the competition. 
+                                5 teams of higher education institutions from the Volga Federal District, 3 teams of higher education institutions from other districts of Russian Federation and 2 teams of higher education institutions from the Commonwealth of Independent States will take part in the final of the competition.
                             </li>
                             <li>
-                                The Administrators of the competition reserve the right to increase the number of the participants of the final round (increasing the number of finalists, inviting the guest-teams, inviting the teams in exchange for the teams-finalists leaving the competition). 
+                                The Administrators of the competition reserve the right to increase the number of the participants of the final round (increasing the number of finalists, inviting the guest-teams, inviting the teams in exchange for the teams-finalists leaving the competition).
                             </li>
                             <li>VolgaCTF 2015 Finals will take place on September 7-11 in Samara.</li>
 
@@ -401,9 +1155,13 @@
                         <h1>Hello!</h1>
                         <p>Welcome to {{#event}}{{ title }}{{/event}}!</p>
                         <p>VolgaCTF is an inter-regional inter-university open computer security contest.</p>
+                        <% if (!contest.isFinished()) { %>
                         <p>Interested? Please register for the competition!</p>
+                        <% } %>
                         <p>
+                            <% if (!contest.isFinished()) { %>
                             <a class="btn btn-primary btn-lg" href="/signup" role="button" data-push-history>Sign up</a>
+                            <% } %>
                             <a class="btn btn-success btn-lg" href="/signin" role="button" data-push-history><span class="glyphicon glyphicon-log-in"></span>&nbsp;Sign in</a>
                         </p>
                     </div>
@@ -423,7 +1181,9 @@
                         Now, you can check out the <a href="/news" data-push-history>news</a> or <a href="/profile/<%- identity.id %>" data-push-history>edit your profile</a>.
                     </p>
                     <% } else if (identity.role === 'manager' || identity.role === 'admin') { %>
-                    <h1>Control</h1>
+                    <h1>Welcome back!</h1>
+                    <p class="lead">
+                        Now, you can check out the <a href="/news" data-push-history>news</a>.
                     <% } %>
                 </div>
             </script>
@@ -444,7 +1204,7 @@
                 </div>
             </script>
 
-            <script type="text/x-template" data-name="internal-error">
+            <script type="text/x-template" data-name="internal-error-view">
                 <div class="container">
                     <header>
                         <h1>Internal error</h1>
@@ -455,13 +1215,35 @@
                 </div>
             </script>
 
-            <script type="text/x-template" data-name="already-authenticated">
+            <script type="text/x-template" data-name="already-authenticated-view">
                 <div class="container">
                     <header>
                         <h1>Already authenticated</h1>
                     </header>
                     <section>
                         <p class="lead">You have already been authenticated. Please navigate to another page.</p>
+                    </section>
+                </div>
+            </script>
+
+            <script type="text/x-template" data-name="access-forbidden-view">
+                <div class="container">
+                    <header>
+                        <h1>Forbidden</h1>
+                    </header>
+                    <section>
+                        <p class="lead">We are really sorry, but you are not authorized to access <mark><%- urlPath %></mark> page.</p>
+                    </section>
+                </div>
+            </script>
+
+            <script type="text/x-template" data-name="signup-not-available-view">
+                <div class="container">
+                    <header>
+                        <h1>Signup not available</h1>
+                    </header>
+                    <section>
+                        <p class="lead">We are really sorry, but the contest has finished.</p>
                     </section>
                 </div>
             </script>
@@ -551,7 +1333,9 @@
                                 <form method="POST" action="//api.{{ domain }}/team/upload-logo">
                                     <div class="form-group">
                                         <label for="upload-logo-logo" class="control-label">Logo</label>
-                                        <input type="file" id="upload-logo-logo" name="logo" class="filestyle" data-buttonText="&nbsp;Choose file" data-iconName="glyphicon-picture" accept="image/jpeg,image/png,image/gif" required>
+                                        <input type="file" id="upload-logo-logo" name="logo" class="filestyle" data-buttonText="&nbsp;Choose file" data-iconName="glyphicon-picture" accept="image/jpeg,image/png,image/gif" required data-parsley-errors-container="#upload-logo-errors">
+                                        <div id="upload-logo-errors">
+                                        </div>
                                     </div>
                                     <div class="submit-error">
                                         <p class="text-danger"></p>

@@ -1,8 +1,7 @@
-define 'profileView', ['jquery', 'view', 'renderTemplate', 'dataStore', 'navigationBar', 'metadataStore', 'jquery.history', 'parsley', 'jquery.form', 'bootstrap-filestyle'], ($, View, renderTemplate, dataStore, navigationBar, metadataStore, History) ->
+define 'profileView', ['jquery', 'view', 'renderTemplate', 'dataStore', 'navigationBar', 'metadataStore', 'identityProvider', 'teamProvider', 'jquery.history', 'parsley', 'jquery.form', 'bootstrap-filestyle'], ($, View, renderTemplate, dataStore, navigationBar, metadataStore, identityProvider, teamProvider, History) ->
     class ProfileView extends View
         constructor: ->
             @$main = null
-            @identity = null
             @team = null
 
             @urlRegex = /^\/profile\/[0-9]+$/
@@ -29,6 +28,7 @@ define 'profileView', ['jquery', 'view', 'renderTemplate', 'dataStore', 'navigat
 
                 $uploadLogoModal.on 'show.bs.modal', (e) ->
                     $uploadLogoForm.find('input:file').filestyle 'clear'
+                    $uploadLogoForm.parsley().reset()
 
                 $uploadLogoForm.on 'submit', (e) =>
                     e.preventDefault()
@@ -40,7 +40,7 @@ define 'profileView', ['jquery', 'view', 'renderTemplate', 'dataStore', 'navigat
                         dataType: 'json'
                         xhrFields:
                             withCredentials: yes
-                        headers: { 'X-CSRF-Token': @identity.token }
+                        headers: { 'X-CSRF-Token': identityProvider.getIdentity().token }
                         success: (responseText, textStatus, jqXHR) ->
                             onTimeout = ->
                                 $uploadLogoModal.modal 'hide'
@@ -74,6 +74,7 @@ define 'profileView', ['jquery', 'view', 'renderTemplate', 'dataStore', 'navigat
                 $changeEmailModal.on 'show.bs.modal', (e) ->
                     $('#change-email-new').val ''
                     $changeEmailSubmitError.text ''
+                    $changeEmailForm.parsley().reset()
 
                 $changeEmailModal.on 'shown.bs.modal', (e) ->
                     $('#change-email-new').focus()
@@ -88,7 +89,7 @@ define 'profileView', ['jquery', 'view', 'renderTemplate', 'dataStore', 'navigat
                         dataType: 'json'
                         xhrFields:
                             withCredentials: yes
-                        headers: { 'X-CSRF-Token': @identity.token }
+                        headers: { 'X-CSRF-Token': identityProvider.getIdentity().token }
                         success: (responseText, textStatus, jqXHR) ->
                             $changeEmailModal.modal 'hide'
                             window.location.reload()
@@ -132,7 +133,7 @@ define 'profileView', ['jquery', 'view', 'renderTemplate', 'dataStore', 'navigat
                         dataType: 'json'
                         xhrFields:
                             withCredentials: yes
-                        headers: { 'X-CSRF-Token': @identity.token }
+                        headers: { 'X-CSRF-Token': identityProvider.getIdentity().token }
                         success: (responseText, textStatus, jqXHR) ->
                             $resendConfirmationModal.modal 'hide'
                             window.location.reload()
@@ -179,7 +180,7 @@ define 'profileView', ['jquery', 'view', 'renderTemplate', 'dataStore', 'navigat
                         dataType: 'json'
                         xhrFields:
                             withCredentials: yes
-                        headers: { 'X-CSRF-Token': @identity.token }
+                        headers: { 'X-CSRF-Token': identityProvider.getIdentity().token }
                         success: (responseText, textStatus, jqXHR) ->
                             $editProfileModal.modal 'hide'
                             window.location.reload()
@@ -212,6 +213,7 @@ define 'profileView', ['jquery', 'view', 'renderTemplate', 'dataStore', 'navigat
                     $('#change-pwd-new').val ''
                     $('#change-pwd-confirm-new').val ''
                     $changePasswordSubmitError.text ''
+                    $changePasswordForm.parsley().reset()
 
                 $changePasswordModal.on 'shown.bs.modal', (e) ->
                     $('#change-pwd-current').focus()
@@ -226,7 +228,7 @@ define 'profileView', ['jquery', 'view', 'renderTemplate', 'dataStore', 'navigat
                         dataType: 'json'
                         xhrFields:
                             withCredentials: yes
-                        headers: { 'X-CSRF-Token': @identity.token }
+                        headers: { 'X-CSRF-Token': identityProvider.getIdentity().token }
                         success: (responseText, textStatus, jqXHR) ->
                             $changePasswordModal.modal 'hide'
                         error: (jqXHR, textStatus, errorThrown) ->
@@ -242,23 +244,18 @@ define 'profileView', ['jquery', 'view', 'renderTemplate', 'dataStore', 'navigat
             @$main = $ '#main'
             @$main.html renderTemplate 'profile-view'
 
-            dataStore.getIdentity (err, identity) =>
-                if err?
-                    @$main.html renderTemplate 'internal-error'
+            $
+                .when identityProvider.fetchIdentity()
+                .done (identity) =>
+                    identityProvider.subscribe()
                     navigationBar.present()
-                else
-                    @identity = identity
-
-                    navigationBar.present
-                        identity: identity
 
                     url = History.getState().data.urlPath
                     urlParts = url.split '/'
                     teamId = parseInt urlParts[urlParts.length - 1], 10
-                    dataStore.getTeamProfile teamId, (err, team) =>
-                        if err? or not team?
-                            @$main.html renderTemplate 'internal-error'
-                        else
+                    $
+                        .when teamProvider.fetchTeamProfile teamId
+                        .done (team) =>
                             @team = team
                             @$main.find('section').html renderTemplate 'team-profile-partial', identity: identity, team: team
                             if identity.role is 'team' and identity.id == team.id
@@ -270,13 +267,18 @@ define 'profileView', ['jquery', 'view', 'renderTemplate', 'dataStore', 'navigat
 
                                 @initEditProfileModal()
                                 @initChangePasswordModal()
+                        .fail (err) =>
+                            @$main.html renderTemplate 'internal-error-view'
+
+                .fail (err) =>
+                    navigationBar.present()
+                    @$main.html renderTemplate 'internal-error-view'
 
         dismiss: ->
+            identityProvider.unsubscribe()
             @$main.empty()
             @$main = null
-            @identity = null
             @team = null
-
             navigationBar.dismiss()
 
 
