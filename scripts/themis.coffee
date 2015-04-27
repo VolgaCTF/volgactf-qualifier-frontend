@@ -133,8 +133,10 @@ define 'statusBar', ['jquery', 'underscore', 'renderTemplate', 'dataStore', 'mom
         constructor: ->
             @$container = null
             @$stateContainer = null
+            @$timerContainer = null
 
             @onUpdateContest = null
+            @timerInterval = null
 
         initUpdateContestModal: ->
             $updateContestModal = $ '#update-contest-modal'
@@ -205,8 +207,19 @@ define 'statusBar', ['jquery', 'underscore', 'renderTemplate', 'dataStore', 'mom
             contest = contestProvider.getContest()
             contestObj =
                 state: contest.state
-                startsAt: moment(contest.startsAt).format 'lll'
             @$stateContainer.html renderTemplate 'contest-state-partial', contest: contestObj, identity: identityProvider.getIdentity()
+
+        renderContestTimer: ->
+            @$timerContainer.empty()
+            contest = contestProvider.getContest()
+            if contest.isInitial() and contest.startsAt?
+                @$timerContainer.html renderTemplate 'contest-timer-initial', startsAt: moment(contest.startsAt).format('lll'), interval: moment(contest.startsAt).fromNow()
+            if contest.isStarted()
+                @$timerContainer.html renderTemplate 'contest-timer-started', finishesAt: moment(contest.finishesAt).format('lll'), interval: moment(contest.finishesAt).fromNow()
+            if contest.isPaused()
+                @$timerContainer.html renderTemplate 'contest-timer-paused'
+            if contest.isFinished()
+                @$timerContainer.html renderTemplate 'contest-timer-finished', finishesAt: moment(contest.finishesAt).format('lll'), interval: moment(contest.finishesAt).fromNow()
 
         present: ->
             @$container = $ '#themis-statusbar'
@@ -214,12 +227,21 @@ define 'statusBar', ['jquery', 'underscore', 'renderTemplate', 'dataStore', 'mom
             @$stateContainer = $ '#themis-contest-state'
             @renderContestState()
 
+            @$timerContainer = $ '#themis-contest-timer'
+            @renderContestTimer()
+
             if identityProvider.getIdentity().role == 'admin'
                 @initUpdateContestModal()
 
             @onUpdateContest = (e) =>
                 @renderContestState()
+                @renderContestTimer()
                 false
+
+            onUpdateTimer = =>
+                @renderContestTimer()
+
+            @timerInterval = setInterval onUpdateTimer, 60000
 
             contestProvider.subscribe()
             contestProvider.on 'updateContest', @onUpdateContest
@@ -229,6 +251,10 @@ define 'statusBar', ['jquery', 'underscore', 'renderTemplate', 'dataStore', 'mom
                 contestProvider.off 'updateContest', @onUpdateContest
                 @onUpdateContest = null
             contestProvider.unsubscribe()
+
+            if @timerInterval
+                clearInterval @timerInterval
+                @timerInterval = null
 
             if @$container?.length
                 @$container.empty()

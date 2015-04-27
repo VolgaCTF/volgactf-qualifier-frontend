@@ -793,9 +793,29 @@
                 <% } %>
             </script>
 
+            <script type="text/x-template" data-name="contest-timer-initial">
+                <span class="text-info">Contest starts on <%- startsAt %> (<%- interval %>)</span>
+            </script>
+
+            <script type="text/x-template" data-name="contest-timer-started">
+                <span class="text-info">Contest finishes on <%- finishesAt %> (<%- interval %>)</span>
+            </script>
+
+            <script type="text/x-template" data-name="contest-timer-paused">
+                <span class="text-info">Contest is paused</span>
+            </script>
+
+            <script type="text/x-template" data-name="contest-timer-finished">
+                <span class="text-info">Contest has finished on <%- finishesAt %> (<%- interval %>)</span>
+            </script>
+
             <script type="text/x-template" data-name="statusbar-view">
                 <div class="container themis-statusbar">
-                    <div id="themis-contest-state">
+                    <div class="col-md-3 themis-no-side-gaps" id="themis-contest-state">
+                    </div>
+                    <div class="col-md-6 themis-no-side-gaps" id="themis-contest-timer">
+                    </div>
+                    <div class="col-md-3 themis-no-side-gaps" id="themis-contest-score">
                     </div>
                 </div>
 
