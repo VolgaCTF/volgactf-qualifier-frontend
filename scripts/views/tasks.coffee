@@ -471,11 +471,16 @@ define 'tasksView', ['jquery', 'underscore', 'view', 'renderTemplate', 'dataStor
                             hints: hintsFormatted
                         $reviseTaskContents.html renderTemplate 'task-content-partial', options
 
-                        teamTaskProgressEntries = contestProvider.getTeamTaskProgressEntries()
-                        teamIds = _.map _.where(teamTaskProgressEntries, taskId: task.id), (entry) -> entry.teamId
-                        teams = _.filter teamProvider.getTeams(), (team) ->
-                            _.contains teamIds, team.id
-                        teamNames = _.map teams, (team) -> team.name
+                        teamTaskProgressEntries = _.where contestProvider.getTeamTaskProgressEntries(), taskId: task.id
+                        sortedTeamTaskProgressEntries = _.sortBy teamTaskProgressEntries, 'createdAt'
+                        teamIds = _.map sortedTeamTaskProgressEntries, (entry) -> entry.teamId
+                        teamNames = []
+                        teams = teamProvider.getTeams()
+                        for teamId in teamIds
+                            team = _.findWhere teams, id: teamId
+                            if team?
+                                teamNames.push team.name
+
                         $reviseTaskStatus.html renderTemplate 'revise-task-status-partial', teamNames: teamNames
 
                         $reviseTaskSubmitButton.prop 'disabled', no
