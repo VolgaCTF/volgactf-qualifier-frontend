@@ -592,28 +592,33 @@ define 'tasksView', ['jquery', 'underscore', 'view', 'renderTemplate', 'dataStor
                 $submitTaskSubmitButton.prop 'disabled', yes
 
                 taskPreview = _.findWhere taskProvider.getTaskPreviews(), id: taskId
-                if taskPreview?
-                    taskIsSolved = no
-                    taskProgress = null
-                    identity = identityProvider.getIdentity()
-                    contest = contestProvider.getContest()
-                    if identity.role is 'team'
+                identity = identityProvider.getIdentity()
+
+                if taskPreview? and identity.role is 'team'
+                    if identity.emailConfirmed
+                        taskIsSolved = no
+                        taskProgress = null
+                        contest = contestProvider.getContest()
                         taskProgress = _.findWhere contestProvider.getTeamTaskProgressEntries(), teamId: identity.id, taskId: taskId
                         if taskProgress?
                             taskIsSolved = yes
 
-                    if taskPreview.isOpened() and not taskIsSolved and contest.isStarted()
-                        $submitTaskAnswerGroup.show()
-                        $submitTaskSubmitButton.show()
+                        if taskPreview.isOpened() and not taskIsSolved and contest.isStarted()
+                            $submitTaskAnswerGroup.show()
+                            $submitTaskSubmitButton.show()
+                        else
+                            $submitTaskAnswerGroup.hide()
+                            $submitTaskSubmitButton.hide()
+                            if contest.isPaused() and not taskIsSolved
+                                $submitTaskSubmitError.text 'Contest has been paused.'
+                            if taskPreview.isClosed()
+                                $submitTaskSubmitError.text 'Task has been closed by the event organizers.'
+                            if taskIsSolved
+                                $submitTaskSubmitSuccess.text "Your team has solved the task on #{moment(taskProgress.createdAt).format 'lll' }!"
                     else
+                        $submitTaskSubmitError.text 'You should confirm your email before you can submit an answer to the task.'
                         $submitTaskAnswerGroup.hide()
                         $submitTaskSubmitButton.hide()
-                        if contest.isPaused() and not taskIsSolved
-                            $submitTaskSubmitError.text 'Contest has been paused.'
-                        if taskPreview.isClosed()
-                            $submitTaskSubmitError.text 'Task has been closed by the event organizers.'
-                        if taskIsSolved
-                            $submitTaskSubmitSuccess.text "Your team has solved the task on #{moment(taskProgress.createdAt).format 'lll' }!"
                 else
                     $submitTaskAnswerGroup.hide()
                     $submitTaskSubmitButton.hide()

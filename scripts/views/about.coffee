@@ -9,11 +9,11 @@ define 'aboutView', ['jquery', 'view', 'renderTemplate', 'dataStore', 'navigatio
 
         present: ->
             @$main = $ '#main'
-            @$main.html renderTemplate 'about-view'
 
             $
                 .when identityProvider.fetchIdentity(), contestProvider.fetchContest()
-                .done (identity, contest) ->
+                .done (identity, contest) =>
+                    @$main.html renderTemplate 'about-view', identity: identity
                     identityProvider.subscribe()
 
                     if dataStore.supportsRealtime()

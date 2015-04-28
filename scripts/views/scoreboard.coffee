@@ -51,26 +51,33 @@ define 'scoreboardView', ['jquery', 'underscore', 'view', 'renderTemplate', 'dat
 
         present: ->
             @$main = $ '#main'
-            @$main.html renderTemplate 'scoreboard-view'
 
             $
-                .when identityProvider.fetchIdentity(), contestProvider.fetchContest(), teamProvider.fetchTeams(), contestProvider.fetchTeamScores()
-                .done (identity, contest, teams, teamScores) =>
+                .when identityProvider.fetchIdentity()
+                .done (identity) =>
                     identityProvider.subscribe()
-                    if dataStore.supportsRealtime()
-                        dataStore.connectRealtime()
+                    @$main.html renderTemplate 'scoreboard-view', identity: identity
+                    $
+                        .when contestProvider.fetchContest(), teamProvider.fetchTeams(), contestProvider.fetchTeamScores()
+                        .done (contest, teams, teamScores) =>
+                            if dataStore.supportsRealtime()
+                                dataStore.connectRealtime()
 
-                    teamProvider.subscribe()
+                            teamProvider.subscribe()
 
-                    navigationBar.present active: 'scoreboard'
-                    statusBar.present()
+                            navigationBar.present active: 'scoreboard'
+                            statusBar.present()
 
-                    @renderScoreboard()
+                            @renderScoreboard()
 
-                    @onUpdateTeamScore = (teamScore) =>
-                        @renderScoreboard()
-                        false
-                    contestProvider.on 'updateTeamScore', @onUpdateTeamScore
+                            @onUpdateTeamScore = (teamScore) =>
+                                @renderScoreboard()
+                                false
+                            contestProvider.on 'updateTeamScore', @onUpdateTeamScore
+                        .fail =>
+                            navigationBar.present()
+                            @$main.html renderTemplate 'internal-error-view'
+
                 .fail =>
                     navigationBar.present()
                     @$main.html renderTemplate 'internal-error-view'

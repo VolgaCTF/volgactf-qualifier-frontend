@@ -131,6 +131,14 @@
 
             <script type="text/x-template" data-name="teams-view">
                 <div class="container">
+                    <% if (identity.role === 'team' && !('emailConfirmed' in identity && identity.emailConfirmed)) { %>
+                    <div class="alert alert-warning" role="alert">
+                        <p>
+                            <span class="glyphicon glyphicon-alert"></span>&nbsp;You need to confirm your email address.
+                            Please check your inbox and follow the provided instructions.
+                        </p>
+                    </div>
+                    <% } %>
                     <header>
                         <h2>Teams<span class="themis-team-count"></span></h2>
                     </header>
@@ -421,6 +429,14 @@
 
             <script type="text/x-template" data-name="tasks-view">
                 <div class="container">
+                    <% if (identity.role === 'team' && !('emailConfirmed' in identity && identity.emailConfirmed)) { %>
+                    <div class="alert alert-warning" role="alert">
+                        <p>
+                            <span class="glyphicon glyphicon-alert"></span>&nbsp;You need to confirm your email address.
+                            Please check your inbox and follow the provided instructions.
+                        </p>
+                    </div>
+                    <% } %>
                     <header>
                         <h1>Tasks</h1>
                     </header>
@@ -748,6 +764,14 @@
 
             <script type="text/x-template" data-name="scoreboard-view">
                 <div class="container">
+                    <% if (identity.role === 'team' && !('emailConfirmed' in identity && identity.emailConfirmed)) { %>
+                    <div class="alert alert-warning" role="alert">
+                        <p>
+                            <span class="glyphicon glyphicon-alert"></span>&nbsp;You need to confirm your email address.
+                            Please check your inbox and follow the provided instructions.
+                        </p>
+                    </div>
+                    <% } %>
                     <header>
                         <h1>Scoreboard</h1>
                     </header>
@@ -946,6 +970,14 @@
 
             <script type="text/x-template" data-name="news-view">
                 <div class="container">
+                    <% if (identity.role === 'team' && !('emailConfirmed' in identity && identity.emailConfirmed)) { %>
+                    <div class="alert alert-warning" role="alert">
+                        <p>
+                            <span class="glyphicon glyphicon-alert"></span>&nbsp;You need to confirm your email address.
+                            Please check your inbox and follow the provided instructions.
+                        </p>
+                    </div>
+                    <% } %>
                     <header>
                         <h1>News</h1>
                         <% if (!supportsRealtime) { %>
@@ -1072,6 +1104,14 @@
 
             <script type="text/x-template" data-name="about-view">
                 <div class="container">
+                    <% if (identity.role === 'team' && !('emailConfirmed' in identity && identity.emailConfirmed)) { %>
+                    <div class="alert alert-warning" role="alert">
+                        <p>
+                            <span class="glyphicon glyphicon-alert"></span>&nbsp;You need to confirm your email address.
+                            Please check your inbox and follow the provided instructions.
+                        </p>
+                    </div>
+                    <% } %>
                     <header>
                         <h1>About</h1>
                     </header>
@@ -1184,16 +1224,15 @@
                         </p>
                     </div>
                     <% } else if (identity.role === 'team') { %>
-                    <h1>Welcome back!</h1>
                     <% if (!('emailConfirmed' in identity) || !identity.emailConfirmed) { %>
                     <div class="alert alert-warning" role="alert">
                         <p>
                             <span class="glyphicon glyphicon-alert"></span>&nbsp;You need to confirm your email address.
                             Please check your inbox and follow the provided instructions.
                         </p>
-                        <p>Note, if you do not confirm your email address, the team account will be deleted in several days.</p>
                     </div>
                     <% } %>
+                    <h1>Welcome back!</h1>
                     <p class="lead">
                         VolgaCTF 2015 Quals will start on May 1 at 19:00 SAMT/15:00 UTC.
                         Now, you can check out the <a href="/news" data-push-history>news</a> or <a href="/profile/<%- identity.id %>" data-push-history>edit your profile</a>.

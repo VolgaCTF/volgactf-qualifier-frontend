@@ -39,7 +39,7 @@ define 'teamsView', ['jquery', 'underscore', 'view', 'renderTemplate', 'dataStor
                     navigationBar.present active: 'teams'
                     statusBar.present()
 
-                    @$main.html renderTemplate 'teams-view'
+                    @$main.html renderTemplate 'teams-view', identity: identity
                     $section = @$main.find 'section'
 
                     $
