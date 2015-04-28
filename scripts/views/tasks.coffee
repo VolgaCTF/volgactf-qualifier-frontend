@@ -301,22 +301,20 @@ define 'tasksView', ['jquery', 'underscore', 'view', 'renderTemplate', 'dataStor
             $editTaskHints.find('a[data-action="create-task-hint"]').on 'click', (e) =>
                 e.preventDefault()
                 number = $editTaskHintList.children().length + 1
-                $editTaskHintList.append $ renderTemplate 'edit-task-hint-textarea-partial', number: number, editable: yes
+                $editTaskHintList.append $ renderTemplate 'edit-task-hint-textarea-partial', number: number
 
             $editTaskHintList.on 'click', 'a[data-action="remove-task-hint"]', (e) =>
                 e.preventDefault()
                 number = $(e.target).closest('a').attr('data-number')
                 $("#edit-task-hint-#{number}").remove()
-                hintParams = []
+                hints = []
                 $editTaskHintList.find('textarea[name="hints"]').each ->
                     $el = $ @
-                    hintParams.push
-                        value: $el.val()
-                        editable: not $el.prop 'disabled'
+                    hints.push $el.val()
                 $editTaskHintList.empty()
-                _.each hintParams, (hintParam, ndx) ->
-                    $editTaskHintList.append $ renderTemplate 'edit-task-hint-textarea-partial', number: ndx + 1, editable: hintParam.editable
-                    $("#edit-task-hint-#{ndx + 1} textarea").val hintParam.value
+                _.each hints, (hint, ndx) ->
+                    $editTaskHintList.append $ renderTemplate 'edit-task-hint-textarea-partial', number: ndx + 1
+                    $("#edit-task-hint-#{ndx + 1} textarea").val hint
 
             $editTaskAnswers.find('a[data-action="create-task-answer"]').on 'click', (e) =>
                 e.preventDefault()

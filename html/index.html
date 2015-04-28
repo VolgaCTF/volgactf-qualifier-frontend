@@ -270,13 +270,11 @@
                 <div id="edit-task-hint-<%- number %>">
                     <h5>
                         Hint #<%- number %>
-                        <% if (editable) { %>
                         <a href="#" data-action="remove-task-hint" data-number="<%- number %>">
                             <i class="glyphicon glyphicon-remove"></i>
                         </a>
-                        <% } %>
                     </h5>
-                    <textarea name="hints" class="form-control" required data-parsley-length="[2,1024]"<% print(editable ? '' : ' disabled'); %>></textarea>
+                    <textarea name="hints" class="form-control" required data-parsley-length="[2,1024]"></textarea>
                 </div>
             </script>
 
