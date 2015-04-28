@@ -754,7 +754,7 @@
             </script>
 
             <script type="text/x-template" data-name="scoreboard-table-row-partial">
-                <tr class="themis-scoreboard-row">
+                <tr class="themis-scoreboard-row<% print(highlight ? ' info': ''); %>">
                     <td><%- rank %></td>
                     <td><img class="themis-scoreboard-logo" src="//api.{{ domain }}/team/<%- id %>/logo"><%- name %></td>
                     <td><%- score %></td>

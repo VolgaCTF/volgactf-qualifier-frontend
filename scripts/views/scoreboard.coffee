@@ -37,6 +37,9 @@ define 'scoreboardView', ['jquery', 'underscore', 'view', 'renderTemplate', 'dat
             teamScores = contestProvider.getTeamScores()
             teams = teamProvider.getTeams()
 
+            identity = identityProvider.getIdentity()
+            isTeam = identity.role is 'team'
+
             teamScores.sort rankFunc
             _.each teamScores, (teamScore, ndx) ->
                 team = _.findWhere teams, id: teamScore.teamId
@@ -47,6 +50,7 @@ define 'scoreboardView', ['jquery', 'underscore', 'view', 'renderTemplate', 'dat
                         name: team.name
                         score: teamScore.score
                         updatedAt: if teamScore.updatedAt? then moment(teamScore.updatedAt).format('lll') else 'never'
+                        highlight: isTeam and team.id == identity.id
                     $tableBody.append $ renderTemplate 'scoreboard-table-row-partial', obj
 
         present: ->
