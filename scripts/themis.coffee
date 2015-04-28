@@ -122,6 +122,8 @@ define 'dataStore', ['jquery', 'underscore', 'metadataStore', 'teamModel'], ($, 
 #= include views/scoreboard.coffee
 #= include views/logs.coffee
 #= include views/not-found.coffee
+#= include views/restore.coffee
+#= include views/reset-password.coffee
 
 #= include controllers/state.coffee
 #= include controllers/view-base.coffee

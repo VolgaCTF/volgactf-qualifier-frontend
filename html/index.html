@@ -1245,6 +1245,64 @@
                 </div>
             </script>
 
+            <script type="text/x-template" data-name="restore-view">
+                <div class="container">
+                    <form class="themis-form-restore" method="POST" action="//api.{{ domain }}/team/restore">
+                        <h2>Restore password</h2>
+                        <div class="alert alert-warning">
+                            <span class="glyphicon glyphicon-alert"></span>&nbsp;If you have already requested password reset, please wait 10-15 minutes for email to be sent.
+                        </div>
+                        <label for="restore-email" class="sr-only">Email</label>
+                        <input type="email" id="restore-email" name="email" class="form-control" placeholder="Email" required autofocus>
+                        <div class="submit-error">
+                            <p class="text-danger"></p>
+                        </div>
+                        <button class="btn btn-lg btn-primary btn-block" type="submit">Restore</button>
+                    </form>
+                    <div class="themis-alert-restore">
+                        <div class="col-sm-offset-3 col-sm-9">
+                            <h2>Restore password</h2>
+                        </div>
+                        <div class="col-sm-12 alert alert-success">
+                            You will receive a email with further instructions.
+                        </div>
+                    </div>
+                </div>
+            </script>
+
+            <script type="text/x-template" data-name="reset-password-view">
+                <div class="container">
+                    <form class="themis-form-reset" method="POST" action="//api.{{ domain }}/team/reset-password">
+                        <h2>Reset password</h2>
+                        <label for="reset-password" class="sr-only">Password</label>
+                        <input type="password" id="reset-password" name="password" class="form-control" placeholder="Password" required minlength="6" maxlength="40" pattern="^[A-Za-z0-9\x5b\x5d\x28\x29\x7b\x7d\x7e\x60\x21\x40\x23\x24\x25\x5e\x26\x2a\x2d\x5f\x3d\x2b\x27\x22\x3a\x3b\x7c\x2f\x5c\x2e\x2c\x3f\x3c\x3e]+$">
+                        <label for="reset-password-confirm" class="sr-only">Confirm password</label>
+                        <input type="password" id="reset-password-confirm" class="form-control" placeholder="Confirm password" required minlength="6" maxlength="40" pattern="^[A-Za-z0-9\x5b\x5d\x28\x29\x7b\x7d\x7e\x60\x21\x40\x23\x24\x25\x5e\x26\x2a\x2d\x5f\x3d\x2b\x27\x22\x3a\x3b\x7c\x2f\x5c\x2e\x2c\x3f\x3c\x3e]+$" data-parsley-equalto="#reset-password">
+                        <div class="submit-error">
+                            <p class="text-danger"></p>
+                        </div>
+                        <button class="btn btn-lg btn-primary btn-block" type="submit">Reset</button>
+                    </form>
+                    <div class="themis-reset-error">
+                        <div class="col-sm-offset-3 col-sm-9">
+                            <h2>Restore password</h2>
+                        </div>
+                        <div class="col-sm-12 alert alert-danger">
+                            Invalid reset password URL!
+                        </div>
+                    </div>
+                    <div class="themis-reset-success">
+                        <div class="col-sm-offset-3 col-sm-9">
+                            <h2>Restore password</h2>
+                        </div>
+                        <div class="col-sm-12 alert alert-success">
+                            Password has been successfully reset! Now you can <a href="/signin" data-push-history>sign in</a> to your account.
+                        </div>
+                    </div>
+                </div>
+            </script>
+
+
             <script type="text/x-template" data-name="signin-view">
                 <div class="container">
                     <form class="themis-form-signin" method="POST" action="//api.{{ domain }}/team/signin">
@@ -1257,6 +1315,9 @@
                             <p class="text-danger"></p>
                         </div>
                         <button class="btn btn-lg btn-primary btn-block" type="submit"><span class="glyphicon glyphicon-log-in"></span>&nbsp;Sign in</button>
+                        <div>
+                            <p class="text-center"><a href="/restore" data-push-history>Forgot password?</a></p>
+                        </div>
                     </form>
                 </div>
             </script>
