@@ -12,6 +12,7 @@ uglify = require 'gulp-uglify'
 minifyCSS = require 'gulp-minify-css'
 minifyHTML = require 'gulp-minify-html'
 include = require 'gulp-include'
+rev = require 'gulp-rev'
 
 paths =
     scripts: [
@@ -30,6 +31,9 @@ paths =
         'bower_components/eonasdan-bootstrap-datetimepicker/src/js/bootstrap-datetimepicker.js'
         'scripts/themis.coffee'
     ]
+    app_scripts: [
+        'scripts/themis.coffee'
+    ]
     fonts: [
         'bower_components/bootstrap/dist/fonts/*.eot'
         'bower_components/bootstrap/dist/fonts/*.svg'
@@ -40,6 +44,8 @@ paths =
     stylesheets: [
         'bower_components/bootstrap/dist/css/bootstrap.css'
         'bower_components/eonasdan-bootstrap-datetimepicker/build/css/bootstrap-datetimepicker.css'
+    ]
+    app_stylesheets: [
         'stylesheets/themis.sass'
     ]
     html: [
@@ -53,17 +59,29 @@ isProduction = ->
 isCoffee = (file) ->
     path.extname(file.path) is '.coffee'
 
+isBusted = (file) ->
+    false
+
 gulp.task 'clean_scripts', (callback) ->
     del ['public/cdn/js/*'], callback
 
 gulp.task 'scripts', ['clean_scripts'], ->
     gulp.src paths.scripts
         .pipe plumber()
-        .pipe include()
-        .pipe gulpIf isCoffee, coffee()
         .pipe gulpIf isProduction, uglify()
         .pipe gulp.dest 'public/cdn/js'
 
+gulp.task 'app_scripts', ['clean_scripts'], ->
+    gulp.src paths.app_scripts
+        .pipe plumber()
+        .pipe include()
+        .pipe coffee()
+        .pipe gulpIf isProduction, uglify()
+        .pipe gulp.dest 'public/cdn/js'
+        .pipe rev()
+        .pipe gulp.dest 'public/cdn/js'
+        .pipe rev.manifest base: 'public', merge: yes
+        .pipe gulp.dest 'public'
 
 isSass = (file) ->
     path.extname(file.path) is '.sass'
@@ -73,9 +91,19 @@ gulp.task 'clean_stylesheets', (callback) ->
 
 gulp.task 'stylesheets', ['clean_stylesheets'], ->
     gulp.src paths.stylesheets
-        .pipe gulpIf isSass, sass indentedSyntax: yes, errLogToConsole: yes
         .pipe gulpIf isProduction, minifyCSS()
         .pipe gulp.dest 'public/cdn/css'
+
+
+gulp.task 'app_stylesheets', ['clean_stylesheets'], ->
+    gulp.src paths.app_stylesheets
+        .pipe sass indentedSyntax: yes, errLogToConsole: yes
+        .pipe gulpIf isProduction, minifyCSS()
+        .pipe gulp.dest 'public/cdn/css'
+        .pipe rev()
+        .pipe gulp.dest 'public/cdn/css'
+        .pipe rev.manifest base: 'public', merge: yes
+        .pipe gulp.dest 'public'
 
 
 gulp.task 'clean_fonts', (callback) ->
@@ -92,6 +120,11 @@ gulp.task 'clean_html', (callback) ->
 gulp.task 'html', ['clean_html'], ->
     try
         opts = yaml.safeLoad fs.readFileSync './opts.yml', 'utf8'
+        cachebusting = JSON.parse fs.readFileSync './rev-manifest.json', 'utf8'
+        opts.cachebusting =
+            themis:
+                js: cachebusting['themis.js']
+                css: cachebusting['themis.css']
     catch e
         console.log e
         opts = {}
@@ -101,14 +134,16 @@ gulp.task 'html', ['clean_html'], ->
         .pipe gulpIf isProduction, minifyHTML()
         .pipe gulp.dest 'public/html'
 
-gulp.task 'default', ['html', 'stylesheets', 'scripts', 'fonts']
+gulp.task 'default', ['html', 'stylesheets', 'scripts', 'fonts', 'app_scripts', 'app_stylesheets']
 
 gulp.task 'watch', ->
     extraScripts = [
         'scripts/**/*.coffee'
     ]
 
-    gulp.watch paths.html, ['html']
-    gulp.watch paths.stylesheets, ['stylesheets']
-    gulp.watch paths.scripts.concat(extraScripts), ['scripts']
-    gulp.watch paths.fonts, ['fonts']
+    gulp.watch paths.html, ['default']
+    gulp.watch paths.stylesheets, ['default']
+    gulp.watch paths.scripts.concat(extraScripts), ['default']
+    gulp.watch paths.fonts, ['default']
+    gulp.watch paths.app_scripts, ['default']
+    gulp.watch paths.app_stylesheets, ['default']

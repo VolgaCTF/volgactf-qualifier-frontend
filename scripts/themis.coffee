@@ -305,6 +305,6 @@ define 'navigationBar', ['jquery', 'underscore', 'renderTemplate', 'metadataStor
     new NavigationBar()
 
 
-define 'themis', ['jquery', 'stateController', 'viewController', 'bootstrap'], ($, stateController, viewController) ->
+require ['jquery', 'stateController', 'viewController', 'bootstrap'], ($, stateController, viewController) ->
     $(document).ready ->
         stateController.init viewController
