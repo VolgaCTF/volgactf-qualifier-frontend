@@ -138,6 +138,8 @@ define 'statusBar', ['jquery', 'underscore', 'renderTemplate', 'dataStore', 'mom
             @$timerContainer = null
 
             @onUpdateContest = null
+            @onUpdateTeamScore = null
+
             @timerInterval = null
 
         initUpdateContestModal: ->
@@ -223,6 +225,18 @@ define 'statusBar', ['jquery', 'underscore', 'renderTemplate', 'dataStore', 'mom
             if contest.isFinished()
                 @$timerContainer.html renderTemplate 'contest-timer-finished', finishesAt: moment(contest.finishesAt).format('lll'), interval: moment(contest.finishesAt).fromNow()
 
+        renderContestScore: ->
+            @$scoreContainer.empty()
+            identity = identityProvider.getIdentity()
+            return unless identity.role is 'team'
+            teamScores = contestProvider.getTeamScores()
+            teamScore = _.findWhere teamScores, teamId: identity.id
+            if teamScore?
+                teamScores.sort contestProvider.teamRankFunc
+                teamNdx = _.findIndex teamScores, (teamScore) -> teamScore.teamId is identity.id
+
+                @$scoreContainer.html renderTemplate 'contest-score', teamRank: teamNdx + 1, teamScore: teamScore.score
+
         present: ->
             @$container = $ '#themis-statusbar'
             @$container.html renderTemplate 'statusbar-view'
@@ -232,7 +246,13 @@ define 'statusBar', ['jquery', 'underscore', 'renderTemplate', 'dataStore', 'mom
             @$timerContainer = $ '#themis-contest-timer'
             @renderContestTimer()
 
-            if identityProvider.getIdentity().role == 'admin'
+            identity = identityProvider.getIdentity()
+
+            @$scoreContainer = $ '#themis-contest-score'
+            if identity.role == 'team'
+                @renderContestScore()
+
+            if identity.role == 'admin'
                 @initUpdateContestModal()
 
             @onUpdateContest = (e) =>
@@ -248,10 +268,20 @@ define 'statusBar', ['jquery', 'underscore', 'renderTemplate', 'dataStore', 'mom
             contestProvider.subscribe()
             contestProvider.on 'updateContest', @onUpdateContest
 
+            if identity.role == 'team'
+                @onUpdateTeamScore = (teamScore) =>
+                    @renderContestScore()
+                    false
+
+                contestProvider.on 'updateTeamScore', @onUpdateTeamScore
+
         dismiss: ->
             if @onUpdateContest?
                 contestProvider.off 'updateContest', @onUpdateContest
                 @onUpdateContest = null
+            if @onUpdateTeamScore?
+                contestProvider.off 'updateTeamScore', @onUpdateTeamScore
+                @onUpdateTeamScore = null
             contestProvider.unsubscribe()
 
             if @timerInterval
@@ -262,6 +292,8 @@ define 'statusBar', ['jquery', 'underscore', 'renderTemplate', 'dataStore', 'mom
                 @$container.empty()
                 @$container = null
             @$stateContainer = null
+            @$timerContainer = null
+            @$scoreContainer = null
 
 
     new StatusBar()

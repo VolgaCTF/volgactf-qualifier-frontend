@@ -59,8 +59,6 @@ isProduction = ->
 isCoffee = (file) ->
     path.extname(file.path) is '.coffee'
 
-isBusted = (file) ->
-    false
 
 gulp.task 'clean_scripts', (callback) ->
     del ['public/cdn/js/*'], callback
@@ -80,8 +78,8 @@ gulp.task 'app_scripts', ['clean_scripts'], ->
         .pipe gulp.dest 'public/cdn/js'
         .pipe rev()
         .pipe gulp.dest 'public/cdn/js'
-        .pipe rev.manifest base: 'public', merge: yes
-        .pipe gulp.dest 'public'
+        .pipe rev.manifest 'manifest.json'
+        .pipe gulp.dest 'public/cdn/js'
 
 isSass = (file) ->
     path.extname(file.path) is '.sass'
@@ -102,8 +100,8 @@ gulp.task 'app_stylesheets', ['clean_stylesheets'], ->
         .pipe gulp.dest 'public/cdn/css'
         .pipe rev()
         .pipe gulp.dest 'public/cdn/css'
-        .pipe rev.manifest base: 'public', merge: yes
-        .pipe gulp.dest 'public'
+        .pipe rev.manifest 'manifest.json'
+        .pipe gulp.dest 'public/cdn/css'
 
 
 gulp.task 'clean_fonts', (callback) ->
@@ -117,14 +115,16 @@ gulp.task 'fonts', ['clean_fonts'], ->
 gulp.task 'clean_html', (callback) ->
     del ['public/html/*'], callback
 
-gulp.task 'html', ['clean_html'], ->
+
+gulp.task 'html', ['clean_html', 'stylesheets', 'scripts', 'fonts', 'app_scripts', 'app_stylesheets'], ->
     try
         opts = yaml.safeLoad fs.readFileSync './opts.yml', 'utf8'
-        cachebusting = JSON.parse fs.readFileSync './rev-manifest.json', 'utf8'
+        cachebusting_js = JSON.parse fs.readFileSync './public/cdn/js/manifest.json', 'utf8'
+        cachebusting_css = JSON.parse fs.readFileSync './public/cdn/css/manifest.json', 'utf8'
         opts.cachebusting =
             themis:
-                js: cachebusting['themis.js']
-                css: cachebusting['themis.css']
+                js: cachebusting_js['themis.js']
+                css: cachebusting_css['themis.css']
     catch e
         console.log e
         opts = {}
@@ -134,7 +134,7 @@ gulp.task 'html', ['clean_html'], ->
         .pipe gulpIf isProduction, minifyHTML()
         .pipe gulp.dest 'public/html'
 
-gulp.task 'default', ['html', 'stylesheets', 'scripts', 'fonts', 'app_scripts', 'app_stylesheets']
+gulp.task 'default', ['html']
 
 gulp.task 'watch', ->
     extraScripts = [

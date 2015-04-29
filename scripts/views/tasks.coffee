@@ -789,7 +789,7 @@ define 'tasksView', ['jquery', 'underscore', 'view', 'renderTemplate', 'dataStor
                     navigationBar.present active: 'tasks'
 
                     if isTeam
-                        promise = $.when taskProvider.fetchTaskPreviews(), taskCategoryProvider.fetchTaskCategories(), contestProvider.fetchTeamTaskProgressEntries()
+                        promise = $.when taskProvider.fetchTaskPreviews(), taskCategoryProvider.fetchTaskCategories(), contestProvider.fetchTeamTaskProgressEntries(), contestProvider.fetchTeamScores()
                     else if isSupervisor
                         promise = $.when taskProvider.fetchTaskPreviews(), taskCategoryProvider.fetchTaskCategories(), contestProvider.fetchTeamTaskProgressEntries(), teamProvider.fetchTeams()
                     else

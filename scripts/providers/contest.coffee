@@ -18,6 +18,26 @@ define 'contestProvider', ['jquery', 'underscore', 'EventEmitter', 'dataStore', 
         getTeamScores: ->
             @teamScores
 
+        teamRankFunc: (a, b) ->
+            if a.score > b.score
+                return -1
+            else if a.score < b.score
+                return 1
+            else
+                if a.updatedAt? and b.updatedAt?
+                    if a.updatedAt.getTime() < b.updatedAt.getTime()
+                        return -1
+                    else if a.updatedAt.getTime() > b.updatedAt.getTime()
+                        return 1
+                    else
+                        return 0
+                else if a.updatedAt? and not b.updatedAt?
+                    return -1
+                else if not a.updatedAt? and b.updatedAt?
+                    return 1
+                else
+                    return 0
+
         getTeamTaskProgressEntries: ->
             @teamTaskProgressEntries
 
