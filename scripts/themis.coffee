@@ -58,6 +58,7 @@ require.config
 #= include models/post.coffee
 #= include models/team-task-progress.coffee
 #= include models/task-full.coffee
+#= include models/log.coffee
 
 
 define 'dataStore', ['jquery', 'underscore', 'metadataStore', 'teamModel'], ($, _, metadataStore, TeamModel) ->
@@ -111,6 +112,7 @@ define 'dataStore', ['jquery', 'underscore', 'metadataStore', 'teamModel'], ($, 
 #= include providers/task.coffee
 #= include providers/contest.coffee
 #= include providers/team.coffee
+#= include providers/log.coffee
 
 #= include views/base.coffee
 #= include views/signup.coffee

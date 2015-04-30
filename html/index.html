@@ -934,7 +934,8 @@
                         <h1>Logs</h1>
                     </header>
                     <section>
-                        <p class="lead">Not implemented yet.</p>
+                        <div id="themis-logs">
+                        </div>
                     </section>
                 </div>
             </script>
@@ -1390,6 +1391,24 @@
                         <p class="lead">We are really sorry, but the contest has finished.</p>
                     </section>
                 </div>
+            </script>
+
+            <script type="text/x-template" data-name="log-entry-1">
+                <p>
+                    <span><%- createdAt %></span>&nbsp;&nbsp;
+                    <span class="text-danger">
+                        Team <strong><%- team.name %></strong> has provided wrong answer <mark><%- answer %></mark> for task <strong><%- task.title %></strong>
+                    </span>
+                </p>
+            </script>
+
+            <script type="text/x-template" data-name="log-entry-2">
+                <p>
+                    <span><%- createdAt %></span>&nbsp;&nbsp;
+                    <span class="text-success">
+                        Team <strong><%- team.name %></strong> has solved task <strong><%- task.title %></strong> and earned <strong><%- task.value %></strong> points!
+                    </span>
+                </p>
             </script>
 
             <script type="text/x-template" data-name="verify-email-view">
