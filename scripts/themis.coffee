@@ -137,6 +137,7 @@ define 'statusBar', ['jquery', 'underscore', 'renderTemplate', 'dataStore', 'mom
             @$container = null
             @$stateContainer = null
             @$timerContainer = null
+            @$realtimeContainer = null
 
             @onUpdateContest = null
             @onUpdateTeamScore = null
@@ -147,6 +148,9 @@ define 'statusBar', ['jquery', 'underscore', 'renderTemplate', 'dataStore', 'mom
             @reloadTeamScore = no
             @reloadTeamScoreInterval = null
             @renderingTeamScore = no
+
+            @realtimeControlInterval = null
+            @onRealtimeControl = null
 
         initUpdateContestModal: ->
             $updateContestModal = $ '#update-contest-modal'
@@ -243,6 +247,17 @@ define 'statusBar', ['jquery', 'underscore', 'renderTemplate', 'dataStore', 'mom
 
                 @$scoreContainer.html renderTemplate 'contest-score', teamRank: teamNdx + 1, teamScore: teamScore.score
 
+        renderRealtimeState: ->
+            @$realtimeContainer.empty()
+            state = null
+            if dataStore.supportsRealtime()
+                state = if dataStore.getRealtimeProvider().readyState == 2 then 'offline' else 'online'
+            else
+                state = 'not-supported'
+            @$realtimeContainer.html renderTemplate 'contest-realtime-state', state: state
+            $state = @$realtimeContainer.find 'span'
+            $state.tooltip()
+
         present: ->
             @$container = $ '#themis-statusbar'
             @$container.html renderTemplate 'statusbar-view'
@@ -291,6 +306,14 @@ define 'statusBar', ['jquery', 'underscore', 'renderTemplate', 'dataStore', 'mom
 
                 @reloadTeamScoreInterval = setInterval @onReloadTeamScore, 1000
 
+            @$realtimeContainer = $ '#themis-realtime-state'
+            @renderRealtimeState()
+
+            @onRealtimeControl = =>
+                @renderRealtimeState()
+
+            @realtimeControlInterval = setInterval @onRealtimeControl, 10000
+
         dismiss: ->
             if @onUpdateContest?
                 contestProvider.off 'updateContest', @onUpdateContest
@@ -308,6 +331,10 @@ define 'statusBar', ['jquery', 'underscore', 'renderTemplate', 'dataStore', 'mom
             if @timerInterval
                 clearInterval @timerInterval
                 @timerInterval = null
+
+            if @onRealtimeControl?
+                clearInterval @realtimeControlInterval
+                @onRealtimeControl = null
 
             if @$container?.length
                 @$container.empty()

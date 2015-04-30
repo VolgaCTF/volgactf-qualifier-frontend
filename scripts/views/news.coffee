@@ -213,7 +213,7 @@ define 'newsView', ['jquery', 'underscore', 'view', 'renderTemplate', 'dataStore
                             navigationBar.present active: 'news'
                             statusBar.present()
 
-                            @$main.html renderTemplate 'news-view', identity: identity, supportsRealtime: dataStore.supportsRealtime()
+                            @$main.html renderTemplate 'news-view', identity: identity
                             $section = @$main.find 'section'
 
                             if _.contains ['admin', 'manager'], identity.role
