@@ -1,4 +1,5 @@
 require.config
+    waitSeconds: 20
     paths:
         jquery: [
             'http://code.jquery.com/jquery-2.1.3.min'
