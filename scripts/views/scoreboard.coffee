@@ -5,6 +5,11 @@ define 'scoreboardView', ['jquery', 'underscore', 'view', 'renderTemplate', 'dat
 
             @onUpdateTeamScore = null
 
+            @onReloadScoreboard = null
+            @reloadScoreboard = no
+            @reloadScoreboardInterval = null
+            @renderingScoreboard = no
+
             @urlRegex = /^\/scoreboard$/
 
         getTitle: ->
@@ -54,9 +59,19 @@ define 'scoreboardView', ['jquery', 'underscore', 'view', 'renderTemplate', 'dat
                     @renderScoreboard()
 
                     @onUpdateTeamScore = (teamScore) =>
-                        @renderScoreboard()
+                        @reloadScoreboard = yes
                         false
                     contestProvider.on 'updateTeamScore', @onUpdateTeamScore
+
+                    @onReloadScoreboard = =>
+                        if not @reloadScoreboard or @renderingScoreboard
+                            return
+                        @renderingScoreboard = yes
+                        @renderScoreboard()
+                        @reloadScoreboard = no
+                        @renderingScoreboard = no
+
+                    @reloadScoreboardInterval = setInterval @onReloadScoreboard, 1000
                 .fail =>
                     navigationBar.present()
                     @$main.html renderTemplate 'internal-error-view'
@@ -68,6 +83,12 @@ define 'scoreboardView', ['jquery', 'underscore', 'view', 'renderTemplate', 'dat
             if @onUpdateTeamScore?
                 contestProvider.off 'updateTeamScore', @onUpdateTeamScore
                 @onUpdateTeamScore = null
+
+            if @reloadScoreboardInterval?
+                clearInterval @reloadScoreboardInterval
+                @reloadScoreboardInterval = null
+                @renderingScoreboard = no
+                @reloadScoreboard = no
 
             @$main.empty()
             @$main = null

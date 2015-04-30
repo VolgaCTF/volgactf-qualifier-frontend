@@ -143,6 +143,11 @@ define 'statusBar', ['jquery', 'underscore', 'renderTemplate', 'dataStore', 'mom
 
             @timerInterval = null
 
+            @onReloadTeamScore = null
+            @reloadTeamScore = no
+            @reloadTeamScoreInterval = null
+            @renderingTeamScore = no
+
         initUpdateContestModal: ->
             $updateContestModal = $ '#update-contest-modal'
             $updateContestModal.modal
@@ -226,7 +231,7 @@ define 'statusBar', ['jquery', 'underscore', 'renderTemplate', 'dataStore', 'mom
             if contest.isFinished()
                 @$timerContainer.html renderTemplate 'contest-timer-finished', finishesAt: moment(contest.finishesAt).format('lll'), interval: moment(contest.finishesAt).fromNow()
 
-        renderContestScore: ->
+        renderTeamScore: ->
             @$scoreContainer.empty()
             identity = identityProvider.getIdentity()
             return unless identity.role is 'team'
@@ -251,7 +256,7 @@ define 'statusBar', ['jquery', 'underscore', 'renderTemplate', 'dataStore', 'mom
 
             @$scoreContainer = $ '#themis-contest-score'
             if identity.role == 'team'
-                @renderContestScore()
+                @renderTeamScore()
 
             if identity.role == 'admin'
                 @initUpdateContestModal()
@@ -271,10 +276,20 @@ define 'statusBar', ['jquery', 'underscore', 'renderTemplate', 'dataStore', 'mom
 
             if identity.role == 'team'
                 @onUpdateTeamScore = (teamScore) =>
-                    @renderContestScore()
+                    @reloadTeamScore = yes
                     false
 
                 contestProvider.on 'updateTeamScore', @onUpdateTeamScore
+
+                @onReloadTeamScore = =>
+                    if not @reloadTeamScore or @renderingTeamScore
+                        return
+                    @renderingTeamScore = yes
+                    @renderTeamScore()
+                    @reloadTeamScore = no
+                    @renderingTeamScore = no
+
+                @reloadTeamScoreInterval = setInterval @onReloadTeamScore, 1000
 
         dismiss: ->
             if @onUpdateContest?
@@ -283,6 +298,11 @@ define 'statusBar', ['jquery', 'underscore', 'renderTemplate', 'dataStore', 'mom
             if @onUpdateTeamScore?
                 contestProvider.off 'updateTeamScore', @onUpdateTeamScore
                 @onUpdateTeamScore = null
+            if @onReloadTeamScore?
+                clearInterval @reloadTeamScoreInterval
+                @onReloadTeamScore = null
+                @renderingTeamScore = no
+                @reloadTeamScore = no
             contestProvider.unsubscribe()
 
             if @timerInterval
