@@ -19,6 +19,7 @@
     "parsleyjs": "~2.0.7",
     "markdown-it": "~4.1.0",
     "moment": "~2.9.0",
-    "eonasdan-bootstrap-datetimepicker": "~4.7.14"
+    "eonasdan-bootstrap-datetimepicker": "~4.7.14",
+    "animate.css": "~3.2.6"
   }
 }

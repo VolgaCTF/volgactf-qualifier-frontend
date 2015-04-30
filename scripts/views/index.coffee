@@ -9,6 +9,14 @@ define 'indexView', ['jquery', 'view', 'renderTemplate', 'dataStore', 'navigatio
 
         present: ->
             @$main = $ '#main'
+            @$main.html renderTemplate 'loading-view'
+
+            # fakeLoad = ->
+            #     promise = $.Deferred()
+            #     resolvePromise = ->
+            #         promise.resolve()
+            #     setTimeout resolvePromise, 5000
+            #     promise
 
             $
                 .when identityProvider.fetchIdentity()

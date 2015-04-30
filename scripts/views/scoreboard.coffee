@@ -35,33 +35,28 @@ define 'scoreboardView', ['jquery', 'underscore', 'view', 'renderTemplate', 'dat
 
         present: ->
             @$main = $ '#main'
+            @$main.html renderTemplate 'loading-view'
 
             $
-                .when identityProvider.fetchIdentity()
-                .done (identity) =>
+                .when identityProvider.fetchIdentity(), contestProvider.fetchContest(), teamProvider.fetchTeams(), contestProvider.fetchTeamScores()
+                .done (identity, contest, teams, teamScores) =>
+                    if dataStore.supportsRealtime()
+                        dataStore.connectRealtime()
+
                     identityProvider.subscribe()
                     @$main.html renderTemplate 'scoreboard-view', identity: identity
-                    $
-                        .when contestProvider.fetchContest(), teamProvider.fetchTeams(), contestProvider.fetchTeamScores()
-                        .done (contest, teams, teamScores) =>
-                            if dataStore.supportsRealtime()
-                                dataStore.connectRealtime()
 
-                            teamProvider.subscribe()
+                    teamProvider.subscribe()
 
-                            navigationBar.present active: 'scoreboard'
-                            statusBar.present()
+                    navigationBar.present active: 'scoreboard'
+                    statusBar.present()
 
-                            @renderScoreboard()
+                    @renderScoreboard()
 
-                            @onUpdateTeamScore = (teamScore) =>
-                                @renderScoreboard()
-                                false
-                            contestProvider.on 'updateTeamScore', @onUpdateTeamScore
-                        .fail =>
-                            navigationBar.present()
-                            @$main.html renderTemplate 'internal-error-view'
-
+                    @onUpdateTeamScore = (teamScore) =>
+                        @renderScoreboard()
+                        false
+                    contestProvider.on 'updateTeamScore', @onUpdateTeamScore
                 .fail =>
                     navigationBar.present()
                     @$main.html renderTemplate 'internal-error-view'

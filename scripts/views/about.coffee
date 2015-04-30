@@ -9,18 +9,29 @@ define 'aboutView', ['jquery', 'view', 'renderTemplate', 'dataStore', 'navigatio
 
         present: ->
             @$main = $ '#main'
+            @$main.html renderTemplate 'loading-view'
 
             $
-                .when identityProvider.fetchIdentity(), contestProvider.fetchContest()
-                .done (identity, contest) =>
-                    @$main.html renderTemplate 'about-view', identity: identity
-                    identityProvider.subscribe()
+                .when identityProvider.fetchIdentity()
+                .done (identity) =>
+                    if identity.role is 'team'
+                        promise = $.when contestProvider.fetchContest(), contestProvider.fetchTeamScores()
+                    else
+                        promise = $.when contestProvider.fetchContest()
 
-                    if dataStore.supportsRealtime()
-                        dataStore.connectRealtime()
+                    promise
+                        .done (contest) =>
+                            @$main.html renderTemplate 'about-view', identity: identity
+                            identityProvider.subscribe()
 
-                    navigationBar.present active: 'about'
-                    statusBar.present()
+                            if dataStore.supportsRealtime()
+                                dataStore.connectRealtime()
+
+                            navigationBar.present active: 'about'
+                            statusBar.present()
+                        .fail (err) ->
+                            navigationBar.present()
+                            $main.html renderTemplate 'internal-error-view'
                 .fail (err) ->
                     navigationBar.present()
                     $main.html renderTemplate 'internal-error-view'

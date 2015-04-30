@@ -194,28 +194,33 @@ define 'newsView', ['jquery', 'underscore', 'view', 'renderTemplate', 'dataStore
 
         present: ->
             @$main = $ '#main'
+            @$main.html renderTemplate 'loading-view'
 
             $
-                .when identityProvider.fetchIdentity(), contestProvider.fetchContest()
-                .done (identity, contest) =>
-                    identityProvider.subscribe()
-                    if dataStore.supportsRealtime()
-                        dataStore.connectRealtime()
+                .when identityProvider.fetchIdentity()
+                .done (identity) =>
+                    if identity.role is 'team'
+                        promise = $.when contestProvider.fetchContest(), postProvider.fetchPosts(), contestProvider.fetchTeamScores()
+                    else
+                        promise = $.when contestProvider.fetchContest(), postProvider.fetchPosts()
 
-                    navigationBar.present active: 'news'
-                    statusBar.present()
+                    promise
+                        .done (contest) =>
+                            identityProvider.subscribe()
+                            if dataStore.supportsRealtime()
+                                dataStore.connectRealtime()
 
-                    @$main.html renderTemplate 'news-view', identity: identity, supportsRealtime: dataStore.supportsRealtime()
-                    $section = @$main.find 'section'
+                            navigationBar.present active: 'news'
+                            statusBar.present()
 
-                    if _.contains ['admin', 'manager'], identity.role
-                        @initCreatePostModal()
-                        @initRemovePostModal()
-                        @initEditPostModal()
+                            @$main.html renderTemplate 'news-view', identity: identity, supportsRealtime: dataStore.supportsRealtime()
+                            $section = @$main.find 'section'
 
-                    $
-                        .when postProvider.fetchPosts()
-                        .done =>
+                            if _.contains ['admin', 'manager'], identity.role
+                                @initCreatePostModal()
+                                @initRemovePostModal()
+                                @initEditPostModal()
+
                             @renderPosts()
 
                             @onCreatePost = (post) =>
@@ -234,9 +239,9 @@ define 'newsView', ['jquery', 'underscore', 'view', 'renderTemplate', 'dataStore
                             postProvider.on 'createPost', @onCreatePost
                             postProvider.on 'updatePost', @onUpdatePost
                             postProvider.on 'removePost', @onRemovePost
-
-                        .fail (err) ->
-                            $section.html $('<p></p>').addClass('lead text-danger').text err
+                        .fail (err) =>
+                            navigationBar.present()
+                            @$main.html renderTemplate 'internal-error-view'
                 .fail (err) =>
                     navigationBar.present()
                     @$main.html renderTemplate 'internal-error-view'

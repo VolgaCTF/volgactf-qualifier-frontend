@@ -9,6 +9,7 @@
         <link rel="stylesheet" href="//cdn.{{ domain }}/css/bootstrap.css">
         <link rel="stylesheet" href="//cdn.{{ domain }}/css/bootstrap-datetimepicker.css">
         <link rel="stylesheet" href="//cdn.{{ domain }}/css/{{#cachebusting}}{{#themis}}{{ css }}{{/themis}}{{/cachebusting}}">
+        <link rel="stylesheet" href="//cdn.{{ domain }}/css/animate.css">
 
         <script type="text/x-metadata" data-name="domain-api" data-value="//api.{{ domain }}"></script>
         <script type="text/x-metadata" data-name="event-title" data-value="{{#event}}{{ title }}{{/event}}"></script>
@@ -52,6 +53,14 @@
         </footer>
 
         <div class="themis-partials">
+            <script type="text/x-template" data-name="loading-view">
+                <div class="container">
+                    <div class="text-center">
+                        <p id="themis-view-loader" class="animated pulse infinite">Loading, please wait</p>
+                    </div>
+                </div>
+            </script>
+
             <script type="text/x-template" data-name="navbar-view">
                 <ul class="nav navbar-nav">
                     <li class="<% print((active === 'teams') ? 'active' : ''); %>"><a href="/teams" data-push-history>Teams</a></li>

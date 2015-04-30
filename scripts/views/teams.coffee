@@ -28,25 +28,28 @@ define 'teamsView', ['jquery', 'underscore', 'view', 'renderTemplate', 'dataStor
 
         present: ->
             @$main = $ '#main'
+            @$main.html renderTemplate 'loading-view'
 
             $
-                .when identityProvider.fetchIdentity(), contestProvider.fetchContest()
-                .done (identity, contest) =>
-                    identityProvider.subscribe()
-                    if dataStore.supportsRealtime()
-                        dataStore.connectRealtime()
+                .when identityProvider.fetchIdentity()
+                .done (identity) =>
+                    if identity.role is 'team'
+                        promise = $.when contestProvider.fetchContest(), teamProvider.fetchTeams(), contestProvider.fetchTeamScores()
+                    else
+                        promise = $.when contestProvider.fetchContest(), teamProvider.fetchTeams()
 
-                    navigationBar.present active: 'teams'
-                    statusBar.present()
+                    promise
+                        .done =>
+                            identityProvider.subscribe()
+                            if dataStore.supportsRealtime()
+                                dataStore.connectRealtime()
 
-                    @$main.html renderTemplate 'teams-view', identity: identity
-                    $section = @$main.find 'section'
+                            navigationBar.present active: 'teams'
+                            statusBar.present()
 
-                    $
-                        .when teamProvider.fetchTeams()
-                        .fail (err) ->
-                            $section.html $('<p></p>').addClass('lead text-danger').text err
-                        .done (teams) =>
+                            @$main.html renderTemplate 'teams-view', identity: identity
+                            $section = @$main.find 'section'
+
                             @renderTeams()
 
                             teamProvider.subscribe()
@@ -75,9 +78,13 @@ define 'teamsView', ['jquery', 'underscore', 'view', 'renderTemplate', 'dataStor
                                     false
 
                                 teamProvider.on 'changeTeamEmail', @onChangeTeamEmail
+                        .fail (err) =>
+                            navigationBar.present()
+                            @$main.html renderTemplate 'internal-error-view'
                 .fail (err) =>
                     navigationBar.present()
                     @$main.html renderTemplate 'internal-error-view'
+
 
         dismiss: ->
             identityProvider.unsubscribe()

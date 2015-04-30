@@ -772,6 +772,7 @@ define 'tasksView', ['jquery', 'underscore', 'view', 'renderTemplate', 'dataStor
 
         present: ->
             @$main = $ '#main'
+            @$main.html renderTemplate 'loading-view'
 
             $
                 .when identityProvider.fetchIdentity(), contestProvider.fetchContest()
