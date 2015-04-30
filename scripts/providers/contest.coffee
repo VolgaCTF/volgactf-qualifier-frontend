@@ -18,6 +18,26 @@ define 'contestProvider', ['jquery', 'underscore', 'EventEmitter', 'dataStore', 
         getTeamScores: ->
             @teamScores
 
+        teamRankFunc: (a, b) ->
+            if a.score > b.score
+                return -1
+            else if a.score < b.score
+                return 1
+            else
+                if a.updatedAt? and b.updatedAt?
+                    if a.updatedAt.getTime() < b.updatedAt.getTime()
+                        return -1
+                    else if a.updatedAt.getTime() > b.updatedAt.getTime()
+                        return 1
+                    else
+                        return 0
+                else if a.updatedAt? and not b.updatedAt?
+                    return -1
+                else if not a.updatedAt? and b.updatedAt?
+                    return 1
+                else
+                    return 0
+
         getTeamTaskProgressEntries: ->
             @teamTaskProgressEntries
 
@@ -56,12 +76,14 @@ define 'contestProvider', ['jquery', 'underscore', 'EventEmitter', 'dataStore', 
             teamProvider.on 'qualifyTeam', @onQualifyTeam
 
             identity = identityProvider.getIdentity()
-            if identity.role is 'team'
+            if _.contains ['admin', 'manager', 'team'], identity.role
                 @onCreateTeamTaskProgress = (e) =>
                     options = JSON.parse e.data
                     teamTaskProgress = new TeamTaskProgressModel options
                     ndx = _.findIndex @teamTaskProgressEntries, teamId: options.teamId, taskId: options.taskId
-                    if teamTaskProgress.teamId == identity.id and ndx == -1
+                    if ndx == -1
+                        if identity.role == 'team' and identity.id != options.teamId
+                            return
                         @teamTaskProgressEntries.push teamTaskProgress
                         @trigger 'createTeamTaskProgress', [teamTaskProgress]
 

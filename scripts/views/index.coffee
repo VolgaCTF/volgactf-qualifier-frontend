@@ -11,16 +11,26 @@ define 'indexView', ['jquery', 'view', 'renderTemplate', 'dataStore', 'navigatio
             @$main = $ '#main'
 
             $
-                .when identityProvider.fetchIdentity(), contestProvider.fetchContest()
-                .done (identity, contest) =>
-                    identityProvider.subscribe()
-                    if dataStore.supportsRealtime()
-                        dataStore.connectRealtime()
+                .when identityProvider.fetchIdentity()
+                .done (identity) =>
+                    if identity.role is 'team'
+                        promise = $.when contestProvider.fetchContest(), contestProvider.fetchTeamScores()
+                    else
+                        promise = $.when contestProvider.fetchContest()
 
-                    navigationBar.present()
-                    statusBar.present()
+                    promise
+                        .done (contest) =>
+                            identityProvider.subscribe()
+                            if dataStore.supportsRealtime()
+                                dataStore.connectRealtime()
 
-                    @$main.html renderTemplate 'index-view', identity: identity, contest: contest
+                            navigationBar.present()
+                            statusBar.present()
+
+                            @$main.html renderTemplate 'index-view', identity: identity, contest: contest
+                        .fail (err) =>
+                            navigationBar.present()
+                            @$main.html renderTemplate 'internal-error-view'
                 .fail (err) =>
                     navigationBar.present()
                     @$main.html renderTemplate 'internal-error-view'

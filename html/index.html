@@ -8,12 +8,12 @@
 
         <link rel="stylesheet" href="//cdn.{{ domain }}/css/bootstrap.css">
         <link rel="stylesheet" href="//cdn.{{ domain }}/css/bootstrap-datetimepicker.css">
-        <link rel="stylesheet" href="//cdn.{{ domain }}/css/themis.css">
+        <link rel="stylesheet" href="//cdn.{{ domain }}/css/{{#cachebusting}}{{#themis}}{{ css }}{{/themis}}{{/cachebusting}}">
 
         <script type="text/x-metadata" data-name="domain-api" data-value="//api.{{ domain }}"></script>
         <script type="text/x-metadata" data-name="event-title" data-value="{{#event}}{{ title }}{{/event}}"></script>
 
-        <script src="//cdn.{{ domain }}/js/require.js" data-main='//cdn.{{ domain }}/js/themis.js'></script>
+        <script src="//cdn.{{ domain }}/js/require.js" data-main='//cdn.{{ domain }}/js/{{#cachebusting}}{{#themis}}{{ js }}{{/themis}}{{/cachebusting}}'></script>
     </head>
     <body>
         <div class="navbar navbar-default navbar-static-top themis-navbar">
@@ -31,7 +31,6 @@
                 </div>
             </div>
         </div>
-
         <div id="themis-statusbar">
         </div>
 
@@ -131,6 +130,14 @@
 
             <script type="text/x-template" data-name="teams-view">
                 <div class="container">
+                    <% if (identity.role === 'team' && !('emailConfirmed' in identity && identity.emailConfirmed)) { %>
+                    <div class="alert alert-warning" role="alert">
+                        <p>
+                            <span class="glyphicon glyphicon-alert"></span>&nbsp;You need to confirm your email address.
+                            Please check your inbox and follow the provided instructions.
+                        </p>
+                    </div>
+                    <% } %>
                     <header>
                         <h2>Teams<span class="themis-team-count"></span></h2>
                     </header>
@@ -270,13 +277,11 @@
                 <div id="edit-task-hint-<%- number %>">
                     <h5>
                         Hint #<%- number %>
-                        <% if (editable) { %>
                         <a href="#" data-action="remove-task-hint" data-number="<%- number %>">
                             <i class="glyphicon glyphicon-remove"></i>
                         </a>
-                        <% } %>
                     </h5>
-                    <textarea name="hints" class="form-control" required data-parsley-length="[2,1024]"<% print(editable ? '' : ' disabled'); %>></textarea>
+                    <textarea name="hints" class="form-control" required data-parsley-length="[2,1024]"></textarea>
                 </div>
             </script>
 
@@ -327,7 +332,7 @@
             </script>
 
             <script type="text/x-template" data-name="task-category-partial">
-                <span class="label label-default" title="<%- description %>"><span class="glyphicon glyphicon-tag"></span>&nbsp;<%- title %></span>
+                <span class="label label-default" title="<%- description %>"><span class="glyphicon glyphicon-tag"></span>&nbsp;<%- title %></span>&nbsp;
             </script>
 
             <script type="text/x-template" data-name="task-content-partial">
@@ -423,6 +428,14 @@
 
             <script type="text/x-template" data-name="tasks-view">
                 <div class="container">
+                    <% if (identity.role === 'team' && !('emailConfirmed' in identity && identity.emailConfirmed)) { %>
+                    <div class="alert alert-warning" role="alert">
+                        <p>
+                            <span class="glyphicon glyphicon-alert"></span>&nbsp;You need to confirm your email address.
+                            Please check your inbox and follow the provided instructions.
+                        </p>
+                    </div>
+                    <% } %>
                     <header>
                         <h1>Tasks</h1>
                     </header>
@@ -740,7 +753,7 @@
             </script>
 
             <script type="text/x-template" data-name="scoreboard-table-row-partial">
-                <tr class="themis-scoreboard-row">
+                <tr class="themis-scoreboard-row<% print(highlight ? ' info': ''); %>">
                     <td><%- rank %></td>
                     <td><img class="themis-scoreboard-logo" src="//api.{{ domain }}/team/<%- id %>/logo"><%- name %></td>
                     <td><%- score %></td>
@@ -750,6 +763,14 @@
 
             <script type="text/x-template" data-name="scoreboard-view">
                 <div class="container">
+                    <% if (identity.role === 'team' && !('emailConfirmed' in identity && identity.emailConfirmed)) { %>
+                    <div class="alert alert-warning" role="alert">
+                        <p>
+                            <span class="glyphicon glyphicon-alert"></span>&nbsp;You need to confirm your email address.
+                            Please check your inbox and follow the provided instructions.
+                        </p>
+                    </div>
+                    <% } %>
                     <header>
                         <h1>Scoreboard</h1>
                     </header>
@@ -793,9 +814,33 @@
                 <% } %>
             </script>
 
+            <script type="text/x-template" data-name="contest-timer-initial">
+                <span class="text-info">Contest starts on <%- startsAt %> (<%- interval %>)</span>
+            </script>
+
+            <script type="text/x-template" data-name="contest-timer-started">
+                <span class="text-info">Contest finishes on <%- finishesAt %> (<%- interval %>)</span>
+            </script>
+
+            <script type="text/x-template" data-name="contest-timer-paused">
+                <span class="text-info">Contest is paused</span>
+            </script>
+
+            <script type="text/x-template" data-name="contest-timer-finished">
+                <span class="text-info">Contest has finished on <%- finishesAt %> (<%- interval %>)</span>
+            </script>
+
+            <script type="text/x-template" data-name="contest-score">
+                <span class="text-info"><em>rank:</em>&nbsp;<strong><%- teamRank %></strong></span>&nbsp;&nbsp;&nbsp;<span class="text-info"><em>points:</em>&nbsp;<strong><%- teamScore %></strong></span>
+            </script>
+
             <script type="text/x-template" data-name="statusbar-view">
                 <div class="container themis-statusbar">
-                    <div id="themis-contest-state">
+                    <div class="col-md-3 themis-no-side-gaps" id="themis-contest-state">
+                    </div>
+                    <div class="col-md-6 themis-no-side-gaps" id="themis-contest-timer">
+                    </div>
+                    <div class="col-md-3 themis-no-side-gaps" id="themis-contest-score">
                     </div>
                 </div>
 
@@ -928,6 +973,14 @@
 
             <script type="text/x-template" data-name="news-view">
                 <div class="container">
+                    <% if (identity.role === 'team' && !('emailConfirmed' in identity && identity.emailConfirmed)) { %>
+                    <div class="alert alert-warning" role="alert">
+                        <p>
+                            <span class="glyphicon glyphicon-alert"></span>&nbsp;You need to confirm your email address.
+                            Please check your inbox and follow the provided instructions.
+                        </p>
+                    </div>
+                    <% } %>
                     <header>
                         <h1>News</h1>
                         <% if (!supportsRealtime) { %>
@@ -1054,6 +1107,14 @@
 
             <script type="text/x-template" data-name="about-view">
                 <div class="container">
+                    <% if (identity.role === 'team' && !('emailConfirmed' in identity && identity.emailConfirmed)) { %>
+                    <div class="alert alert-warning" role="alert">
+                        <p>
+                            <span class="glyphicon glyphicon-alert"></span>&nbsp;You need to confirm your email address.
+                            Please check your inbox and follow the provided instructions.
+                        </p>
+                    </div>
+                    <% } %>
                     <header>
                         <h1>About</h1>
                     </header>
@@ -1166,16 +1227,15 @@
                         </p>
                     </div>
                     <% } else if (identity.role === 'team') { %>
-                    <h1>Welcome back!</h1>
                     <% if (!('emailConfirmed' in identity) || !identity.emailConfirmed) { %>
                     <div class="alert alert-warning" role="alert">
                         <p>
                             <span class="glyphicon glyphicon-alert"></span>&nbsp;You need to confirm your email address.
                             Please check your inbox and follow the provided instructions.
                         </p>
-                        <p>Note, if you do not confirm your email address, the team account will be deleted in several days.</p>
                     </div>
                     <% } %>
+                    <h1>Welcome back!</h1>
                     <p class="lead">
                         VolgaCTF 2015 Quals will start on May 1 at 19:00 SAMT/15:00 UTC.
                         Now, you can check out the <a href="/news" data-push-history>news</a> or <a href="/profile/<%- identity.id %>" data-push-history>edit your profile</a>.
@@ -1187,6 +1247,64 @@
                     <% } %>
                 </div>
             </script>
+
+            <script type="text/x-template" data-name="restore-view">
+                <div class="container">
+                    <form class="themis-form-restore" method="POST" action="//api.{{ domain }}/team/restore">
+                        <h2>Restore password</h2>
+                        <div class="alert alert-warning">
+                            <span class="glyphicon glyphicon-alert"></span>&nbsp;If you have already requested password reset, please wait 10-15 minutes for email to be sent.
+                        </div>
+                        <label for="restore-email" class="sr-only">Email</label>
+                        <input type="email" id="restore-email" name="email" class="form-control" placeholder="Email" required autofocus>
+                        <div class="submit-error">
+                            <p class="text-danger"></p>
+                        </div>
+                        <button class="btn btn-lg btn-primary btn-block" type="submit">Restore</button>
+                    </form>
+                    <div class="themis-alert-restore">
+                        <div class="col-sm-offset-3 col-sm-9">
+                            <h2>Restore password</h2>
+                        </div>
+                        <div class="col-sm-12 alert alert-success">
+                            You will receive a email with further instructions.
+                        </div>
+                    </div>
+                </div>
+            </script>
+
+            <script type="text/x-template" data-name="reset-password-view">
+                <div class="container">
+                    <form class="themis-form-reset" method="POST" action="//api.{{ domain }}/team/reset-password">
+                        <h2>Reset password</h2>
+                        <label for="reset-password" class="sr-only">Password</label>
+                        <input type="password" id="reset-password" name="password" class="form-control" placeholder="Password" required minlength="6" maxlength="40" pattern="^[A-Za-z0-9\x5b\x5d\x28\x29\x7b\x7d\x7e\x60\x21\x40\x23\x24\x25\x5e\x26\x2a\x2d\x5f\x3d\x2b\x27\x22\x3a\x3b\x7c\x2f\x5c\x2e\x2c\x3f\x3c\x3e]+$">
+                        <label for="reset-password-confirm" class="sr-only">Confirm password</label>
+                        <input type="password" id="reset-password-confirm" class="form-control" placeholder="Confirm password" required minlength="6" maxlength="40" pattern="^[A-Za-z0-9\x5b\x5d\x28\x29\x7b\x7d\x7e\x60\x21\x40\x23\x24\x25\x5e\x26\x2a\x2d\x5f\x3d\x2b\x27\x22\x3a\x3b\x7c\x2f\x5c\x2e\x2c\x3f\x3c\x3e]+$" data-parsley-equalto="#reset-password">
+                        <div class="submit-error">
+                            <p class="text-danger"></p>
+                        </div>
+                        <button class="btn btn-lg btn-primary btn-block" type="submit">Reset</button>
+                    </form>
+                    <div class="themis-reset-error">
+                        <div class="col-sm-offset-3 col-sm-9">
+                            <h2>Restore password</h2>
+                        </div>
+                        <div class="col-sm-12 alert alert-danger">
+                            Invalid reset password URL!
+                        </div>
+                    </div>
+                    <div class="themis-reset-success">
+                        <div class="col-sm-offset-3 col-sm-9">
+                            <h2>Restore password</h2>
+                        </div>
+                        <div class="col-sm-12 alert alert-success">
+                            Password has been successfully reset! Now you can <a href="/signin" data-push-history>sign in</a> to your account.
+                        </div>
+                    </div>
+                </div>
+            </script>
+
 
             <script type="text/x-template" data-name="signin-view">
                 <div class="container">
@@ -1200,6 +1318,9 @@
                             <p class="text-danger"></p>
                         </div>
                         <button class="btn btn-lg btn-primary btn-block" type="submit"><span class="glyphicon glyphicon-log-in"></span>&nbsp;Sign in</button>
+                        <div>
+                            <p class="text-center"><a href="/restore" data-push-history>Forgot password?</a></p>
+                        </div>
                     </form>
                 </div>
             </script>

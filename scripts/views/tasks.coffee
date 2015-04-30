@@ -301,22 +301,20 @@ define 'tasksView', ['jquery', 'underscore', 'view', 'renderTemplate', 'dataStor
             $editTaskHints.find('a[data-action="create-task-hint"]').on 'click', (e) =>
                 e.preventDefault()
                 number = $editTaskHintList.children().length + 1
-                $editTaskHintList.append $ renderTemplate 'edit-task-hint-textarea-partial', number: number, editable: yes
+                $editTaskHintList.append $ renderTemplate 'edit-task-hint-textarea-partial', number: number
 
             $editTaskHintList.on 'click', 'a[data-action="remove-task-hint"]', (e) =>
                 e.preventDefault()
                 number = $(e.target).closest('a').attr('data-number')
                 $("#edit-task-hint-#{number}").remove()
-                hintParams = []
+                hints = []
                 $editTaskHintList.find('textarea[name="hints"]').each ->
                     $el = $ @
-                    hintParams.push
-                        value: $el.val()
-                        editable: not $el.prop 'disabled'
+                    hints.push $el.val()
                 $editTaskHintList.empty()
-                _.each hintParams, (hintParam, ndx) ->
-                    $editTaskHintList.append $ renderTemplate 'edit-task-hint-textarea-partial', number: ndx + 1, editable: hintParam.editable
-                    $("#edit-task-hint-#{ndx + 1} textarea").val hintParam.value
+                _.each hints, (hint, ndx) ->
+                    $editTaskHintList.append $ renderTemplate 'edit-task-hint-textarea-partial', number: ndx + 1
+                    $("#edit-task-hint-#{ndx + 1} textarea").val hint
 
             $editTaskAnswers.find('a[data-action="create-task-answer"]').on 'click', (e) =>
                 e.preventDefault()
@@ -473,11 +471,16 @@ define 'tasksView', ['jquery', 'underscore', 'view', 'renderTemplate', 'dataStor
                             hints: hintsFormatted
                         $reviseTaskContents.html renderTemplate 'task-content-partial', options
 
-                        teamTaskProgressEntries = contestProvider.getTeamTaskProgressEntries()
-                        teamIds = _.map _.where(teamTaskProgressEntries, taskId: task.id), (entry) -> entry.teamId
-                        teams = _.filter teamProvider.getTeams(), (team) ->
-                            _.contains teamIds, team.id
-                        teamNames = _.map teams, (team) -> team.name
+                        teamTaskProgressEntries = _.where contestProvider.getTeamTaskProgressEntries(), taskId: task.id
+                        sortedTeamTaskProgressEntries = _.sortBy teamTaskProgressEntries, 'createdAt'
+                        teamIds = _.map sortedTeamTaskProgressEntries, (entry) -> entry.teamId
+                        teamNames = []
+                        teams = teamProvider.getTeams()
+                        for teamId in teamIds
+                            team = _.findWhere teams, id: teamId
+                            if team?
+                                teamNames.push team.name
+
                         $reviseTaskStatus.html renderTemplate 'revise-task-status-partial', teamNames: teamNames
 
                         $reviseTaskSubmitButton.prop 'disabled', no
@@ -594,28 +597,33 @@ define 'tasksView', ['jquery', 'underscore', 'view', 'renderTemplate', 'dataStor
                 $submitTaskSubmitButton.prop 'disabled', yes
 
                 taskPreview = _.findWhere taskProvider.getTaskPreviews(), id: taskId
-                if taskPreview?
-                    taskIsSolved = no
-                    taskProgress = null
-                    identity = identityProvider.getIdentity()
-                    contest = contestProvider.getContest()
-                    if identity.role is 'team'
+                identity = identityProvider.getIdentity()
+
+                if taskPreview? and identity.role is 'team'
+                    if identity.emailConfirmed
+                        taskIsSolved = no
+                        taskProgress = null
+                        contest = contestProvider.getContest()
                         taskProgress = _.findWhere contestProvider.getTeamTaskProgressEntries(), teamId: identity.id, taskId: taskId
                         if taskProgress?
                             taskIsSolved = yes
 
-                    if taskPreview.isOpened() and not taskIsSolved and contest.isStarted()
-                        $submitTaskAnswerGroup.show()
-                        $submitTaskSubmitButton.show()
+                        if taskPreview.isOpened() and not taskIsSolved and contest.isStarted()
+                            $submitTaskAnswerGroup.show()
+                            $submitTaskSubmitButton.show()
+                        else
+                            $submitTaskAnswerGroup.hide()
+                            $submitTaskSubmitButton.hide()
+                            if contest.isPaused() and not taskIsSolved
+                                $submitTaskSubmitError.text 'Contest has been paused.'
+                            if taskPreview.isClosed()
+                                $submitTaskSubmitError.text 'Task has been closed by the event organizers.'
+                            if taskIsSolved
+                                $submitTaskSubmitSuccess.text "Your team has solved the task on #{moment(taskProgress.createdAt).format 'lll' }!"
                     else
+                        $submitTaskSubmitError.text 'You should confirm your email before you can submit an answer to the task.'
                         $submitTaskAnswerGroup.hide()
                         $submitTaskSubmitButton.hide()
-                        if contest.isPaused() and not taskIsSolved
-                            $submitTaskSubmitError.text 'Contest has been paused.'
-                        if taskPreview.isClosed()
-                            $submitTaskSubmitError.text 'Task has been closed by the event organizers.'
-                        if taskIsSolved
-                            $submitTaskSubmitSuccess.text "Your team has solved the task on #{moment(taskProgress.createdAt).format 'lll' }!"
                 else
                     $submitTaskAnswerGroup.hide()
                     $submitTaskSubmitButton.hide()
@@ -781,7 +789,7 @@ define 'tasksView', ['jquery', 'underscore', 'view', 'renderTemplate', 'dataStor
                     navigationBar.present active: 'tasks'
 
                     if isTeam
-                        promise = $.when taskProvider.fetchTaskPreviews(), taskCategoryProvider.fetchTaskCategories(), contestProvider.fetchTeamTaskProgressEntries()
+                        promise = $.when taskProvider.fetchTaskPreviews(), taskCategoryProvider.fetchTaskCategories(), contestProvider.fetchTeamTaskProgressEntries(), contestProvider.fetchTeamScores()
                     else if isSupervisor
                         promise = $.when taskProvider.fetchTaskPreviews(), taskCategoryProvider.fetchTaskCategories(), contestProvider.fetchTeamTaskProgressEntries(), teamProvider.fetchTeams()
                     else

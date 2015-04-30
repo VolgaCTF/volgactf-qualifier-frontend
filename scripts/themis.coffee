@@ -122,6 +122,8 @@ define 'dataStore', ['jquery', 'underscore', 'metadataStore', 'teamModel'], ($, 
 #= include views/scoreboard.coffee
 #= include views/logs.coffee
 #= include views/not-found.coffee
+#= include views/restore.coffee
+#= include views/reset-password.coffee
 
 #= include controllers/state.coffee
 #= include controllers/view-base.coffee
@@ -133,8 +135,12 @@ define 'statusBar', ['jquery', 'underscore', 'renderTemplate', 'dataStore', 'mom
         constructor: ->
             @$container = null
             @$stateContainer = null
+            @$timerContainer = null
 
             @onUpdateContest = null
+            @onUpdateTeamScore = null
+
+            @timerInterval = null
 
         initUpdateContestModal: ->
             $updateContestModal = $ '#update-contest-modal'
@@ -205,8 +211,31 @@ define 'statusBar', ['jquery', 'underscore', 'renderTemplate', 'dataStore', 'mom
             contest = contestProvider.getContest()
             contestObj =
                 state: contest.state
-                startsAt: moment(contest.startsAt).format 'lll'
             @$stateContainer.html renderTemplate 'contest-state-partial', contest: contestObj, identity: identityProvider.getIdentity()
+
+        renderContestTimer: ->
+            @$timerContainer.empty()
+            contest = contestProvider.getContest()
+            if contest.isInitial() and contest.startsAt?
+                @$timerContainer.html renderTemplate 'contest-timer-initial', startsAt: moment(contest.startsAt).format('lll'), interval: moment(contest.startsAt).fromNow()
+            if contest.isStarted()
+                @$timerContainer.html renderTemplate 'contest-timer-started', finishesAt: moment(contest.finishesAt).format('lll'), interval: moment(contest.finishesAt).fromNow()
+            if contest.isPaused()
+                @$timerContainer.html renderTemplate 'contest-timer-paused'
+            if contest.isFinished()
+                @$timerContainer.html renderTemplate 'contest-timer-finished', finishesAt: moment(contest.finishesAt).format('lll'), interval: moment(contest.finishesAt).fromNow()
+
+        renderContestScore: ->
+            @$scoreContainer.empty()
+            identity = identityProvider.getIdentity()
+            return unless identity.role is 'team'
+            teamScores = contestProvider.getTeamScores()
+            teamScore = _.findWhere teamScores, teamId: identity.id
+            if teamScore?
+                teamScores.sort contestProvider.teamRankFunc
+                teamNdx = _.findIndex teamScores, (teamScore) -> teamScore.teamId is identity.id
+
+                @$scoreContainer.html renderTemplate 'contest-score', teamRank: teamNdx + 1, teamScore: teamScore.score
 
         present: ->
             @$container = $ '#themis-statusbar'
@@ -214,26 +243,57 @@ define 'statusBar', ['jquery', 'underscore', 'renderTemplate', 'dataStore', 'mom
             @$stateContainer = $ '#themis-contest-state'
             @renderContestState()
 
-            if identityProvider.getIdentity().role == 'admin'
+            @$timerContainer = $ '#themis-contest-timer'
+            @renderContestTimer()
+
+            identity = identityProvider.getIdentity()
+
+            @$scoreContainer = $ '#themis-contest-score'
+            if identity.role == 'team'
+                @renderContestScore()
+
+            if identity.role == 'admin'
                 @initUpdateContestModal()
 
             @onUpdateContest = (e) =>
                 @renderContestState()
+                @renderContestTimer()
                 false
+
+            onUpdateTimer = =>
+                @renderContestTimer()
+
+            @timerInterval = setInterval onUpdateTimer, 60000
 
             contestProvider.subscribe()
             contestProvider.on 'updateContest', @onUpdateContest
+
+            if identity.role == 'team'
+                @onUpdateTeamScore = (teamScore) =>
+                    @renderContestScore()
+                    false
+
+                contestProvider.on 'updateTeamScore', @onUpdateTeamScore
 
         dismiss: ->
             if @onUpdateContest?
                 contestProvider.off 'updateContest', @onUpdateContest
                 @onUpdateContest = null
+            if @onUpdateTeamScore?
+                contestProvider.off 'updateTeamScore', @onUpdateTeamScore
+                @onUpdateTeamScore = null
             contestProvider.unsubscribe()
+
+            if @timerInterval
+                clearInterval @timerInterval
+                @timerInterval = null
 
             if @$container?.length
                 @$container.empty()
                 @$container = null
             @$stateContainer = null
+            @$timerContainer = null
+            @$scoreContainer = null
 
 
     new StatusBar()
@@ -277,6 +337,6 @@ define 'navigationBar', ['jquery', 'underscore', 'renderTemplate', 'metadataStor
     new NavigationBar()
 
 
-define 'themis', ['jquery', 'stateController', 'viewController', 'bootstrap'], ($, stateController, viewController) ->
+require ['jquery', 'stateController', 'viewController', 'bootstrap'], ($, stateController, viewController) ->
     $(document).ready ->
         stateController.init viewController
