@@ -29,7 +29,6 @@ paths =
         'bower_components/markdown-it/dist/markdown-it.js'
         'bower_components/moment/moment.js'
         'bower_components/eonasdan-bootstrap-datetimepicker/src/js/bootstrap-datetimepicker.js'
-        'scripts/themis.coffee'
     ]
     app_scripts: [
         'scripts/themis.coffee'
