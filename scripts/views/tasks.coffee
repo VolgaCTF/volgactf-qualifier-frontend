@@ -57,6 +57,8 @@ define 'tasksView', ['jquery', 'underscore', 'view', 'renderTemplate', 'dataStor
                     headers: { 'X-CSRF-Token': identityProvider.getIdentity().token }
                     success: (responseText, textStatus, jqXHR) ->
                         $createTaskCategoryModal.modal 'hide'
+                        unless dataStore.connectedRealtime()
+                            window.location.reload()
                     error: (jqXHR, textStatus, errorThrown) ->
                         if jqXHR.responseJSON?
                             $createTaskCategorySubmitError.text jqXHR.responseJSON
@@ -107,6 +109,8 @@ define 'tasksView', ['jquery', 'underscore', 'view', 'renderTemplate', 'dataStor
                     headers: { 'X-CSRF-Token': identityProvider.getIdentity().token }
                     success: (responseText, textStatus, jqXHR) ->
                         $editTaskCategoryModal.modal 'hide'
+                        unless dataStore.connectedRealtime()
+                            window.location.reload()
                     error: (jqXHR, textStatus, errorThrown) ->
                         if jqXHR.responseJSON?
                             $editTaskCategorySubmitError.text jqXHR.responseJSON
@@ -137,6 +141,8 @@ define 'tasksView', ['jquery', 'underscore', 'view', 'renderTemplate', 'dataStor
                     .when taskCategoryProvider.removeTaskCategory taskCategoryId, identityProvider.getIdentity().token
                     .done ->
                         $removeTaskCategoryModal.modal 'hide'
+                        unless dataStore.connectedRealtime()
+                            window.location.reload()
                     .fail (err) ->
                         $removeTaskCategorySubmitError.text err
 
@@ -255,6 +261,8 @@ define 'tasksView', ['jquery', 'underscore', 'view', 'renderTemplate', 'dataStor
                     headers: { 'X-CSRF-Token': identityProvider.getIdentity().token }
                     success: (responseText, textStatus, jqXHR) ->
                         $createTaskModal.modal 'hide'
+                        unless dataStore.connectedRealtime()
+                            window.location.reload()
                     error: (jqXHR, textStatus, errorThrown) ->
                         if jqXHR.responseJSON?
                             $createTaskSubmitError.text jqXHR.responseJSON
@@ -415,6 +423,8 @@ define 'tasksView', ['jquery', 'underscore', 'view', 'renderTemplate', 'dataStor
                     headers: { 'X-CSRF-Token': identityProvider.getIdentity().token }
                     success: (responseText, textStatus, jqXHR) ->
                         $editTaskModal.modal 'hide'
+                        unless dataStore.connectedRealtime()
+                            window.location.reload()
                     error: (jqXHR, textStatus, errorThrown) ->
                         if jqXHR.responseJSON?
                             $editTaskSubmitError.text jqXHR.responseJSON
@@ -508,6 +518,8 @@ define 'tasksView', ['jquery', 'underscore', 'view', 'renderTemplate', 'dataStor
                         $reviseTaskSubmitSuccess.text 'Answer is correct!'
                         hideModal = ->
                             $reviseTaskModal.modal 'hide'
+                            unless dataStore.connectedRealtime()
+                                window.location.reload()
                         setTimeout hideModal, 1000
                     error: (jqXHR, textStatus, errorThrown) ->
                         if jqXHR.responseJSON?
@@ -539,6 +551,8 @@ define 'tasksView', ['jquery', 'underscore', 'view', 'renderTemplate', 'dataStor
                     .when taskProvider.openTask taskId, identityProvider.getIdentity().token
                     .done ->
                         $openTaskModal.modal 'hide'
+                        unless dataStore.connectedRealtime()
+                            window.location.reload()
                     .fail (err) ->
                         $openTaskSubmitError.text err
 
@@ -564,6 +578,8 @@ define 'tasksView', ['jquery', 'underscore', 'view', 'renderTemplate', 'dataStor
                     .when taskProvider.closeTask taskId, identityProvider.getIdentity().token
                     .done ->
                         $closeTaskModal.modal 'hide'
+                        unless dataStore.connectedRealtime()
+                            window.location.reload()
                     .fail (err) ->
                         $closeTaskSubmitError.text err
 
@@ -673,6 +689,8 @@ define 'tasksView', ['jquery', 'underscore', 'view', 'renderTemplate', 'dataStor
                         $submitTaskSubmitSuccess.text 'Answer is correct!'
                         hideModal = ->
                             $submitTaskModal.modal 'hide'
+                            unless dataStore.connectedRealtime()
+                                window.location.reload()
                         setTimeout hideModal, 1000
                     error: (jqXHR, textStatus, errorThrown) ->
                         if jqXHR.responseJSON?

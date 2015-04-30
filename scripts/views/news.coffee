@@ -55,6 +55,8 @@ define 'newsView', ['jquery', 'underscore', 'view', 'renderTemplate', 'dataStore
                     .when postProvider.removePost postId, identityProvider.getIdentity().token
                     .done ->
                         $removePostModal.modal 'hide'
+                        unless dataStore.connectedRealtime()
+                            window.location.reload()
                     .fail (err) ->
                         $removePostSubmitError.text err
 
@@ -115,6 +117,8 @@ define 'newsView', ['jquery', 'underscore', 'view', 'renderTemplate', 'dataStore
                     headers: { 'X-CSRF-Token': identityProvider.getIdentity().token }
                     success: (responseText, textStatus, jqXHR) ->
                         $createPostModal.modal 'hide'
+                        unless dataStore.connectedRealtime()
+                            window.location.reload()
                     error: (jqXHR, textStatus, errorThrown) ->
                         if jqXHR.responseJSON?
                             $createPostSubmitError.text jqXHR.responseJSON
@@ -184,6 +188,8 @@ define 'newsView', ['jquery', 'underscore', 'view', 'renderTemplate', 'dataStore
                     headers: { 'X-CSRF-Token': identityProvider.getIdentity().token }
                     success: (responseText, textStatus, jqXHR) ->
                         $editPostModal.modal 'hide'
+                        unless dataStore.connectedRealtime()
+                            window.location.reload()
                     error: (jqXHR, textStatus, errorThrown) ->
                         if jqXHR.responseJSON?
                             $editPostSubmitError.text jqXHR.responseJSON

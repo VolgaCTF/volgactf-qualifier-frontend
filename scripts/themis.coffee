@@ -86,6 +86,9 @@ define 'dataStore', ['jquery', 'underscore', 'metadataStore', 'teamModel'], ($, 
         supportsRealtime: ->
             window.EventSource?
 
+        connectedRealtime: ->
+            @supportsRealtime() and @eventSource? and @eventSource.readyState != 2
+
         connectRealtime: ->
             @eventSource = new window.EventSource "#{metadataStore.getMetadata 'domain-api' }/events", withCredentials: yes
 
@@ -209,6 +212,8 @@ define 'statusBar', ['jquery', 'underscore', 'renderTemplate', 'dataStore', 'mom
                     headers: { 'X-CSRF-Token': identityProvider.getIdentity().token }
                     success: (responseJSON, textStatus, jqXHR) ->
                         $updateContestModal.modal 'hide'
+                        unless dataStore.connectedRealtime()
+                            window.location.reload()
                     error: (jqXHR, textStatus, errorThrown) ->
                         if jqXHR.responseJSON?
                             $updateContestSubmitError.text jqXHR.responseJSON
@@ -251,7 +256,7 @@ define 'statusBar', ['jquery', 'underscore', 'renderTemplate', 'dataStore', 'mom
             @$realtimeContainer.empty()
             state = null
             if dataStore.supportsRealtime()
-                state = if dataStore.getRealtimeProvider().readyState == 2 then 'offline' else 'online'
+                state = if dataStore.connectedRealtime() then 'online' else 'offline'
             else
                 state = 'not-supported'
             @$realtimeContainer.html renderTemplate 'contest-realtime-state', state: state
