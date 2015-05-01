@@ -1,4 +1,5 @@
 require.config
+    waitSeconds: 20
     paths:
         jquery: [
             'http://code.jquery.com/jquery-2.1.3.min'
@@ -57,6 +58,7 @@ require.config
 #= include models/post.coffee
 #= include models/team-task-progress.coffee
 #= include models/task-full.coffee
+#= include models/log.coffee
 
 
 define 'dataStore', ['jquery', 'underscore', 'metadataStore', 'teamModel'], ($, _, metadataStore, TeamModel) ->
@@ -85,6 +87,9 @@ define 'dataStore', ['jquery', 'underscore', 'metadataStore', 'teamModel'], ($, 
         supportsRealtime: ->
             window.EventSource?
 
+        connectedRealtime: ->
+            @supportsRealtime() and @eventSource? and @eventSource.readyState != 2
+
         connectRealtime: ->
             @eventSource = new window.EventSource "#{metadataStore.getMetadata 'domain-api' }/events", withCredentials: yes
 
@@ -107,6 +112,7 @@ define 'dataStore', ['jquery', 'underscore', 'metadataStore', 'teamModel'], ($, 
 #= include providers/task.coffee
 #= include providers/contest.coffee
 #= include providers/team.coffee
+#= include providers/log.coffee
 
 #= include views/base.coffee
 #= include views/signup.coffee
@@ -136,11 +142,20 @@ define 'statusBar', ['jquery', 'underscore', 'renderTemplate', 'dataStore', 'mom
             @$container = null
             @$stateContainer = null
             @$timerContainer = null
+            @$realtimeContainer = null
 
             @onUpdateContest = null
             @onUpdateTeamScore = null
 
             @timerInterval = null
+
+            @onReloadTeamScore = null
+            @reloadTeamScore = no
+            @reloadTeamScoreInterval = null
+            @renderingTeamScore = no
+
+            @realtimeControlInterval = null
+            @onRealtimeControl = null
 
         initUpdateContestModal: ->
             $updateContestModal = $ '#update-contest-modal'
@@ -199,6 +214,8 @@ define 'statusBar', ['jquery', 'underscore', 'renderTemplate', 'dataStore', 'mom
                     headers: { 'X-CSRF-Token': identityProvider.getIdentity().token }
                     success: (responseJSON, textStatus, jqXHR) ->
                         $updateContestModal.modal 'hide'
+                        unless dataStore.connectedRealtime()
+                            window.location.reload()
                     error: (jqXHR, textStatus, errorThrown) ->
                         if jqXHR.responseJSON?
                             $updateContestSubmitError.text jqXHR.responseJSON
@@ -225,7 +242,7 @@ define 'statusBar', ['jquery', 'underscore', 'renderTemplate', 'dataStore', 'mom
             if contest.isFinished()
                 @$timerContainer.html renderTemplate 'contest-timer-finished', finishesAt: moment(contest.finishesAt).format('lll'), interval: moment(contest.finishesAt).fromNow()
 
-        renderContestScore: ->
+        renderTeamScore: ->
             @$scoreContainer.empty()
             identity = identityProvider.getIdentity()
             return unless identity.role is 'team'
@@ -236,6 +253,17 @@ define 'statusBar', ['jquery', 'underscore', 'renderTemplate', 'dataStore', 'mom
                 teamNdx = _.findIndex teamScores, (teamScore) -> teamScore.teamId is identity.id
 
                 @$scoreContainer.html renderTemplate 'contest-score', teamRank: teamNdx + 1, teamScore: teamScore.score
+
+        renderRealtimeState: ->
+            @$realtimeContainer.empty()
+            state = null
+            if dataStore.supportsRealtime()
+                state = if dataStore.connectedRealtime() then 'online' else 'offline'
+            else
+                state = 'not-supported'
+            @$realtimeContainer.html renderTemplate 'contest-realtime-state', state: state
+            $state = @$realtimeContainer.find 'span'
+            $state.tooltip()
 
         present: ->
             @$container = $ '#themis-statusbar'
@@ -250,7 +278,7 @@ define 'statusBar', ['jquery', 'underscore', 'renderTemplate', 'dataStore', 'mom
 
             @$scoreContainer = $ '#themis-contest-score'
             if identity.role == 'team'
-                @renderContestScore()
+                @renderTeamScore()
 
             if identity.role == 'admin'
                 @initUpdateContestModal()
@@ -270,10 +298,28 @@ define 'statusBar', ['jquery', 'underscore', 'renderTemplate', 'dataStore', 'mom
 
             if identity.role == 'team'
                 @onUpdateTeamScore = (teamScore) =>
-                    @renderContestScore()
+                    @reloadTeamScore = yes
                     false
 
                 contestProvider.on 'updateTeamScore', @onUpdateTeamScore
+
+                @onReloadTeamScore = =>
+                    if not @reloadTeamScore or @renderingTeamScore
+                        return
+                    @renderingTeamScore = yes
+                    @renderTeamScore()
+                    @reloadTeamScore = no
+                    @renderingTeamScore = no
+
+                @reloadTeamScoreInterval = setInterval @onReloadTeamScore, 1000
+
+            @$realtimeContainer = $ '#themis-realtime-state'
+            @renderRealtimeState()
+
+            @onRealtimeControl = =>
+                @renderRealtimeState()
+
+            @realtimeControlInterval = setInterval @onRealtimeControl, 10000
 
         dismiss: ->
             if @onUpdateContest?
@@ -282,11 +328,20 @@ define 'statusBar', ['jquery', 'underscore', 'renderTemplate', 'dataStore', 'mom
             if @onUpdateTeamScore?
                 contestProvider.off 'updateTeamScore', @onUpdateTeamScore
                 @onUpdateTeamScore = null
+            if @onReloadTeamScore?
+                clearInterval @reloadTeamScoreInterval
+                @onReloadTeamScore = null
+                @renderingTeamScore = no
+                @reloadTeamScore = no
             contestProvider.unsubscribe()
 
             if @timerInterval
                 clearInterval @timerInterval
                 @timerInterval = null
+
+            if @onRealtimeControl?
+                clearInterval @realtimeControlInterval
+                @onRealtimeControl = null
 
             if @$container?.length
                 @$container.empty()

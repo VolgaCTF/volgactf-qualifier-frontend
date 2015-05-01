@@ -9,6 +9,7 @@
         <link rel="stylesheet" href="//cdn.{{ domain }}/css/bootstrap.css">
         <link rel="stylesheet" href="//cdn.{{ domain }}/css/bootstrap-datetimepicker.css">
         <link rel="stylesheet" href="//cdn.{{ domain }}/css/{{#cachebusting}}{{#themis}}{{ css }}{{/themis}}{{/cachebusting}}">
+        <link rel="stylesheet" href="//cdn.{{ domain }}/css/animate.css">
 
         <script type="text/x-metadata" data-name="domain-api" data-value="//api.{{ domain }}"></script>
         <script type="text/x-metadata" data-name="event-title" data-value="{{#event}}{{ title }}{{/event}}"></script>
@@ -52,6 +53,14 @@
         </footer>
 
         <div class="themis-partials">
+            <script type="text/x-template" data-name="loading-view">
+                <div class="container">
+                    <div class="text-center">
+                        <p id="themis-view-loader" class="animated pulse infinite">Loading, please wait</p>
+                    </div>
+                </div>
+            </script>
+
             <script type="text/x-template" data-name="navbar-view">
                 <ul class="nav navbar-nav">
                     <li class="<% print((active === 'teams') ? 'active' : ''); %>"><a href="/teams" data-push-history>Teams</a></li>
@@ -335,6 +344,10 @@
                 <span class="label label-default" title="<%- description %>"><span class="glyphicon glyphicon-tag"></span>&nbsp;<%- title %></span>&nbsp;
             </script>
 
+            <script type="text/x-template" data-name="check-task-guest-error">
+                To view the task, you must be authorized. Please <a href="/signin">sign in</a>. If you have not registered yet, please <a href="/signup">sign up</a>.
+            </script>
+
             <script type="text/x-template" data-name="task-content-partial">
                 <div>
                     <header>
@@ -376,7 +389,7 @@
                                 <%- task.title %>
                                 &nbsp;
                                 <% if (identity.role === 'admin') { %>
-                                    <% if (!task.isClosed()) { %>
+                                    <% if (!task.isClosed() && !contest.isFinished()) { %>
                                     <a href="#" data-action="edit-task" data-toggle="modal" data-target="#edit-task-modal" data-task-id="<%- task.id %>"><span class="glyphicon glyphicon-pencil"></span></a>
                                     <% } %>
                                     <% if (contest.isStarted()) { %>
@@ -394,7 +407,7 @@
                         <% } else if (identity.role === 'team') { %>
                         <div class="panel-body" data-task-id="<%- task.id %>" data-toggle="modal" data-target="#submit-task-modal">
                         <% } else { %>
-                        <div class="panel-body">
+                        <div class="panel-body" data-task-id="<%- task.id %>" data-toggle="modal" data-target="#check-task-modal">
                         <% } %>
                             <div class="themis-task-value">
                                 <%- task.value %>
@@ -405,7 +418,7 @@
                         <% } else if (identity.role === 'team') { %>
                         <div class="panel-footer" data-task-id="<%- task.id %>" data-toggle="modal" data-target="#submit-task-modal">
                         <% } else { %>
-                        <div class="panel-footer">
+                        <div class="panel-footer" data-task-id="<%- task.id %>" data-toggle="modal" data-target="#check-task-modal">
                         <% } %>
                             <div class="themis-task-categories">
                                 <%= categoriesList %>
@@ -487,6 +500,42 @@
                             <div class="modal-footer">
                                 <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
                                 <button type="button" class="btn btn-primary" data-action="complete-submit-task">Submit</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <% } %>
+
+                <% if (identity.role === 'guest' || identity.role === 'team') { %>
+                <div class="modal fade" id="check-task-modal" tabindex="-1" role="dialog">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                                <h4 class="modal-title">Check task</h4>
+                            </div>
+                            <div class="modal-body">
+                                <div class="themis-task-contents">
+                                </div>
+                            </div>
+                            <div class="modal-body">
+                                <form method="POST">
+                                    <div class="form-group" id="check-task-answer-group">
+                                        <label for="check-task-answer" class="control-label">Answer</label>
+                                        <input type="text" class="form-control" id="check-task-answer" name="answer" required data-parsley-length="[2,256]">
+                                        <span class="help-block" id="check-task-status"></span>
+                                    </div>
+                                    <div class="submit-error">
+                                        <p class="text-danger"></p>
+                                    </div>
+                                    <div class="submit-success">
+                                        <p class="text-success"></p>
+                                    </div>
+                                </form>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                                <button type="button" class="btn btn-primary" data-action="complete-check-task">Check</button>
                             </div>
                         </div>
                     </div>
@@ -830,17 +879,39 @@
                 <span class="text-info">Contest has finished on <%- finishesAt %> (<%- interval %>)</span>
             </script>
 
+            <script type="text/x-template" data-name="contest-realtime-state">
+                <% if (state === 'online') { %>
+                    <span class="text-success" data-toggle="tooltip" data-placement="top" title="You are connected to a realtime stream update channel. You do not need to reload the page.">
+                        &#9679;&nbsp;Realtime stream online
+                    </span>
+                <% } else if (state === 'offline') { %>
+                    <span class="text-danger" data-toggle="tooltip" data-placement="top" title="Connection to realtime stream update channel has been closed. To get latest updates, you have to reload page manually.">
+                        &#9679;&nbsp;Realtime stream offline
+                    </span>
+                <% } else if (state === 'not-supported') { %>
+                    <span class="text-warning" data-toggle="tooltip" data-placement="top" title="Your browser does not support Server-Sent Events. To get latest updates, you have to reload page manually.">
+                        &#9679;&nbsp;Realtime stream not supported
+                    </span>
+                <% } %>
+            </script>
+
             <script type="text/x-template" data-name="contest-score">
                 <span class="text-info"><em>rank:</em>&nbsp;<strong><%- teamRank %></strong></span>&nbsp;&nbsp;&nbsp;<span class="text-info"><em>points:</em>&nbsp;<strong><%- teamScore %></strong></span>
             </script>
 
             <script type="text/x-template" data-name="statusbar-view">
                 <div class="container themis-statusbar">
-                    <div class="col-md-3 themis-no-side-gaps" id="themis-contest-state">
+                    <div class="row">
+                        <div class="col-md-3 themis-no-side-gaps" id="themis-contest-state">
+                        </div>
+                        <div class="col-md-6 themis-no-side-gaps" id="themis-contest-timer">
+                        </div>
+                        <div class="col-md-3 themis-no-side-gaps" id="themis-contest-score">
+                        </div>
                     </div>
-                    <div class="col-md-6 themis-no-side-gaps" id="themis-contest-timer">
-                    </div>
-                    <div class="col-md-3 themis-no-side-gaps" id="themis-contest-score">
+                    <div class="row">
+                        <div class="col-md-3 themis-no-side-gaps" id="themis-realtime-state">
+                        </div>
                     </div>
                 </div>
 
@@ -903,7 +974,8 @@
                         <h1>Logs</h1>
                     </header>
                     <section>
-                        <p class="lead">Not implemented yet.</p>
+                        <div id="themis-logs">
+                        </div>
                     </section>
                 </div>
             </script>
@@ -983,14 +1055,6 @@
                     <% } %>
                     <header>
                         <h1>News</h1>
-                        <% if (!supportsRealtime) { %>
-                        <div class="alert alert-warning" role="alert">
-                            <p>
-                                <span class="glyphicon glyphicon-alert"></span>&nbsp;
-                                Your browser does not support <a href="https://developer.mozilla.org/en-US/docs/Server-sent_events" target="_blank">Server-Sent events</a>, a technology which provides realtime updates from our servers. Please consider using the latest version of your browser.
-                            </p>
-                        </div>
-                        <% } %>
                         <% if (identity.role === 'admin' || identity.role === 'manager') { %>
                         <button type="button" class="btn btn-primary btn-xs" data-action="create-post" data-toggle="modal" data-target="#create-post-modal">
                             <i class="glyphicon glyphicon-plus"></i>&nbsp;Create
@@ -1236,14 +1300,41 @@
                     </div>
                     <% } %>
                     <h1>Welcome back!</h1>
+                    <% if (contest.isInitial()) { %>
                     <p class="lead">
                         VolgaCTF 2015 Quals will start on May 1 at 19:00 SAMT/15:00 UTC.
                         Now, you can check out the <a href="/news" data-push-history>news</a> or <a href="/profile/<%- identity.id %>" data-push-history>edit your profile</a>.
                     </p>
+                    <% } else if (contest.isStarted() || contest.isPaused()) { %>
+                    <p class="lead">
+                        VolgaCTF 2015 Quals contest has begun!
+                    </p>
+                    <ul class="lead list-unstyled">
+                        <li><a href="/news" data-push-history>Check out news</a></li>
+                        <li><a href="/scoreboard" data-push-history>View scoreboard</a></li>
+                        <li><a href="/tasks" data-push-history>Get tasks!</a></li>
+                    </ul>
+                    <% } else if (contest.isFinished()) { %>
+                    <p class="lead">
+                        VolgaCTF 2015 Quals contest has finished!
+                    </p>
+                    <ul class="lead list-unstyled">
+                        <li><a href="/scoreboard" data-push-history>View results scoreboard</a></li>
+                    </ul>
+                    <p class="lead">
+                        We hope you have enjoyed the <a href="/tasks" data-push-history>tasks</a>! See you the next year!
+                    </p>
+                    <% } %>
                     <% } else if (identity.role === 'manager' || identity.role === 'admin') { %>
                     <h1>Welcome back!</h1>
-                    <p class="lead">
-                        Now, you can check out the <a href="/news" data-push-history>news</a>.
+                    <ul class="lead list-unstyled">
+                        <li><a href="/news" data-push-history>News management</a></li>
+                        <li><a href="/scoreboard" data-push-history>View scoreboard</a></li>
+                        <% if (identity.role === 'admin') { %>
+                        <li><a href="/tasks" data-push-history>Task management</a></li>
+                        <% } %>
+                        <li><a href="/logs" data-push-history>Realtime logs</a></li>
+                    </ul>
                     <% } %>
                 </div>
             </script>
@@ -1367,6 +1458,24 @@
                         <p class="lead">We are really sorry, but the contest has finished.</p>
                     </section>
                 </div>
+            </script>
+
+            <script type="text/x-template" data-name="log-entry-1">
+                <p>
+                    <span><%- createdAt %></span>&nbsp;&nbsp;
+                    <span class="text-danger">
+                        Team <strong><%- team.name %></strong> has provided wrong answer <mark><%- answer %></mark> for task <strong><%- task.title %></strong>
+                    </span>
+                </p>
+            </script>
+
+            <script type="text/x-template" data-name="log-entry-2">
+                <p>
+                    <span><%- createdAt %></span>&nbsp;&nbsp;
+                    <span class="text-success">
+                        Team <strong><%- team.name %></strong> has solved task <strong><%- task.title %></strong> and earned <strong><%- task.value %></strong> points!
+                    </span>
+                </p>
             </script>
 
             <script type="text/x-template" data-name="verify-email-view">

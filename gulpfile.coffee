@@ -43,6 +43,7 @@ paths =
     stylesheets: [
         'bower_components/bootstrap/dist/css/bootstrap.css'
         'bower_components/eonasdan-bootstrap-datetimepicker/build/css/bootstrap-datetimepicker.css'
+        'bower_components/animate.css/animate.css'
     ]
     app_stylesheets: [
         'stylesheets/themis.sass'
