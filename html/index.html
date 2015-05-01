@@ -344,6 +344,10 @@
                 <span class="label label-default" title="<%- description %>"><span class="glyphicon glyphicon-tag"></span>&nbsp;<%- title %></span>&nbsp;
             </script>
 
+            <script type="text/x-template" data-name="check-task-guest-error">
+                To view the task, you must be authorized. Please <a href="/signin">sign in</a>. If you have not registered yet, please <a href="/signup">sign up</a>.
+            </script>
+
             <script type="text/x-template" data-name="task-content-partial">
                 <div>
                     <header>
@@ -385,7 +389,7 @@
                                 <%- task.title %>
                                 &nbsp;
                                 <% if (identity.role === 'admin') { %>
-                                    <% if (!task.isClosed()) { %>
+                                    <% if (!task.isClosed() && !contest.isFinished()) { %>
                                     <a href="#" data-action="edit-task" data-toggle="modal" data-target="#edit-task-modal" data-task-id="<%- task.id %>"><span class="glyphicon glyphicon-pencil"></span></a>
                                     <% } %>
                                     <% if (contest.isStarted()) { %>
@@ -403,7 +407,7 @@
                         <% } else if (identity.role === 'team') { %>
                         <div class="panel-body" data-task-id="<%- task.id %>" data-toggle="modal" data-target="#submit-task-modal">
                         <% } else { %>
-                        <div class="panel-body">
+                        <div class="panel-body" data-task-id="<%- task.id %>" data-toggle="modal" data-target="#check-task-modal">
                         <% } %>
                             <div class="themis-task-value">
                                 <%- task.value %>
@@ -414,7 +418,7 @@
                         <% } else if (identity.role === 'team') { %>
                         <div class="panel-footer" data-task-id="<%- task.id %>" data-toggle="modal" data-target="#submit-task-modal">
                         <% } else { %>
-                        <div class="panel-footer">
+                        <div class="panel-footer" data-task-id="<%- task.id %>" data-toggle="modal" data-target="#check-task-modal">
                         <% } %>
                             <div class="themis-task-categories">
                                 <%= categoriesList %>
@@ -496,6 +500,42 @@
                             <div class="modal-footer">
                                 <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
                                 <button type="button" class="btn btn-primary" data-action="complete-submit-task">Submit</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <% } %>
+
+                <% if (identity.role === 'guest' || identity.role === 'team') { %>
+                <div class="modal fade" id="check-task-modal" tabindex="-1" role="dialog">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                                <h4 class="modal-title">Check task</h4>
+                            </div>
+                            <div class="modal-body">
+                                <div class="themis-task-contents">
+                                </div>
+                            </div>
+                            <div class="modal-body">
+                                <form method="POST">
+                                    <div class="form-group" id="check-task-answer-group">
+                                        <label for="check-task-answer" class="control-label">Answer</label>
+                                        <input type="text" class="form-control" id="check-task-answer" name="answer" required data-parsley-length="[2,256]">
+                                        <span class="help-block" id="check-task-status"></span>
+                                    </div>
+                                    <div class="submit-error">
+                                        <p class="text-danger"></p>
+                                    </div>
+                                    <div class="submit-success">
+                                        <p class="text-success"></p>
+                                    </div>
+                                </form>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                                <button type="button" class="btn btn-primary" data-action="complete-check-task">Check</button>
                             </div>
                         </div>
                     </div>
@@ -1260,14 +1300,41 @@
                     </div>
                     <% } %>
                     <h1>Welcome back!</h1>
+                    <% if (contest.isInitial()) { %>
                     <p class="lead">
                         VolgaCTF 2015 Quals will start on May 1 at 19:00 SAMT/15:00 UTC.
                         Now, you can check out the <a href="/news" data-push-history>news</a> or <a href="/profile/<%- identity.id %>" data-push-history>edit your profile</a>.
                     </p>
+                    <% } else if (contest.isStarted() || contest.isPaused()) { %>
+                    <p class="lead">
+                        VolgaCTF 2015 Quals contest has begun!
+                    </p>
+                    <ul class="lead list-unstyled">
+                        <li><a href="/news" data-push-history>Check out news</a></li>
+                        <li><a href="/scoreboard" data-push-history>View scoreboard</a></li>
+                        <li><a href="/tasks" data-push-history>Get tasks!</a></li>
+                    </ul>
+                    <% } else if (contest.isFinished()) { %>
+                    <p class="lead">
+                        VolgaCTF 2015 Quals contest has finished!
+                    </p>
+                    <ul class="lead list-unstyled">
+                        <li><a href="/scoreboard" data-push-history>View results scoreboard</a></li>
+                    </ul>
+                    <p class="lead">
+                        We hope you have enjoyed the <a href="/tasks" data-push-history>tasks</a>! See you the next year!
+                    </p>
+                    <% } %>
                     <% } else if (identity.role === 'manager' || identity.role === 'admin') { %>
                     <h1>Welcome back!</h1>
-                    <p class="lead">
-                        Now, you can check out the <a href="/news" data-push-history>news</a>.
+                    <ul class="lead list-unstyled">
+                        <li><a href="/news" data-push-history>News management</a></li>
+                        <li><a href="/scoreboard" data-push-history>View scoreboard</a></li>
+                        <% if (identity.role === 'admin') { %>
+                        <li><a href="/tasks" data-push-history>Task management</a></li>
+                        <% } %>
+                        <li><a href="/logs" data-push-history>Realtime logs</a></li>
+                    </ul>
                     <% } %>
                 </div>
             </script>

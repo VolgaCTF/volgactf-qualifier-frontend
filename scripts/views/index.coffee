@@ -2,21 +2,23 @@ define 'indexView', ['jquery', 'view', 'renderTemplate', 'dataStore', 'navigatio
     class IndexView extends View
         constructor: ->
             @$main = null
+
+            @onUpdateContest = null
+
             @urlRegex = /^\/$/
 
         getTitle: ->
             "#{metadataStore.getMetadata 'event-title' } :: Main"
 
+        render: ->
+            identity = identityProvider.getIdentity()
+            contest = contestProvider.getContest()
+            @$main.empty()
+            @$main.html renderTemplate 'index-view', identity: identity, contest: contest
+
         present: ->
             @$main = $ '#main'
             @$main.html renderTemplate 'loading-view'
-
-            # fakeLoad = ->
-            #     promise = $.Deferred()
-            #     resolvePromise = ->
-            #         promise.resolve()
-            #     setTimeout resolvePromise, 5000
-            #     promise
 
             $
                 .when identityProvider.fetchIdentity()
@@ -27,7 +29,7 @@ define 'indexView', ['jquery', 'view', 'renderTemplate', 'dataStore', 'navigatio
                         promise = $.when contestProvider.fetchContest()
 
                     promise
-                        .done (contest) =>
+                        .done =>
                             identityProvider.subscribe()
                             if dataStore.supportsRealtime()
                                 dataStore.connectRealtime()
@@ -35,7 +37,13 @@ define 'indexView', ['jquery', 'view', 'renderTemplate', 'dataStore', 'navigatio
                             navigationBar.present()
                             statusBar.present()
 
-                            @$main.html renderTemplate 'index-view', identity: identity, contest: contest
+                            @render()
+
+                            @onUpdateContest = (e) =>
+                                @render()
+                                false
+
+                            contestProvider.on 'updateContest', @onUpdateContest
                         .fail (err) =>
                             navigationBar.present()
                             @$main.html renderTemplate 'internal-error-view'
@@ -45,6 +53,11 @@ define 'indexView', ['jquery', 'view', 'renderTemplate', 'dataStore', 'navigatio
 
         dismiss: ->
             identityProvider.unsubscribe()
+
+            if @onUpdateContest?
+                contestProvider.off 'updateContest', @onUpdateContest
+                @onUpdateContest = null
+
             @$main.empty()
             @$main = null
             navigationBar.dismiss()

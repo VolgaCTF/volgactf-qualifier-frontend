@@ -614,17 +614,16 @@ define 'tasksView', ['jquery', 'underscore', 'view', 'renderTemplate', 'dataStor
 
                 taskPreview = _.findWhere taskProvider.getTaskPreviews(), id: taskId
                 identity = identityProvider.getIdentity()
+                contest = contestProvider.getContest()
 
                 if taskPreview? and identity.role is 'team'
                     if identity.emailConfirmed
                         taskIsSolved = no
-                        taskProgress = null
-                        contest = contestProvider.getContest()
                         taskProgress = _.findWhere contestProvider.getTeamTaskProgressEntries(), teamId: identity.id, taskId: taskId
                         if taskProgress?
                             taskIsSolved = yes
 
-                        if taskPreview.isOpened() and not taskIsSolved and contest.isStarted()
+                        if taskPreview.isOpened() and ((not taskIsSolved and contest.isStarted()) or contest.isFinished())
                             $submitTaskAnswerGroup.show()
                             $submitTaskSubmitButton.show()
                         else
@@ -634,8 +633,8 @@ define 'tasksView', ['jquery', 'underscore', 'view', 'renderTemplate', 'dataStor
                                 $submitTaskSubmitError.text 'Contest has been paused.'
                             if taskPreview.isClosed()
                                 $submitTaskSubmitError.text 'Task has been closed by the event organizers.'
-                            if taskIsSolved
-                                $submitTaskSubmitSuccess.text "Your team has solved the task on #{moment(taskProgress.createdAt).format 'lll' }!"
+                        if taskIsSolved
+                            $submitTaskSubmitSuccess.text "Your team has solved the task on #{moment(taskProgress.createdAt).format 'lll' }!"
                     else
                         $submitTaskSubmitError.text 'You should confirm your email before you can submit an answer to the task.'
                         $submitTaskAnswerGroup.hide()
@@ -647,7 +646,10 @@ define 'tasksView', ['jquery', 'underscore', 'view', 'renderTemplate', 'dataStor
                 $submitTaskModal.data 'task-id', taskId
 
                 $submitTaskForm.parsley().reset()
-                $submitTaskForm.attr 'action', "#{metadataStore.getMetadata 'domain-api' }/task/#{taskId}/submit"
+                if contest.isFinished()
+                    $submitTaskForm.attr 'action', "#{metadataStore.getMetadata 'domain-api' }/task/#{taskId}/check"
+                else
+                    $submitTaskForm.attr 'action', "#{metadataStore.getMetadata 'domain-api' }/task/#{taskId}/submit"
 
                 $
                     .when taskProvider.fetchTask(taskId), contestProvider.fetchSolvedTeamCountByTask(taskId)
@@ -699,6 +701,113 @@ define 'tasksView', ['jquery', 'underscore', 'view', 'renderTemplate', 'dataStor
                             $submitTaskSubmitError.text 'Unknown error. Please try again later.'
                     complete: ->
                         $submitTaskSubmitButton.prop 'disabled', no
+
+        initCheckTaskModal: ->
+            $checkTaskModal = $ '#check-task-modal'
+            $checkTaskModal.modal
+                show: no
+
+            $checkTaskSubmitError = $checkTaskModal.find '.submit-error > p'
+            $checkTaskInfo = $checkTaskModal.find '.submit-info > p'
+            $checkTaskSubmitSuccess = $checkTaskModal.find '.submit-success > p'
+            $checkTaskSubmitButton = $checkTaskModal.find 'button[data-action="complete-check-task"]'
+            $checkTaskForm = $checkTaskModal.find 'form'
+            $checkTaskForm.parsley()
+
+            $checkTaskSubmitButton.on 'click', (e) ->
+                $checkTaskForm.trigger 'submit'
+
+            $checkTaskAnswerGroup = $ '#check-task-answer-group'
+            $checkTaskAnswer = $ '#check-task-answer'
+            $checkTaskContents = $checkTaskModal.find '.themis-task-contents'
+
+            $checkTaskModal.on 'show.bs.modal', (e) =>
+                taskId = parseInt $(e.relatedTarget).data('task-id'), 10
+
+                $checkTaskContents.empty()
+                $checkTaskAnswer.val ''
+                $checkTaskSubmitError.text ''
+                $checkTaskInfo.text ''
+                $checkTaskSubmitSuccess.text ''
+                $checkTaskSubmitButton.prop 'disabled', yes
+
+                taskPreview = _.findWhere taskProvider.getTaskPreviews(), id: taskId
+                identity = identityProvider.getIdentity()
+                contest = contestProvider.getContest()
+
+                if taskPreview? and identity.role is 'guest'
+                    if contest.isFinished()
+                        if taskPreview.isOpened()
+                            $checkTaskAnswerGroup.show()
+                            $checkTaskSubmitButton.show()
+                        else
+                            $checkTaskAnswerGroup.hide()
+                            $checkTaskSubmitButton.hide()
+                            if taskPreview.isClosed()
+                                $checkTaskSubmitError.text 'Task has been closed by the event organizers.'
+                    else
+                        $checkTaskAnswerGroup.hide()
+                        $checkTaskSubmitButton.hide()
+                        $checkTaskSubmitError.html renderTemplate 'check-task-guest-error'
+                else
+                    $checkTaskAnswerGroup.hide()
+                    $checkTaskSubmitButton.hide()
+
+                $checkTaskModal.data 'task-id', taskId
+
+                $checkTaskForm.parsley().reset()
+                $checkTaskForm.attr 'action', "#{metadataStore.getMetadata 'domain-api' }/task/#{taskId}/check"
+
+                if contest.isFinished()
+                    $
+                        .when taskProvider.fetchTask(taskId)
+                        .done (task) ->
+                            md = new MarkdownIt()
+                            hintsFormatted = []
+                            _.each task.hints, (hint) ->
+                                hintsFormatted.push md.render hint
+                            options =
+                                title: task.title
+                                description: md.render task.description
+                                hints: hintsFormatted
+                            $checkTaskContents.html renderTemplate 'task-content-partial', options
+
+                            $checkTaskSubmitButton.prop 'disabled', no
+                        .fail (err) ->
+                            $checkTaskSubmitError.text err
+
+            $checkTaskModal.on 'shown.bs.modal', (e) ->
+                $checkTaskAnswer.focus()
+
+            $checkTaskForm.on 'submit', (e) =>
+                e.preventDefault()
+                $checkTaskForm.ajaxSubmit
+                    beforeSubmit: ->
+                        $checkTaskSubmitError.text ''
+                        $checkTaskSubmitSuccess.text ''
+                        $checkTaskSubmitButton.prop 'disabled', yes
+                    clearForm: yes
+                    dataType: 'json'
+                    xhrFields:
+                        withCredentials: yes
+                    headers: { 'X-CSRF-Token': identityProvider.getIdentity().token }
+                    success: (responseText, textStatus, jqXHR) ->
+                        $checkTaskAnswerGroup.hide()
+                        $checkTaskSubmitButton.hide()
+                        $checkTaskSubmitSuccess.text 'Answer is correct!'
+                        hideModal = ->
+                            $checkTaskModal.modal 'hide'
+                            unless dataStore.connectedRealtime()
+                                window.location.reload()
+                        setTimeout hideModal, 1000
+                    error: (jqXHR, textStatus, errorThrown) ->
+                        if jqXHR.responseJSON?
+                            $checkTaskSubmitError.text jqXHR.responseJSON
+                        else
+                            $checkTaskSubmitError.text 'Unknown error. Please try again later.'
+                    complete: ->
+                        $checkTaskSubmitButton.prop 'disabled', no
+
 
         renderTaskCategories: ->
             taskCategories = taskCategoryProvider.getTaskCategories()
@@ -804,6 +913,7 @@ define 'tasksView', ['jquery', 'underscore', 'view', 'renderTemplate', 'dataStor
                     isAdmin = identity.role is 'admin'
                     isSupervisor = _.contains ['admin', 'manager'], identity.role
                     isTeam = identity.role is 'team'
+                    isGuest = identity.role is 'guest'
 
                     navigationBar.present active: 'tasks'
 
@@ -838,6 +948,9 @@ define 'tasksView', ['jquery', 'underscore', 'view', 'renderTemplate', 'dataStor
 
                             if isTeam
                                 @initSubmitTaskModal()
+
+                            if isGuest
+                                @initCheckTaskModal()
 
                             @$taskPreviewsList = $ '#themis-task-previews'
                             @renderTaskPreviews()
