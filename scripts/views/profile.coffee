@@ -1,4 +1,4 @@
-define 'profileView', ['jquery', 'view', 'renderTemplate', 'dataStore', 'navigationBar', 'metadataStore', 'identityProvider', 'teamProvider', 'jquery.history', 'parsley', 'jquery.form', 'bootstrap-filestyle'], ($, View, renderTemplate, dataStore, navigationBar, metadataStore, identityProvider, teamProvider, History) ->
+define 'profileView', ['jquery', 'view', 'renderTemplate', 'dataStore', 'navigationBar', 'metadataStore', 'identityProvider', 'teamProvider', 'contestProvider', 'taskProvider', 'jquery.history', 'parsley', 'jquery.form', 'bootstrap-filestyle'], ($, View, renderTemplate, dataStore, navigationBar, metadataStore, identityProvider, teamProvider, contestProvider, taskProvider, History) ->
     class ProfileView extends View
         constructor: ->
             @$main = null
@@ -253,11 +253,33 @@ define 'profileView', ['jquery', 'view', 'renderTemplate', 'dataStore', 'navigat
                     url = History.getState().data.urlPath
                     urlParts = url.split '/'
                     teamId = parseInt urlParts[urlParts.length - 1], 10
-                    $
-                        .when teamProvider.fetchTeamProfile teamId
-                        .done (team) =>
+
+                    if _.contains(['admin', 'manager'], identity.role) or (identity.role is 'team' and identity.id == teamId)
+                        promise = $.when teamProvider.fetchTeamProfile(teamId), contestProvider.fetchTeamTaskProgress(teamId), taskProvider.fetchTaskPreviews()
+                    else
+                        promise = $.when teamProvider.fetchTeamProfile(teamId), contestProvider.fetchTeamTaskProgress(teamId)
+
+                    promise
+                        .done (team, teamTaskProgress) =>
                             @team = team
-                            @$main.find('section').html renderTemplate 'team-profile-partial', identity: identity, team: team
+                            opts =
+                                identity: identity
+                                team: team
+
+                            if _.contains(['admin', 'manager'], identity.role) or (identity.role is 'team' and identity.id == teamId)
+                                tasks = taskProvider.getTaskPreviews()
+                                taskNames = []
+
+                                for entry in teamTaskProgress
+                                    task = _.findWhere tasks, id: entry.taskId
+                                    if task? and not _.contains taskNames, task.title
+                                        taskNames.push task.title
+
+                                opts.teamProgressInfo = renderTemplate 'team-progress-partial', identity: identity, teamId: team.id, taskNames: taskNames
+                            else
+                                opts.teamProgressInfo = renderTemplate 'team-progress-partial', identity: identity, teamId: team.id, count: teamTaskProgress
+
+                            @$main.find('section').html renderTemplate 'team-profile-partial', opts
                             if identity.role is 'team' and identity.id == team.id
                                 @initUploadLogoModal()
 
@@ -269,7 +291,6 @@ define 'profileView', ['jquery', 'view', 'renderTemplate', 'dataStore', 'navigat
                                 @initChangePasswordModal()
                         .fail (err) =>
                             @$main.html renderTemplate 'internal-error-view'
-
                 .fail (err) =>
                     navigationBar.present()
                     @$main.html renderTemplate 'internal-error-view'
