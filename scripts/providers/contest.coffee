@@ -171,6 +171,32 @@ define 'contestProvider', ['jquery', 'underscore', 'EventEmitter', 'dataStore', 
 
             promise
 
+        fetchTeamTaskProgress: (teamId) ->
+            promise = $.Deferred()
+
+            identity = identityProvider.getIdentity()
+            url = "#{metadataStore.getMetadata 'domain-api' }/contest/team/#{teamId}/progress"
+
+            $.ajax
+                url: url
+                dataType: 'json'
+                xhrFields:
+                    withCredentials: yes
+                success: (responseJSON, textStatus, jqXHR) =>
+                    if _.contains(['admin', 'manager'], identity.role) or (identity.role is 'team' and identity.id == teamId)
+                        teamTaskProgressEntries = _.map responseJSON, (options) ->
+                            new TeamTaskProgressModel options
+                        promise.resolve teamTaskProgressEntries
+                    else
+                        promise.resolve responseJSON
+                error: (jqXHR, textStatus, errorThrown) ->
+                    if jqXHR.responseJSON?
+                        promise.reject jqXHR.responseJSON
+                    else
+                        promise.reject 'Unknown error. Please try again later.'
+
+            promise
+
         fetchTeamTaskProgressEntries: ->
             promise = $.Deferred()
 

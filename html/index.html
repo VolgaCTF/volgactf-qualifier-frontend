@@ -804,7 +804,10 @@
             <script type="text/x-template" data-name="scoreboard-table-row-partial">
                 <tr class="themis-scoreboard-row<% print(highlight ? ' info': ''); %>">
                     <td><%- rank %></td>
-                    <td><img class="themis-scoreboard-logo" src="//api.{{ domain }}/team/<%- id %>/logo"><%- name %></td>
+                    <td>
+                        <img class="themis-scoreboard-logo" src="//api.{{ domain }}/team/<%- id %>/logo">
+                        <a href="/profile/<%- id %>" class="themis-team-link" data-push-history><%- name %></a>
+                    </td>
                     <td><%- score %></td>
                     <td><%- updatedAt %></td>
                 </tr>
@@ -1433,6 +1436,25 @@
                 </div>
             </script>
 
+            <script type="text/x-template" data-name="team-progress-partial">
+                <% if (identity.role === 'admin' || identity.role === 'manager' || (identity.role === 'team' && identity.id === teamId)) { %>
+                    <% if (taskNames.length > 0) { %>
+                    Team has solved the following tasks:
+                    <% for (var i=0; i<taskNames.length; ++i) { %>
+                        <i><%- taskNames[i] %></i><% if (i < taskNames.length - 1) { %>, <% } else { %>.<% } %>
+                    <% } %>
+                    <% } else { %>
+                    Team did not solve a single task
+                    <% } %>
+                <% } else { %>
+                    <% if (count > 0) { %>
+                    Team solved <strong><%- count %></strong> <% print((count === 1) ? 'task' : 'tasks') %>
+                    <% } else { %>
+                    Team did not solve a single task
+                    <% } %>
+                <% } %>
+            </script>
+
             <script type="text/x-template" data-name="team-profile-partial">
                 <div class="clearfix themis-profile">
                     <div class="pull-left logo">
@@ -1482,6 +1504,9 @@
                             </li>
                             <% } %>
                         </ul>
+                        <p class="text-muted">
+                            <%= teamProgressInfo %>
+                        </p>
                     </div>
                 </div>
             </script>
