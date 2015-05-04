@@ -808,6 +808,11 @@
                         <img class="themis-scoreboard-logo" src="//api.{{ domain }}/team/<%- id %>/logo">
                         <a href="/profile/<%- id %>" class="themis-team-link" data-push-history><%- name %></a>
                     </td>
+                    <% if (detailed) { %>
+                    <td><%- country %></td>
+                    <td><%- locality %></td>
+                    <td><%- institution %></td>
+                    <% } %>
                     <td><%- score %></td>
                     <td><%- updatedAt %></td>
                 </tr>
@@ -831,6 +836,11 @@
                             <thead>
                                 <th>#</th>
                                 <th>Team</th>
+                                <% if (detailed) { %>
+                                <th>Country</th>
+                                <th>Locality</th>
+                                <th>Institution</th>
+                                <% } %>
                                 <th>Score</th>
                                 <th>Last updated</th>
                             </thead>
