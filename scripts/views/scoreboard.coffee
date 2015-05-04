@@ -1,4 +1,4 @@
-define 'scoreboardView', ['jquery', 'underscore', 'view', 'renderTemplate', 'dataStore', 'navigationBar', 'statusBar', 'metadataStore', 'moment', 'contestProvider', 'identityProvider', 'teamProvider'], ($, _, View, renderTemplate, dataStore, navigationBar, statusBar, metadataStore, moment, contestProvider, identityProvider, teamProvider) ->
+define 'scoreboardView', ['jquery', 'underscore', 'view', 'renderTemplate', 'dataStore', 'navigationBar', 'statusBar', 'metadataStore', 'moment', 'contestProvider', 'identityProvider', 'teamProvider', 'jquery.history'], ($, _, View, renderTemplate, dataStore, navigationBar, statusBar, metadataStore, moment, contestProvider, identityProvider, teamProvider, History) ->
     class ScoreboardView extends View
         constructor: ->
             @$main = null
@@ -9,6 +9,8 @@ define 'scoreboardView', ['jquery', 'underscore', 'view', 'renderTemplate', 'dat
             @reloadScoreboard = no
             @reloadScoreboardInterval = null
             @renderingScoreboard = no
+
+            @detailed = no
 
             @urlRegex = /^\/scoreboard$/
 
@@ -26,7 +28,7 @@ define 'scoreboardView', ['jquery', 'underscore', 'view', 'renderTemplate', 'dat
             isTeam = identity.role is 'team'
 
             teamScores.sort contestProvider.teamRankFunc
-            _.each teamScores, (teamScore, ndx) ->
+            _.each teamScores, (teamScore, ndx) =>
                 team = _.findWhere teams, id: teamScore.teamId
                 if team?
                     obj =
@@ -36,6 +38,13 @@ define 'scoreboardView', ['jquery', 'underscore', 'view', 'renderTemplate', 'dat
                         score: teamScore.score
                         updatedAt: if teamScore.updatedAt? then moment(teamScore.updatedAt).format('lll') else 'never'
                         highlight: isTeam and team.id == identity.id
+                        detailed: @detailed
+
+                    if @detailed
+                        obj.country = team.country
+                        obj.locality = team.locality
+                        obj.institution = team.institution
+
                     $tableBody.append $ renderTemplate 'scoreboard-table-row-partial', obj
 
         present: ->
@@ -49,7 +58,11 @@ define 'scoreboardView', ['jquery', 'underscore', 'view', 'renderTemplate', 'dat
                         dataStore.connectRealtime()
 
                     identityProvider.subscribe()
-                    @$main.html renderTemplate 'scoreboard-view', identity: identity
+
+                    params = History.getState().data.params
+                    @detailed = 'full' of params
+
+                    @$main.html renderTemplate 'scoreboard-view', identity: identity, detailed: @detailed
 
                     teamProvider.subscribe()
 
