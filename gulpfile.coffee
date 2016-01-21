@@ -54,7 +54,7 @@ paths =
 
 
 isProduction = ->
-    process.env['ENV'] == 'production'
+    process.env['NODE_ENV'] == 'production'
 
 isCoffee = (file) ->
     path.extname(file.path) is '.coffee'
