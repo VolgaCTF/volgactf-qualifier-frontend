@@ -1,0 +1,171 @@
+0 info it worked if it ends with ok
+1 verbose cli [ '/usr/local/bin/node',
+1 verbose cli   '/usr/local/bin/npm',
+1 verbose cli   'install',
+1 verbose cli   '-g',
+1 verbose cli   'decaffeinate' ]
+2 info using npm@2.14.12
+3 info using node@v4.2.4
+4 verbose install initial load of /usr/local/lib/package.json
+5 verbose readDependencies loading dependencies from /usr/local/lib/package.json
+6 silly cache add args [ 'decaffeinate', null ]
+7 verbose cache add spec decaffeinate
+8 silly cache add parsed spec Result {
+8 silly cache add   raw: 'decaffeinate',
+8 silly cache add   scope: null,
+8 silly cache add   name: 'decaffeinate',
+8 silly cache add   rawSpec: '',
+8 silly cache add   spec: 'latest',
+8 silly cache add   type: 'tag' }
+9 silly addNamed decaffeinate@latest
+10 verbose addNamed "latest" is being treated as a dist-tag for decaffeinate
+11 info addNameTag [ 'decaffeinate', 'latest' ]
+12 silly mapToRegistry name decaffeinate
+13 silly mapToRegistry using default registry
+14 silly mapToRegistry registry https://registry.npmjs.org/
+15 silly mapToRegistry uri https://registry.npmjs.org/decaffeinate
+16 verbose addNameTag registry:https://registry.npmjs.org/decaffeinate not in flight; fetching
+17 verbose request uri https://registry.npmjs.org/decaffeinate
+18 verbose request no auth needed
+19 info attempt registry request try #1 at 08:20:46
+20 verbose request id 87ce236b63474873
+21 verbose etag "935JTRQ3YM7CSTU9CC011V1EJ"
+22 http request GET https://registry.npmjs.org/decaffeinate
+23 http 304 https://registry.npmjs.org/decaffeinate
+24 verbose headers { date: 'Fri, 05 Feb 2016 08:20:46 GMT',
+24 verbose headers   via: '1.1 varnish',
+24 verbose headers   'cache-control': 'max-age=300',
+24 verbose headers   etag: '"935JTRQ3YM7CSTU9CC011V1EJ"',
+24 verbose headers   age: '99',
+24 verbose headers   connection: 'keep-alive',
+24 verbose headers   'x-served-by': 'cache-fra1235-FRA',
+24 verbose headers   'x-cache': 'HIT',
+24 verbose headers   'x-cache-hits': '1',
+24 verbose headers   'x-timer': 'S1454660446.999083,VS0,VE0',
+24 verbose headers   vary: 'Accept' }
+25 silly get cb [ 304,
+25 silly get   { date: 'Fri, 05 Feb 2016 08:20:46 GMT',
+25 silly get     via: '1.1 varnish',
+25 silly get     'cache-control': 'max-age=300',
+25 silly get     etag: '"935JTRQ3YM7CSTU9CC011V1EJ"',
+25 silly get     age: '99',
+25 silly get     connection: 'keep-alive',
+25 silly get     'x-served-by': 'cache-fra1235-FRA',
+25 silly get     'x-cache': 'HIT',
+25 silly get     'x-cache-hits': '1',
+25 silly get     'x-timer': 'S1454660446.999083,VS0,VE0',
+25 silly get     vary: 'Accept' } ]
+26 verbose etag https://registry.npmjs.org/decaffeinate from cache
+27 verbose get saving decaffeinate to /home/vagrant/.npm/registry.npmjs.org/decaffeinate/.cache.json
+28 silly addNameTag next cb for decaffeinate with tag latest
+29 silly addNamed decaffeinate@1.44.13
+30 verbose addNamed "1.44.13" is a plain semver version for decaffeinate
+31 silly cache afterAdd decaffeinate@1.44.13
+32 verbose afterAdd /home/vagrant/.npm/decaffeinate/1.44.13/package/package.json not in flight; writing
+33 verbose afterAdd /home/vagrant/.npm/decaffeinate/1.44.13/package/package.json written
+34 silly install resolved [ { name: 'decaffeinate',
+34 silly install resolved     version: '1.44.13',
+34 silly install resolved     description: 'Move your CoffeeScript source to JavaScript using ES6 syntax.',
+34 silly install resolved     main: 'dist/decaffeinate.cjs.js',
+34 silly install resolved     'jsnext:main': 'dist/decaffeinate.es6.js',
+34 silly install resolved     bin: { decaffeinate: './bin/decaffeinate' },
+34 silly install resolved     scripts:
+34 silly install resolved      { lint: 'eslint src test',
+34 silly install resolved        pretest: 'npm run build',
+34 silly install resolved        test: 'mocha --compilers js:./test/support/babel-register.js',
+34 silly install resolved        prebuild: 'npm run lint',
+34 silly install resolved        build: 'rollup -c rollup.cjs.config.js && rollup -c rollup.es6.config.js',
+34 silly install resolved        prepublish: 'npm run build' },
+34 silly install resolved     repository:
+34 silly install resolved      { type: 'git',
+34 silly install resolved        url: 'git+https://github.com/eventualbuddha/decaffeinate.git' },
+34 silly install resolved     keywords: [ 'coffee', 'coffee-script', 'convert', 'es3', 'es6' ],
+34 silly install resolved     author: { name: 'Brian Donovan' },
+34 silly install resolved     license: 'MIT',
+34 silly install resolved     dependencies:
+34 silly install resolved      { 'coffee-script-redux': 'git+https://github.com/michaelficarra/CoffeeScriptRedux.git',
+34 silly install resolved        'detect-indent': '^4.0.0',
+34 silly install resolved        'magic-string': '^0.10.2',
+34 silly install resolved        repeating: '^2.0.0' },
+34 silly install resolved     files: [ 'bin', 'dist' ],
+34 silly install resolved     devDependencies:
+34 silly install resolved      { babel: '^6.3.26',
+34 silly install resolved        'babel-eslint': '^5.0.0-beta6',
+34 silly install resolved        'babel-preset-es2015': '^6.3.13',
+34 silly install resolved        'babel-preset-es2015-rollup': '^1.1.1',
+34 silly install resolved        'babel-register': '^6.4.3',
+34 silly install resolved        browserify: '^13.0.0',
+34 silly install resolved        eslint: '^1.10.3',
+34 silly install resolved        'eslint-plugin-babel': '^3.0.0',
+34 silly install resolved        mocha: '^2.3.4',
+34 silly install resolved        mversion: '^1.10.1',
+34 silly install resolved        rollup: '^0.25.0',
+34 silly install resolved        'rollup-plugin-babel': '^2.3.9' },
+34 silly install resolved     publishConfig: { registry: 'https://registry.npmjs.org/' },
+34 silly install resolved     gitHead: '412b4f7a74737b95ca2ae919c3924668bd8a8238',
+34 silly install resolved     bugs: { url: 'https://github.com/eventualbuddha/decaffeinate/issues' },
+34 silly install resolved     homepage: 'https://github.com/eventualbuddha/decaffeinate',
+34 silly install resolved     _id: 'decaffeinate@1.44.13',
+34 silly install resolved     _shasum: '90fa326f308a47093c19baf6b4935ed22d34f349',
+34 silly install resolved     _from: 'decaffeinate@latest',
+34 silly install resolved     _npmVersion: '3.3.12',
+34 silly install resolved     _nodeVersion: '5.4.1',
+34 silly install resolved     _npmUser: { name: 'eventualbuddha', email: 'me@brian-donovan.com' },
+34 silly install resolved     dist:
+34 silly install resolved      { shasum: '90fa326f308a47093c19baf6b4935ed22d34f349',
+34 silly install resolved        tarball: 'http://registry.npmjs.org/decaffeinate/-/decaffeinate-1.44.13.tgz' },
+34 silly install resolved     maintainers: [ [Object] ],
+34 silly install resolved     directories: {},
+34 silly install resolved     _resolved: 'https://registry.npmjs.org/decaffeinate/-/decaffeinate-1.44.13.tgz',
+34 silly install resolved     readme: 'ERROR: No README data found!' } ]
+35 info install decaffeinate@1.44.13 into /usr/local/lib
+36 info installOne decaffeinate@1.44.13
+37 verbose installOne of decaffeinate to /usr/local/lib not in flight; installing
+38 verbose lock using /home/vagrant/.npm/_locks/decaffeinate-d9aa6389721f8c3c.lock for /usr/local/lib/node_modules/decaffeinate
+39 silly install write writing decaffeinate 1.44.13 to /usr/local/lib/node_modules/decaffeinate
+40 verbose unbuild lib/node_modules/decaffeinate
+41 silly gentlyRm /usr/local/lib/node_modules/decaffeinate is being purged from base /usr/local
+42 verbose gentlyRm don't care about contents; nuking /usr/local/lib/node_modules/decaffeinate
+43 verbose tar unpack /home/vagrant/.npm/decaffeinate/1.44.13/package.tgz
+44 verbose tar unpacking to /usr/local/lib/node_modules/decaffeinate
+45 silly gentlyRm /usr/local/lib/node_modules/decaffeinate is being purged
+46 verbose gentlyRm don't care about contents; nuking /usr/local/lib/node_modules/decaffeinate
+47 silly gunzTarPerm modes [ '775', '664' ]
+48 error tar.unpack untar error /home/vagrant/.npm/decaffeinate/1.44.13/package.tgz
+49 verbose unlock done using /home/vagrant/.npm/_locks/decaffeinate-d9aa6389721f8c3c.lock for /usr/local/lib/node_modules/decaffeinate
+50 verbose fstream_path /usr/local/lib/node_modules/decaffeinate
+51 verbose fstream_type Directory
+52 verbose fstream_class DirWriter
+53 verbose stack Error: EACCES: permission denied, mkdir '/usr/local/lib/node_modules/decaffeinate'
+53 verbose stack     at Error (native)
+54 verbose fstream_stack /usr/local/lib/node_modules/npm/node_modules/fstream/lib/dir-writer.js:35:25
+54 verbose fstream_stack /usr/local/lib/node_modules/npm/node_modules/mkdirp/index.js:47:53
+54 verbose fstream_stack FSReqWrap.oncomplete (fs.js:82:15)
+55 verbose cwd /var/themis/quals/frontend
+56 error Linux 3.19.0-25-generic
+57 error argv "/usr/local/bin/node" "/usr/local/bin/npm" "install" "-g" "decaffeinate"
+58 error node v4.2.4
+59 error npm  v2.14.12
+60 error path /usr/local/lib/node_modules/decaffeinate
+61 error code EACCES
+62 error errno -13
+63 error syscall mkdir
+64 error Error: EACCES: permission denied, mkdir '/usr/local/lib/node_modules/decaffeinate'
+64 error     at Error (native)
+64 error  { [Error: EACCES: permission denied, mkdir '/usr/local/lib/node_modules/decaffeinate']
+64 error   errno: -13,
+64 error   code: 'EACCES',
+64 error   syscall: 'mkdir',
+64 error   path: '/usr/local/lib/node_modules/decaffeinate',
+64 error   fstream_type: 'Directory',
+64 error   fstream_path: '/usr/local/lib/node_modules/decaffeinate',
+64 error   fstream_class: 'DirWriter',
+64 error   fstream_stack:
+64 error    [ '/usr/local/lib/node_modules/npm/node_modules/fstream/lib/dir-writer.js:35:25',
+64 error      '/usr/local/lib/node_modules/npm/node_modules/mkdirp/index.js:47:53',
+64 error      'FSReqWrap.oncomplete (fs.js:82:15)' ] }
+65 error Please try running this command again as root/Administrator.
+66 verbose exit [ -13, true ]
+67 verbose unbuild lib/node_modules/decaffeinate
+68 silly gentlyRm /usr/local/lib/node_modules/decaffeinate is being purged from base /usr/local
+69 verbose gentlyRm don't care about contents; nuking /usr/local/lib/node_modules/decaffeinate
