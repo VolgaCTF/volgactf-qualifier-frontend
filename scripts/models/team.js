@@ -6,7 +6,7 @@ export default class TeamModel {
     this.locality = options.locality
     this.institution = options.institution
     this.createdAt = new Date(options.createdAt)
-    this.email = if (options.email != null) ? options.email : null
-    this.emailConfirmed = if (options.emailConfirmed != null) ? options.emailConfirmed : no
+    this.email = (options.email) ? options.email : null
+    this.emailConfirmed = (options.emailConfirmed) ? options.emailConfirmed : no
   }
 }

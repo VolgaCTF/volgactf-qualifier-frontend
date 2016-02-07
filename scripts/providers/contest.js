@@ -1,239 +1,294 @@
-import _ from 'underscore'
+define 'contestProvider', ['jquery', 'underscore', 'EventEmitter', 'dataStore', 'metadataStore', 'contestModel', 'teamScoreModel', 'teamProvider', 'teamTaskProgressModel', 'identityProvider'], ($, _, EventEmitter, dataStore, metadataStore, ContestModel, TeamScoreModel, teamProvider, TeamTaskProgressModel, identityProvider) ->
+    
 import $ from 'jquery'
-import dataStore from 'dataStore'
-import metadataStore from 'metadataStore'
+import _ from 'underscore'
 import EventEmitter from 'EventEmitter'
 
-import TeamTaskProgressModel from '../models/team-task-progress.js'
-import TeamScoreModel from '../models/team-score.js'
-import ContestModel from '../models/contest.js'
+import dataStore from '../data-store'
+import metadataStore from '../utils/metadata-store'
+import ContestModel from '../models/contest'
+import TeamScoreModel from '../models/team-score'
+import TeamTaskProgressModel from '../models/team-task-progress'
+import teamProvider from './team'
+import identityProvider from './identity' 
 
-define 'contestProvider', ['jquery', 'underscore', 'EventEmitter', 'dataStore', 'metadataStore', 'contestModel', 'teamScoreModel', 'teamProvider', 'teamTaskProgressModel', 'identityProvider'], ($, _, EventEmitter, dataStore, metadataStore, ContestModel, TeamScoreModel, teamProvider, TeamTaskProgressModel, identityProvider) ->
-    class ContestProvider extends EventEmitter
-        constructor: ->
-            super()
-            @contest = null
-            @teamScores = []
-            @teamTaskProgressEntries = []
+class ContestProvider extends EventEmitter {
+  constructor() {
+     super()
+     this.contest = null
+     this.teamScores = []
+     this.teamTaskProgressEntries = []
 
-            @onUpdate = null
-            @onUpdateTeamScore = null
-            @onQualifyTeam = null
+     this.onUpdate = null
+     this.onUpdateTeamScore = null
+     this.onQualifyTeam = null
 
-            @onCreateTeamTaskProgress = null
+     this.onCreateTeamTaskProgress = null
+  }
 
-        getContest: ->
-            @contest
+  getContest() {
+    return this.contest
+  }
+        
+  getTeamScores() {
+    return this.teamScores
+  }
+        
+  teamRankFunc(a, b) {
+    if (a.score > b.score) {
+      return -1
+    } else if (a.score < b.score) {
+      return 1
+    } else {
+      if (a.updatedAt && b.updatedAt) { 
+        if (a.updatedAt.getTime() < b.updatedAt.getTime()) {
+          return -1
+	} else if (a.updatedAt.getTime() > b.updatedAt.getTime()) {
+          return 1 
+        } else {
+          return 0
+        }
+      } else if (a.updatedAt && (!b.updatedAt)) {
+        return -1
+      } else if ((!a.updatedAt) && b.updatedAt) {
+        return 1
+      } else {
+        return 0
+      }
+    }
+  }
 
-        getTeamScores: ->
-            @teamScores
+  getTeamTaskProgressEntries() {
+    return this.teamTaskProgressEntries
+  }	    
 
-        teamRankFunc: (a, b) ->
-            if a.score > b.score
-                return -1
-            else if a.score < b.score
-                return 1
-            else
-                if a.updatedAt? and b.updatedAt?
-                    if a.updatedAt.getTime() < b.updatedAt.getTime()
-                        return -1
-                    else if a.updatedAt.getTime() > b.updatedAt.getTime()
-                        return 1
-                    else
-                        return 0
-                else if a.updatedAt? and not b.updatedAt?
-                    return -1
-                else if not a.updatedAt? and b.updatedAt?
-                    return 1
-                else
-                    return 0
+  subscribe() {
+    if (!dataStore.supportsRealtime()) {
+      return }
 
-        getTeamTaskProgressEntries: ->
-            @teamTaskProgressEntries
+    let realtimeProvider = dataStore.getRealtimeProvider()
+  
+    this.onUpdate = ((e) => {
+      let options = JSON.parse(e.data)
+      this.contest = new ContestModel(options)
+      return this.trigger('updateContest', [this.contest])
+    })
 
-        subscribe: ->
-            return unless dataStore.supportsRealtime()
-            realtimeProvider = dataStore.getRealtimeProvider()
+    realtimeProvider.addEventListener('updateContest', this.onUpdate)
 
-            @onUpdate = (e) =>
-                options = JSON.parse e.data
-                @contest = new ContestModel options
-                @trigger 'updateContest', [@contest]
+    this.onUpdateTeamScore = ((e) => {
+      let options = JSON.parse(e.data)
+      let teamScore = new TeamScoreModel(options)
+      let ndx = _.findIndex(this.teamScores, {teamId: options.teamId})
+      if (ndx > -1) {
+        this.teamScores.splice(ndx, 1)
+      }
+      this.teamScores.push(teamScore)
+      return this.trigger('updateTeamScore', [teamScore])
+    })
 
-            realtimeProvider.addEventListener 'updateContest', @onUpdate
+    realtimeProvider.addEventListener('updateTeamScore', this.onUpdateTeamScore)
 
-            @onUpdateTeamScore = (e) =>
-                options = JSON.parse e.data
-                teamScore = new TeamScoreModel options
-                ndx = _.findIndex @teamScores, teamId: options.teamId
-                if ndx > -1
-                    @teamScores.splice ndx, 1
-                @teamScores.push teamScore
-                @trigger 'updateTeamScore', [teamScore]
+    this.nQualifyTeam = ((team) => {
+      let ndx = _.findIndex(this.teamScores, {teamId: team.id})
+      if (ndx === -1) {
+        let teamScore = new TeamScoreModel({teamId: team.id, score: 0, updatedAt: null})  
+        this.teamScores.push(teamScore)
+        return this.trigger('updateTeamScore', [teamScore])
+      }
+    })
+      
+    teamProvider.on('qualifyTeam', this.onQualifyTeam)
 
-            realtimeProvider.addEventListener 'updateTeamScore', @onUpdateTeamScore
+    // identity = identityProvider.getIdentity()
+    if (_.contains (['admin', 'manager', 'team'], identity.role)) {
+      this.onCreateTeamTaskProgress = ((e) => {
+	let identity = identityProvider.getIdentity() 
+	let options = JSON.parse(e.data)
+        let teamTaskProgress = new TeamTaskProgressModel(options)
+        let ndx = _.findIndex(this.teamTaskProgressEntries, {teamId: options.teamId, taskId: options.taskId})
+        if (ndx === -1) {
+          if ((identity.role === 'team') && (identity.id !== options.teamId)) {
+            return
+          }
+          this.teamTaskProgressEntries.push(teamTaskProgress)
+          return this.trigger ('createTeamTaskProgress', [teamTaskProgress])
+	}
+      })
+    }	  
 
-            @onQualifyTeam = (team) =>
-                ndx = _.findIndex @teamScores, teamId: team.id
-                if ndx == -1
-                    teamScore = new TeamScoreModel
-                        teamId: team.id
-                        score: 0
-                        updatedAt: null
-                    @teamScores.push teamScore
-                    @trigger 'updateTeamScore', [teamScore]
+    realtimeProvider.addEventListener('createTeamTaskProgress', this.onCreateTeamTaskProgress, false)
+  }
 
-            teamProvider.on 'qualifyTeam', @onQualifyTeam
+  unsubscribe() {
+    
+    if (!dataStore.supportsRealtime()) {
+      return
+    }	      
+    
+    let realtimeProvider = dataStore.getRealtimeProvider()
 
-            identity = identityProvider.getIdentity()
-            if _.contains ['admin', 'manager', 'team'], identity.role
-                @onCreateTeamTaskProgress = (e) =>
-                    options = JSON.parse e.data
-                    teamTaskProgress = new TeamTaskProgressModel options
-                    ndx = _.findIndex @teamTaskProgressEntries, teamId: options.teamId, taskId: options.taskId
-                    if ndx == -1
-                        if identity.role == 'team' and identity.id != options.teamId
-                            return
-                        @teamTaskProgressEntries.push teamTaskProgress
-                        @trigger 'createTeamTaskProgress', [teamTaskProgress]
+    if (this.onUpdate !== null) {
+      realtimeProvider.removeEventListener('updateContest', this.onUpdate)
+      this.onUpdate = null
+    }
+    
+    if (this.onUpdateTeamScore !== null) {
+      realtimeProvider.removeEventListener('updateTeamScore', this.onUpdateTeamScore)
+      this.onUpdateTeamScore = null
+    }
 
-                realtimeProvider.addEventListener 'createTeamTaskProgress', @onCreateTeamTaskProgress, false
+    if (this.onQualifyTeam !== null) {
+      teamProvider.off('qualifyTeam', this.onQualifyTeam)
+      this.onQualifyTeam = null
+    }
 
-        unsubscribe: ->
-            return unless dataStore.supportsRealtime()
-            realtimeProvider = dataStore.getRealtimeProvider()
+    if (this.onCreateTeamTaskProgress !== null) {
+      realtimeProvider.removeEventListener('createTeamTaskProgress', this.onCreateTeamTaskProgress)
+      this.onCreateTeamTaskProgress = null
+    }
+    
+    this.contest = null
+    this.teamScores = []
+    this.teamTaskProgressEntries = []
 
-            if @onUpdate?
-                realtimeProvider.removeEventListener 'updateContest', @onUpdate
-                @onUpdate = null
+  }
+  
+  fetchContest() {
+    let promise = $.Deferred()
+    let url = "#{metadataStore.getMetadata 'domain-api' }/contest"
+    $.ajax({
+	url: url, 
+	dataType: 'json',
+        xhrFields: {withCredentials: yes},
+        success: ((responseJSON, textStatus, jqXHR) => {
+          this.contest = new ContestModel(responseJSON)
+          promise.resolve(this.contest)
+	}),
+        error: ((jqXHR, textStatus, errorThrown) => {
+          if (jqXHR.responseJSON !== null) {
+            promise.rejectjqXHR(responseJSON)
+	  } else {
+          promise.reject('Unknown error. Please try again later.')
+          }
+	})
+    })
+    return promise
+  }
 
-            if @onUpdateTeamScore?
-                realtimeProvider.removeEventListener 'updateTeamScore', @onUpdateTeamScore
-                @onUpdateTeamScore = null
+  fetchTeamScores() {
+    let promise = $.Deferred()
+    let url = "#{metadataStore.getMetadata 'domain-api' }/contest/scores"
+    $.ajax({
+	url: url,
+        dataType: 'json',
+        xhrFields: {withCredentials: yes},
+        success: ((responseJSON, textStatus, jqXHR) => {
+        this.teamScores = _.map(responseJSON, (options) {
+          return new TeamScoreModel(options)
+          })
+	promise.resolve(this.teamScores)
+        }),
+        error: ((jqXHR, textStatus, errorThrown) => {
+          if (jqXHR.responseJSON) {
+            promise.reject(jqXHR.responseJSON)
+          } else {
+            promise.reject('Unknown error. Please try again later.')
+	  }
+	})
+    })
+    return promise
+  }
 
-            if @onQualifyTeam?
-                teamProvider.off 'qualifyTeam', @onQualifyTeam
-                @onQualifyTeam = null
+  fetchSolvedTeamCountByTask(taskId) {
+    let promise = $.Deferred()
+    let url = "#{metadataStore.getMetadata 'domain-api' }/contest/task/#{taskId}/progress"
+    $.ajax({
+        url: url,
+        dataType: 'json',
+        xhrFields: {withCredentials: yes},
+        success: ((responseJSON, textStatus, jqXHR) => {
+          promise.resolve(responseJSON)
+	}),
+        error: ((jqXHR, textStatus, errorThrown) => {
+          if (jqXHR.responseJSON) {
+            promise.reject(jqXHR.responseJSON)
+          } else {
+             promise.reject('Unknown error. Please try again later.')
+          }
+        })
+    })
+    return promise
+  }
 
-            if @onCreateTeamTaskProgress?
-                realtimeProvider.removeEventListener 'createTeamTaskProgress', @onCreateTeamTaskProgress
-                @onCreateTeamTaskProgress = null
+  fetchTeamTaskProgress(teamId) {
+    let promise = $.Deferred()
+    let identity = identityProvider.getIdentity()
+    let url = "#{metadataStore.getMetadata 'domain-api' }/contest/team/#{teamId}/progress"
 
-            @contest = null
-            @teamScores = []
-            @teamTaskProgressEntries = []
+    $.ajax({
+        url: url,
+        dataType: 'json',
+        xhrFields: {withCredentials: yes},
+        success: ((responseJSON, textStatus, jqXHR) => {
+          if ((_.contains(['admin', 'manager'], identity.role)) || (identity.role === 'team' && identity.id === teamId)) {
+            teamTaskProgressEntries = _.map(responseJSON, ((options) => {
+              return new TeamTaskProgressModel(options)
+            })
+            )
+            promise.resolve(teamTaskProgressEntries)
+          
+	  }else {
+            promise.resolve(responseJSON)
+          }
+	}),
+        error: ((jqXHR, textStatus, errorThrown) => {
+          if (jqXHR.responseJSON) {
+            promise.reject jqXHR.responseJSON
+	  }
+          else {
+          promise.reject 'Unknown error. Please try again later.'
+          }
+	})
+    })
+  
+    return promise
+  }
 
-        fetchContest: ->
-            promise = $.Deferred()
-            url = "#{metadataStore.getMetadata 'domain-api' }/contest"
-            $.ajax
-                url: url
-                dataType: 'json'
-                xhrFields:
-                    withCredentials: yes
-                success: (responseJSON, textStatus, jqXHR) =>
-                    @contest = new ContestModel responseJSON
-                    promise.resolve @contest
-                error: (jqXHR, textStatus, errorThrown) ->
-                    if jqXHR.responseJSON?
-                        promise.reject jqXHR.responseJSON
-                    else
-                        promise.reject 'Unknown error. Please try again later.'
+  fetchTeamTaskProgressEntries() {
+    let promise = $.Deferred()
+    let identity = identityProvider.getIdentity()
+    if (_.contains(['admin', 'manager']), identity.role) {
+      let url = "#{metadataStore.getMetadata 'domain-api' }/contest/progress"
+    } else { 
+      if (identity.role === 'team') {
+        let url = "#{metadataStore.getMetadata 'domain-api' }/contest/team/#{identity.id}/progress"
+      }
+    } else {
+      promise.reject('Unknown error. Please try again later.')
+    }
+    
+    if (_.contains(['admin', 'manager', 'team']), identity.role) {
+      $.ajax({
+	  url: url,
+          dataType: 'json',
+          xhrFields: {withCredentials: yes},
+	  success: ((responseJSON, textStatus, jqXHR) => {
+            this.teamTaskProgressEntries = _.map(responseJSON, ((options) => {
+              new TeamTaskProgressModel(options)
+	    })
+            )
+            promise.resolve(this.teamTaskProgressEntries)
+          }),
+          error: ((jqXHR, textStatus, errorThrown) => {
+            if (jqXHR.responseJSON) {
+              promise.reject(jqXHR.responseJSON)
+            } else {
+              promise.reject('Unknown error. Please try again later.')
+            }
+	  })
+      })
+    return promise
+  }		  
 
-            promise
-
-        fetchTeamScores: ->
-            promise = $.Deferred()
-
-            url = "#{metadataStore.getMetadata 'domain-api' }/contest/scores"
-            $.ajax
-                url: url
-                dataType: 'json'
-                xhrFields:
-                    withCredentials: yes
-                success: (responseJSON, textStatus, jqXHR) =>
-                    @teamScores = _.map responseJSON, (options) ->
-                        new TeamScoreModel options
-                    promise.resolve @teamScores
-                error: (jqXHR, textStatus, errorThrown) ->
-                    if jqXHR.responseJSON?
-                        promise.reject jqXHR.responseJSON
-                    else
-                        promise.reject 'Unknown error. Please try again later.'
-
-            promise
-
-        fetchSolvedTeamCountByTask: (taskId) ->
-            promise = $.Deferred()
-            url = "#{metadataStore.getMetadata 'domain-api' }/contest/task/#{taskId}/progress"
-            $.ajax
-                url: url
-                dataType: 'json'
-                xhrFields:
-                    withCredentials: yes
-                success: (responseJSON, textStatus, jqXHR) =>
-                    promise.resolve responseJSON
-                error: (jqXHR, textStatus, errorThrown) ->
-                    if jqXHR.responseJSON?
-                        promise.reject jqXHR.responseJSON
-                    else
-                        promise.reject 'Unknown error. Please try again later.'
-
-            promise
-
-        fetchTeamTaskProgress: (teamId) ->
-            promise = $.Deferred()
-
-            identity = identityProvider.getIdentity()
-            url = "#{metadataStore.getMetadata 'domain-api' }/contest/team/#{teamId}/progress"
-
-            $.ajax
-                url: url
-                dataType: 'json'
-                xhrFields:
-                    withCredentials: yes
-                success: (responseJSON, textStatus, jqXHR) =>
-                    if _.contains(['admin', 'manager'], identity.role) or (identity.role is 'team' and identity.id == teamId)
-                        teamTaskProgressEntries = _.map responseJSON, (options) ->
-                            new TeamTaskProgressModel options
-                        promise.resolve teamTaskProgressEntries
-                    else
-                        promise.resolve responseJSON
-                error: (jqXHR, textStatus, errorThrown) ->
-                    if jqXHR.responseJSON?
-                        promise.reject jqXHR.responseJSON
-                    else
-                        promise.reject 'Unknown error. Please try again later.'
-
-            promise
-
-        fetchTeamTaskProgressEntries: ->
-            promise = $.Deferred()
-
-            identity = identityProvider.getIdentity()
-            if _.contains ['admin', 'manager'], identity.role
-                url = "#{metadataStore.getMetadata 'domain-api' }/contest/progress"
-            else if identity.role is 'team'
-                url = "#{metadataStore.getMetadata 'domain-api' }/contest/team/#{identity.id}/progress"
-            else
-                promise.reject 'Unknown error. Please try again later.'
-
-            if _.contains ['admin', 'manager', 'team'], identity.role
-                $.ajax
-                    url: url
-                    dataType: 'json'
-                    xhrFields:
-                        withCredentials: yes
-                    success: (responseJSON, textStatus, jqXHR) =>
-                        @teamTaskProgressEntries = _.map responseJSON, (options) ->
-                            new TeamTaskProgressModel options
-                        promise.resolve @teamTaskProgressEntries
-                    error: (jqXHR, textStatus, errorThrown) ->
-                        if jqXHR.responseJSON?
-                            promise.reject jqXHR.responseJSON
-                        else
-                            promise.reject 'Unknown error. Please try again later.'
-
-            promise
-
-    new ContestProvider()
+export default new ContestProvider()
