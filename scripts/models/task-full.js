@@ -1,4 +1,6 @@
-import TaskModel from './taskModel.js'
+import TaskModel from './task'
+
+
 export default class TaskFullModel extends TaskModel {
   constructor(options) {
     super(options)

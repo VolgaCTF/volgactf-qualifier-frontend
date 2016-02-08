@@ -8,17 +8,16 @@ export default class TaskPreviewModel {
     this.categories = options.categories
     this.state = options.state
   }
-  
+
   isInitial() {
-    return state === 1
-  }	    
+    return (this.state === 1)
+  }
 
   isOpened() {
-    return state === 2
+    return (this.state === 2)
   }
-  
+
   isClosed() {
-    return state === 3
+    return (this.state === 3)
   }
 }
-

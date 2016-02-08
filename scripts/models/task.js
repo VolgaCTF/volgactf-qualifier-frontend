@@ -1,4 +1,6 @@
-import TaskPreviewModel from './taskPreviewModel.js' 
+import TaskPreviewModel from './task-preview'
+
+
 export default class TaskModel extends TaskPreviewModel {
   constructor(options) {
     super(options)

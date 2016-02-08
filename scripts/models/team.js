@@ -7,6 +7,6 @@ export default class TeamModel {
     this.institution = options.institution
     this.createdAt = new Date(options.createdAt)
     this.email = (options.email) ? options.email : null
-    this.emailConfirmed = (options.emailConfirmed) ? options.emailConfirmed : no
+    this.emailConfirmed = (options.emailConfirmed) ? options.emailConfirmed : false
   }
 }

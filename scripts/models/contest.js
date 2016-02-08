@@ -6,18 +6,18 @@ export default class ContestModel {
   }
 
   isInitial() {
-    return this.state === 1
+    return (this.state === 1)
   }
 
   isStarted() {
-    return this.state === 2
+    return (this.state === 2)
   }
 
   isPaused() {
-    return this.state === 3
+    return (this.state === 3)
   }
-    
+
   isFinished() {
-    return this.state === 4
+    return (this.state === 4)
   }
 }

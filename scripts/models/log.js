@@ -6,5 +6,3 @@ export default class LogModel {
     this.data = options.data
   }
 }
-
-
