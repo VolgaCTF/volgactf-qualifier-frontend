@@ -1,5 +1,5 @@
 import $ from 'jquery'
-import History from 'jquery.history'
+import History from 'history.js'
 import queryString from 'query-string'
 
 
@@ -15,7 +15,7 @@ class StateController {
     // I have chosen to pass unix timestamp.
     return {
       urlPath: urlPath,
-      tick: (new Date()).getTime()
+      tick: (new Date()).getTime(),
       params: params
     }
   }

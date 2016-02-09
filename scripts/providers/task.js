@@ -1,6 +1,6 @@
 import $ from 'jquery'
 import _ from 'underscore'
-import EventEmitter from 'EventEmitter'
+import EventEmitter from 'wolfy87-eventemitter'
 import dataStore from '../data-store'
 import metadataStore from '../utils/metadata-store'
 import TaskPreviewModel from '../models/task-preview'
@@ -21,7 +21,7 @@ class TaskProvider extends EventEmitter {
   }
 
   getTaskPreviews() {
-    return taskPreviews
+    return this.taskPreviews
   }
 
   subscribe() {
@@ -29,7 +29,7 @@ class TaskProvider extends EventEmitter {
       return
     }
 
-    realtimeProvider = dataStore.getRealtimeProvider()
+    let realtimeProvider = dataStore.getRealtimeProvider()
 
     let isSupervisor = _.contains(['admin', 'manager'], identityProvider.getIdentity().role)
     if (isSupervisor) {
@@ -125,7 +125,7 @@ class TaskProvider extends EventEmitter {
       },
       success: (responseJSON, textStatus, jqXHR) => {
         this.taskPreviews = _.map(responseJSON, (options) => {
-          new TaskPreviewModel(options)
+          return new TaskPreviewModel(options)
         })
 
         promise.resolve(this.taskPreviews)
@@ -146,8 +146,9 @@ class TaskProvider extends EventEmitter {
     let defaultOptions = {
       full: false
     }
-    let options = _.extend(defaultOptions, options)
+    options = _.extend(defaultOptions, options)
     let promise = $.Deferred()
+    let url = null
 
     if (options.full) {
       url = `${metadataStore.getMetadata('domain-api')}/task/${taskId}/full`

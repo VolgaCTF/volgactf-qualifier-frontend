@@ -9,8 +9,8 @@ import navigationBar from '../navigation-bar'
 
 class NotFoundView extends View {
   constructor() {
-    this.$main = null
     super(null)
+    this.$main = null
   }
 
   getTitle() {

@@ -22,6 +22,7 @@ import 'parsley'
 
 class TasksView extends View {
   constructor() {
+    super(/^\/tasks$/)
     this.$main = null
     this.$taskCategoriesSection = null
     this.$taskCategoriesList = null
@@ -39,8 +40,6 @@ class TasksView extends View {
 
     this.onCreateTeamTaskProgress = null
     this.onUpdateContest = null
-
-    this.urlRegex = /^\/tasks$/
   }
 
   getTitle() {
@@ -506,7 +505,7 @@ class TasksView extends View {
           _.each(task.answers, (answer, ndx) => {
             $editTaskAnswerList.append($(renderTemplate('edit-task-answer-input-partial', {
               number: ndx + 1,
-              editable: no
+              editable: false
             })))
             $(`#edit-task-answer-${ndx + 1} input`).val(answer)
           })
@@ -514,7 +513,7 @@ class TasksView extends View {
         .fail((err) => {
           $editTaskSubmitError.text(err)
         })
-
+    })
 
     $editTaskModal.on('shown.bs.modal', (e) => {
       $editTaskTitle.focus()
@@ -527,7 +526,7 @@ class TasksView extends View {
           $editTaskSubmitError.text('')
           $editTaskSubmitButton.prop('disabled', true)
         },
-        clearForm: true
+        clearForm: true,
         dataType: 'json',
         xhrFields: {
           withCredentials: true
@@ -621,7 +620,7 @@ class TasksView extends View {
             }
           }
 
-          $reviseTaskStatus.html(renderTemplate('revise-task-status-partial', { teamNames: teamNames })
+          $reviseTaskStatus.html(renderTemplate('revise-task-status-partial', { teamNames: teamNames }))
           $reviseTaskSubmitButton.prop('disabled', false)
         })
         .fail((err) => {
@@ -641,7 +640,7 @@ class TasksView extends View {
           $reviseTaskSubmitSuccess.text('')
           $reviseTaskSubmitButton.prop('disabled', true)
         },
-        clearForm: true
+        clearForm: true,
         dataType: 'json',
         xhrFields: {
           withCredentials: true
@@ -720,7 +719,7 @@ class TasksView extends View {
       let taskId = parseInt($(e.relatedTarget).data('task-id'), 10)
       $closeTaskModal.data('task-id', taskId)
       let taskPreview = _.findWhere(taskProvider.getTaskPreviews(), { id: taskId })
-      $closeTaskModalBody.html(renderTemplate 'close-task-confirmation', { title: taskPreview.title })
+      $closeTaskModalBody.html(renderTemplate('close-task-confirmation', { title: taskPreview.title }))
       $closeTaskSubmitError.text('')
     })
 
@@ -753,7 +752,7 @@ class TasksView extends View {
 
     $submitTaskSubmitButton.on('click', (e) => {
       $submitTaskForm.trigger('submit')
-    }
+    })
 
     let $submitTaskAnswerGroup = $('#submit-task-answer-group')
     let $submitTaskAnswer = $('#submit-task-answer')
@@ -842,6 +841,7 @@ class TasksView extends View {
         .fail((err) => {
           $submitTaskSubmitError.text(err)
         })
+    })
 
     $submitTaskModal.on('shown.bs.modal', (e) => {
       $submitTaskAnswer.focus()
@@ -1059,7 +1059,7 @@ class TasksView extends View {
         })
       }
 
-      getSortResultByKey = (a, b, getValueFunc) => {
+      let getSortResultByKey = (a, b, getValueFunc) => {
         let valA = getValueFunc(a)
         let valB = getValueFunc(b)
         if (a < b) {
@@ -1071,7 +1071,7 @@ class TasksView extends View {
         }
       }
 
-      sortTaskPreviewsFunc = (a, b) => {
+      let sortTaskPreviewsFunc = (a, b) => {
         if (a.state === b.state) {
           let solvedA = _.contains(solvedTaskIds, a.id)
           let solvedB = _.contains(solvedTaskIds, b.id)

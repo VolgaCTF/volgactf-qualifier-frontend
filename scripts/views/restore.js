@@ -12,8 +12,8 @@ import 'jquery.form'
 
 class RestoreView extends View {
   constructor() {
+    super(/^\/restore$/)
     this.$main = null
-    this.urlRegex = /^\/restore$/
   }
 
   getTitle() {
@@ -38,7 +38,7 @@ class RestoreView extends View {
           $submitError.text('')
           $submitButton.prop('disabled', true)
         },
-        clearForm: true
+        clearForm: true,
         dataType: 'json',
         xhrFields: {
           withCredentials: true
@@ -56,7 +56,7 @@ class RestoreView extends View {
           } else {
             $submitError.text('Unknown error. Please try again later.')
           }
-        }
+        },
         complete: () => {
           $submitButton.prop('disabled', false)
         }

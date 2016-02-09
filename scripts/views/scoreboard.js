@@ -10,11 +10,12 @@ import moment from 'moment'
 import contestProvider from '../providers/contest'
 import identityProvider from '../providers/identity'
 import teamProvider from '../providers/team'
-import History from 'jquery.History'
+import History from 'history.js'
 
 
 class ScoreboardView extends View {
   constructor() {
+    super(/^\/scoreboard$/)
     this.$main = null
 
     this.onUpdateTeamScore = null
@@ -25,8 +26,6 @@ class ScoreboardView extends View {
     this.renderingScoreboard = false
 
     this.detailed = false
-
-    this.urlRegex = /^\/scoreboard$/
   }
 
   getTitle() {
@@ -45,7 +44,7 @@ class ScoreboardView extends View {
 
     teamScores.sort(contestProvider.teamRankFunc)
     _.each(teamScores, (teamScore, ndx) => {
-      team = _.findWhere(teams, { id: teamScore.teamId })
+      let team = _.findWhere(teams, { id: teamScore.teamId })
       if (team) {
         let obj = {
           rank: ndx + 1,

@@ -5,13 +5,13 @@ import dataStore from '../data-store'
 import navigationBar from '../navigation-bar'
 import metadataStore from '../utils/metadata-store'
 import identityProvider from '../providers/identity'
-import History from 'jquery.history'
+import History from 'history.js'
 
 
 class VerifyEmailView extends View {
   constructor() {
+    super(/^\/verify-email$/)
     this.$main = null
-    this.urlRegex = /^\/verify-email$/
   }
 
   getTitle() {
@@ -27,7 +27,7 @@ class VerifyEmailView extends View {
         identityProvider.subscribe()
         navigationBar.present()
 
-        this.$main.html(renderTemplate('verify-email-view', { identity: identity })
+        this.$main.html(renderTemplate('verify-email-view', { identity: identity }))
 
         let $progress = this.$main.find('p[data-role="progress"]')
         let $result = this.$main.find('p[data-role="result"]')
@@ -40,6 +40,7 @@ class VerifyEmailView extends View {
             $result.addClass('text-success').text('Email verified! Thank you!')
           }
         })
+      })
       .fail((err) => {
         navigationBar.present()
         this.$main.html(renderTemplate('internal-error-view'))

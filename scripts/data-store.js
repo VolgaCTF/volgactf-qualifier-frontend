@@ -7,7 +7,7 @@ class DataStore {
     this.eventSource = null
   }
 
-  static verifyEmail(data, token, callback) {
+  verifyEmail(data, token, callback) {
     return $.ajax({
       url: `${metadataStore.getMetadata('domain-api')}/team/verify-email`,
       type: 'POST',

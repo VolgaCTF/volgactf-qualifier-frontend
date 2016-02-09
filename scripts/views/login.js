@@ -12,8 +12,8 @@ import 'jquery.form'
 
 class LoginView extends View {
   constructor() {
+    super(/^\/login$/)
     this.$main = null
-    this.urlRegex = /^\/login$/
   }
 
   getTitle() {
@@ -24,8 +24,8 @@ class LoginView extends View {
     let $form = this.$main.find('form.themis-form-login')
     $form.parsley()
 
-    $submitError = $form.find('.submit-error > p')
-    $submitButton = $form.find('button')
+    let $submitError = $form.find('.submit-error > p')
+    let $submitButton = $form.find('button')
 
     $form.on('submit', (e) => {
       e.preventDefault()
@@ -34,7 +34,7 @@ class LoginView extends View {
           $submitError.text('')
           $submitButton.prop('disabled', true)
         },
-        clearForm: true
+        clearForm: true,
         dataType: 'json',
         xhrFields: {
           withCredentials: true

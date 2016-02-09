@@ -5,15 +5,15 @@ import dataStore from '../data-store'
 import navigationBar from '../navigation-bar'
 import metadataStore from '../utils/metadata-store'
 import identityProvider from '../providers/identity'
-import History from 'jquery.history'
+import History from 'history.js'
 import 'parsley'
 import 'jquery.form'
 
 
 class ResetPasswordView extends View {
   constructor() {
+    super(/^\/reset-password$/)
     this.$main = null
-    this.urlRegex = /^\/reset-password$/
   }
 
   getTitle() {
@@ -81,6 +81,7 @@ class ResetPasswordView extends View {
         } else {
           $errorAlert.show()
         }
+      })
       .fail((err) => {
         navigationBar.present()
         this.$main.html(renderTemplate('internal-error-view'))

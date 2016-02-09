@@ -11,9 +11,9 @@ import identityProvider from '../providers/identity'
 
 class IndexView extends View {
   constructor() {
+    super(/^\/$/)
     this.$main = null
     this.onUpdateContest = null
-    this.urlRegex = /^\/$/
   }
 
   getTitle() {

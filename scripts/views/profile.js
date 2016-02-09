@@ -1,4 +1,5 @@
 import $ from 'jquery'
+import _ from 'underscore'
 import View from './base'
 import renderTemplate from '../utils/render-template'
 import dataStore from '../data-store'
@@ -7,7 +8,8 @@ import identityProvider from '../providers/identity'
 import teamProvider from '../providers/team'
 import contestProvider from '../providers/contest'
 import taskProvider from '../providers/task'
-import History from 'jquery.history'
+import History from 'history.js'
+import metadataStore from '../utils/metadata-store'
 import 'parsley'
 import 'jquery.form'
 import 'bootstrap-filestyle'
@@ -15,10 +17,9 @@ import 'bootstrap-filestyle'
 
 class ProfileView extends View {
   constructor() {
+    super(/^\/profile\/[0-9]+$/)
     this.$main = null
     this.team = null
-
-    this.urlRegex = /^\/profile\/[0-9]+$/
   }
 
   getTitle() {

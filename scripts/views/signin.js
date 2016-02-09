@@ -12,8 +12,8 @@ import 'jquery.form'
 
 class SigninView extends View {
   constructor() {
+    super(/^\/signin$/)
     this.$main = null
-    this.urlRegex = /^\/signin$/
   }
 
   getTitle() {
@@ -53,7 +53,7 @@ class SigninView extends View {
           } else {
             $submitError.text('Unknown error. Please try again later.')
           }
-        }
+        },
         complete: () => {
           $submitButton.prop('disabled', false)
         }

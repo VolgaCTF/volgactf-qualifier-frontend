@@ -11,8 +11,8 @@ import identityProvider from '../providers/identity'
 
 class AboutView extends View {
   constructor() {
+    super(/^\/about$/)
     this.$main = null
-    this.urlRegex = /^\/about$/
   }
 
   getTitle() {

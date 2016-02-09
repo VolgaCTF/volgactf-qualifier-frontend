@@ -18,10 +18,11 @@
     "url": "https://github.com/aspyatkin/themis-quals-website/issues"
   },
   "dependencies": {
+    "bootstrap": "^3.3.4",
     "bower": "~1.7.2",
+    "browserify-shim": "^3.8.12",
     "coffee-script": "~1.8.0",
     "del": "~1.1.1",
-    "gulp": "~3.8.10",
     "gulp-buster": "~1.0.0",
     "gulp-coffee": "~2.2.0",
     "gulp-if": "~1.2.5",
@@ -34,7 +35,64 @@
     "gulp-sass": "^2.1.1",
     "gulp-uglify": "~1.1.0",
     "gulp-watch": "~4.1.0",
+    "jquery": "^2.1.3",
     "js-yaml": "~3.2.5",
     "node-sass": "^3.4.2"
+  },
+  "devDependencies": {
+    "babel-preset-es2015": "^6.5.0",
+    "babelify": "^7.2.0",
+    "browserify": "^13.0.0",
+    "browserify-shim": "^3.8.12",
+    "gulp": "^3.9.1",
+    "gulp-babel": "^6.1.2",
+    "vinyl-buffer": "^1.0.0",
+    "vinyl-source-stream": "^1.1.0"
+  },
+  "browserify": {
+    "transform": [
+      "browserify-shim"
+    ]
+  },
+  "browser": {
+    "history.js": "./bower_components/history.js/scripts/bundled-uncompressed/html5/jquery.history.js",
+    "parsley": "./bower_components/parsleyjs/dist/parsley.js",
+    "jquery.form": "./bower_components/jquery-form/jquery.form.js",
+    "bootstrap-filestyle": "./bower_components/bootstrap-filestyle/src/bootstrap-filestyle.js",
+    "bootstrap-datetimepicker": "./bower_components/eonasdan-bootstrap-datetimepicker/src/js/bootstrap-datetimepicker.js"
+  },
+  "browserify-shim": {
+    "jquery": {
+      "exports": "$"
+    },
+    "history.js": {
+      "exports": "History",
+      "depends": [
+        "jquery:jQuery"
+      ]
+    },
+    "parsley": {
+      "depends": [
+        "jquery"
+      ]
+    },
+    "jquery.form": {
+      "depends": [
+        "jquery"
+      ]
+    },
+    "bootstrap-filestyle": {
+      "depends": [
+        "jquery",
+        "bootstrap"
+      ]
+    },
+    "bootstrap-datetimepicker": {
+      "depends": [
+        "jquery",
+        "bootstrap",
+        "moment"
+      ]
+    }
   }
 }

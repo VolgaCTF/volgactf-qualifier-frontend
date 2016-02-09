@@ -2,7 +2,7 @@ import $ from 'jquery'
 import _ from 'underscore'
 import dataStore from '../data-store'
 import metadataStore from '../utils/metadata-store'
-import EventEmitter from 'EventEmitter'
+import EventEmitter from 'wolfy87-eventemitter'
 import TaskCategoryModel from '../models/task-category'
 
 

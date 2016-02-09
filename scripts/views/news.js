@@ -17,13 +17,12 @@ import 'parsley'
 
 class NewsView extends View {
   constructor() {
+    super(/^\/news$/)
     this.$main = null
 
     this.onCreatePost = null
     this.onUpdatePost = null
     this.onRemovePost = null
-
-    this.urlRegex = /^\/news$/
   }
 
   getTitle() {
@@ -320,7 +319,7 @@ class NewsView extends View {
       })
       .fail((err) => {
         navigationBar.present()
-        this.$main.html(renderTemplate 'internal-error-view')
+        this.$main.html(renderTemplate('internal-error-view'))
       })
   }
 

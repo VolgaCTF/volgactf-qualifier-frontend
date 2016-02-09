@@ -14,8 +14,8 @@ import 'bootstrap-filestyle'
 
 class SignupView extends View {
   constructor() {
+    super(/^\/signup$/)
     this.$main = null
-    this.urlRegex = /^\/signup$/
   }
 
   getTitle() {

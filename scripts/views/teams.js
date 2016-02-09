@@ -14,14 +14,13 @@ import teamProvider from '../providers/team'
 
 class TeamsView extends View {
   constructor() {
+    super(/^\/teams$/)
     this.$main = null
 
     this.onUpdateTeamProfile = null
     this.onCreateTeam = null
     this.onChangeTeamEmail = null
     this.onQualifyTeam = null
-
-    this.urlRegex = /^\/teams$/
   }
 
   getTitle() {

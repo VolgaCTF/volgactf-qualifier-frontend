@@ -2,9 +2,9 @@ import $ from 'jquery'
 import _ from 'underscore'
 import renderTemplate from './utils/render-template'
 import dataStore from './data-store'
-import moment from moment
-import contestProvider from '../providers/contest'
-import identityProvider from '../providers/identity'
+import moment from 'moment'
+import contestProvider from './providers/contest'
+import identityProvider from './providers/identity'
 import 'bootstrap'
 import 'parsley'
 import 'bootstrap-datetimepicker'
@@ -49,8 +49,8 @@ class StatusBar {
     let pickerFormat = 'D MMM YYYY [at] HH:mm'
 
     $updateContestStartsAt.datetimepicker({
-      showClose: true
-      sideBySide: true
+      showClose: true,
+      sideBySide: true,
       format: pickerFormat
     })
 
@@ -70,7 +70,7 @@ class StatusBar {
       $updateContestStartsAt.data('DateTimePicker').date(contest.startsAt)
       $updateContestFinishesAt.data('DateTimePicker').date(contest.finishesAt)
       $updateContestSubmitError.text('')
-    }
+    })
 
     $updateContestModal.on('shown.bs.modal', (e) => {
       $updateContestState.focus()
@@ -99,7 +99,7 @@ class StatusBar {
           'X-CSRF-Token': identityProvider.getIdentity().token
         },
         success: (responseJSON, textStatus, jqXHR) => {
-          $updateContestModal.modal 'hide'
+          $updateContestModal.modal('hide')
           if (!dataStore.connectedRealtime()) {
             window.location.reload()
           }
@@ -124,10 +124,10 @@ class StatusBar {
       state: contest.state
     }
 
-    this.$stateContainer.html(renderTemplate 'contest-state-partial', {
+    this.$stateContainer.html(renderTemplate('contest-state-partial', {
       contest: contestObj,
       identity: identityProvider.getIdentity()
-    })
+    }))
   }
 
   renderContestTimer() {

@@ -1,7 +1,7 @@
 import $ from 'jquery'
 import _ from 'underscore'
 import dataStore from '../data-store'
-import EventEmitter from 'EventEmitter'
+import EventEmitter from 'wolfy87-eventemitter'
 import metadataStore from '../utils/metadata-store'
 import LogModel from '../models/log'
 

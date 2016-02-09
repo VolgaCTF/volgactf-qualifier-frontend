@@ -13,8 +13,6 @@
 
         <script type="text/x-metadata" data-name="domain-api" data-value="//api.{{ domain }}"></script>
         <script type="text/x-metadata" data-name="event-title" data-value="{{#event}}{{ title }}{{/event}}"></script>
-
-        <script src="//cdn.{{ domain }}/js/require.js" data-main='//cdn.{{ domain }}/js/{{#cachebusting}}{{#themis}}{{ js }}{{/themis}}{{/cachebusting}}'></script>
     </head>
     <body>
         <div class="navbar navbar-default navbar-static-top themis-navbar">
@@ -1799,5 +1797,7 @@
                 </div>
             </script>
         </div>
+
+        <script src="//cdn.{{ domain }}/js/{{#cachebusting}}{{#themis}}{{ js }}{{/themis}}{{/cachebusting}}"></script>
     </body>
 </html>

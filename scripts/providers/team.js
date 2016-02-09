@@ -1,6 +1,6 @@
 import $ from 'jquery'
 import _ from 'underscore'
-import EventEmitter from 'EventEmitter'
+import EventEmitter from 'wolfy87-eventemitter'
 import TeamModel from '../models/team'
 import metadataStore from '../utils/metadata-store'
 import identityProvider from './identity'
@@ -146,7 +146,7 @@ class TeamProvider extends EventEmitter {
       },
       success: (responseJSON, textStatus, jqXHR) => {
         this.teams = _.map(responseJSON, (options) => {
-          new TeamModel(options)
+          return new TeamModel(options)
         })
 
         promise.resolve(this.teams)
@@ -165,4 +165,4 @@ class TeamProvider extends EventEmitter {
 }
 
 
-new TeamProvider()
+export default new TeamProvider()

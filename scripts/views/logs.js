@@ -12,18 +12,17 @@ import teamProvider from '../providers/team'
 import taskProvider from '../providers/task'
 import logProvider from '../providers/log'
 import moment from 'moment'
-import History from 'jquery.history'
+import History from 'history.js'
 
 
 class LogsView extends View {
   constructor() {
+    super(/^\/logs$/)
     this.$main = null
 
     this.onCreateLog = null
     this.$section = null
     this.$logsContainer = null
-
-    this.urlRegex = /^\/logs$/
   }
 
   getTitle() {
@@ -42,6 +41,7 @@ class LogsView extends View {
           answer: log.data.answer,
           createdAt: moment(log.createdAt).format()
         }))
+      }
     } else if (log.event === 2) {
       let team = _.findWhere(teams, { id: log.data.teamId })
       let task = _.findWhere(tasks, { id: log.data.taskId })
@@ -140,7 +140,8 @@ class LogsView extends View {
         } else {
           this.$main.html(renderTemplate('access-forbidden-view', {
             urlPath: window.location.pathname
-          })
+          }))
+        }
       })
       .fail((err) => {
         navigationBar.present()
@@ -174,4 +175,4 @@ class LogsView extends View {
 }
 
 
-new LogsView()
+export default new LogsView()

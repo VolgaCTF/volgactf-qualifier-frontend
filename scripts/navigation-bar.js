@@ -26,7 +26,7 @@ class NavigationBar {
         e.preventDefault()
         e.stopPropagation()
 
-        let url = "#{metadataStore.getMetadata('domain-api')}/signout"
+        let url = `${metadataStore.getMetadata('domain-api')}/signout`
         $.ajax({
           method: 'POST',
           url: url,
@@ -39,7 +39,7 @@ class NavigationBar {
           },
           success: (responseText, textStatus, jqXHR) => {
             stateController.navigateTo('/')
-          }
+          },
           error: (jqXHR, textStatus, errorThrown) => {
             console.log(errorThrown)
           }

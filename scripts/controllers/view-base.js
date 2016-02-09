@@ -21,7 +21,7 @@ export default class ViewControllerBase {
   findView(urlPath) {
     let found = _.find(this.views, (view) => {
       return view.urlRegex.test(urlPath)
-    }
+    })
 
     if (found) {
       return found
@@ -31,7 +31,7 @@ export default class ViewControllerBase {
   }
 
   getTitle(urlPath) {
-    return this.findView(urlPath).view.getTitle()
+    return this.findView(urlPath).getTitle()
   }
 
   render(urlPath) {

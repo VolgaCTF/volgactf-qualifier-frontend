@@ -1,12 +1,13 @@
 import $ from 'jquery'
 import _ from 'underscore'
-import EventEmitter from 'EventEmitter'
+import EventEmitter from 'wolfy87-eventemitter'
 import dataStore from '../data-store'
 import metadataStore from '../utils/metadata-store'
 import ContestModel from '../models/contest'
 import TeamScoreModel from '../models/team-score'
-import TeamTaskProgressModel from '../models/team-tasl-progress'
+import TeamTaskProgressModel from '../models/team-task-progress'
 import identityProvider from './identity'
+import teamProvider from './team'
 
 
 class ContestProvider extends EventEmitter {
@@ -24,11 +25,11 @@ class ContestProvider extends EventEmitter {
   }
 
   getContest() {
-    return contest
+    return this.contest
   }
 
   getTeamScores() {
-    return teamScores
+    return this.teamScores
   }
 
   teamRankFunc(a, b) {
