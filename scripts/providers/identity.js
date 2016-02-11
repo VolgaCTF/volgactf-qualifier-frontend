@@ -20,7 +20,7 @@ class IdentityProvider {
 
   fetchIdentity() {
     let promise = $.Deferred()
-    let url = `${metadataStore.getMetadata('domain-api')}/identity`
+    let url = '/api/identity'
 
     $.ajax({
       url: url,

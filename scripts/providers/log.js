@@ -51,7 +51,7 @@ class LogProvider extends EventEmitter {
 
   fetchLogs() {
     let promise = $.Deferred()
-    let url = `${metadataStore.getMetadata('domain-api')}/contest/logs`
+    let url = '/api/contest/logs'
 
     $.ajax({
       url: url,

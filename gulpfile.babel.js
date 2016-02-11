@@ -65,17 +65,8 @@ function isProduction() {
 
 
 gulp.task('clean_scripts', (callback) => {
-  del(['public/cdn/js/*'], callback)
+  del(['public/assets/js/*'], callback)
 })
-
-
-// gulp.task('scripts', ['clean_scripts'], () => {
-//   return gulp
-//     .src(paths.scripts)
-//     .pipe(plumber())
-//     .pipe(gulpIf(isProduction, uglify()))
-//     .pipe(gulp.dest('public/cdn/js'))
-// })
 
 
 gulp.task('app_scripts', ['clean_scripts'], () => {
@@ -91,11 +82,11 @@ gulp.task('app_scripts', ['clean_scripts'], () => {
     .pipe(buffer())
     .pipe(plumber())
     .pipe(gulpIf(isProduction, uglify()))
-    .pipe(gulp.dest('public/cdn/js'))
+    .pipe(gulp.dest('public/assets/js'))
     .pipe(rev())
-    .pipe(gulp.dest('public/cdn/js'))
+    .pipe(gulp.dest('public/assets/js'))
     .pipe(rev.manifest('manifest.json'))
-    .pipe(gulp.dest('public/cdn/js'))
+    .pipe(gulp.dest('public/assets/js'))
 })
 
 
@@ -105,7 +96,7 @@ function isSass(file) {
 
 
 gulp.task('clean_stylesheets', (callback) => {
-  del(['public/cdn/css/*'], callback)
+  del(['public/assets/css/*'], callback)
 })
 
 
@@ -113,7 +104,7 @@ gulp.task('stylesheets', ['clean_stylesheets'], () => {
   return gulp
     .src(paths.stylesheets)
     .pipe(gulpIf(isProduction, minifyCSS()))
-    .pipe(gulp.dest('public/cdn/css'))
+    .pipe(gulp.dest('public/assets/css'))
 })
 
 
@@ -122,23 +113,23 @@ gulp.task('app_stylesheets', ['clean_stylesheets'], () => {
     .src(paths.app_stylesheets)
     .pipe(sass({ indentedSyntax: true, errLogToConsole: true }))
     .pipe(gulpIf(isProduction, minifyCSS()))
-    .pipe(gulp.dest('public/cdn/css'))
+    .pipe(gulp.dest('public/assets/css'))
     .pipe(rev())
-    .pipe(gulp.dest('public/cdn/css'))
+    .pipe(gulp.dest('public/assets/css'))
     .pipe(rev.manifest('manifest.json'))
-    .pipe(gulp.dest('public/cdn/css'))
+    .pipe(gulp.dest('public/assets/css'))
 })
 
 
 gulp.task('clean_fonts', (callback) => {
-  del(['public/cdn/fonts/*'], callback)
+  del(['public/assets/fonts/*'], callback)
 })
 
 
 gulp.task('fonts', ['clean_fonts'], () => {
   gulp
     .src(paths.fonts)
-    .pipe(gulp.dest('public/cdn/fonts'))
+    .pipe(gulp.dest('public/assets/fonts'))
 })
 
 
@@ -147,13 +138,13 @@ gulp.task('clean_html', (callback) => {
 })
 
 
-gulp.task('html', ['clean_html', 'stylesheets', /*'scripts',*/ 'fonts', 'app_scripts', 'app_stylesheets'], () => {
+gulp.task('html', ['clean_html', 'stylesheets', 'fonts', 'app_scripts', 'app_stylesheets'], () => {
   let opts = null
 
   try {
     opts = yaml.safeLoad(fs.readFileSync('./opts.yml', 'utf8'))
-    let cachebusting_js = JSON.parse(fs.readFileSync('./public/cdn/js/manifest.json', 'utf8'))
-    let cachebusting_css = JSON.parse(fs.readFileSync('./public/cdn/css/manifest.json', 'utf8'))
+    let cachebusting_js = JSON.parse(fs.readFileSync('./public/assets/js/manifest.json', 'utf8'))
+    let cachebusting_css = JSON.parse(fs.readFileSync('./public/assets/css/manifest.json', 'utf8'))
 
     opts.cachebusting = {
       themis: {

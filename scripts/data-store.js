@@ -9,7 +9,7 @@ class DataStore {
 
   verifyEmail(data, token, callback) {
     return $.ajax({
-      url: `${metadataStore.getMetadata('domain-api')}/team/verify-email`,
+      url: '/api/team/verify-email',
       type: 'POST',
       dataType: 'json',
       data: data,
@@ -41,7 +41,7 @@ class DataStore {
   }
 
   connectRealtime() {
-    this.eventSource = new window.EventSource(`${metadataStore.getMetadata('domain-api')}/events`, { withCredentials: true })
+    this.eventSource = new window.EventSource('/api/events')
   }
 
   disconnectRealtime() {

@@ -88,7 +88,7 @@ class PostProvider extends EventEmitter {
 
   fetchPosts() {
     let promise = $.Deferred()
-    let url = `${metadataStore.getMetadata('domain-api')}/post/all`
+    let url = '/api/post/all'
 
     $.ajax({
       url: url,
@@ -117,7 +117,7 @@ class PostProvider extends EventEmitter {
 
   removePost(id, token) {
     let promise = $.Deferred()
-    let url = `${metadataStore.getMetadata('domain-api')}/post/${id}/remove`
+    let url = `/api/post/${id}/remove`
 
     $.ajax({
       url: url,

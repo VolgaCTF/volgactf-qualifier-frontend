@@ -156,7 +156,7 @@ class ContestProvider extends EventEmitter {
 
   fetchContest() {
     let promise = $.Deferred()
-    let url = `${metadataStore.getMetadata('domain-api')}/contest`
+    let url = '/api/contest'
 
     $.ajax({
       url: url,
@@ -182,7 +182,7 @@ class ContestProvider extends EventEmitter {
 
   fetchTeamScores() {
     let promise = $.Deferred()
-    let url = `${metadataStore.getMetadata('domain-api')}/contest/scores`
+    let url = '/api/contest/scores'
 
     $.ajax({
       url: url,
@@ -211,7 +211,7 @@ class ContestProvider extends EventEmitter {
 
   fetchSolvedTeamCountByTask(taskId) {
     let promise = $.Deferred()
-    let url = `${metadataStore.getMetadata('domain-api')}/contest/task/${taskId}/progress`
+    let url = `/api/contest/task/${taskId}/progress`
 
     $.ajax({
       url: url,
@@ -238,7 +238,7 @@ class ContestProvider extends EventEmitter {
     let promise = $.Deferred()
 
     let identity = identityProvider.getIdentity()
-    let url = `${metadataStore.getMetadata('domain-api')}/contest/team/${teamId}/progress`
+    let url = `/api/contest/team/${teamId}/progress`
 
     $.ajax({
       url: url,
@@ -275,9 +275,9 @@ class ContestProvider extends EventEmitter {
     let url = null
 
     if (_.contains(['admin', 'manager'], identity.role)) {
-      url = `${metadataStore.getMetadata('domain-api')}/contest/progress`
+      url = '/api/contest/progress'
     } else if (identity.role === 'team') {
-      url = `${metadataStore.getMetadata('domain-api')}/contest/team/${identity.id}/progress`
+      url = `/api/contest/team/${identity.id}/progress`
     } else {
       promise.reject('Unknown error. Please try again later.')
     }

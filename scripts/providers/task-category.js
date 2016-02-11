@@ -89,7 +89,7 @@ class TaskCategoryProvider extends EventEmitter {
 
   fetchTaskCategories() {
     let promise = $.Deferred()
-    let url = `${metadataStore.getMetadata('domain-api')}/task/category/all`
+    let url = '/api/task/category/all'
 
     $.ajax({
       url: url,
@@ -118,7 +118,7 @@ class TaskCategoryProvider extends EventEmitter {
 
   removeTaskCategory(id, token) {
     let promise = $.Deferred()
-    let url = `${metadataStore.getMetadata('domain-api')}/task/category/${id}/remove`
+    let url = `/api/task/category/${id}/remove`
 
     $.ajax({
       url: url,

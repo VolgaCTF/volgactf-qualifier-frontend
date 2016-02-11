@@ -115,7 +115,7 @@ class TaskProvider extends EventEmitter {
 
   fetchTaskPreviews() {
     let promise = $.Deferred()
-    let url = `${metadataStore.getMetadata('domain-api')}/task/all`
+    let url = '/api/task/all'
 
     $.ajax({
       url: url,
@@ -151,9 +151,9 @@ class TaskProvider extends EventEmitter {
     let url = null
 
     if (options.full) {
-      url = `${metadataStore.getMetadata('domain-api')}/task/${taskId}/full`
+      url = `/api/task/${taskId}/full`
     } else {
-      url = `${metadataStore.getMetadata('domain-api')}/task/${taskId}`
+      url = `/api/task/${taskId}`
     }
 
     $.ajax({
@@ -186,7 +186,7 @@ class TaskProvider extends EventEmitter {
 
   openTask(id, token) {
     let promise = $.Deferred()
-    let url = `${metadataStore.getMetadata('domain-api')}/task/${id}/open`
+    let url = `/api/task/${id}/open`
 
     $.ajax({
       url: url,
@@ -216,7 +216,7 @@ class TaskProvider extends EventEmitter {
 
   closeTask(id, token) {
     let promise = $.Deferred()
-    let url = `${metadataStore.getMetadata('domain-api')}/task/${id}/close`
+    let url = `/api/task/${id}/close`
 
     $.ajax({
       url: url,

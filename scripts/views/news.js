@@ -211,7 +211,7 @@ class NewsView extends View {
       let postId = parseInt($(e.relatedTarget).data('post-id'), 10)
       let post = _.findWhere(postProvider.getPosts(), { id: postId })
 
-      $editPostForm.attr('action', `${metadataStore.getMetadata('domain-api')}/post/${postId}/update`)
+      $editPostForm.attr('action', `/api/post/${postId}/update`)
       $editPostTitle.val(post.title)
       $editPostDescription.val(post.description)
       $editPostSubmitError.text('')

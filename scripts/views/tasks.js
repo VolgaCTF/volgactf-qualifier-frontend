@@ -123,7 +123,7 @@ class TasksView extends View {
       let taskCategoryId = parseInt($(e.relatedTarget).data('task-category-id'), 10)
       let taskCategory = _.findWhere(taskCategoryProvider.getTaskCategories(), { id: taskCategoryId })
 
-      $editTaskCategoryForm.attr('action', `${metadataStore.getMetadata('domain-api')}/task/category/${taskCategoryId}/update`)
+      $editTaskCategoryForm.attr('action', `/api/task/category/${taskCategoryId}/update`)
       $editTaskCategoryTitle.val(taskCategory.title)
       $editTaskCategoryDescription.val(taskCategory.description)
       $editTaskCategorySubmitError.text('')
@@ -477,7 +477,7 @@ class TasksView extends View {
 
       $editTaskSubmitError.text('')
       $editTaskForm.parsley().reset()
-      $editTaskForm.attr('action', `${metadataStore.getMetadata('domain-api')}/task/${taskId}/update`)
+      $editTaskForm.attr('action', `/api/task/${taskId}/update`)
 
       $editTaskSubmitButton.prop('disabled', true)
 
@@ -578,7 +578,7 @@ class TasksView extends View {
       $reviseTaskModal.data('task-id', taskId)
 
       $reviseTaskForm.parsley().reset()
-      $reviseTaskForm.attr('action', `${metadataStore.getMetadata('domain-api')}/task/${taskId}/revise`)
+      $reviseTaskForm.attr('action', `/api/task/${taskId}/revise`)
 
       $reviseTaskContents.empty()
       $reviseTaskAnswerGroup.show()
@@ -814,9 +814,9 @@ class TasksView extends View {
 
       $submitTaskForm.parsley().reset()
       if (contest.isFinished()) {
-        $submitTaskForm.attr('action', `${metadataStore.getMetadata('domain-api')}/task/${taskId}/check`)
+        $submitTaskForm.attr('action', `/api/task/${taskId}/check`)
       } else {
-        $submitTaskForm.attr('action', `${metadataStore.getMetadata('domain-api')}/task/${taskId}/submit`)
+        $submitTaskForm.attr('action', `/api/task/${taskId}/submit`)
       }
 
       $
@@ -948,7 +948,7 @@ class TasksView extends View {
       $checkTaskModal.data('task-id', taskId)
 
       $checkTaskForm.parsley().reset()
-      $checkTaskForm.attr('action', `${metadataStore.getMetadata('domain-api')}/task/${taskId}/check`)
+      $checkTaskForm.attr('action', `/api/task/${taskId}/check`)
 
       if (contest.isFinished()) {
         $

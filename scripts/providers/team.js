@@ -111,7 +111,7 @@ class TeamProvider extends EventEmitter {
 
   fetchTeamProfile(id) {
     let promise = $.Deferred()
-    let url = `${metadataStore.getMetadata('domain-api')}/team/${id}/profile`
+    let url = `/api/team/${id}/profile`
 
     $.ajax({
       url: url,
@@ -136,7 +136,7 @@ class TeamProvider extends EventEmitter {
 
   fetchTeams(callback) {
     let promise = $.Deferred()
-    let url = `${metadataStore.getMetadata('domain-api')}/team/all`
+    let url = '/api/team/all'
 
     $.ajax({
       url: url,

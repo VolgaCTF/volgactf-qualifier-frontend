@@ -26,7 +26,7 @@ class NavigationBar {
         e.preventDefault()
         e.stopPropagation()
 
-        let url = `${metadataStore.getMetadata('domain-api')}/signout`
+        let url = '/api/signout'
         $.ajax({
           method: 'POST',
           url: url,

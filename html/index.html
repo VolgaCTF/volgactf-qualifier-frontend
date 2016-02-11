@@ -6,10 +6,10 @@
         <meta charset="utf8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
 
-        <link rel="stylesheet" href="//cdn.{{ domain }}/css/bootstrap.css">
-        <link rel="stylesheet" href="//cdn.{{ domain }}/css/bootstrap-datetimepicker.css">
-        <link rel="stylesheet" href="//cdn.{{ domain }}/css/{{#cachebusting}}{{#themis}}{{ css }}{{/themis}}{{/cachebusting}}">
-        <link rel="stylesheet" href="//cdn.{{ domain }}/css/animate.css">
+        <link rel="stylesheet" href="/assets/css/bootstrap.css">
+        <link rel="stylesheet" href="/assets/css/bootstrap-datetimepicker.css">
+        <link rel="stylesheet" href="/assets/css/{{#cachebusting}}{{#themis}}{{ css }}{{/themis}}{{/cachebusting}}">
+        <link rel="stylesheet" href="/assets/css/animate.css">
 
         <script type="text/x-metadata" data-name="domain-api" data-value="//api.{{ domain }}"></script>
         <script type="text/x-metadata" data-name="event-title" data-value="{{#event}}{{ title }}{{/event}}"></script>
@@ -82,7 +82,7 @@
                             <% } else if (identity.role === 'manager') { %>
                             <span class="label label-primary">M</span>
                             <% } else if (identity.role === 'team') { %>
-                            <img class="profile-image" src="//api.{{ domain }}/team/<%- identity.id %>/logo">
+                            <img class="profile-image" src="/api/team/<%- identity.id %>/logo">
                             <% } %>
                             <%- identity.name %>&nbsp;<span class="caret"></span>
                         </a>
@@ -100,7 +100,7 @@
             <script type="text/x-template" data-name="team-profile-simplified-partial">
                 <div class="clearfix themis-profile">
                     <div class="pull-left logo">
-                        <img class="img-thumbnail" src="//api.{{ domain }}/team/<%- team.id %>/logo">
+                        <img class="img-thumbnail" src="/api/team/<%- team.id %>/logo">
                     </div>
                     <div class="pull-left info">
                         <h4 class="text-primary"><a href="/profile/<%- team.id %>" data-push-history><%- team.name %></a></h4>
@@ -205,7 +205,7 @@
                                 <h4 class="modal-title">Create task category</h4>
                             </div>
                             <div class="modal-body">
-                                <form method="POST" action="//api.{{ domain }}/task/category/create">
+                                <form method="POST" action="/api/task/category/create">
                                     <div class="form-group">
                                         <label for="create-task-category-title" class="control-label">Title</label>
                                         <input type="text" class="form-control" id="create-task-category-title" name="title" autofocus required minlength="2" maxlength="20">
@@ -639,7 +639,7 @@
 
                                     <div class="tab-content">
                                         <div role="tabpanel" class="tab-pane" id="create-task-data">
-                                            <form method="POST" action="//api.{{ domain }}/task/create">
+                                            <form method="POST" action="/api/task/create">
                                                 <div class="container-fluid">
                                                     <div class="col-sm-6">
                                                         <div class="form-group">
@@ -803,7 +803,7 @@
                 <tr class="themis-scoreboard-row<% print(highlight ? ' info': ''); %>">
                     <td><%- rank %></td>
                     <td>
-                        <img class="themis-scoreboard-logo" src="//api.{{ domain }}/team/<%- id %>/logo">
+                        <img class="themis-scoreboard-logo" src="/api/team/<%- id %>/logo">
                         <a href="/profile/<%- id %>" class="themis-team-link" data-push-history><%- name %></a>
                     </td>
                     <% if (detailed) { %>
@@ -934,7 +934,7 @@
                                 <h4 class="modal-title">Update contest</h4>
                             </div>
                             <div class="modal-body">
-                                <form method="POST" action="//api.{{ domain }}/contest/update">
+                                <form method="POST" action="/api/contest/update">
                                     <div class="form-group">
                                         <label for="update-contest-state" class="control-label">State</label>
                                         <select id="update-contest-state" class="form-control" name="state" autofocus required>
@@ -1092,7 +1092,7 @@
 
                                     <div class="tab-content">
                                         <div role="tabpanel" class="tab-pane" id="create-post-data">
-                                            <form method="POST" action="//api.{{ domain }}/post/create">
+                                            <form method="POST" action="/api/post/create">
                                                 <div class="form-group">
                                                     <label for="create-post-title" class="control-label">Title</label>
                                                     <input type="text" class="form-control" id="create-post-title" required minlength="2" maxlength="250" name="title">
@@ -1295,7 +1295,7 @@
 
             <script type="text/x-template" data-name="restore-view">
                 <div class="container">
-                    <form class="themis-form-restore" method="POST" action="//api.{{ domain }}/team/restore">
+                    <form class="themis-form-restore" method="POST" action="/api/team/restore">
                         <h2>Restore password</h2>
                         <div class="alert alert-warning">
                             <span class="glyphicon glyphicon-alert"></span>&nbsp;If you have already requested password reset, please wait 10-15 minutes for email to be sent.
@@ -1320,7 +1320,7 @@
 
             <script type="text/x-template" data-name="reset-password-view">
                 <div class="container">
-                    <form class="themis-form-reset" method="POST" action="//api.{{ domain }}/team/reset-password">
+                    <form class="themis-form-reset" method="POST" action="/api/team/reset-password">
                         <h2>Reset password</h2>
                         <label for="reset-password" class="sr-only">Password</label>
                         <input type="password" id="reset-password" name="password" class="form-control" placeholder="Password" required minlength="6" maxlength="40" pattern="^[A-Za-z0-9\x5b\x5d\x28\x29\x7b\x7d\x7e\x60\x21\x40\x23\x24\x25\x5e\x26\x2a\x2d\x5f\x3d\x2b\x27\x22\x3a\x3b\x7c\x2f\x5c\x2e\x2c\x3f\x3c\x3e]+$">
@@ -1353,7 +1353,7 @@
 
             <script type="text/x-template" data-name="signin-view">
                 <div class="container">
-                    <form class="themis-form-signin" method="POST" action="//api.{{ domain }}/team/signin">
+                    <form class="themis-form-signin" method="POST" action="/api/team/signin">
                         <h1>Please sign in</h1>
                         <label for="signin-team" class="sr-only">Team</label>
                         <input type="text" id="signin-team" name="team" class="form-control" placeholder="Team" required autofocus minlength="2" maxlength="100">
@@ -1468,10 +1468,10 @@
                     <div class="pull-left logo">
                         <% if (identity.role === 'team' && identity.id === team.id) { %>
                         <a href="#" data-action="upload-logo" data-toggle="modal" data-target="#upload-logo-modal">
-                            <img class="img-thumbnail" src="//api.{{ domain }}/team/<%- team.id %>/logo">
+                            <img class="img-thumbnail" src="/api/team/<%- team.id %>/logo">
                         </a>
                         <% } else { %>
-                            <img class="img-thumbnail" src="//api.{{ domain }}/team/<%- team.id %>/logo">
+                            <img class="img-thumbnail" src="/api/team/<%- team.id %>/logo">
                         <% } %>
                     </div>
                     <div class="pull-left info">
@@ -1536,7 +1536,7 @@
                                 <h4 class="modal-title">Upload logo</h4>
                             </div>
                             <div class="modal-body">
-                                <form method="POST" action="//api.{{ domain }}/team/upload-logo">
+                                <form method="POST" action="/api/team/upload-logo">
                                     <div class="form-group">
                                         <label for="upload-logo-logo" class="control-label">Logo</label>
                                         <input type="file" id="upload-logo-logo" name="logo" class="filestyle" data-buttonText="&nbsp;Choose file" data-iconName="glyphicon-picture" accept="image/jpeg,image/png,image/gif" required data-parsley-errors-container="#upload-logo-errors">
@@ -1564,7 +1564,7 @@
                                 <h4 class="modal-title">Resend confirmation email</h4>
                             </div>
                             <div class="modal-body">
-                                <form method="POST" action="//api.{{ domain }}/team/resend-confirmation-email">
+                                <form method="POST" action="/api/team/resend-confirmation-email">
                                     <div class="form-group">
                                         <label for="resend-confirmation-email" class="control-label">Email</label>
                                         <input type="email" class="form-control" id="resend-confirmation-email" disabled>
@@ -1590,7 +1590,7 @@
                                 <h4 class="modal-title">Change email</h4>
                             </div>
                             <div class="modal-body">
-                                <form method="POST" action="//api.{{ domain }}/team/change-email">
+                                <form method="POST" action="/api/team/change-email">
                                     <div class="form-group">
                                         <label for="change-email-new" class="control-label">New email</label>
                                         <input type="email" class="form-control" id="change-email-new" name="email" required autofocus>
@@ -1616,7 +1616,7 @@
                                 <h4 class="modal-title">Edit profile</h4>
                             </div>
                             <div class="modal-body">
-                                <form method="POST" action="//api.{{ domain }}/team/edit-profile">
+                                <form method="POST" action="/api/team/edit-profile">
                                     <div class="form-group">
                                         <label for="edit-profile-country" class="control-label">Country</label>
                                         <input type="text" class="form-control" id="edit-profile-country" name="country" autofocus>
@@ -1650,7 +1650,7 @@
                                 <h4 class="modal-title">Change password</h4>
                             </div>
                             <div class="modal-body">
-                                <form method="POST" action="//api.{{ domain }}/team/change-password">
+                                <form method="POST" action="/api/team/change-password">
                                     <div class="form-group">
                                         <label for="change-pwd-current" class="control-label">Current password</label>
                                         <input type="password" class="form-control" id="change-pwd-current" name="currentPassword" required autofocus minlength="6" maxlength="40" pattern="^[A-Za-z0-9\x5b\x5d\x28\x29\x7b\x7d\x7e\x60\x21\x40\x23\x24\x25\x5e\x26\x2a\x2d\x5f\x3d\x2b\x27\x22\x3a\x3b\x7c\x2f\x5c\x2e\x2c\x3f\x3c\x3e]+$">
@@ -1679,7 +1679,7 @@
 
             <script type="text/x-template" data-name="login-view">
                 <div class="container">
-                    <form class="themis-form-login" method="POST" action="//api.{{ domain }}/login">
+                    <form class="themis-form-login" method="POST" action="/api/login">
                         <h1>Please log in</h1>
                         <label for="login-team" class="sr-only">Username</label>
                         <input type="text" id="login-username" name="username" class="form-control" placeholder="Username" required autofocus minlength="2" maxlength="100">
@@ -1695,7 +1695,7 @@
 
             <script type="text/x-template" data-name="signup-view">
                 <div class="container">
-                    <form class="form-horizontal themis-form-signup" method="POST" enctype="multipart/form-data" action="//api.{{ domain }}/team/signup">
+                    <form class="form-horizontal themis-form-signup" method="POST" enctype="multipart/form-data" action="/api/team/signup">
                         <div class="form-group">
                             <div class="col-sm-offset-3 col-sm-9">
                                 <h1>Sign up</h1>
@@ -1798,6 +1798,6 @@
             </script>
         </div>
 
-        <script src="//cdn.{{ domain }}/js/{{#cachebusting}}{{#themis}}{{ js }}{{/themis}}{{/cachebusting}}"></script>
+        <script src="/assets/js/{{#cachebusting}}{{#themis}}{{ js }}{{/themis}}{{/cachebusting}}"></script>
     </body>
 </html>
