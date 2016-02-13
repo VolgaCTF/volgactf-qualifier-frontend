@@ -1,5 +1,5 @@
 export default class TaskPreviewModel {
-  constructor(options) {
+  constructor (options) {
     this.id = options.id
     this.title = options.title
     this.value = options.value
@@ -9,15 +9,15 @@ export default class TaskPreviewModel {
     this.state = options.state
   }
 
-  isInitial() {
-    return (this.state === 1)
+  isInitial () {
+    return this.state === 1
   }
 
-  isOpened() {
-    return (this.state === 2)
+  isOpened () {
+    return this.state === 2
   }
 
-  isClosed() {
-    return (this.state === 3)
+  isClosed () {
+    return this.state === 3
   }
 }

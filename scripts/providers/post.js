@@ -2,12 +2,10 @@ import $ from 'jquery'
 import _ from 'underscore'
 import dataStore from '../data-store'
 import EventEmitter from 'wolfy87-eventemitter'
-import metadataStore from '../utils/metadata-store'
 import PostModel from '../models/post'
 
-
 class PostProvider extends EventEmitter {
-  constructor() {
+  constructor () {
     super()
     this.posts = []
 
@@ -16,11 +14,11 @@ class PostProvider extends EventEmitter {
     this.onRemove = null
   }
 
-  getPosts() {
+  getPosts () {
     return this.posts
   }
 
-  subscribe() {
+  subscribe () {
     if (!dataStore.supportsRealtime()) {
       return
     }
@@ -61,7 +59,7 @@ class PostProvider extends EventEmitter {
     realtimeProvider.addEventListener('removePost', this.onRemove)
   }
 
-  unsubscribe() {
+  unsubscribe () {
     if (!dataStore.supportsRealtime()) {
       return
     }
@@ -86,7 +84,7 @@ class PostProvider extends EventEmitter {
     this.posts = []
   }
 
-  fetchPosts() {
+  fetchPosts () {
     let promise = $.Deferred()
     let url = '/api/post/all'
 
@@ -115,7 +113,7 @@ class PostProvider extends EventEmitter {
     return promise
   }
 
-  removePost(id, token) {
+  removePost (id, token) {
     let promise = $.Deferred()
     let url = `/api/post/${id}/remove`
 
@@ -145,6 +143,5 @@ class PostProvider extends EventEmitter {
     return promise
   }
 }
-
 
 export default new PostProvider()

@@ -1,21 +1,22 @@
 {
-  "name": "themis-quals-website",
+  "name": "themis-quals-frontend",
   "version": "0.0.1",
   "description": "",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "bower": "bower",
-    "gulp": "gulp"
+    "gulp": "gulp",
+    "lint": "standard --verbose scripts/**/*.js | snazzy"
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/aspyatkin/themis-quals-website.git"
+    "url": "https://github.com/aspyatkin/themis-quals-frontend.git"
   },
   "author": "Alexander Pyatkin",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/aspyatkin/themis-quals-website/issues"
+    "url": "https://github.com/aspyatkin/themis-quals-frontend/issues"
   },
   "dependencies": {
     "bootstrap": "^3.3.4",
@@ -45,12 +46,15 @@
     "wolfy87-eventemitter": "^4.2.11"
   },
   "devDependencies": {
+    "babel-eslint": "^4.1.8",
     "babel-preset-es2015": "^6.5.0",
     "babelify": "^7.2.0",
     "browserify": "^13.0.0",
     "browserify-shim": "^3.8.12",
     "gulp": "^3.9.1",
     "gulp-babel": "^6.1.2",
+    "snazzy": "^2.0.1",
+    "standard": "^6.0.5",
     "vinyl-buffer": "^1.0.0",
     "vinyl-source-stream": "^1.1.0"
   },
@@ -99,5 +103,8 @@
         "moment"
       ]
     }
+  },
+  "standard": {
+    "parser": "babel-eslint"
   }
 }

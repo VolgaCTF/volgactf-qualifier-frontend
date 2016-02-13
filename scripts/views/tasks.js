@@ -7,8 +7,6 @@ import navigationBar from '../navigation-bar'
 import statusBar from '../status-bar'
 import metadataStore from '../utils/metadata-store'
 import moment from 'moment'
-import taskCategoryModel from '../models/task-category'
-import taskPreviewModel from '../models/task-preview'
 import taskCategoryProvider from '../providers/task-category'
 import taskProvider from '../providers/task'
 import contestProvider from '../providers/contest'
@@ -19,9 +17,8 @@ import 'bootstrap'
 import 'jquery.form'
 import 'parsley'
 
-
 class TasksView extends View {
-  constructor() {
+  constructor () {
     super(/^\/tasks$/)
     this.$main = null
     this.$taskCategoriesSection = null
@@ -42,11 +39,11 @@ class TasksView extends View {
     this.onUpdateContest = null
   }
 
-  getTitle() {
+  getTitle () {
     return `${metadataStore.getMetadata('event-title')} :: Tasks`
   }
 
-  initCreateTaskCategoryModal() {
+  initCreateTaskCategoryModal () {
     let $createTaskCategoryModal = $('#create-task-category-modal')
     $createTaskCategoryModal.modal({ show: false })
 
@@ -103,7 +100,7 @@ class TasksView extends View {
     })
   }
 
-  initEditTaskCategoryModal() {
+  initEditTaskCategoryModal () {
     let $editTaskCategoryModal = $('#edit-task-category-modal')
     $editTaskCategoryModal.modal({ show: false })
 
@@ -169,7 +166,7 @@ class TasksView extends View {
     })
   }
 
-  initRemoveTaskCategoryModal() {
+  initRemoveTaskCategoryModal () {
     let $removeTaskCategoryModal = $('#remove-task-category-modal')
     $removeTaskCategoryModal.modal({ show: false })
 
@@ -201,7 +198,7 @@ class TasksView extends View {
     })
   }
 
-  initCreateTaskModal() {
+  initCreateTaskModal () {
     let $createTaskModal = $('#create-task-modal')
     $createTaskModal.modal({ show: false })
 
@@ -354,7 +351,7 @@ class TasksView extends View {
     })
   }
 
-  initEditTaskModal() {
+  initEditTaskModal () {
     let $editTaskModal = $('#edit-task-modal')
     $editTaskModal.modal({ show: false })
 
@@ -554,7 +551,7 @@ class TasksView extends View {
     })
   }
 
-  initReviseTaskModal() {
+  initReviseTaskModal () {
     let $reviseTaskModal = $('#revise-task-modal')
     $reviseTaskModal.modal({ show: false })
 
@@ -675,7 +672,7 @@ class TasksView extends View {
     })
   }
 
-  initOpenTaskModal() {
+  initOpenTaskModal () {
     let $openTaskModal = $('#open-task-modal')
     $openTaskModal.modal({ show: false })
 
@@ -707,7 +704,7 @@ class TasksView extends View {
     })
   }
 
-  initCloseTaskModal() {
+  initCloseTaskModal () {
     let $closeTaskModal = $('#close-task-modal')
     $closeTaskModal.modal({ show: false })
 
@@ -739,7 +736,7 @@ class TasksView extends View {
     })
   }
 
-  initSubmitTaskModal() {
+  initSubmitTaskModal () {
     let $submitTaskModal = $('#submit-task-modal')
     $submitTaskModal.modal({ show: false })
 
@@ -890,7 +887,7 @@ class TasksView extends View {
     })
   }
 
-  initCheckTaskModal() {
+  initCheckTaskModal () {
     let $checkTaskModal = $('#check-task-modal')
     $checkTaskModal.modal({ show: false })
 
@@ -1021,7 +1018,7 @@ class TasksView extends View {
     })
   }
 
-  renderTaskCategories() {
+  renderTaskCategories () {
     let taskCategories = taskCategoryProvider.getTaskCategories()
     if (taskCategories.length === 0) {
       this.$taskCategoriesList.empty()
@@ -1044,7 +1041,7 @@ class TasksView extends View {
     }
   }
 
-  renderTaskPreviews() {
+  renderTaskPreviews () {
     let taskPreviews = taskProvider.getTaskPreviews()
     if (taskPreviews.length === 0) {
       this.$taskPreviewsList.empty()
@@ -1062,9 +1059,9 @@ class TasksView extends View {
       let getSortResultByKey = (a, b, getValueFunc) => {
         let valA = getValueFunc(a)
         let valB = getValueFunc(b)
-        if (a < b) {
+        if (valA < valB) {
           return -1
-        } else if (a > b) {
+        } else if (valA > valB) {
           return 1
         } else {
           return 0
@@ -1095,7 +1092,7 @@ class TasksView extends View {
             return 1
           } if (a.isClosed() && b.isInitial()) {
             return -1
-          } if(a.isInitial() && b.isClosed()) {
+          } if (a.isInitial() && b.isClosed()) {
             return 1
           }
 
@@ -1135,7 +1132,7 @@ class TasksView extends View {
     }
   }
 
-  present() {
+  present () {
     this.$main = $('#main')
     this.$main.html(renderTemplate('loading-view'))
 
@@ -1284,16 +1281,18 @@ class TasksView extends View {
             teamProvider.subscribe()
           })
           .fail((err) => {
+            console.error(err)
             this.$main.html(renderTemplate('internal-error-view'))
           })
       })
       .fail((err) => {
+        console.error(err)
         navigationBar.present()
         this.$main.html(renderTemplate('internal-error-view'))
       })
   }
 
-  dismiss() {
+  dismiss () {
     identityProvider.unsubscribe()
 
     if (this.onCreateTeamTaskProgress) {
@@ -1359,6 +1358,5 @@ class TasksView extends View {
     }
   }
 }
-
 
 export default new TasksView()

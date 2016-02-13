@@ -2,13 +2,11 @@ import $ from 'jquery'
 import _ from 'underscore'
 import EventEmitter from 'wolfy87-eventemitter'
 import TeamModel from '../models/team'
-import metadataStore from '../utils/metadata-store'
 import identityProvider from './identity'
 import dataStore from '../data-store'
 
-
 class TeamProvider extends EventEmitter {
-  constructor() {
+  constructor () {
     super()
     this.teams = []
 
@@ -18,11 +16,11 @@ class TeamProvider extends EventEmitter {
     this.onQualify = null
   }
 
-  getTeams() {
+  getTeams () {
     return this.teams
   }
 
-  subscribe() {
+  subscribe () {
     if (!dataStore.supportsRealtime()) {
       return
     }
@@ -81,7 +79,7 @@ class TeamProvider extends EventEmitter {
     }
   }
 
-  unsubscribe() {
+  unsubscribe () {
     if (!dataStore.supportsRealtime()) {
       return
     }
@@ -109,7 +107,7 @@ class TeamProvider extends EventEmitter {
     }
   }
 
-  fetchTeamProfile(id) {
+  fetchTeamProfile (id) {
     let promise = $.Deferred()
     let url = `/api/team/${id}/profile`
 
@@ -134,7 +132,7 @@ class TeamProvider extends EventEmitter {
     return promise
   }
 
-  fetchTeams(callback) {
+  fetchTeams (callback) {
     let promise = $.Deferred()
     let url = '/api/team/all'
 
@@ -163,6 +161,5 @@ class TeamProvider extends EventEmitter {
     return promise
   }
 }
-
 
 export default new TeamProvider()

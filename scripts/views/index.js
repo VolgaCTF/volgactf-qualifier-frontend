@@ -8,19 +8,18 @@ import metadataStore from '../utils/metadata-store'
 import contestProvider from '../providers/contest'
 import identityProvider from '../providers/identity'
 
-
 class IndexView extends View {
-  constructor() {
+  constructor () {
     super(/^\/$/)
     this.$main = null
     this.onUpdateContest = null
   }
 
-  getTitle() {
+  getTitle () {
     return `${metadataStore.getMetadata('event-title')} :: Main`
   }
 
-  render() {
+  render () {
     let identity = identityProvider.getIdentity()
     let contest = contestProvider.getContest()
     this.$main.empty()
@@ -30,7 +29,7 @@ class IndexView extends View {
     }))
   }
 
-  present() {
+  present () {
     this.$main = $('#main')
     this.$main.html(renderTemplate('loading-view'))
 
@@ -64,17 +63,19 @@ class IndexView extends View {
             contestProvider.on('updateContest', this.onUpdateContest)
           })
           .fail((err) => {
+            console.error(err)
             navigationBar.present()
             this.$main.html(renderTemplate('internal-error-view'))
           })
       })
       .fail((err) => {
+        console.error(err)
         navigationBar.present()
         this.$main.html(renderTemplate('internal-error-view'))
       })
   }
 
-  dismiss() {
+  dismiss () {
     identityProvider.unsubscribe()
 
     if (this.onUpdateContest) {
@@ -92,6 +93,5 @@ class IndexView extends View {
     }
   }
 }
-
 
 export default new IndexView()

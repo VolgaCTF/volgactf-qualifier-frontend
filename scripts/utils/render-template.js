@@ -1,11 +1,10 @@
 import $ from 'jquery'
 import _ from 'underscore'
 
-
 let store = null
 let templates = {}
 
-export default function renderTemplate(name, params = {}) {
+export default function renderTemplate (name, params = {}) {
   if (!templates[name]) {
     if (!store) {
       store = $('.themis-partials')

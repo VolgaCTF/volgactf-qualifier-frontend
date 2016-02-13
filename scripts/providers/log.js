@@ -2,22 +2,20 @@ import $ from 'jquery'
 import _ from 'underscore'
 import dataStore from '../data-store'
 import EventEmitter from 'wolfy87-eventemitter'
-import metadataStore from '../utils/metadata-store'
 import LogModel from '../models/log'
 
-
 class LogProvider extends EventEmitter {
-  constructor() {
+  constructor () {
     super()
     this.logs = []
     this.onCreate = null
   }
 
-  getLogs() {
+  getLogs () {
     return this.logs
   }
 
-  subscribe() {
+  subscribe () {
     if (!dataStore.supportsRealtime()) {
       return
     }
@@ -34,7 +32,7 @@ class LogProvider extends EventEmitter {
     realtimeProvider.addEventListener('createLog', this.onCreate)
   }
 
-  unsubscribe() {
+  unsubscribe () {
     if (!dataStore.supportsRealtime()) {
       return
     }
@@ -49,7 +47,7 @@ class LogProvider extends EventEmitter {
     this.logs = []
   }
 
-  fetchLogs() {
+  fetchLogs () {
     let promise = $.Deferred()
     let url = '/api/contest/logs'
 
@@ -78,6 +76,5 @@ class LogProvider extends EventEmitter {
     return promise
   }
 }
-
 
 export default new LogProvider()

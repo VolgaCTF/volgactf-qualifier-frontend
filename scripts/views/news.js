@@ -14,9 +14,8 @@ import identityProvider from '../providers/identity'
 import 'jquery.form'
 import 'parsley'
 
-
 class NewsView extends View {
-  constructor() {
+  constructor () {
     super(/^\/news$/)
     this.$main = null
 
@@ -25,11 +24,11 @@ class NewsView extends View {
     this.onRemovePost = null
   }
 
-  getTitle() {
+  getTitle () {
     return `${metadataStore.getMetadata('event-title')} :: News`
   }
 
-  renderPosts() {
+  renderPosts () {
     let posts = postProvider.getPosts()
     let $section = this.$main.find('section')
 
@@ -55,7 +54,7 @@ class NewsView extends View {
     }
   }
 
-  initRemovePostModal() {
+  initRemovePostModal () {
     let $removePostModal = $('#remove-post-modal')
     $removePostModal.modal({ show: false })
 
@@ -87,7 +86,7 @@ class NewsView extends View {
     })
   }
 
-  initCreatePostModal() {
+  initCreatePostModal () {
     let $createPostModal = $('#create-post-modal')
     $createPostModal.modal({ show: false })
 
@@ -170,7 +169,7 @@ class NewsView extends View {
     })
   }
 
-  initEditPostModal() {
+  initEditPostModal () {
     let $editPostModal = $('#edit-post-modal')
     $editPostModal.modal({ show: false })
 
@@ -257,7 +256,7 @@ class NewsView extends View {
     })
   }
 
-  present() {
+  present () {
     this.$main = $('#main')
     this.$main.html(renderTemplate('loading-view'))
 
@@ -282,7 +281,6 @@ class NewsView extends View {
             statusBar.present()
 
             this.$main.html(renderTemplate('news-view', { identity: identity }))
-            let $section = this.$main.find('section')
 
             if (_.contains(['admin', 'manager'], identity.role)) {
               this.initCreatePostModal()
@@ -313,17 +311,19 @@ class NewsView extends View {
             postProvider.on('removePost', this.onRemovePost)
           })
           .fail((err) => {
+            console.error(err)
             navigationBar.present()
             this.$main.html(renderTemplate('internal-error-view'))
           })
       })
       .fail((err) => {
+        console.error(err)
         navigationBar.present()
         this.$main.html(renderTemplate('internal-error-view'))
       })
   }
 
-  dismiss() {
+  dismiss () {
     identityProvider.unsubscribe()
 
     if (this.onCreatePost) {
@@ -353,6 +353,5 @@ class NewsView extends View {
     }
   }
 }
-
 
 export default new NewsView()

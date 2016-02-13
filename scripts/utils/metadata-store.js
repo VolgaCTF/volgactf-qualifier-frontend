@@ -1,12 +1,11 @@
 import $ from 'jquery'
 
-
 class MetadataStore {
-  constructor() {
+  constructor () {
     this.metadata = {}
   }
 
-  getMetadata(name) {
+  getMetadata (name) {
     if (!this.metadata[name]) {
       let $el = $(`script[type="text/x-metadata"][data-name="${name}"]`)
       if ($el.length > 0) {
@@ -19,6 +18,5 @@ class MetadataStore {
     return this.metadata[name]
   }
 }
-
 
 export default new MetadataStore()

@@ -1,24 +1,23 @@
 import _ from 'underscore'
 
-
 export default class ViewControllerBase {
-  constructor() {
+  constructor () {
     this.views = []
     this.activeView = null
     this.errorViews = {}
   }
 
-  view(view) {
+  view (view) {
     this.views.push(view)
     return view
   }
 
-  errorView(name, view) {
+  errorView (name, view) {
     this.errorViews[name] = view
     return view
   }
 
-  findView(urlPath) {
+  findView (urlPath) {
     let found = _.find(this.views, (view) => {
       return view.urlRegex.test(urlPath)
     })
@@ -30,11 +29,11 @@ export default class ViewControllerBase {
     }
   }
 
-  getTitle(urlPath) {
+  getTitle (urlPath) {
     return this.findView(urlPath).getTitle()
   }
 
-  render(urlPath) {
+  render (urlPath) {
     let newView = this.findView(urlPath)
     if (this.activeView) {
       this.activeView.dismiss()

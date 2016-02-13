@@ -14,9 +14,8 @@ import logProvider from '../providers/log'
 import moment from 'moment'
 import History from 'history.js'
 
-
 class LogsView extends View {
-  constructor() {
+  constructor () {
     super(/^\/logs$/)
     this.$main = null
 
@@ -25,11 +24,11 @@ class LogsView extends View {
     this.$logsContainer = null
   }
 
-  getTitle() {
+  getTitle () {
     return `${metadataStore.getMetadata('event-title')} :: Logs`
   }
 
-  renderLog(log, teams, tasks) {
+  renderLog (log, teams, tasks) {
     let $el = null
     if (log.event === 1) {
       let team = _.findWhere(teams, { id: log.data.teamId })
@@ -57,7 +56,7 @@ class LogsView extends View {
     return $el
   }
 
-  renderLogs() {
+  renderLogs () {
     let logs = logProvider.getLogs()
     let teams = teamProvider.getTeams()
     let tasks = taskProvider.getTaskPreviews()
@@ -77,7 +76,7 @@ class LogsView extends View {
     this.$logsContainer = $('#themis-logs')
   }
 
-  prependLog(log) {
+  prependLog (log) {
     let teams = teamProvider.getTeams()
     let tasks = taskProvider.getTaskPreviews()
 
@@ -87,7 +86,7 @@ class LogsView extends View {
     }
   }
 
-  present() {
+  present () {
     this.$main = $('#main')
     this.$main.html(renderTemplate('loading-view'))
 
@@ -134,6 +133,7 @@ class LogsView extends View {
               logProvider.on('createLog', this.onCreateLog)
             })
             .fail((err) => {
+              console.error(err)
               navigationBar.present()
               this.$main.html(renderTemplate('internal-error-view'))
             })
@@ -144,12 +144,13 @@ class LogsView extends View {
         }
       })
       .fail((err) => {
+        console.error(err)
         navigationBar.present()
         this.$main.html(renderTemplate('internal-error-view'))
       })
   }
 
-  dismiss() {
+  dismiss () {
     identityProvider.unsubscribe()
     teamProvider.unsubscribe()
     taskProvider.unsubscribe()
@@ -173,6 +174,5 @@ class LogsView extends View {
     }
   }
 }
-
 
 export default new LogsView()

@@ -2,16 +2,14 @@ import $ from 'jquery'
 import _ from 'underscore'
 import EventEmitter from 'wolfy87-eventemitter'
 import dataStore from '../data-store'
-import metadataStore from '../utils/metadata-store'
 import ContestModel from '../models/contest'
 import TeamScoreModel from '../models/team-score'
 import TeamTaskProgressModel from '../models/team-task-progress'
 import identityProvider from './identity'
 import teamProvider from './team'
 
-
 class ContestProvider extends EventEmitter {
-  constructor() {
+  constructor () {
     super()
     this.contest = null
     this.teamScores = []
@@ -24,15 +22,15 @@ class ContestProvider extends EventEmitter {
     this.onCreateTeamTaskProgress = null
   }
 
-  getContest() {
+  getContest () {
     return this.contest
   }
 
-  getTeamScores() {
+  getTeamScores () {
     return this.teamScores
   }
 
-  teamRankFunc(a, b) {
+  teamRankFunc (a, b) {
     if (a.score > b.score) {
       return -1
     } else if (a.score < b.score) {
@@ -56,11 +54,11 @@ class ContestProvider extends EventEmitter {
     }
   }
 
-  getTeamTaskProgressEntries() {
+  getTeamTaskProgressEntries () {
     return this.teamTaskProgressEntries
   }
 
-  subscribe() {
+  subscribe () {
     if (!dataStore.supportsRealtime()) {
       return
     }
@@ -104,7 +102,7 @@ class ContestProvider extends EventEmitter {
     teamProvider.on('qualifyTeam', this.onQualifyTeam)
 
     let identity = identityProvider.getIdentity()
-    if (_.contains ['admin', 'manager', 'team'], identity.role) {
+    if (_.contains(['admin', 'manager', 'team'], identity.role)) {
       this.onCreateTeamTaskProgress = (e) => {
         let options = JSON.parse(e.data)
         let teamTaskProgress = new TeamTaskProgressModel(options)
@@ -122,7 +120,7 @@ class ContestProvider extends EventEmitter {
     }
   }
 
-  unsubscribe() {
+  unsubscribe () {
     if (!dataStore.supportsRealtime()) {
       return
     }
@@ -154,7 +152,7 @@ class ContestProvider extends EventEmitter {
     this.teamTaskProgressEntries = []
   }
 
-  fetchContest() {
+  fetchContest () {
     let promise = $.Deferred()
     let url = '/api/contest'
 
@@ -180,7 +178,7 @@ class ContestProvider extends EventEmitter {
     return promise
   }
 
-  fetchTeamScores() {
+  fetchTeamScores () {
     let promise = $.Deferred()
     let url = '/api/contest/scores'
 
@@ -209,7 +207,7 @@ class ContestProvider extends EventEmitter {
     return promise
   }
 
-  fetchSolvedTeamCountByTask(taskId) {
+  fetchSolvedTeamCountByTask (taskId) {
     let promise = $.Deferred()
     let url = `/api/contest/task/${taskId}/progress`
 
@@ -234,7 +232,7 @@ class ContestProvider extends EventEmitter {
     return promise
   }
 
-  fetchTeamTaskProgress(teamId) {
+  fetchTeamTaskProgress (teamId) {
     let promise = $.Deferred()
 
     let identity = identityProvider.getIdentity()
@@ -269,7 +267,7 @@ class ContestProvider extends EventEmitter {
     return promise
   }
 
-  fetchTeamTaskProgressEntries() {
+  fetchTeamTaskProgressEntries () {
     let promise = $.Deferred()
     let identity = identityProvider.getIdentity()
     let url = null
@@ -309,6 +307,5 @@ class ContestProvider extends EventEmitter {
     return promise
   }
 }
-
 
 export default new ContestProvider()

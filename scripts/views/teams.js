@@ -6,14 +6,12 @@ import dataStore from '../data-store'
 import navigationBar from '../navigation-bar'
 import statusBar from '../status-bar'
 import metadataStore from '../utils/metadata-store'
-import teamModel from '../models/team'
 import contestProvider from '../providers/contest'
 import identityProvider from '../providers/identity'
 import teamProvider from '../providers/team'
 
-
 class TeamsView extends View {
-  constructor() {
+  constructor () {
     super(/^\/teams$/)
     this.$main = null
 
@@ -23,11 +21,11 @@ class TeamsView extends View {
     this.onQualifyTeam = null
   }
 
-  getTitle() {
+  getTitle () {
     return `${metadataStore.getMetadata('event-title')} :: Teams`
   }
 
-  renderTeams() {
+  renderTeams () {
     let sortedTeams = _.sortBy(teamProvider.getTeams(), 'createdAt')
     this.$main.find('.themis-team-count').show().html(renderTemplate('team-count-partial', { count: sortedTeams.length }))
 
@@ -45,7 +43,7 @@ class TeamsView extends View {
     $section.html($content)
   }
 
-  present() {
+  present () {
     this.$main = $('#main')
     this.$main.html(renderTemplate('loading-view'))
 
@@ -70,7 +68,6 @@ class TeamsView extends View {
             statusBar.present()
 
             this.$main.html(renderTemplate('teams-view', { identity: identity }))
-            let $section = this.$main.find('section')
 
             this.renderTeams()
 
@@ -107,17 +104,19 @@ class TeamsView extends View {
             }
           })
           .fail((err) => {
+            console.error(err)
             navigationBar.present()
             this.$main.html(renderTemplate('internal-error-view'))
           })
       })
       .fail((err) => {
+        console.error(err)
         navigationBar.present()
         this.$main.html(renderTemplate('internal-error-view'))
       })
   }
 
-  dismiss() {
+  dismiss () {
     identityProvider.unsubscribe()
 
     if (this.onUpdateTeamProfile) {
@@ -152,6 +151,5 @@ class TeamsView extends View {
     }
   }
 }
-
 
 export default new TeamsView()

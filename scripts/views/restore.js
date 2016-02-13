@@ -1,26 +1,23 @@
 import $ from 'jquery'
 import View from './base'
 import renderTemplate from '../utils/render-template'
-import dataStore from '../data-store'
 import navigationBar from '../navigation-bar'
-import stateController from '../controllers/state'
 import metadataStore from '../utils/metadata-store'
 import identityProvider from '../providers/identity'
 import 'parsley'
 import 'jquery.form'
 
-
 class RestoreView extends View {
-  constructor() {
+  constructor () {
     super(/^\/restore$/)
     this.$main = null
   }
 
-  getTitle() {
+  getTitle () {
     return `${metadataStore.getMetadata('event-title')} :: Restore password`
   }
 
-  initRestoreForm() {
+  initRestoreForm () {
     let $form = this.$main.find('form.themis-form-restore')
     $form.parsley()
 
@@ -64,7 +61,7 @@ class RestoreView extends View {
     })
   }
 
-  present() {
+  present () {
     this.$main = $('#main')
 
     $
@@ -82,18 +79,18 @@ class RestoreView extends View {
         }
       })
       .fail((err) => {
+        console.error(err)
         navigationBar.present()
         this.$main.html(renderTemplate('internal-error-view'))
       })
   }
 
-  dismiss() {
+  dismiss () {
     identityProvider.unsubscribe()
     this.$main.empty()
     this.$main = null
     navigationBar.dismiss()
   }
 }
-
 
 export default new RestoreView()

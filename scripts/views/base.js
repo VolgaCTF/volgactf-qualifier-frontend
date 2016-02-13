@@ -1,16 +1,16 @@
 
 export default class View {
-  constructor(urlRegex = null) {
+  constructor (urlRegex = null) {
     this.urlRegex = urlRegex
   }
 
-  present() {
+  present () {
   }
 
-  dismiss() {
+  dismiss () {
   }
 
-  getTitle() {
+  getTitle () {
     return ''
   }
 }

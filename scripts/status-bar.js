@@ -9,9 +9,8 @@ import 'bootstrap'
 import 'parsley'
 import 'bootstrap-datetimepicker'
 
-
 class StatusBar {
-  constructor() {
+  constructor () {
     this.$container = null
     this.$stateContainer = null
     this.$timerContainer = null
@@ -31,7 +30,7 @@ class StatusBar {
     this.onRealtimeControl = null
   }
 
-  initUpdateContestModal() {
+  initUpdateContestModal () {
     let $updateContestModal = $('#update-contest-modal')
     $updateContestModal.modal({
       show: false
@@ -118,7 +117,7 @@ class StatusBar {
     })
   }
 
-  renderContestState() {
+  renderContestState () {
     let contest = contestProvider.getContest()
     let contestObj = {
       state: contest.state
@@ -130,7 +129,7 @@ class StatusBar {
     }))
   }
 
-  renderContestTimer() {
+  renderContestTimer () {
     this.$timerContainer.empty()
     let contest = contestProvider.getContest()
 
@@ -160,7 +159,7 @@ class StatusBar {
     }
   }
 
-  renderTeamScore() {
+  renderTeamScore () {
     this.$scoreContainer.empty()
     let identity = identityProvider.getIdentity()
     if (identity.role !== 'team') {
@@ -182,7 +181,7 @@ class StatusBar {
     }
   }
 
-  renderRealtimeState() {
+  renderRealtimeState () {
     this.$realtimeContainer.empty()
     let state = null
     if (dataStore.supportsRealtime()) {
@@ -196,7 +195,7 @@ class StatusBar {
     $state.tooltip()
   }
 
-  present() {
+  present () {
     this.$container = $('#themis-statusbar')
     this.$container.html(renderTemplate('statusbar-view'))
     this.$stateContainer = $('#themis-contest-state')
@@ -212,7 +211,7 @@ class StatusBar {
       this.renderTeamScore()
     }
 
-    if (identity.role == 'admin') {
+    if (identity.role === 'admin') {
       this.initUpdateContestModal()
     }
 
@@ -262,7 +261,7 @@ class StatusBar {
     this.realtimeControlInterval = setInterval(this.onRealtimeControl, 10000)
   }
 
-  dismiss() {
+  dismiss () {
     if (this.onUpdateContest) {
       contestProvider.off('updateContest', this.onUpdateContest)
       this.onUpdateContest = null
@@ -302,6 +301,5 @@ class StatusBar {
     this.$scoreContainer = null
   }
 }
-
 
 export default new StatusBar()

@@ -2,7 +2,6 @@ import $ from 'jquery'
 import _ from 'underscore'
 import View from './base'
 import renderTemplate from '../utils/render-template'
-import dataStore from '../data-store'
 import navigationBar from '../navigation-bar'
 import identityProvider from '../providers/identity'
 import teamProvider from '../providers/team'
@@ -14,19 +13,18 @@ import 'parsley'
 import 'jquery.form'
 import 'bootstrap-filestyle'
 
-
 class ProfileView extends View {
-  constructor() {
+  constructor () {
     super(/^\/profile\/[0-9]+$/)
     this.$main = null
     this.team = null
   }
 
-  getTitle() {
+  getTitle () {
     return `${metadataStore.getMetadata('event-title')} :: Team profile`
   }
 
-  initUploadLogoModal() {
+  initUploadLogoModal () {
     let $buttonUploadLogo = this.$main.find('a[data-action="upload-logo"]')
 
     if ($buttonUploadLogo.length) {
@@ -86,7 +84,7 @@ class ProfileView extends View {
     }
   }
 
-  initChangeEmailModal() {
+  initChangeEmailModal () {
     let $buttonChangeEmail = this.$main.find('button[data-action="change-email"]')
     if ($buttonChangeEmail.length) {
       let $changeEmailModal = $('#change-email-modal')
@@ -145,7 +143,7 @@ class ProfileView extends View {
     }
   }
 
-  initResendConfirmationModal() {
+  initResendConfirmationModal () {
     let $buttonResendConfirmation = this.$main.find('button[data-action="resend-confirmation"]')
     if ($buttonResendConfirmation.length) {
       let $resendConfirmationModal = $('#resend-confirmation-modal')
@@ -202,7 +200,7 @@ class ProfileView extends View {
     }
   }
 
-  initEditProfileModal() {
+  initEditProfileModal () {
     let $buttonEditProfile = this.$main.find('button[data-action="edit-profile"]')
     if ($buttonEditProfile.length) {
       let $editProfileModal = $('#edit-profile-modal')
@@ -262,7 +260,7 @@ class ProfileView extends View {
     }
   }
 
-  initChangePasswordModal() {
+  initChangePasswordModal () {
     let $buttonChangePassword = this.$main.find('button[data-action="change-password"]')
     if ($buttonChangePassword.length) {
       let $changePasswordModal = $('#change-password-modal')
@@ -322,7 +320,7 @@ class ProfileView extends View {
     }
   }
 
-  present() {
+  present () {
     this.$main = $('#main')
     this.$main.html(renderTemplate('profile-view'))
 
@@ -389,16 +387,18 @@ class ProfileView extends View {
             }
           })
           .fail((err) => {
+            console.error(err)
             this.$main.html(renderTemplate('internal-error-view'))
           })
       })
       .fail((err) => {
+        console.error(err)
         navigationBar.present()
         this.$main.html(renderTemplate('internal-error-view'))
       })
   }
 
-  dismiss() {
+  dismiss () {
     identityProvider.unsubscribe()
     this.$main.empty()
     this.$main = null
@@ -406,6 +406,5 @@ class ProfileView extends View {
     navigationBar.dismiss()
   }
 }
-
 
 export default new ProfileView()

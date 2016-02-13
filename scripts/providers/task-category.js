@@ -1,13 +1,11 @@
 import $ from 'jquery'
 import _ from 'underscore'
 import dataStore from '../data-store'
-import metadataStore from '../utils/metadata-store'
 import EventEmitter from 'wolfy87-eventemitter'
 import TaskCategoryModel from '../models/task-category'
 
-
 class TaskCategoryProvider extends EventEmitter {
-  constructor() {
+  constructor () {
     super()
     this.taskCategories = []
 
@@ -16,11 +14,11 @@ class TaskCategoryProvider extends EventEmitter {
     this.onRemove = null
   }
 
-  getTaskCategories() {
+  getTaskCategories () {
     return this.taskCategories
   }
 
-  subscribe() {
+  subscribe () {
     if (!dataStore.supportsRealtime()) {
       return
     }
@@ -62,7 +60,7 @@ class TaskCategoryProvider extends EventEmitter {
     realtimeProvider.addEventListener('removeTaskCategory', this.onRemove)
   }
 
-  unsubscribe() {
+  unsubscribe () {
     if (!dataStore.supportsRealtime()) {
       return
     }
@@ -87,7 +85,7 @@ class TaskCategoryProvider extends EventEmitter {
     this.taskCategories = []
   }
 
-  fetchTaskCategories() {
+  fetchTaskCategories () {
     let promise = $.Deferred()
     let url = '/api/task/category/all'
 
@@ -116,7 +114,7 @@ class TaskCategoryProvider extends EventEmitter {
     return promise
   }
 
-  removeTaskCategory(id, token) {
+  removeTaskCategory (id, token) {
     let promise = $.Deferred()
     let url = `/api/task/category/${id}/remove`
 
@@ -146,6 +144,5 @@ class TaskCategoryProvider extends EventEmitter {
     return promise
   }
 }
-
 
 export default new TaskCategoryProvider()

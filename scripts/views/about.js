@@ -8,18 +8,17 @@ import metadataStore from '../utils/metadata-store'
 import contestProvider from '../providers/contest'
 import identityProvider from '../providers/identity'
 
-
 class AboutView extends View {
-  constructor() {
+  constructor () {
     super(/^\/about$/)
     this.$main = null
   }
 
-  getTitle() {
+  getTitle () {
     return `${metadataStore.getMetadata('event-title')} :: About`
   }
 
-  present() {
+  present () {
     this.$main = $('#main')
     this.$main.html(renderTemplate('loading-view'))
 
@@ -46,17 +45,19 @@ class AboutView extends View {
             statusBar.present()
           })
           .fail((err) => {
+            console.error(err)
             navigationBar.present()
-            $main.html(renderTemplate('internal-error-view'))
+            this.$main.html(renderTemplate('internal-error-view'))
           })
       })
       .fail((err) => {
+        console.error(err)
         navigationBar.present()
-        $main.html(renderTemplate('internal-error-view'))
+        this.$main.html(renderTemplate('internal-error-view'))
       })
   }
 
-  dismiss() {
+  dismiss () {
     identityProvider.unsubscribe()
 
     this.$main.empty()
@@ -68,6 +69,5 @@ class AboutView extends View {
     }
   }
 }
-
 
 export default new AboutView()

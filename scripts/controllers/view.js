@@ -15,7 +15,6 @@ import restoreView from '../views/restore'
 import resetPasswordView from '../views/reset-password'
 import notFoundView from '../views/not-found'
 
-
 let viewController = new ViewControllerBase()
 
 viewController.view(indexView)

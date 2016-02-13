@@ -7,18 +7,17 @@ import metadataStore from '../utils/metadata-store'
 import identityProvider from '../providers/identity'
 import History from 'history.js'
 
-
 class VerifyEmailView extends View {
-  constructor() {
+  constructor () {
     super(/^\/verify-email$/)
     this.$main = null
   }
 
-  getTitle() {
+  getTitle () {
     return `${metadataStore.getMetadata('event-title')} :: Email verification`
   }
 
-  present() {
+  present () {
     this.$main = $('#main')
 
     $
@@ -42,18 +41,18 @@ class VerifyEmailView extends View {
         })
       })
       .fail((err) => {
+        console.error(err)
         navigationBar.present()
         this.$main.html(renderTemplate('internal-error-view'))
       })
   }
 
-  dismiss() {
+  dismiss () {
     identityProvider.unsubscribe()
     this.$main.empty()
     this.$main = null
     navigationBar.dismiss()
   }
 }
-
 
 export default new VerifyEmailView()

@@ -12,9 +12,8 @@ import identityProvider from '../providers/identity'
 import teamProvider from '../providers/team'
 import History from 'history.js'
 
-
 class ScoreboardView extends View {
-  constructor() {
+  constructor () {
     super(/^\/scoreboard$/)
     this.$main = null
 
@@ -28,11 +27,11 @@ class ScoreboardView extends View {
     this.detailed = false
   }
 
-  getTitle() {
+  getTitle () {
     return `${metadataStore.getMetadata('event-title')} :: Scoreboard`
   }
 
-  renderScoreboard() {
+  renderScoreboard () {
     let $tableBody = $('#themis-scoreboard-table-body')
     $tableBody.empty()
 
@@ -51,7 +50,7 @@ class ScoreboardView extends View {
           id: team.id,
           name: team.name,
           score: teamScore.score,
-          updatedAt: (teamScore.updatedAt)? moment(teamScore.updatedAt).format('lll') : 'never',
+          updatedAt: (teamScore.updatedAt) ? moment(teamScore.updatedAt).format('lll') : 'never',
           highlight: (isTeam && team.id === identity.id),
           detailed: this.detailed
         }
@@ -67,7 +66,7 @@ class ScoreboardView extends View {
     })
   }
 
-  present() {
+  present () {
     this.$main = $('#main')
     this.$main.html(renderTemplate('loading-view'))
 
@@ -126,7 +125,7 @@ class ScoreboardView extends View {
       })
   }
 
-  dismiss() {
+  dismiss () {
     identityProvider.unsubscribe()
     teamProvider.unsubscribe()
 
@@ -152,6 +151,5 @@ class ScoreboardView extends View {
     }
   }
 }
-
 
 export default new ScoreboardView()

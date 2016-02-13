@@ -1,13 +1,11 @@
 import $ from 'jquery'
-import metadataStore from './utils/metadata-store'
-
 
 class DataStore {
-  constructor() {
+  constructor () {
     this.eventSource = null
   }
 
-  verifyEmail(data, token, callback) {
+  verifyEmail (data, token, callback) {
     return $.ajax({
       url: '/api/team/verify-email',
       type: 'POST',
@@ -32,29 +30,28 @@ class DataStore {
     })
   }
 
-  supportsRealtime() {
+  supportsRealtime () {
     return !!window.EventSource
   }
 
-  connectedRealtime() {
+  connectedRealtime () {
     return (this.supportsRealtime() && this.eventSource && this.eventSource.readyState !== 2)
   }
 
-  connectRealtime() {
+  connectRealtime () {
     this.eventSource = new window.EventSource('/api/events')
   }
 
-  disconnectRealtime() {
+  disconnectRealtime () {
     if (this.eventSource) {
       this.eventSource.close()
       this.eventSource = null
     }
   }
 
-  getRealtimeProvider() {
+  getRealtimeProvider () {
     return this.eventSource
   }
 }
-
 
 export default new DataStore()

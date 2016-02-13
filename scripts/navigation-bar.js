@@ -1,13 +1,11 @@
 import $ from 'jquery'
 import _ from 'underscore'
 import renderTemplate from './utils/render-template'
-import metadataStore from './utils/metadata-store'
 import stateController from './controllers/state'
 import identityProvider from './providers/identity'
 
-
 class NavigationBar {
-  present(options = {}) {
+  present (options = {}) {
     let defaultOptions = {
       urlPath: window.location.pathname,
       active: null,
@@ -48,10 +46,9 @@ class NavigationBar {
     }
   }
 
-  dismiss() {
+  dismiss () {
     $('#themis-navbar').empty()
   }
 }
-
 
 export default new NavigationBar()

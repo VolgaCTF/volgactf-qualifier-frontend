@@ -1,5 +1,5 @@
 export default class TeamModel {
-  constructor(options) {
+  constructor (options) {
     this.id = options.id
     this.name = options.name
     this.country = options.country

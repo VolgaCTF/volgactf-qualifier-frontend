@@ -1,7 +1,6 @@
 import $ from 'jquery'
 import View from './base'
 import renderTemplate from '../utils/render-template'
-import dataStore from '../data-store'
 import navigationBar from '../navigation-bar'
 import stateController from '../controllers/state'
 import metadataStore from '../utils/metadata-store'
@@ -9,18 +8,17 @@ import identityProvider from '../providers/identity'
 import 'parsley'
 import 'jquery.form'
 
-
 class SigninView extends View {
-  constructor() {
+  constructor () {
     super(/^\/signin$/)
     this.$main = null
   }
 
-  getTitle() {
+  getTitle () {
     return `${metadataStore.getMetadata('event-title')} :: Sign in`
   }
 
-  initSigninForm() {
+  initSigninForm () {
     let $form = this.$main.find('form.themis-form-signin')
     $form.parsley()
 
@@ -61,7 +59,7 @@ class SigninView extends View {
     })
   }
 
-  present() {
+  present () {
     this.$main = $('#main')
 
     $
@@ -79,18 +77,18 @@ class SigninView extends View {
         }
       })
       .fail((err) => {
+        console.error(err)
         navigationBar.present()
         this.$main.html(renderTemplate('internal-error-view'))
       })
   }
 
-  dismiss() {
+  dismiss () {
     identityProvider.unsubscribe()
     this.$main.empty()
     this.$main = null
     navigationBar.dismiss()
   }
 }
-
 
 export default new SigninView()

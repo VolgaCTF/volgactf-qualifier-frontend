@@ -2,15 +2,13 @@ import $ from 'jquery'
 import _ from 'underscore'
 import EventEmitter from 'wolfy87-eventemitter'
 import dataStore from '../data-store'
-import metadataStore from '../utils/metadata-store'
 import TaskPreviewModel from '../models/task-preview'
 import TaskModel from '../models/task'
 import identityProvider from './identity'
 import TaskFullModel from '../models/task-full'
 
-
 class TaskProvider extends EventEmitter {
-  constructor() {
+  constructor () {
     super()
     this.taskPreviews = []
 
@@ -20,11 +18,11 @@ class TaskProvider extends EventEmitter {
     this.onUpdateTask = null
   }
 
-  getTaskPreviews() {
+  getTaskPreviews () {
     return this.taskPreviews
   }
 
-  subscribe() {
+  subscribe () {
     if (!dataStore.supportsRealtime()) {
       return
     }
@@ -83,7 +81,7 @@ class TaskProvider extends EventEmitter {
     realtimeProvider.addEventListener('updateTask', this.onUpdateTask)
   }
 
-  unsubscribe() {
+  unsubscribe () {
     if (!dataStore.supportsRealtime()) {
       return
     }
@@ -113,7 +111,7 @@ class TaskProvider extends EventEmitter {
     this.taskPreviews = []
   }
 
-  fetchTaskPreviews() {
+  fetchTaskPreviews () {
     let promise = $.Deferred()
     let url = '/api/task/all'
 
@@ -142,7 +140,7 @@ class TaskProvider extends EventEmitter {
     return promise
   }
 
-  fetchTask(taskId, options = {}) {
+  fetchTask (taskId, options = {}) {
     let defaultOptions = {
       full: false
     }
@@ -184,7 +182,7 @@ class TaskProvider extends EventEmitter {
     return promise
   }
 
-  openTask(id, token) {
+  openTask (id, token) {
     let promise = $.Deferred()
     let url = `/api/task/${id}/open`
 
@@ -214,7 +212,7 @@ class TaskProvider extends EventEmitter {
     return promise
   }
 
-  closeTask(id, token) {
+  closeTask (id, token) {
     let promise = $.Deferred()
     let url = `/api/task/${id}/close`
 
@@ -244,6 +242,5 @@ class TaskProvider extends EventEmitter {
     return promise
   }
 }
-
 
 export default new TaskProvider()

@@ -1,5 +1,5 @@
 export default class PostModel {
-  constructor(options) {
+  constructor (options) {
     this.id = options.id
     this.title = options.title
     this.description = options.description

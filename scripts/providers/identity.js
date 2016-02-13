@@ -1,24 +1,22 @@
 import $ from 'jquery'
-import metadataStore from '../utils/metadata-store'
-
 
 class IdentityProvider {
-  constructor() {
+  constructor () {
     this.identity = null
   }
 
-  subscribe() {
+  subscribe () {
   }
 
-  unsubscribe() {
+  unsubscribe () {
     this.identity = null
   }
 
-  getIdentity() {
+  getIdentity () {
     return this.identity
   }
 
-  fetchIdentity() {
+  fetchIdentity () {
     let promise = $.Deferred()
     let url = '/api/identity'
 
@@ -44,6 +42,5 @@ class IdentityProvider {
     return promise
   }
 }
-
 
 export default new IdentityProvider()
