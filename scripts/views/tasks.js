@@ -14,7 +14,7 @@ import taskProvider from '../providers/task'
 import contestProvider from '../providers/contest'
 import identityProvider from '../providers/identity'
 import teamProvider from '../providers/team'
-import MarkdownIt from 'markdown-it'
+import MarkdownRenderer from '../utils/markdown'
 import 'bootstrap'
 import 'jquery.form'
 import 'parsley'
@@ -280,7 +280,7 @@ class TasksView extends View {
     })
 
     $createTaskTabPreview.on('show.bs.tab', (e) => {
-      let md = new MarkdownIt()
+      let md = new MarkdownRenderer()
       let hintsFormatted = []
       $createTaskHintList.find('textarea[name="hints"]').each((ndx, $el) => {
         hintsFormatted.push(md.render($($el).val()))
@@ -441,7 +441,7 @@ class TasksView extends View {
     })
 
     $editTaskTabPreview.on('show.bs.tab', (e) => {
-      let md = new MarkdownIt()
+      let md = new MarkdownRenderer()
       let hintsFormatted = []
       $editTaskHintList.find('textarea[name="hints"]').each((ndx, el) => {
         hintsFormatted.push(md.render($(el).val()))
@@ -591,9 +591,9 @@ class TasksView extends View {
 
       $
         .when(taskProvider.fetchTask(taskId))
-        .done((task) => {
-          let md = new MarkdownIt()
-          let hintsFormatted = []
+        .done((task) => { 
+          let md = new MarkdownRenderer()
+	  let hintsFormatted = []
           _.each(task.hints, (hint) => {
             hintsFormatted.push(md.render(hint))
           })
@@ -822,8 +822,8 @@ class TasksView extends View {
       $
         .when(taskProvider.fetchTask(taskId), contestProvider.fetchSolvedTeamCountByTask(taskId))
         .done((task, solvedTeamCount) => {
-          let md = new MarkdownIt()
-          let hintsFormatted = []
+          let md = new MarkdownRenderer()
+	  let hintsFormatted = []
           _.each(task.hints, (hint) => {
             hintsFormatted.push(md.render(hint))
           })
@@ -954,7 +954,7 @@ class TasksView extends View {
         $
           .when(taskProvider.fetchTask(taskId))
           .done((task) => {
-            let md = new MarkdownIt()
+            let md = new MarkdownRenderer()
             let hintsFormatted = []
             _.each(task.hints, (hint) => {
               hintsFormatted.push(md.render(hint))

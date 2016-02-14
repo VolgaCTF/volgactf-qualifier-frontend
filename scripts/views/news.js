@@ -6,7 +6,7 @@ import dataStore from '../data-store'
 import navigationBar from '../navigation-bar'
 import statusBar from '../status-bar'
 import metadataStore from '../utils/metadata-store'
-import MarkdownIt from 'markdown-it'
+import MarkdownRenderer from '../utils/markdown'
 import moment from 'moment'
 import postProvider from '../providers/post'
 import contestProvider from '../providers/contest'
@@ -38,7 +38,7 @@ class NewsView extends View {
       $section.html($('<p></p>').addClass('lead').text('No news yet.'))
     } else {
       $section.empty()
-      let md = new MarkdownIt()
+      let md = new MarkdownRenderer()
       let sortedPosts = _.sortBy(posts, 'createdAt').reverse()
       let manageable = _.contains(['admin', 'manager'], identityProvider.getIdentity().role)
       for (let post of sortedPosts) {
@@ -113,7 +113,7 @@ class NewsView extends View {
     $createPostTabPreview.tab()
 
     $createPostTabPreview.on('show.bs.tab', (e) => {
-      let md = new MarkdownIt()
+      let md = new MarkdownRenderer()
       let options = {
         title: $createPostTitle.val(),
         description: md.render($createPostDescription.val()),
@@ -196,7 +196,7 @@ class NewsView extends View {
     $editPostTabPreview.tab()
 
     $editPostTabPreview.on('show.bs.tab', (e) => {
-      let md = new MarkdownIt()
+      let md = new MarkdownRenderer()
       let options = {
         title: $editPostTitle.val(),
         description: md.render($editPostDescription.val()),
