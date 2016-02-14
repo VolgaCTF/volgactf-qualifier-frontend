@@ -52,6 +52,7 @@
     "browserify-shim": "^3.8.12",
     "gulp": "^3.9.1",
     "gulp-babel": "^6.1.2",
+    "gulp-concat-css": "^2.2.0",
     "snazzy": "^2.0.1",
     "standard": "^6.0.5",
     "vinyl-buffer": "^1.0.0",

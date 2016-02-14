@@ -1,7 +1,7 @@
 {
-  "name": "themis-quals-website",
-  "version": "0.0.1",
-  "homepage": "https://github.com/aspyatkin/themis-quals-website",
+  "name": "themis-quals-frontend",
+  "version": "1.0.0",
+  "homepage": "https://github.com/aspyatkin/themis-quals-frontend",
   "moduleType": [
     "amd"
   ],
