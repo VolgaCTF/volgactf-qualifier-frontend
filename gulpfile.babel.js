@@ -72,10 +72,10 @@ gulp.task('stylesheets', ['clean_stylesheets'], () => {
   return gulp
     .src(paths.stylesheets)
     .pipe(sass({ indentedSyntax: true, errLogToConsole: true }))
-    .pipe(gulpIf(isProduction, minifyCSS()))
     .pipe(concatCss('themis.css', {
       rebaseUrls: false
     }))
+    .pipe(gulpIf(isProduction, minifyCSS()))
     .pipe(gulp.dest('public/assets/css'))
     .pipe(rev())
     .pipe(gulp.dest('public/assets/css'))
