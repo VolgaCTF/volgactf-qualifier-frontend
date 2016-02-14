@@ -588,9 +588,9 @@ class TasksView extends View {
 
       $
         .when(taskProvider.fetchTask(taskId))
-        .done((task) => { 
+        .done((task) => {
           let md = new MarkdownRenderer()
-	  let hintsFormatted = []
+          let hintsFormatted = []
           _.each(task.hints, (hint) => {
             hintsFormatted.push(md.render(hint))
           })
@@ -820,7 +820,7 @@ class TasksView extends View {
         .when(taskProvider.fetchTask(taskId), contestProvider.fetchSolvedTeamCountByTask(taskId))
         .done((task, solvedTeamCount) => {
           let md = new MarkdownRenderer()
-	  let hintsFormatted = []
+          let hintsFormatted = []
           _.each(task.hints, (hint) => {
             hintsFormatted.push(md.render(hint))
           })
