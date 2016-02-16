@@ -1441,7 +1441,7 @@
                 </div>
             </script>
 
-            <script type="text/x-template" data-name="team-progress-partial">
+            <script type="text/x-template" data-name="team-hits-partial">
                 <% if (identity.role === 'admin' || identity.role === 'manager' || (identity.role === 'team' && identity.id === teamId)) { %>
                     <% if (taskNames.length > 0) { %>
                     Team has solved the following tasks:
@@ -1510,7 +1510,7 @@
                             <% } %>
                         </ul>
                         <p class="text-muted">
-                            <%= teamProgressInfo %>
+                            <%= teamHitsInfo %>
                         </p>
                     </div>
                 </div>

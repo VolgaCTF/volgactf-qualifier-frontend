@@ -35,7 +35,7 @@ class TasksView extends View {
     this.onCloseTask = null
     this.onUpdateTask = null
 
-    this.onCreateTeamTaskProgress = null
+    this.onCreateTeamTaskHit = null
     this.onUpdateContest = null
   }
 
@@ -603,9 +603,9 @@ class TasksView extends View {
 
           $reviseTaskContents.html(renderTemplate('task-content-partial', options))
 
-          let teamTaskProgressEntries = _.where(contestProvider.getTeamTaskProgressEntries(), { taskId: task.id })
-          let sortedTeamTaskProgressEntries = _.sortBy(teamTaskProgressEntries, 'createdAt')
-          let teamIds = _.map(sortedTeamTaskProgressEntries, (entry) => {
+          let teamTaskHits = _.where(contestProvider.getTeamTaskHits(), { taskId: task.id })
+          let sortedTeamTaskHits = _.sortBy(teamTaskHits, 'createdAt')
+          let teamIds = _.map(sortedTeamTaskHits, (entry) => {
             return entry.teamId
           })
           let teamNames = []
@@ -772,11 +772,11 @@ class TasksView extends View {
       if (taskPreview && identity.role === 'team') {
         if (identity.emailConfirmed) {
           let taskIsSolved = false
-          let taskProgress = _.findWhere(contestProvider.getTeamTaskProgressEntries(), {
+          let taskHit = _.findWhere(contestProvider.getTeamTaskHits(), {
             teamId: identity.id,
             taskId: taskId
           })
-          if (taskProgress) {
+          if (taskHit) {
             taskIsSolved = true
           }
 
@@ -795,7 +795,7 @@ class TasksView extends View {
           }
 
           if (taskIsSolved) {
-            $submitTaskSubmitSuccess.text(`Your team has solved the task on ${moment(taskProgress.createdAt).format('lll')}!`)
+            $submitTaskSubmitSuccess.text(`Your team has solved the task on ${moment(taskHit.createdAt).format('lll')}!`)
           }
         } else {
           $submitTaskSubmitError.text('You should confirm your email before you can submit an answer to the task.')
@@ -1050,9 +1050,9 @@ class TasksView extends View {
       let identity = identityProvider.getIdentity()
       let solvedTaskIds = []
       if (identity.role === 'team') {
-        let taskProgressEntries = _.where(contestProvider.getTeamTaskProgressEntries(), { teamId: identity.id })
-        solvedTaskIds = _.map(taskProgressEntries, (taskProgress) => {
-          return taskProgress.taskId
+        let taskHits = _.where(contestProvider.getTeamTaskHits(), { teamId: identity.id })
+        solvedTaskIds = _.map(taskHits, (taskHit) => {
+          return taskHit.taskId
         })
       }
 
@@ -1155,9 +1155,9 @@ class TasksView extends View {
 
         let promise = null
         if (isTeam) {
-          promise = $.when(taskProvider.fetchTaskPreviews(), categoryProvider.fetchCategories(), contestProvider.fetchTeamTaskProgressEntries(), contestProvider.fetchTeamScores())
+          promise = $.when(taskProvider.fetchTaskPreviews(), categoryProvider.fetchCategories(), contestProvider.fetchTeamTaskHits(), contestProvider.fetchTeamScores())
         } else if (isSupervisor) {
-          promise = $.when(taskProvider.fetchTaskPreviews(), categoryProvider.fetchCategories(), contestProvider.fetchTeamTaskProgressEntries(), teamProvider.fetchTeams())
+          promise = $.when(taskProvider.fetchTaskPreviews(), categoryProvider.fetchCategories(), contestProvider.fetchTeamTaskHits(), teamProvider.fetchTeams())
         } else {
           promise = $.when(taskProvider.fetchTaskPreviews(), categoryProvider.fetchCategories())
         }
@@ -1262,12 +1262,12 @@ class TasksView extends View {
             taskProvider.on('updateTask', this.onUpdateTask)
 
             if (isTeam) {
-              this.onCreateTeamTaskProgress = (teamTaskProgress) => {
+              this.onCreateTeamTaskHit = (teamTaskHit) => {
                 this.renderTaskPreviews()
                 return false
               }
 
-              contestProvider.on('createTeamTaskProgress', this.onCreateTeamTaskProgress)
+              contestProvider.on('createTeamTaskHit', this.onCreateTeamTaskHit)
             }
 
             this.onUpdateContest = (contest) => {
@@ -1295,9 +1295,9 @@ class TasksView extends View {
   dismiss () {
     identityProvider.unsubscribe()
 
-    if (this.onCreateTeamTaskProgress) {
-      contestProvider.off('createTeamTaskProgress', this.onCreateTeamTaskProgress)
-      this.onCreateTeamTaskProgress = null
+    if (this.onCreateTeamTaskHit) {
+      contestProvider.off('createTeamTaskHit', this.onCreateTeamTaskHit)
+      this.onCreateTeamTaskHit = null
     }
 
     if (this.onCreateCategory) {

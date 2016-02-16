@@ -1,4 +1,4 @@
-export default class TeamTaskProgress {
+export default class TeamTaskHitModel {
   constructor (options) {
     this.teamId = options.teamId
     this.taskId = options.taskId
