@@ -150,8 +150,8 @@
                 </div>
             </script>
 
-            <script type="text/x-template" data-name="task-category-supervisor-partial">
-                <div class="themis-task-category">
+            <script type="text/x-template" data-name="category-supervisor-partial">
+                <div class="themis-category">
                     <header>
                         <h4><%- title %></h4>
                     </header>
@@ -162,10 +162,10 @@
                         <p class="text-muted"><small>Updated on <%- updatedAt %></small>
                             <% if (manageable) { %>
                             &nbsp;
-                            <button type="button" class="btn btn-success btn-xs" data-action="edit-task-category" data-toggle="modal" data-target="#edit-task-category-modal" data-task-category-id="<%- id %>">
+                            <button type="button" class="btn btn-success btn-xs" data-action="edit-category" data-toggle="modal" data-target="#edit-category-modal" data-category-id="<%- id %>">
                                 <i class="glyphicon glyphicon-pencil"></i>&nbsp;Edit
                             </button>
-                            <button type="button" class="btn btn-danger btn-xs" data-action="remove-task-category" data-toggle="modal" data-target="#remove-task-category-modal" data-task-category-id="<%- id %>">
+                            <button type="button" class="btn btn-danger btn-xs" data-action="remove-category" data-toggle="modal" data-target="#remove-category-modal" data-category-id="<%- id %>">
                                 <i class="glyphicon glyphicon-remove"></i>&nbsp;Remove
                             </button>
                             <% } %>
@@ -174,27 +174,27 @@
                 </div>
             </script>
 
-            <script type="text/x-template" data-name="remove-task-category-confirmation">
-                You are about to remove the task category <mark><%- title %></mark>. Continue?
+            <script type="text/x-template" data-name="remove-category-confirmation">
+                You are about to remove the category <mark><%- title %></mark>. Continue?
             </script>
 
-            <script type="text/x-template" data-name="task-categories-view">
+            <script type="text/x-template" data-name="categories-view">
                 <div class="panel panel-info">
                     <div class="panel-heading">
                         <h3 class="panel-title">Task categories</h3>
                     </div>
                     <div class="panel-body">
                         <% if (identity.role === 'admin' && !contest.isFinished()) { %>
-                        <button type="button" class="btn btn-primary btn-xs" data-action="create-task-category" data-toggle="modal" data-target="#create-task-category-modal">
+                        <button type="button" class="btn btn-primary btn-xs" data-action="create-category" data-toggle="modal" data-target="#create-category-modal">
                             <i class="glyphicon glyphicon-plus"></i>&nbsp;Create
                         </button>
                         <% } %>
-                        <div id="themis-task-categories-list"></div>
+                        <div id="themis-categories-list"></div>
                     </div>
                 </div>
 
                 <% if (identity.role === 'admin' && !contest.isFinished()) { %>
-                <div class="modal fade" id="create-task-category-modal" tabindex="-1" role="dialog">
+                <div class="modal fade" id="create-category-modal" tabindex="-1" role="dialog">
                     <div class="modal-dialog">
                         <div class="modal-content">
                             <div class="modal-header">
@@ -202,14 +202,14 @@
                                 <h4 class="modal-title">Create task category</h4>
                             </div>
                             <div class="modal-body">
-                                <form method="POST" action="/api/task/category/create">
+                                <form method="POST" action="/api/category/create">
                                     <div class="form-group">
-                                        <label for="create-task-category-title" class="control-label">Title</label>
-                                        <input type="text" class="form-control" id="create-task-category-title" name="title" autofocus required minlength="2" maxlength="20">
+                                        <label for="create-category-title" class="control-label">Title</label>
+                                        <input type="text" class="form-control" id="create-category-title" name="title" autofocus required minlength="2" maxlength="20">
                                     </div>
                                     <div class="form-group">
-                                        <label for="create-task-category-description" class="control-label">Description</label>
-                                        <textarea class="form-control themis-task-category-description" id="create-task-category-description" minlength="0" maxlength="150" name="description"></textarea>
+                                        <label for="create-category-description" class="control-label">Description</label>
+                                        <textarea class="form-control themis-category-description" id="create-category-description" minlength="0" maxlength="150" name="description"></textarea>
                                     </div>
                                     <div class="submit-error">
                                         <p class="text-danger"></p>
@@ -218,13 +218,13 @@
                             </div>
                             <div class="modal-footer">
                                 <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                                <button type="button" class="btn btn-primary" data-action="complete-create-task-category">Create</button>
+                                <button type="button" class="btn btn-primary" data-action="complete-create-category">Create</button>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <div class="modal fade" id="remove-task-category-modal" tabindex="-1" role="dialog">
+                <div class="modal fade" id="remove-category-modal" tabindex="-1" role="dialog">
                     <div class="modal-dialog">
                         <div class="modal-content">
                             <div class="modal-header">
@@ -239,13 +239,13 @@
                             </div>
                             <div class="modal-footer">
                                 <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                                <button type="button" class="btn btn-danger" data-action="complete-remove-task-category">Remove</button>
+                                <button type="button" class="btn btn-danger" data-action="complete-remove-category">Remove</button>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <div class="modal fade" id="edit-task-category-modal" tabindex="-1" role="dialog">
+                <div class="modal fade" id="edit-category-modal" tabindex="-1" role="dialog">
                     <div class="modal-dialog">
                         <div class="modal-content">
                             <div class="modal-header">
@@ -255,12 +255,12 @@
                             <div class="modal-body">
                                 <form method="POST">
                                     <div class="form-group">
-                                        <label for="edir-task-category-title" class="control-label">Title</label>
-                                        <input type="text" class="form-control" id="edit-task-category-title" name="title" autofocus required minlength="2" maxlength="20">
+                                        <label for="edit-category-title" class="control-label">Title</label>
+                                        <input type="text" class="form-control" id="edit-category-title" name="title" autofocus required minlength="2" maxlength="20">
                                     </div>
                                     <div class="form-group">
-                                        <label for="edit-task-category-description" class="control-label">Description</label>
-                                        <textarea class="form-control themis-task-category-description" id="edit-task-category-description" minlength="0" maxlength="150" name="description"></textarea>
+                                        <label for="edit-category-description" class="control-label">Description</label>
+                                        <textarea class="form-control themis-category-description" id="edit-category-description" minlength="0" maxlength="150" name="description"></textarea>
                                     </div>
                                     <div class="submit-error">
                                         <p class="text-danger"></p>
@@ -269,7 +269,7 @@
                             </div>
                             <div class="modal-footer">
                                 <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                                <button type="button" class="btn btn-primary" data-action="complete-edit-task-category">Save</button>
+                                <button type="button" class="btn btn-primary" data-action="complete-edit-category">Save</button>
                             </div>
                         </div>
                     </div>
@@ -335,7 +335,7 @@
                 </div>
             </script>
 
-            <script type="text/x-template" data-name="task-category-partial">
+            <script type="text/x-template" data-name="category-partial">
                 <span class="label label-default" title="<%- description %>"><span class="glyphicon glyphicon-tag"></span>&nbsp;<%- title %></span>&nbsp;
             </script>
 
@@ -415,7 +415,7 @@
                         <% } else { %>
                         <div class="panel-footer" data-task-id="<%- task.id %>" data-toggle="modal" data-target="#check-task-modal">
                         <% } %>
-                            <div class="themis-task-categories">
+                            <div class="themis-categories">
                                 <%= categoriesList %>
                             </div>
                         </div>
@@ -459,7 +459,7 @@
                         </div>
                     </section>
                     <% if (identity.role === 'admin' || identity.role === 'manager') { %>
-                    <section class="col-sm-4" id="themis-task-categories"></section>
+                    <section class="col-sm-4" id="themis-categories"></section>
                     <% } %>
                 </div>
 
@@ -654,8 +654,8 @@
                                                     </div>
                                                     <div class="col-sm-6">
                                                         <div class="form-group">
-                                                            <label for="create-task-categories" class="control-label">Categories</label>
-                                                            <select class="form-control" multiple size="4" id="create-task-categories" required name="categories"></select>
+                                                            <label for="create-categories" class="control-label">Categories</label>
+                                                            <select class="form-control" multiple size="4" id="create-categories" required name="categories"></select>
                                                         </div>
                                                         <div class="form-group" id="create-task-hints">
                                                             <label class="control-label">
@@ -742,8 +742,8 @@
                                                     </div>
                                                     <div class="col-sm-6">
                                                         <div class="form-group">
-                                                            <label for="edit-task-categories" class="control-label">Categories</label>
-                                                            <select class="form-control" multiple size="4" id="edit-task-categories" required name="categories"></select>
+                                                            <label for="edit-categories" class="control-label">Categories</label>
+                                                            <select class="form-control" multiple size="4" id="edit-categories" required name="categories"></select>
                                                         </div>
                                                         <div class="form-group" id="edit-task-hints">
                                                             <label class="control-label">

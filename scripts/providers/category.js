@@ -2,20 +2,20 @@ import $ from 'jquery'
 import _ from 'underscore'
 import dataStore from '../data-store'
 import EventEmitter from 'wolfy87-eventemitter'
-import TaskCategoryModel from '../models/task-category'
+import CategoryModel from '../models/category'
 
-class TaskCategoryProvider extends EventEmitter {
+class CategoryProvider extends EventEmitter {
   constructor () {
     super()
-    this.taskCategories = []
+    this.categories = []
 
     this.onCreate = null
     this.onUpdate = null
     this.onRemove = null
   }
 
-  getTaskCategories () {
-    return this.taskCategories
+  getCategories () {
+    return this.categories
   }
 
   subscribe () {
@@ -27,37 +27,37 @@ class TaskCategoryProvider extends EventEmitter {
 
     this.onCreate = (e) => {
       let options = JSON.parse(e.data)
-      let taskCategory = new TaskCategoryModel(options)
-      this.taskCategories.push(taskCategory)
-      this.trigger('createTaskCategory', [taskCategory])
+      let category = new CategoryModel(options)
+      this.categories.push(category)
+      this.trigger('createCategory', [category])
     }
 
-    realtimeProvider.addEventListener('createTaskCategory', this.onCreate)
+    realtimeProvider.addEventListener('createCategory', this.onCreate)
 
     this.onUpdate = (e) => {
       let options = JSON.parse(e.data)
-      let taskCategory = new TaskCategoryModel(options)
-      let ndx = _.findIndex(this.taskCategories, { id: taskCategory.id })
+      let category = new CategoryModel(options)
+      let ndx = _.findIndex(this.categories, { id: category.id })
       if (ndx > -1) {
-        this.taskCategories.splice(ndx, 1)
+        this.categories.splice(ndx, 1)
       }
-      this.taskCategories.push(taskCategory)
-      this.trigger('updateTaskCategory', [taskCategory])
+      this.categories.push(category)
+      this.trigger('updateCategory', [category])
     }
 
-    realtimeProvider.addEventListener('updateTaskCategory', this.onUpdate)
+    realtimeProvider.addEventListener('updateCategory', this.onUpdate)
 
     this.onRemove = (e) => {
       let options = JSON.parse(e.data)
-      let ndx = _.findIndex(this.taskCategories, { id: options.id })
+      let ndx = _.findIndex(this.categories, { id: options.id })
 
       if (ndx > -1) {
-        this.taskCategories.splice(ndx, 1)
-        this.trigger('removeTaskCategory', [options.id])
+        this.categories.splice(ndx, 1)
+        this.trigger('removeCategory', [options.id])
       }
     }
 
-    realtimeProvider.addEventListener('removeTaskCategory', this.onRemove)
+    realtimeProvider.addEventListener('removeCategory', this.onRemove)
   }
 
   unsubscribe () {
@@ -68,26 +68,26 @@ class TaskCategoryProvider extends EventEmitter {
     let realtimeProvider = dataStore.getRealtimeProvider()
 
     if (this.onCreate) {
-      realtimeProvider.removeEventListener('createTaskCategory', this.onCreate)
+      realtimeProvider.removeEventListener('createCategory', this.onCreate)
       this.onCreate = null
     }
 
     if (this.onUpdate) {
-      realtimeProvider.removeEventListener('updateTaskCategory', this.onUpdate)
+      realtimeProvider.removeEventListener('updateCategory', this.onUpdate)
       this.onUpdate = null
     }
 
     if (this.onRemove) {
-      realtimeProvider.removeEventListener('removeTaskCategory', this.onRemove)
+      realtimeProvider.removeEventListener('removeCategory', this.onRemove)
       this.onRemove = null
     }
 
-    this.taskCategories = []
+    this.categories = []
   }
 
-  fetchTaskCategories () {
+  fetchCategories () {
     let promise = $.Deferred()
-    let url = '/api/task/category/all'
+    let url = '/api/category/all'
 
     $.ajax({
       url: url,
@@ -96,11 +96,11 @@ class TaskCategoryProvider extends EventEmitter {
         withCredentials: true
       },
       success: (responseJSON, textStatus, jqXHR) => {
-        this.taskCategories = _.map(responseJSON, (options) => {
-          return new TaskCategoryModel(options)
+        this.categories = _.map(responseJSON, (options) => {
+          return new CategoryModel(options)
         })
 
-        promise.resolve(this.taskCategories)
+        promise.resolve(this.categories)
       },
       error: (jqXHR, textStatus, errorThrown) => {
         if (jqXHR.responseJSON) {
@@ -114,9 +114,9 @@ class TaskCategoryProvider extends EventEmitter {
     return promise
   }
 
-  removeTaskCategory (id, token) {
+  removeCategory (id, token) {
     let promise = $.Deferred()
-    let url = `/api/task/category/${id}/remove`
+    let url = `/api/category/${id}/remove`
 
     $.ajax({
       url: url,
@@ -145,4 +145,4 @@ class TaskCategoryProvider extends EventEmitter {
   }
 }
 
-export default new TaskCategoryProvider()
+export default new CategoryProvider()

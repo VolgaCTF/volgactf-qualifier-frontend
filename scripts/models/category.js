@@ -1,4 +1,4 @@
-export default class TaskCategoryModel {
+export default class CategoryModel {
   constructor (options) {
     this.id = options.id
     this.title = options.title
