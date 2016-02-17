@@ -8,6 +8,7 @@ import statusBar from '../status-bar'
 import metadataStore from '../utils/metadata-store'
 import moment from 'moment'
 import categoryProvider from '../providers/category'
+import taskCategoryProvider from '../providers/task-category'
 import taskProvider from '../providers/task'
 import contestProvider from '../providers/contest'
 import identityProvider from '../providers/identity'
@@ -29,6 +30,8 @@ class TasksView extends View {
     this.onCreateCategory = null
     this.onUpdateCategory = null
     this.onRemoveCategory = null
+
+    this.onCreateTaskCategory = null
 
     this.onCreateTask = null
     this.onOpenTask = null
@@ -1101,14 +1104,16 @@ class TasksView extends View {
       }
 
       let categories = categoryProvider.getCategories()
+      let allTaskCategories = taskCategoryProvider.getTaskCategories()
 
       this.$taskPreviewsList.empty()
       taskPreviews.sort(sortTaskPreviewsFunc)
       let contest = contestProvider.getContest()
       for (let taskPreview of taskPreviews) {
         let categoriesList = ''
-        for (let categoryId of taskPreview.categories) {
-          let category = _.findWhere(categories, { id: categoryId })
+        let taskCategories = _.where(allTaskCategories, { taskId: taskPreview.id })
+        for (let taskCategory of taskCategories) {
+          let category = _.findWhere(categories, { id: taskCategory.categoryId })
           if (category) {
             categoriesList += renderTemplate('category-partial', {
               title: category.title,
@@ -1155,11 +1160,11 @@ class TasksView extends View {
 
         let promise = null
         if (isTeam) {
-          promise = $.when(taskProvider.fetchTaskPreviews(), categoryProvider.fetchCategories(), contestProvider.fetchTeamTaskHits(), contestProvider.fetchTeamScores())
+          promise = $.when(taskProvider.fetchTaskPreviews(), categoryProvider.fetchCategories(), taskCategoryProvider.fetchTaskCategories(), contestProvider.fetchTeamTaskHits(), contestProvider.fetchTeamScores())
         } else if (isSupervisor) {
-          promise = $.when(taskProvider.fetchTaskPreviews(), categoryProvider.fetchCategories(), contestProvider.fetchTeamTaskHits(), teamProvider.fetchTeams())
+          promise = $.when(taskProvider.fetchTaskPreviews(), categoryProvider.fetchCategories(), taskCategoryProvider.fetchTaskCategories(), contestProvider.fetchTeamTaskHits(), teamProvider.fetchTeams())
         } else {
-          promise = $.when(taskProvider.fetchTaskPreviews(), categoryProvider.fetchCategories())
+          promise = $.when(taskProvider.fetchTaskPreviews(), categoryProvider.fetchCategories(), taskCategoryProvider.fetchTaskCategories())
         }
 
         promise
@@ -1204,6 +1209,11 @@ class TasksView extends View {
               if (isSupervisor) {
                 this.renderCategories()
               }
+              return false
+            }
+
+            this.onCreateTaskCategory = (taskCategory) => {
+              this.renderTaskPreviews()
               return false
             }
 
@@ -1279,6 +1289,8 @@ class TasksView extends View {
             contestProvider.on('updateContest', this.onUpdateContest)
 
             teamProvider.subscribe()
+            taskCategoryProvider.subscribe()
+            taskCategoryProvider.on('createTaskCategory', this.onCreateTaskCategory)
           })
           .fail((err) => {
             console.error(err)
@@ -1344,6 +1356,13 @@ class TasksView extends View {
       contestProvider.off('updateContest', this.onUpdateContest)
       this.onUpdateContest = null
     }
+
+    if (this.onCreateTaskCategory) {
+      taskCategoryProvider.off('createTaskCategory', this.onCreateTaskCategory)
+      this.onCreateTaskCategory = null
+    }
+
+    taskCategoryProvider.unsubscribe()
 
     this.$main.empty()
     this.$main = null
