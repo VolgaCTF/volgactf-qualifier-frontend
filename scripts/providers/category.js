@@ -92,9 +92,6 @@ class CategoryProvider extends EventEmitter {
     $.ajax({
       url: url,
       dataType: 'json',
-      xhrFields: {
-        withCredentials: true
-      },
       success: (responseJSON, textStatus, jqXHR) => {
         this.categories = _.map(responseJSON, (options) => {
           return new CategoryModel(options)
@@ -123,9 +120,6 @@ class CategoryProvider extends EventEmitter {
       type: 'POST',
       dataType: 'json',
       data: {},
-      xhrFields: {
-        withCredentials: true
-      },
       headers: {
         'X-CSRF-Token': token
       },

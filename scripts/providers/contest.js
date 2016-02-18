@@ -159,9 +159,6 @@ class ContestProvider extends EventEmitter {
     $.ajax({
       url: url,
       dataType: 'json',
-      xhrFields: {
-        withCredentials: true
-      },
       success: (responseJSON, textStatus, jqXHR) => {
         this.contest = new ContestModel(responseJSON)
         promise.resolve(this.contest)
@@ -185,9 +182,6 @@ class ContestProvider extends EventEmitter {
     $.ajax({
       url: url,
       dataType: 'json',
-      xhrFields: {
-        withCredentials: true
-      },
       success: (responseJSON, textStatus, jqXHR) => {
         this.teamScores = _.map(responseJSON, (options) => {
           return new TeamScoreModel(options)
@@ -214,9 +208,6 @@ class ContestProvider extends EventEmitter {
     $.ajax({
       url: url,
       dataType: 'json',
-      xhrFields: {
-        withCredentials: true
-      },
       success: (responseJSON, textStatus, jqXHR) => {
         promise.resolve(responseJSON)
       },
@@ -241,9 +232,6 @@ class ContestProvider extends EventEmitter {
     $.ajax({
       url: url,
       dataType: 'json',
-      xhrFields: {
-        withCredentials: true
-      },
       success: (responseJSON, textStatus, jqXHR) => {
         if (_.contains(['admin', 'manager'], identity.role) || (identity.role === 'team' && identity.id === teamId)) {
           let teamTaskHits = _.map(responseJSON, (options) => {
@@ -284,9 +272,6 @@ class ContestProvider extends EventEmitter {
       $.ajax({
         url: url,
         dataType: 'json',
-        xhrFields: {
-          withCredentials: true
-        },
         success: (responseJSON, textStatus, jqXHR) => {
           this.teamTaskHits = _.map(responseJSON, (options) => {
             return new TeamTaskHitModel(options)

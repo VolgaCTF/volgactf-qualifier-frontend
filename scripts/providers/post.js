@@ -91,9 +91,6 @@ class PostProvider extends EventEmitter {
     $.ajax({
       url: url,
       dataType: 'json',
-      xhrFields: {
-        withCredentials: true
-      },
       success: (responseJSON, textStatus, jqXHR) => {
         this.posts = _.map(responseJSON, (options) => {
           return new PostModel(options)
@@ -122,9 +119,6 @@ class PostProvider extends EventEmitter {
       type: 'POST',
       dataType: 'json',
       data: {},
-      xhrFields: {
-        withCredentials: true
-      },
       headers: {
         'X-CSRF-Token': token
       },

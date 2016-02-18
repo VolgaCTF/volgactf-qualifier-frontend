@@ -23,9 +23,6 @@ class IdentityProvider {
     $.ajax({
       url: url,
       dataType: 'json',
-      xhrFields: {
-        withCredentials: true
-      },
       success: (responseJSON, textStatus, jqXHR) => {
         this.identity = responseJSON
         promise.resolve(this.identity)

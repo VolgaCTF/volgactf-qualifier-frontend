@@ -118,9 +118,6 @@ class TaskProvider extends EventEmitter {
     $.ajax({
       url: url,
       dataType: 'json',
-      xhrFields: {
-        withCredentials: true
-      },
       success: (responseJSON, textStatus, jqXHR) => {
         this.taskPreviews = _.map(responseJSON, (options) => {
           return new TaskPreviewModel(options)
@@ -157,9 +154,6 @@ class TaskProvider extends EventEmitter {
     $.ajax({
       url: url,
       dataType: 'json',
-      xhrFields: {
-        withCredentials: true
-      },
       success: (responseJSON, textStatus, jqXHR) => {
         let res = null
         if (options.full) {
@@ -191,9 +185,6 @@ class TaskProvider extends EventEmitter {
       type: 'POST',
       dataType: 'json',
       data: {},
-      xhrFields: {
-        withCredentials: true
-      },
       headers: {
         'X-CSRF-Token': token
       },
@@ -221,9 +212,6 @@ class TaskProvider extends EventEmitter {
       type: 'POST',
       dataType: 'json',
       data: {},
-      xhrFields: {
-        withCredentials: true
-      },
       headers: {
         'X-CSRF-Token': token
       },
