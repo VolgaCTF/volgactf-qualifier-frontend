@@ -55,15 +55,38 @@ class TaskCategoryProvider extends EventEmitter {
     $.ajax({
       url: url,
       dataType: 'json',
-      xhrFields: {
-        withCredentials: true
-      },
       success: (responseJSON, textStatus, jqXHR) => {
         this.taskCategories = _.map(responseJSON, (options) => {
           return new TaskCategoryModel(options)
         })
 
         promise.resolve(this.taskCategories)
+      },
+      error: (jqXHR, textStatus, errorThrown) => {
+        if (jqXHR.responseJSON) {
+          promise.reject(jqXHR.responseJSON)
+        } else {
+          promise.reject('Unknown error. Please try again later.')
+        }
+      }
+    })
+
+    return promise
+  }
+
+  fetchTaskCategoriesByTask (taskId) {
+    let promise = $.Deferred()
+    let url = `/api/task/${taskId}/category`
+
+    $.ajax({
+      url: url,
+      dataType: 'json',
+      success: (responseJSON, textStatus, jqXHR) => {
+        let taskCategories = _.map(responseJSON, (options) => {
+          return new TaskCategoryModel(options)
+        })
+
+        promise.resolve(taskCategories)
       },
       error: (jqXHR, textStatus, errorThrown) => {
         if (jqXHR.responseJSON) {

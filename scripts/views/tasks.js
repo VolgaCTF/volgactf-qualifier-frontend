@@ -482,14 +482,21 @@ class TasksView extends View {
       $editTaskSubmitButton.prop('disabled', true)
 
       $
-        .when(taskProvider.fetchTask(taskId, { full: true }))
-        .done((task) => {
+        .when(
+          taskProvider.fetchTask(taskId, { full: true }),
+          taskCategoryProvider.fetchTaskCategoriesByTask(taskId)
+        )
+        .done((task, taskCategories) => {
           $editTaskSubmitButton.prop('disabled', false)
 
           $editTaskTitle.val(task.title)
           $editTaskDescription.val(task.description)
           $editTaskValue.val(task.value)
-          $editCategories.val(task.categories)
+
+          $editCategories.val(taskCategories.map((taskCategory) => {
+            return taskCategory.categoryId
+          }))
+
           $editTaskCaseSensitive.val(task.caseSensitive.toString())
 
           $editTaskHintList.empty()
