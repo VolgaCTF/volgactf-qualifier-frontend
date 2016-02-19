@@ -32,6 +32,7 @@ class TasksView extends View {
     this.onRemoveCategory = null
 
     this.onCreateTaskCategory = null
+    this.onRemoveTaskCategory = null
 
     this.onCreateTask = null
     this.onOpenTask = null
@@ -40,6 +41,11 @@ class TasksView extends View {
 
     this.onCreateTeamTaskHit = null
     this.onUpdateContest = null
+
+    this.flagRenderTasks = false
+    this.flagRenderingTasks = false
+    this.renderTasksInterval = null
+    this.onRenderTasks = null
   }
 
   getTitle () {
@@ -1030,6 +1036,10 @@ class TasksView extends View {
     }
   }
 
+  requestRenderTasks () {
+    this.flagRenderTasks = true
+  }
+
   renderTaskPreviews () {
     let taskPreviews = taskProvider.getTaskPreviews()
     if (taskPreviews.length === 0) {
@@ -1189,7 +1199,6 @@ class TasksView extends View {
             }
 
             this.$taskPreviewsList = $('#themis-task-previews')
-            this.renderTaskPreviews()
 
             this.onCreateCategory = (category) => {
               if (isSupervisor) {
@@ -1199,7 +1208,12 @@ class TasksView extends View {
             }
 
             this.onCreateTaskCategory = (taskCategory) => {
-              this.renderTaskPreviews()
+              this.requestRenderTasks()
+              return false
+            }
+
+            this.onRemoveTaskCategory = (taskCategoryId) => {
+              this.requestRenderTasks()
               return false
             }
 
@@ -1208,7 +1222,7 @@ class TasksView extends View {
                 this.renderCategories()
               }
 
-              this.renderTaskPreviews()
+              this.requestRenderTasks()
               return false
             }
 
@@ -1217,7 +1231,7 @@ class TasksView extends View {
                 this.renderCategories()
               }
 
-              this.renderTaskPreviews()
+              this.requestRenderTasks()
               return false
             }
 
@@ -1229,7 +1243,7 @@ class TasksView extends View {
             taskProvider.subscribe()
             if (isSupervisor) {
               this.onCreateTask = (taskPreview) => {
-                this.renderTaskPreviews()
+                this.requestRenderTasks()
                 return false
               }
 
@@ -1237,21 +1251,21 @@ class TasksView extends View {
             }
 
             this.onOpenTask = (taskPreview) => {
-              this.renderTaskPreviews()
+              this.requestRenderTasks()
               return false
             }
 
             taskProvider.on('openTask', this.onOpenTask)
 
             this.onCloseTask = (taskPreview) => {
-              this.renderTaskPreviews()
+              this.requestRenderTasks()
               return false
             }
 
             taskProvider.on('closeTask', this.onCloseTask)
 
             this.onUpdateTask = (taskPreview) => {
-              this.renderTaskPreviews()
+              this.requestRenderTasks()
               return false
             }
 
@@ -1259,7 +1273,7 @@ class TasksView extends View {
 
             if (isTeam) {
               this.onCreateTeamTaskHit = (teamTaskHit) => {
-                this.renderTaskPreviews()
+                this.requestRenderTasks()
                 return false
               }
 
@@ -1268,7 +1282,7 @@ class TasksView extends View {
 
             this.onUpdateContest = (contest) => {
               this.renderCategories()
-              this.renderTaskPreviews()
+              this.requestRenderTasks()
               return false
             }
 
@@ -1277,6 +1291,19 @@ class TasksView extends View {
             teamProvider.subscribe()
             taskCategoryProvider.subscribe()
             taskCategoryProvider.on('createTaskCategory', this.onCreateTaskCategory)
+            taskCategoryProvider.on('removeTaskCategory', this.onRemoveTaskCategory)
+
+            this.onRenderTasks = (force = false) => {
+              if ((this.flagRenderTasks || force) && !this.flagRenderingTasks) {
+                this.flagRenderingTasks = true
+                this.renderTaskPreviews()
+                this.flagRenderingTasks = false
+                this.flagRenderTasks = false
+              }
+            }
+
+            this.renderTasksInterval = window.setInterval(this.onRenderTasks, 500)
+            this.requestRenderTasks()
           })
           .fail((err) => {
             console.error(err)
@@ -1348,7 +1375,17 @@ class TasksView extends View {
       this.onCreateTaskCategory = null
     }
 
+    if (this.onRemoveTaskCategory) {
+      taskCategoryProvider.off('removeTaskCategory', this.onRemoveTaskCategory)
+      this.onRemoveTaskCategory = null
+    }
+
     taskCategoryProvider.unsubscribe()
+
+    window.clearInterval(this.renderTasksInterval)
+    this.onRenderTasks = null
+    this.flagRenderTasks = false
+    this.flagRenderingTasks = false
 
     this.$main.empty()
     this.$main = null

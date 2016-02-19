@@ -10,6 +10,7 @@ class TaskCategoryProvider extends EventEmitter {
     this.taskCategories = []
 
     this.onCreate = null
+    this.onRemove = null
   }
 
   getTaskCategories () {
@@ -31,6 +32,18 @@ class TaskCategoryProvider extends EventEmitter {
     }
 
     realtimeProvider.addEventListener('createTaskCategory', this.onCreate)
+
+    this.onRemove = (e) => {
+      let options = JSON.parse(e.data)
+      let ndx = _.findIndex(this.taskCategories, { id: options.id })
+
+      if (ndx > -1) {
+        this.taskCategories.splice(ndx, 1)
+        this.trigger('removeTaskCategory', [options.id])
+      }
+    }
+
+    realtimeProvider.addEventListener('removeTaskCategory', this.onRemove)
   }
 
   unsubscribe () {
@@ -45,7 +58,12 @@ class TaskCategoryProvider extends EventEmitter {
       this.onCreate = null
     }
 
-    this.categories = []
+    if (this.onRemove) {
+      realtimeProvider.removeEventListener('removeTaskCategory', this.onRemove)
+      this.onRemove = null
+    }
+
+    this.taskCategories = []
   }
 
   fetchTaskCategories () {
