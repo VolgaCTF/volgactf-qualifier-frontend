@@ -285,7 +285,6 @@ class TasksView extends View {
       let number = $(e.target).closest('a').attr('data-number')
       $(`#create-task-answer-${number}`).remove()
       let answers = getAnswers()
-      console.log(answers)
       $createTaskAnswerList.empty()
       _.each(answers, (entry, ndx) => {
         let options = {
