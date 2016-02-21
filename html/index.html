@@ -162,7 +162,7 @@
                         <p class="text-muted"><small>Updated on <%- updatedAt %></small>
                             <% if (manageable) { %>
                             &nbsp;
-                            <button type="button" class="btn btn-success btn-xs" data-action="edit-category" data-toggle="modal" data-target="#edit-category-modal" data-category-id="<%- id %>">
+                            <button type="button" class="btn btn-default btn-xs" data-action="edit-category" data-toggle="modal" data-target="#edit-category-modal" data-category-id="<%- id %>">
                                 <i class="glyphicon glyphicon-pencil"></i>&nbsp;Edit
                             </button>
                             <button type="button" class="btn btn-danger btn-xs" data-action="remove-category" data-toggle="modal" data-target="#remove-category-modal" data-category-id="<%- id %>">
@@ -181,11 +181,11 @@
             <script type="text/x-template" data-name="categories-view">
                 <div class="panel panel-info">
                     <div class="panel-heading">
-                        <h3 class="panel-title">Task categories</h3>
+                        <h3 class="panel-title">Categories</h3>
                     </div>
                     <div class="panel-body">
                         <% if (identity.role === 'admin' && !contest.isFinished()) { %>
-                        <button type="button" class="btn btn-primary btn-xs" data-action="create-category" data-toggle="modal" data-target="#create-category-modal">
+                        <button type="button" class="btn btn-success btn-xs" data-action="create-category" data-toggle="modal" data-target="#create-category-modal">
                             <i class="glyphicon glyphicon-plus"></i>&nbsp;Create
                         </button>
                         <% } %>
@@ -282,7 +282,7 @@
                     <h5>
                         Hint #<%- number %>
                         <a href="#" data-action="remove-task-hint" data-number="<%- number %>">
-                            <i class="glyphicon glyphicon-remove"></i>
+                            <i class="glyphicon glyphicon-remove text-danger"></i>
                         </a>
                     </h5>
                     <textarea name="hints" class="form-control" required data-parsley-length="[2,1024]"></textarea>
@@ -294,7 +294,7 @@
                     <h5>
                         Hint #<%- number %>
                         <a href="#" data-action="remove-task-hint" data-number="<%- number %>">
-                            <i class="glyphicon glyphicon-remove"></i>
+                            <i class="glyphicon glyphicon-remove text-danger"></i>
                         </a>
                     </h5>
                     <textarea name="hints" class="form-control" required data-parsley-length="[2,1024]"></textarea>
@@ -309,7 +309,7 @@
                         <% if (editable) { %>
                         <div class="input-group-addon">
                             <a href="#" data-action="remove-task-answer" data-number="<%- number %>">
-                                <i class="glyphicon glyphicon-remove"></i>
+                                <i class="glyphicon glyphicon-remove text-danger"></i>
                             </a>
                         </div>
                         <% } %>
@@ -326,7 +326,7 @@
                         <input type="text" name="answers" class="form-control" required data-parsley-errors-container="#create-task-answer-errors-<%- number %>" data-parsley-length="[2,256]">
                         <div class="input-group-addon">
                             <a href="#" data-action="remove-task-answer" data-number="<%- number %>">
-                                <i class="glyphicon glyphicon-remove"></i>
+                                <i class="glyphicon glyphicon-remove text-danger"></i>
                             </a>
                         </div>
                     </div>
@@ -450,7 +450,7 @@
                     <section class="<% print((identity.role === 'admin' || identity.role === 'manager') ? 'col-sm-8 themis-no-side-gaps': ''); %>">
                         <% if (identity.role === 'admin') { %>
                         <div class="themis-task-controls">
-                            <button type="button" class="btn btn-primary btn-xs" data-action="create-task" data-toggle="modal" data-target="#create-task-modal">
+                            <button type="button" class="btn btn-success btn-xs" data-action="create-task" data-toggle="modal" data-target="#create-task-modal">
                                 <i class="glyphicon glyphicon-plus"></i>&nbsp;Create
                             </button>
                         </div>
@@ -651,18 +651,18 @@
                                                             <label for="create-task-value" class="control-label">Value</label>
                                                             <input type="number" class="form-control" id="create-task-value" name="value" required data-parsley-type="integer" data-parsley-min="10" data-parsley-max="1000">
                                                         </div>
-                                                    </div>
-                                                    <div class="col-sm-6">
                                                         <div class="form-group">
                                                             <label for="create-categories" class="control-label">Categories</label>
-                                                            <select class="form-control" multiple size="4" id="create-categories" required name="categories"></select>
+                                                            <select class="form-control" multiple size="5" id="create-categories" required name="categories"></select>
                                                         </div>
+                                                    </div>
+                                                    <div class="col-sm-6">
                                                         <div class="form-group" id="create-task-hints">
                                                             <label class="control-label">
                                                                 Hints
                                                                 &nbsp;
                                                                 <a href="#" data-action="create-task-hint">
-                                                                    <i class="glyphicon glyphicon-plus"></i>
+                                                                    <i class="glyphicon glyphicon-plus text-success"></i>
                                                                 </a>
                                                             </label>
                                                             <div id="create-task-hint-list">
@@ -673,7 +673,7 @@
                                                                 Answers
                                                                 &nbsp;
                                                                 <a href="#" data-action="create-task-answer">
-                                                                    <i class="glyphicon glyphicon-plus"></i>
+                                                                    <i class="glyphicon glyphicon-plus text-success"></i>
                                                                 </a>
                                                             </label>
                                                             <div id="create-task-answer-list">
@@ -739,18 +739,18 @@
                                                             <label for="edit-task-value" class="control-label">Value</label>
                                                             <input type="number" class="form-control" id="edit-task-value" name="value" required data-parsley-type="integer" data-parsley-min="10" data-parsley-max="1000" disabled>
                                                         </div>
-                                                    </div>
-                                                    <div class="col-sm-6">
                                                         <div class="form-group">
                                                             <label for="edit-categories" class="control-label">Categories</label>
-                                                            <select class="form-control" multiple size="4" id="edit-categories" required name="categories"></select>
+                                                            <select class="form-control" multiple size="5" id="edit-categories" required name="categories"></select>
                                                         </div>
+                                                    </div>
+                                                    <div class="col-sm-6">
                                                         <div class="form-group" id="edit-task-hints">
                                                             <label class="control-label">
                                                                 Hints
                                                                 &nbsp;
                                                                 <a href="#" data-action="create-task-hint">
-                                                                    <i class="glyphicon glyphicon-plus"></i>
+                                                                    <i class="glyphicon glyphicon-plus text-success"></i>
                                                                 </a>
                                                             </label>
                                                             <div id="edit-task-hint-list">
@@ -761,7 +761,7 @@
                                                                 Answers
                                                                 &nbsp;
                                                                 <a href="#" data-action="create-task-answer">
-                                                                    <i class="glyphicon glyphicon-plus"></i>
+                                                                    <i class="glyphicon glyphicon-plus text-success"></i>
                                                                 </a>
                                                             </label>
                                                             <div id="edit-task-answer-list">
@@ -1038,7 +1038,7 @@
                             <small>Updated on <%- updatedAt %></small>
                             <% if (manageable) { %>
                             &nbsp;
-                            <button type="button" class="btn btn-success btn-xs" data-action="edit-post" data-toggle="modal" data-target="#edit-post-modal" data-post-id="<%- id %>">
+                            <button type="button" class="btn btn-default btn-xs" data-action="edit-post" data-toggle="modal" data-target="#edit-post-modal" data-post-id="<%- id %>">
                                 <i class="glyphicon glyphicon-pencil"></i>&nbsp;Edit
                             </button>
                             <button type="button" class="btn btn-danger btn-xs" data-action="remove-post" data-toggle="modal" data-target="#remove-post-modal" data-post-id="<%- id %>">
@@ -1064,7 +1064,7 @@
                     <header>
                         <h1>News</h1>
                         <% if (identity.role === 'admin' || identity.role === 'manager') { %>
-                        <button type="button" class="btn btn-primary btn-xs" data-action="create-post" data-toggle="modal" data-target="#create-post-modal">
+                        <button type="button" class="btn btn-success btn-xs" data-action="create-post" data-toggle="modal" data-target="#create-post-modal">
                             <i class="glyphicon glyphicon-plus"></i>&nbsp;Create
                         </button>
                         <% } %>
