@@ -9,6 +9,7 @@ import metadataStore from '../utils/metadata-store'
 import moment from 'moment'
 import categoryProvider from '../providers/category'
 import taskCategoryProvider from '../providers/task-category'
+import taskAnswerProvider from '../providers/task-answer'
 import taskProvider from '../providers/task'
 import contestProvider from '../providers/contest'
 import identityProvider from '../providers/identity'
@@ -229,8 +230,6 @@ class TasksView extends View {
     let $createTaskAnswers = $('#create-task-answers')
     let $createTaskAnswerList = $('#create-task-answer-list')
 
-    let $createTaskCaseSensitive = $('#create-task-case-sensitive')
-
     let $createTaskPreview = $('#create-task-preview')
 
     $createTaskTabData.tab()
@@ -260,22 +259,41 @@ class TasksView extends View {
 
     $createTaskAnswers.find('a[data-action="create-task-answer"]').on('click', (e) => {
       e.preventDefault()
-      let number = $createTaskAnswerList.children().length + 1
-      $createTaskAnswerList.append($(renderTemplate('create-task-answer-input-partial', { number: number })))
+      let options = {
+        number: $createTaskAnswerList.children().length + 1,
+        answer: '',
+        caseSensitive: true
+      }
+      $createTaskAnswerList.append($(renderTemplate('create-task-answer-input-partial', options)))
     })
+
+    function getAnswers () {
+      let answers = []
+      $createTaskAnswerList.find('.themis-task-answer-group').each((ndx, el) => {
+        let $el = $(el)
+        answers.push({
+          answer: $el.find('input[type=text]').val(),
+          caseSensitive: $el.find('input[type=checkbox]').prop('checked')
+        })
+      })
+
+      return answers
+    }
 
     $createTaskAnswerList.on('click', 'a[data-action="remove-task-answer"]', (e) => {
       e.preventDefault()
       let number = $(e.target).closest('a').attr('data-number')
       $(`#create-task-answer-${number}`).remove()
-      let answers = []
-      $createTaskAnswerList.find('input[name="answers"]').each((ndx, $el) => {
-        answers.push($($el).val())
-      })
+      let answers = getAnswers()
+      console.log(answers)
       $createTaskAnswerList.empty()
-      _.each(answers, (answer, ndx) => {
-        $createTaskAnswerList.append($(renderTemplate('create-task-answer-input-partial', { number: ndx + 1 })))
-        $(`#create-task-answer-${ndx + 1} input`).val(answer)
+      _.each(answers, (entry, ndx) => {
+        let options = {
+          number: ndx + 1,
+          answer: entry.answer,
+          caseSensitive: entry.caseSensitive
+        }
+        $createTaskAnswerList.append($(renderTemplate('create-task-answer-input-partial', options)))
       })
     })
 
@@ -309,8 +327,6 @@ class TasksView extends View {
       $createTaskHintList.empty()
       $createTaskAnswerList.empty()
 
-      $createTaskCaseSensitive.val('true')
-
       $createTaskSubmitError.text('')
       $createTaskForm.parsley().reset()
     })
@@ -328,6 +344,9 @@ class TasksView extends View {
         },
         clearForm: true,
         dataType: 'json',
+        data: {
+          answers: getAnswers()
+        },
         headers: {
           'X-CSRF-Token': identityProvider.getIdentity().token
         },
@@ -379,8 +398,6 @@ class TasksView extends View {
     let $editTaskAnswers = $('#edit-task-answers')
     let $editTaskAnswerList = $('#edit-task-answer-list')
 
-    let $editTaskCaseSensitive = $('#edit-task-case-sensitive')
-
     let $editTaskPreview = $('#edit-task-preview')
 
     $editTaskTabData.tab()
@@ -410,30 +427,51 @@ class TasksView extends View {
 
     $editTaskAnswers.find('a[data-action="create-task-answer"]').on('click', (e) => {
       e.preventDefault()
-      let number = $editTaskAnswerList.children().length + 1
-      $editTaskAnswerList.append($(renderTemplate('edit-task-answer-input-partial', { number: number, editable: true })))
+      let options = {
+        number: $editTaskAnswerList.children().length + 1,
+        editable: true,
+        answer: '',
+        caseSensitive: true
+      }
+      $editTaskAnswerList.append($(renderTemplate('edit-task-answer-input-partial', options)))
     })
+
+    function getAnswers () {
+      let answers = []
+      $editTaskAnswerList.find('.themis-task-answer-group[data-state-disabled=false]').each((ndx, el) => {
+        let $el = $(el)
+        answers.push({
+          answer: $el.find('input[type=text]').val(),
+          caseSensitive: $el.find('input[type=checkbox]').prop('checked')
+        })
+      })
+
+      return answers
+    }
+
+    let savedTaskAnswers = null
 
     $editTaskAnswerList.on('click', 'a[data-action="remove-task-answer"]', (e) => {
       e.preventDefault()
       let number = $(e.target).closest('a').attr('data-number')
       $(`#edit-task-answer-${number}`).remove()
-      let answerParams = []
-      $editTaskAnswerList.find('input[name="answers"]').each((ndx, el) => {
-        let $el = $(el)
-        answerParams.push({
-          value: $el.val(),
-          editable: !$el.prop('disabled')
-        })
-      })
-
+      let answers = getAnswers()
       $editTaskAnswerList.empty()
-      _.each(answerParams, (answerParam, ndx) => {
+      _.each(savedTaskAnswers, (entry, ndx) => {
         $editTaskAnswerList.append($(renderTemplate('edit-task-answer-input-partial', {
           number: ndx + 1,
-          editable: answerParam.editable
+          editable: false,
+          answer: entry.answer,
+          caseSensitive: entry.caseSensitive
         })))
-        $(`#edit-task-answer-${ndx + 1} input`).val(answerParam.value)
+      })
+      _.each(answers, (entry, ndx) => {
+        $editTaskAnswerList.append($(renderTemplate('edit-task-answer-input-partial', {
+          number: savedTaskAnswers.length + ndx + 1,
+          editable: true,
+          answer: entry.answer,
+          caseSensitive: entry.caseSensitive
+        })))
       })
     })
 
@@ -470,8 +508,6 @@ class TasksView extends View {
       $editTaskHintList.empty()
       $editTaskAnswerList.empty()
 
-      $editTaskCaseSensitive.val('true')
-
       $editTaskSubmitError.text('')
       $editTaskForm.parsley().reset()
       $editTaskForm.attr('action', `/api/task/${taskId}/update`)
@@ -480,10 +516,12 @@ class TasksView extends View {
 
       $
         .when(
-          taskProvider.fetchTask(taskId, { full: true }),
-          taskCategoryProvider.fetchTaskCategoriesByTask(taskId)
+          taskProvider.fetchTask(taskId),
+          taskCategoryProvider.fetchTaskCategoriesByTask(taskId),
+          taskAnswerProvider.fetchTaskAnswersByTask(taskId)
         )
-        .done((task, taskCategories) => {
+        .done((task, taskCategories, taskAnswers) => {
+          savedTaskAnswers = taskAnswers
           $editTaskSubmitButton.prop('disabled', false)
 
           $editTaskTitle.val(task.title)
@@ -493,8 +531,6 @@ class TasksView extends View {
           $editCategories.val(taskCategories.map((taskCategory) => {
             return taskCategory.categoryId
           }))
-
-          $editTaskCaseSensitive.val(task.caseSensitive.toString())
 
           $editTaskHintList.empty()
           _.each(task.hints, (hint, ndx) => {
@@ -506,12 +542,13 @@ class TasksView extends View {
           })
 
           $editTaskAnswerList.empty()
-          _.each(task.answers, (answer, ndx) => {
+          _.each(taskAnswers, (entry, ndx) => {
             $editTaskAnswerList.append($(renderTemplate('edit-task-answer-input-partial', {
               number: ndx + 1,
-              editable: false
+              editable: false,
+              answer: entry.answer,
+              caseSensitive: entry.caseSensitive
             })))
-            $(`#edit-task-answer-${ndx + 1} input`).val(answer)
           })
         })
         .fail((err) => {
@@ -532,6 +569,9 @@ class TasksView extends View {
         },
         clearForm: true,
         dataType: 'json',
+        data: {
+          answers: getAnswers()
+        },
         headers: {
           'X-CSRF-Token': identityProvider.getIdentity().token
         },

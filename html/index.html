@@ -3,7 +3,7 @@
     <head>
         <title>{{#event}}{{ title }}{{/event}} :: Main</title>
 
-        <meta charset="utf8">
+        <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
 
         <link rel="stylesheet" href="/assets/css/{{#cachebusting}}{{#themis}}{{ css }}{{/themis}}{{/cachebusting}}">
@@ -303,9 +303,15 @@
 
             <script type="text/x-template" data-name="edit-task-answer-input-partial">
                 <div id="edit-task-answer-<%- number %>">
-                    <div class="input-group themis-task-answer-group" >
+                    <div class="input-group themis-task-answer-group" data-state-disabled="<% print(editable ? 'false' : 'true') %>">
                         <div class="input-group-addon"><%- number %></div>
-                        <input type="text" name="answers" class="form-control" required data-parsley-errors-container="#edit-task-answer-errors-<%- number %>" data-parsley-length="[2,256]"<% print(editable ? '' : ' disabled'); %>>
+                        <input type="text" class="form-control" required data-parsley-errors-container="#edit-task-answer-errors-<%- number %>" data-parsley-length="[2,256]" value="<%- answer %>"<% print(editable ? '' : ' disabled'); %>>
+                        <div class="input-group-addon checkbox">
+                            <label>
+                                <input type="checkbox" data-parsley-excluded="true" value=""<% print(caseSensitive ? ' checked' : '') %><% print(editable ? '' : ' disabled'); %>>
+                                Aa
+                            </label>
+                        </div>
                         <% if (editable) { %>
                         <div class="input-group-addon">
                             <a href="#" data-action="remove-task-answer" data-number="<%- number %>">
@@ -323,7 +329,13 @@
                 <div id="create-task-answer-<%- number %>">
                     <div class="input-group themis-task-answer-group" >
                         <div class="input-group-addon"><%- number %></div>
-                        <input type="text" name="answers" class="form-control" required data-parsley-errors-container="#create-task-answer-errors-<%- number %>" data-parsley-length="[2,256]">
+                        <input type="text" class="form-control" required data-parsley-errors-container="#create-task-answer-errors-<%- number %>" data-parsley-length="[2,256]" value="<%- answer %>">
+                        <div class="input-group-addon checkbox">
+                            <label>
+                                <input type="checkbox" data-parsley-excluded="true" value=""<% print(caseSensitive ? ' checked' : '') %>>
+                                Aa
+                            </label>
+                        </div>
                         <div class="input-group-addon">
                             <a href="#" data-action="remove-task-answer" data-number="<%- number %>">
                                 <i class="glyphicon glyphicon-remove text-danger"></i>
@@ -679,13 +691,6 @@
                                                             <div id="create-task-answer-list">
                                                             </div>
                                                         </div>
-                                                        <div class="form-group">
-                                                            <label for="create-task-case-sensitive" class="control-label">Answers are case sensitive</label>
-                                                            <select class="form-control" id="create-task-case-sensitive" required name="caseSensitive">
-                                                                <option value="true">yes</option>
-                                                                <option value="false">no</option>
-                                                            </select>
-                                                        </div>
                                                     </div>
                                                 </div>
                                                 <div class="submit-error">
@@ -766,13 +771,6 @@
                                                             </label>
                                                             <div id="edit-task-answer-list">
                                                             </div>
-                                                        </div>
-                                                        <div class="form-group">
-                                                            <label for="edit-task-case-sensitive" class="control-label">Answers are case sensitive</label>
-                                                            <select class="form-control" id="edit-task-case-sensitive" required name="caseSensitive" disabled>
-                                                                <option value="true">yes</option>
-                                                                <option value="false">no</option>
-                                                            </select>
                                                         </div>
                                                     </div>
                                                 </div>
