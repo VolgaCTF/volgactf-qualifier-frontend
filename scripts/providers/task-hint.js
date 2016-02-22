@@ -1,31 +1,22 @@
 import $ from 'jquery'
+import _ from 'underscore'
+import EventEmitter from 'wolfy87-eventemitter'
+import TaskHintModel from '../models/task-hint'
 
-class IdentityProvider {
-  constructor () {
-    this.identity = null
-  }
-
-  subscribe () {
-  }
-
-  unsubscribe () {
-    this.identity = null
-  }
-
-  getIdentity () {
-    return this.identity
-  }
-
-  fetchIdentity () {
+class TaskHintProvider extends EventEmitter {
+  fetchTaskHintsByTask (taskId) {
     let promise = $.Deferred()
-    let url = '/api/identity'
+    let url = `/api/task/${taskId}/hint`
 
     $.ajax({
       url: url,
       dataType: 'json',
       success: (responseJSON, textStatus, jqXHR) => {
-        this.identity = responseJSON
-        promise.resolve(this.identity)
+        let taskHints = _.map(responseJSON, (options) => {
+          return new TaskHintModel(options)
+        })
+
+        promise.resolve(taskHints)
       },
       error: (jqXHR, textStatus, errorThrown) => {
         if (jqXHR.responseJSON) {
@@ -40,4 +31,4 @@ class IdentityProvider {
   }
 }
 
-export default new IdentityProvider()
+export default new TaskHintProvider()

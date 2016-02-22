@@ -54,9 +54,6 @@ class LogProvider extends EventEmitter {
     $.ajax({
       url: url,
       dataType: 'json',
-      xhrFields: {
-        withCredentials: true
-      },
       success: (responseJSON, textStatus, jqXHR) => {
         this.logs = _.map(responseJSON, (options) => {
           return new LogModel(options)

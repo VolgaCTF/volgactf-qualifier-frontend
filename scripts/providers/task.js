@@ -5,7 +5,6 @@ import dataStore from '../data-store'
 import TaskPreviewModel from '../models/task-preview'
 import TaskModel from '../models/task'
 import identityProvider from './identity'
-import TaskFullModel from '../models/task-full'
 
 class TaskProvider extends EventEmitter {
   constructor () {
@@ -118,9 +117,6 @@ class TaskProvider extends EventEmitter {
     $.ajax({
       url: url,
       dataType: 'json',
-      xhrFields: {
-        withCredentials: true
-      },
       success: (responseJSON, textStatus, jqXHR) => {
         this.taskPreviews = _.map(responseJSON, (options) => {
           return new TaskPreviewModel(options)
@@ -140,35 +136,15 @@ class TaskProvider extends EventEmitter {
     return promise
   }
 
-  fetchTask (taskId, options = {}) {
-    let defaultOptions = {
-      full: false
-    }
-    options = _.extend(defaultOptions, options)
+  fetchTask (taskId) {
     let promise = $.Deferred()
-    let url = null
-
-    if (options.full) {
-      url = `/api/task/${taskId}/full`
-    } else {
-      url = `/api/task/${taskId}`
-    }
+    let url = `/api/task/${taskId}`
 
     $.ajax({
       url: url,
       dataType: 'json',
-      xhrFields: {
-        withCredentials: true
-      },
       success: (responseJSON, textStatus, jqXHR) => {
-        let res = null
-        if (options.full) {
-          res = new TaskFullModel(responseJSON)
-        } else {
-          res = new TaskModel(responseJSON)
-        }
-
-        promise.resolve(res)
+        promise.resolve(new TaskModel(responseJSON))
       },
       error: (jqXHR, textStatus, errorThrown) => {
         if (jqXHR.responseJSON) {
@@ -191,9 +167,6 @@ class TaskProvider extends EventEmitter {
       type: 'POST',
       dataType: 'json',
       data: {},
-      xhrFields: {
-        withCredentials: true
-      },
       headers: {
         'X-CSRF-Token': token
       },
@@ -221,9 +194,6 @@ class TaskProvider extends EventEmitter {
       type: 'POST',
       dataType: 'json',
       data: {},
-      xhrFields: {
-        withCredentials: true
-      },
       headers: {
         'X-CSRF-Token': token
       },

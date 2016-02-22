@@ -114,9 +114,6 @@ class TeamProvider extends EventEmitter {
     $.ajax({
       url: url,
       dataType: 'json',
-      xhrFields: {
-        withCredentials: true
-      },
       success: (responseJSON, textStatus, jqXHR) => {
         promise.resolve(new TeamModel(responseJSON))
       },
@@ -139,9 +136,6 @@ class TeamProvider extends EventEmitter {
     $.ajax({
       url: url,
       dataType: 'json',
-      xhrFields: {
-        withCredentials: true
-      },
       success: (responseJSON, textStatus, jqXHR) => {
         this.teams = _.map(responseJSON, (options) => {
           return new TeamModel(options)

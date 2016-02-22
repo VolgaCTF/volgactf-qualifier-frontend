@@ -55,9 +55,6 @@ class ProfileView extends View {
           },
           clearForm: true,
           dataType: 'json',
-          xhrFields: {
-            withCredentials: true
-          },
           headers: {
             'X-CSRF-Token': identityProvider.getIdentity().token
           },
@@ -118,9 +115,6 @@ class ProfileView extends View {
           },
           clearForm: true,
           dataType: 'json',
-          xhrFields: {
-            withCredentials: true
-          },
           headers: {
             'X-CSRF-Token': identityProvider.getIdentity().token
           },
@@ -175,9 +169,6 @@ class ProfileView extends View {
           },
           clearForm: true,
           dataType: 'json',
-          xhrFields: {
-            withCredentials: true
-          },
           headers: {
             'X-CSRF-Token': identityProvider.getIdentity().token
           },
@@ -235,9 +226,6 @@ class ProfileView extends View {
           },
           clearForm: true,
           dataType: 'json',
-          xhrFields: {
-            withCredentials: true
-          },
           headers: {
             'X-CSRF-Token': identityProvider.getIdentity().token
           },
@@ -296,9 +284,6 @@ class ProfileView extends View {
           },
           clearForm: true,
           dataType: 'json',
-          xhrFields: {
-            withCredentials: true
-          },
           headers: {
             'X-CSRF-Token': identityProvider.getIdentity().token
           },
@@ -336,13 +321,13 @@ class ProfileView extends View {
         let promise = null
 
         if (_.contains(['admin', 'manager'], identity.role) || (identity.role === 'team' && identity.id === teamId)) {
-          promise = $.when(teamProvider.fetchTeamProfile(teamId), contestProvider.fetchTeamTaskProgress(teamId), taskProvider.fetchTaskPreviews())
+          promise = $.when(teamProvider.fetchTeamProfile(teamId), contestProvider.fetchTeamTaskHit(teamId), taskProvider.fetchTaskPreviews())
         } else {
-          promise = $.when(teamProvider.fetchTeamProfile(teamId), contestProvider.fetchTeamTaskProgress(teamId))
+          promise = $.when(teamProvider.fetchTeamProfile(teamId), contestProvider.fetchTeamTaskHit(teamId))
         }
 
         promise
-          .done((team, teamTaskProgress) => {
+          .done((team, teamTaskHits) => {
             this.team = team
             let opts = {
               identity: identity,
@@ -353,23 +338,23 @@ class ProfileView extends View {
               let tasks = taskProvider.getTaskPreviews()
               let taskNames = []
 
-              for (let entry of teamTaskProgress) {
+              for (let entry of teamTaskHits) {
                 let task = _.findWhere(tasks, { id: entry.taskId })
                 if (task && !_.contains(taskNames, task.title)) {
                   taskNames.push(task.title)
                 }
               }
 
-              opts.teamProgressInfo = renderTemplate('team-progress-partial', {
+              opts.teamHitsInfo = renderTemplate('team-hits-partial', {
                 identity: identity,
                 teamId: team.id,
                 taskNames: taskNames
               })
             } else {
-              opts.teamProgressInfo = renderTemplate('team-progress-partial', {
+              opts.teamHitsInfo = renderTemplate('team-hits-partial', {
                 identity: identity,
                 teamId: team.id,
-                count: teamTaskProgress
+                count: teamTaskHits
               })
             }
 

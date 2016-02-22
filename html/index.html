@@ -3,7 +3,7 @@
     <head>
         <title>{{#event}}{{ title }}{{/event}} :: Main</title>
 
-        <meta charset="utf8">
+        <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
 
         <link rel="stylesheet" href="/assets/css/{{#cachebusting}}{{#themis}}{{ css }}{{/themis}}{{/cachebusting}}">
@@ -40,7 +40,7 @@
                 </div>
                 <div class="pull-right">
                     <ul class="list-unstyled text-right">
-                        <li><a href="http://volgactf.ru" target="_blank">volgactf.ru</a></li>
+                        <li><a href="https://volgactf.ru" target="_blank">volgactf.ru</a></li>
                         <li><a href="https://twitter.com/VolgaCTF" target="_blank">@VolgaCTF</a></li>
                     </ul>
                 </div>
@@ -70,7 +70,7 @@
 
                 <ul class="nav navbar-nav navbar-right">
                     <% if (identity === null || identity.role === 'guest') { %>
-                    <li class="<% print((active === 'signin') ? 'active' : ''); %>"><a href="/signin" data-push-history><span class="glyphicon glyphicon-log-in"></span>&nbsp;Sign in</a></li>
+                    <li class="<% print((active === 'signin') ? 'active' : ''); %>"><a href="/signin" data-push-history>Sign in</a></li>
                     <% } else { %>
                     <li class="dropdown">
                         <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
@@ -150,8 +150,8 @@
                 </div>
             </script>
 
-            <script type="text/x-template" data-name="task-category-supervisor-partial">
-                <div class="themis-task-category">
+            <script type="text/x-template" data-name="category-supervisor-partial">
+                <div class="themis-category">
                     <header>
                         <h4><%- title %></h4>
                     </header>
@@ -162,10 +162,10 @@
                         <p class="text-muted"><small>Updated on <%- updatedAt %></small>
                             <% if (manageable) { %>
                             &nbsp;
-                            <button type="button" class="btn btn-success btn-xs" data-action="edit-task-category" data-toggle="modal" data-target="#edit-task-category-modal" data-task-category-id="<%- id %>">
+                            <button type="button" class="btn btn-default btn-xs" data-action="edit-category" data-toggle="modal" data-target="#edit-category-modal" data-category-id="<%- id %>">
                                 <i class="glyphicon glyphicon-pencil"></i>&nbsp;Edit
                             </button>
-                            <button type="button" class="btn btn-danger btn-xs" data-action="remove-task-category" data-toggle="modal" data-target="#remove-task-category-modal" data-task-category-id="<%- id %>">
+                            <button type="button" class="btn btn-danger btn-xs" data-action="remove-category" data-toggle="modal" data-target="#remove-category-modal" data-category-id="<%- id %>">
                                 <i class="glyphicon glyphicon-remove"></i>&nbsp;Remove
                             </button>
                             <% } %>
@@ -174,27 +174,27 @@
                 </div>
             </script>
 
-            <script type="text/x-template" data-name="remove-task-category-confirmation">
-                You are about to remove the task category <mark><%- title %></mark>. Continue?
+            <script type="text/x-template" data-name="remove-category-confirmation">
+                You are about to remove the category <mark><%- title %></mark>. Continue?
             </script>
 
-            <script type="text/x-template" data-name="task-categories-view">
+            <script type="text/x-template" data-name="categories-view">
                 <div class="panel panel-info">
                     <div class="panel-heading">
-                        <h3 class="panel-title">Task categories</h3>
+                        <h3 class="panel-title">Categories</h3>
                     </div>
                     <div class="panel-body">
                         <% if (identity.role === 'admin' && !contest.isFinished()) { %>
-                        <button type="button" class="btn btn-primary btn-xs" data-action="create-task-category" data-toggle="modal" data-target="#create-task-category-modal">
+                        <button type="button" class="btn btn-success btn-xs" data-action="create-category" data-toggle="modal" data-target="#create-category-modal">
                             <i class="glyphicon glyphicon-plus"></i>&nbsp;Create
                         </button>
                         <% } %>
-                        <div id="themis-task-categories-list"></div>
+                        <div id="themis-categories-list"></div>
                     </div>
                 </div>
 
                 <% if (identity.role === 'admin' && !contest.isFinished()) { %>
-                <div class="modal fade" id="create-task-category-modal" tabindex="-1" role="dialog">
+                <div class="modal fade" id="create-category-modal" tabindex="-1" role="dialog">
                     <div class="modal-dialog">
                         <div class="modal-content">
                             <div class="modal-header">
@@ -202,14 +202,14 @@
                                 <h4 class="modal-title">Create task category</h4>
                             </div>
                             <div class="modal-body">
-                                <form method="POST" action="/api/task/category/create">
+                                <form method="POST" action="/api/category/create">
                                     <div class="form-group">
-                                        <label for="create-task-category-title" class="control-label">Title</label>
-                                        <input type="text" class="form-control" id="create-task-category-title" name="title" autofocus required minlength="2" maxlength="20">
+                                        <label for="create-category-title" class="control-label">Title</label>
+                                        <input type="text" class="form-control" id="create-category-title" name="title" autofocus required minlength="2" maxlength="20">
                                     </div>
                                     <div class="form-group">
-                                        <label for="create-task-category-description" class="control-label">Description</label>
-                                        <textarea class="form-control themis-task-category-description" id="create-task-category-description" minlength="0" maxlength="150" name="description"></textarea>
+                                        <label for="create-category-description" class="control-label">Description</label>
+                                        <textarea class="form-control themis-category-description" id="create-category-description" minlength="0" maxlength="150" name="description"></textarea>
                                     </div>
                                     <div class="submit-error">
                                         <p class="text-danger"></p>
@@ -218,13 +218,13 @@
                             </div>
                             <div class="modal-footer">
                                 <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                                <button type="button" class="btn btn-primary" data-action="complete-create-task-category">Create</button>
+                                <button type="button" class="btn btn-primary" data-action="complete-create-category">Create</button>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <div class="modal fade" id="remove-task-category-modal" tabindex="-1" role="dialog">
+                <div class="modal fade" id="remove-category-modal" tabindex="-1" role="dialog">
                     <div class="modal-dialog">
                         <div class="modal-content">
                             <div class="modal-header">
@@ -239,13 +239,13 @@
                             </div>
                             <div class="modal-footer">
                                 <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                                <button type="button" class="btn btn-danger" data-action="complete-remove-task-category">Remove</button>
+                                <button type="button" class="btn btn-danger" data-action="complete-remove-category">Remove</button>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <div class="modal fade" id="edit-task-category-modal" tabindex="-1" role="dialog">
+                <div class="modal fade" id="edit-category-modal" tabindex="-1" role="dialog">
                     <div class="modal-dialog">
                         <div class="modal-content">
                             <div class="modal-header">
@@ -255,12 +255,12 @@
                             <div class="modal-body">
                                 <form method="POST">
                                     <div class="form-group">
-                                        <label for="edir-task-category-title" class="control-label">Title</label>
-                                        <input type="text" class="form-control" id="edit-task-category-title" name="title" autofocus required minlength="2" maxlength="20">
+                                        <label for="edit-category-title" class="control-label">Title</label>
+                                        <input type="text" class="form-control" id="edit-category-title" name="title" autofocus required minlength="2" maxlength="20">
                                     </div>
                                     <div class="form-group">
-                                        <label for="edit-task-category-description" class="control-label">Description</label>
-                                        <textarea class="form-control themis-task-category-description" id="edit-task-category-description" minlength="0" maxlength="150" name="description"></textarea>
+                                        <label for="edit-category-description" class="control-label">Description</label>
+                                        <textarea class="form-control themis-category-description" id="edit-category-description" minlength="0" maxlength="150" name="description"></textarea>
                                     </div>
                                     <div class="submit-error">
                                         <p class="text-danger"></p>
@@ -269,7 +269,7 @@
                             </div>
                             <div class="modal-footer">
                                 <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                                <button type="button" class="btn btn-primary" data-action="complete-edit-task-category">Save</button>
+                                <button type="button" class="btn btn-primary" data-action="complete-edit-category">Save</button>
                             </div>
                         </div>
                     </div>
@@ -278,38 +278,46 @@
             </script>
 
             <script type="text/x-template" data-name="edit-task-hint-textarea-partial">
-                <div id="edit-task-hint-<%- number %>">
+                <div class="themis-task-hint-group" id="edit-task-hint-<%- number %>" data-state-disabled="<% print(editable ? 'false' : 'true') %>">
                     <h5>
                         Hint #<%- number %>
+                        <% if (editable) { %>
                         <a href="#" data-action="remove-task-hint" data-number="<%- number %>">
-                            <i class="glyphicon glyphicon-remove"></i>
+                            <i class="glyphicon glyphicon-remove text-danger"></i>
                         </a>
+                        <% } %>
                     </h5>
-                    <textarea name="hints" class="form-control" required data-parsley-length="[2,1024]"></textarea>
+                    <textarea class="form-control" required data-parsley-length="[2,1024]"<% print(editable ? '' : ' disabled'); %>><%- hint %></textarea>
                 </div>
             </script>
 
             <script type="text/x-template" data-name="create-task-hint-textarea-partial">
-                <div id="create-task-hint-<%- number %>">
+                <div class="themis-task-hint-group" id="create-task-hint-<%- number %>">
                     <h5>
                         Hint #<%- number %>
                         <a href="#" data-action="remove-task-hint" data-number="<%- number %>">
-                            <i class="glyphicon glyphicon-remove"></i>
+                            <i class="glyphicon glyphicon-remove text-danger"></i>
                         </a>
                     </h5>
-                    <textarea name="hints" class="form-control" required data-parsley-length="[2,1024]"></textarea>
+                    <textarea class="form-control" required data-parsley-length="[2,1024]"><%- hint %></textarea>
                 </div>
             </script>
 
             <script type="text/x-template" data-name="edit-task-answer-input-partial">
                 <div id="edit-task-answer-<%- number %>">
-                    <div class="input-group themis-task-answer-group" >
+                    <div class="input-group themis-task-answer-group" data-state-disabled="<% print(editable ? 'false' : 'true') %>">
                         <div class="input-group-addon"><%- number %></div>
-                        <input type="text" name="answers" class="form-control" required data-parsley-errors-container="#edit-task-answer-errors-<%- number %>" data-parsley-length="[2,256]"<% print(editable ? '' : ' disabled'); %>>
+                        <input type="text" class="form-control" required data-parsley-errors-container="#edit-task-answer-errors-<%- number %>" data-parsley-length="[2,256]" value="<%- answer %>"<% print(editable ? '' : ' disabled'); %>>
+                        <div class="input-group-addon checkbox">
+                            <label>
+                                <input type="checkbox" data-parsley-excluded="true" value=""<% print(caseSensitive ? ' checked' : '') %><% print(editable ? '' : ' disabled'); %>>
+                                Aa
+                            </label>
+                        </div>
                         <% if (editable) { %>
                         <div class="input-group-addon">
                             <a href="#" data-action="remove-task-answer" data-number="<%- number %>">
-                                <i class="glyphicon glyphicon-remove"></i>
+                                <i class="glyphicon glyphicon-remove text-danger"></i>
                             </a>
                         </div>
                         <% } %>
@@ -323,10 +331,16 @@
                 <div id="create-task-answer-<%- number %>">
                     <div class="input-group themis-task-answer-group" >
                         <div class="input-group-addon"><%- number %></div>
-                        <input type="text" name="answers" class="form-control" required data-parsley-errors-container="#create-task-answer-errors-<%- number %>" data-parsley-length="[2,256]">
+                        <input type="text" class="form-control" required data-parsley-errors-container="#create-task-answer-errors-<%- number %>" data-parsley-length="[2,256]" value="<%- answer %>">
+                        <div class="input-group-addon checkbox">
+                            <label>
+                                <input type="checkbox" data-parsley-excluded="true" value=""<% print(caseSensitive ? ' checked' : '') %>>
+                                Aa
+                            </label>
+                        </div>
                         <div class="input-group-addon">
                             <a href="#" data-action="remove-task-answer" data-number="<%- number %>">
-                                <i class="glyphicon glyphicon-remove"></i>
+                                <i class="glyphicon glyphicon-remove text-danger"></i>
                             </a>
                         </div>
                     </div>
@@ -335,7 +349,7 @@
                 </div>
             </script>
 
-            <script type="text/x-template" data-name="task-category-partial">
+            <script type="text/x-template" data-name="category-partial">
                 <span class="label label-default" title="<%- description %>"><span class="glyphicon glyphicon-tag"></span>&nbsp;<%- title %></span>&nbsp;
             </script>
 
@@ -415,7 +429,7 @@
                         <% } else { %>
                         <div class="panel-footer" data-task-id="<%- task.id %>" data-toggle="modal" data-target="#check-task-modal">
                         <% } %>
-                            <div class="themis-task-categories">
+                            <div class="themis-categories">
                                 <%= categoriesList %>
                             </div>
                         </div>
@@ -450,7 +464,7 @@
                     <section class="<% print((identity.role === 'admin' || identity.role === 'manager') ? 'col-sm-8 themis-no-side-gaps': ''); %>">
                         <% if (identity.role === 'admin') { %>
                         <div class="themis-task-controls">
-                            <button type="button" class="btn btn-primary btn-xs" data-action="create-task" data-toggle="modal" data-target="#create-task-modal">
+                            <button type="button" class="btn btn-success btn-xs" data-action="create-task" data-toggle="modal" data-target="#create-task-modal">
                                 <i class="glyphicon glyphicon-plus"></i>&nbsp;Create
                             </button>
                         </div>
@@ -459,7 +473,7 @@
                         </div>
                     </section>
                     <% if (identity.role === 'admin' || identity.role === 'manager') { %>
-                    <section class="col-sm-4" id="themis-task-categories"></section>
+                    <section class="col-sm-4" id="themis-categories"></section>
                     <% } %>
                 </div>
 
@@ -651,18 +665,18 @@
                                                             <label for="create-task-value" class="control-label">Value</label>
                                                             <input type="number" class="form-control" id="create-task-value" name="value" required data-parsley-type="integer" data-parsley-min="10" data-parsley-max="1000">
                                                         </div>
+                                                        <div class="form-group">
+                                                            <label for="create-categories" class="control-label">Categories</label>
+                                                            <select class="form-control" multiple size="5" id="create-categories" required name="categories"></select>
+                                                        </div>
                                                     </div>
                                                     <div class="col-sm-6">
-                                                        <div class="form-group">
-                                                            <label for="create-task-categories" class="control-label">Categories</label>
-                                                            <select class="form-control" multiple size="4" id="create-task-categories" required name="categories"></select>
-                                                        </div>
                                                         <div class="form-group" id="create-task-hints">
                                                             <label class="control-label">
                                                                 Hints
                                                                 &nbsp;
                                                                 <a href="#" data-action="create-task-hint">
-                                                                    <i class="glyphicon glyphicon-plus"></i>
+                                                                    <i class="glyphicon glyphicon-plus text-success"></i>
                                                                 </a>
                                                             </label>
                                                             <div id="create-task-hint-list">
@@ -673,18 +687,11 @@
                                                                 Answers
                                                                 &nbsp;
                                                                 <a href="#" data-action="create-task-answer">
-                                                                    <i class="glyphicon glyphicon-plus"></i>
+                                                                    <i class="glyphicon glyphicon-plus text-success"></i>
                                                                 </a>
                                                             </label>
                                                             <div id="create-task-answer-list">
                                                             </div>
-                                                        </div>
-                                                        <div class="form-group">
-                                                            <label for="create-task-case-sensitive" class="control-label">Answers are case sensitive</label>
-                                                            <select class="form-control" id="create-task-case-sensitive" required name="caseSensitive">
-                                                                <option value="true">yes</option>
-                                                                <option value="false">no</option>
-                                                            </select>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -739,18 +746,18 @@
                                                             <label for="edit-task-value" class="control-label">Value</label>
                                                             <input type="number" class="form-control" id="edit-task-value" name="value" required data-parsley-type="integer" data-parsley-min="10" data-parsley-max="1000" disabled>
                                                         </div>
+                                                        <div class="form-group">
+                                                            <label for="edit-categories" class="control-label">Categories</label>
+                                                            <select class="form-control" multiple size="5" id="edit-categories" required name="categories"></select>
+                                                        </div>
                                                     </div>
                                                     <div class="col-sm-6">
-                                                        <div class="form-group">
-                                                            <label for="edit-task-categories" class="control-label">Categories</label>
-                                                            <select class="form-control" multiple size="4" id="edit-task-categories" required name="categories"></select>
-                                                        </div>
                                                         <div class="form-group" id="edit-task-hints">
                                                             <label class="control-label">
                                                                 Hints
                                                                 &nbsp;
                                                                 <a href="#" data-action="create-task-hint">
-                                                                    <i class="glyphicon glyphicon-plus"></i>
+                                                                    <i class="glyphicon glyphicon-plus text-success"></i>
                                                                 </a>
                                                             </label>
                                                             <div id="edit-task-hint-list">
@@ -761,18 +768,11 @@
                                                                 Answers
                                                                 &nbsp;
                                                                 <a href="#" data-action="create-task-answer">
-                                                                    <i class="glyphicon glyphicon-plus"></i>
+                                                                    <i class="glyphicon glyphicon-plus text-success"></i>
                                                                 </a>
                                                             </label>
                                                             <div id="edit-task-answer-list">
                                                             </div>
-                                                        </div>
-                                                        <div class="form-group">
-                                                            <label for="edit-task-case-sensitive" class="control-label">Answers are case sensitive</label>
-                                                            <select class="form-control" id="edit-task-case-sensitive" required name="caseSensitive" disabled>
-                                                                <option value="true">yes</option>
-                                                                <option value="false">no</option>
-                                                            </select>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -1038,7 +1038,7 @@
                             <small>Updated on <%- updatedAt %></small>
                             <% if (manageable) { %>
                             &nbsp;
-                            <button type="button" class="btn btn-success btn-xs" data-action="edit-post" data-toggle="modal" data-target="#edit-post-modal" data-post-id="<%- id %>">
+                            <button type="button" class="btn btn-default btn-xs" data-action="edit-post" data-toggle="modal" data-target="#edit-post-modal" data-post-id="<%- id %>">
                                 <i class="glyphicon glyphicon-pencil"></i>&nbsp;Edit
                             </button>
                             <button type="button" class="btn btn-danger btn-xs" data-action="remove-post" data-toggle="modal" data-target="#remove-post-modal" data-post-id="<%- id %>">
@@ -1064,7 +1064,7 @@
                     <header>
                         <h1>News</h1>
                         <% if (identity.role === 'admin' || identity.role === 'manager') { %>
-                        <button type="button" class="btn btn-primary btn-xs" data-action="create-post" data-toggle="modal" data-target="#create-post-modal">
+                        <button type="button" class="btn btn-success btn-xs" data-action="create-post" data-toggle="modal" data-target="#create-post-modal">
                             <i class="glyphicon glyphicon-plus"></i>&nbsp;Create
                         </button>
                         <% } %>
@@ -1238,7 +1238,7 @@
                             <% if (!contest.isFinished()) { %>
                             <a class="btn btn-primary btn-lg" href="/signup" role="button" data-push-history>Sign up</a>
                             <% } %>
-                            <a class="btn btn-success btn-lg" href="/signin" role="button" data-push-history><span class="glyphicon glyphicon-log-in"></span>&nbsp;Sign in</a>
+                            <a class="btn btn-success btn-lg" href="/signin" role="button" data-push-history>Sign in</a>
                         </p>
                     </div>
                     <% } else if (identity.role === 'team') { %>
@@ -1359,7 +1359,7 @@
                         <div class="submit-error">
                             <p class="text-danger"></p>
                         </div>
-                        <button class="btn btn-lg btn-primary btn-block" type="submit"><span class="glyphicon glyphicon-log-in"></span>&nbsp;Sign in</button>
+                        <button class="btn btn-lg btn-primary btn-block" type="submit">Sign in</button>
                         <div>
                             <p class="text-center"><a href="/restore" data-push-history>Forgot password?</a></p>
                         </div>
@@ -1441,7 +1441,7 @@
                 </div>
             </script>
 
-            <script type="text/x-template" data-name="team-progress-partial">
+            <script type="text/x-template" data-name="team-hits-partial">
                 <% if (identity.role === 'admin' || identity.role === 'manager' || (identity.role === 'team' && identity.id === teamId)) { %>
                     <% if (taskNames.length > 0) { %>
                     Team has solved the following tasks:
@@ -1510,7 +1510,7 @@
                             <% } %>
                         </ul>
                         <p class="text-muted">
-                            <%= teamProgressInfo %>
+                            <%= teamHitsInfo %>
                         </p>
                     </div>
                 </div>

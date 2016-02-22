@@ -54,9 +54,6 @@ class ResetPasswordView extends View {
                 team: urlParams.team,
                 code: urlParams.code
               },
-              xhrFields: {
-                withCredentials: true
-              },
               headers: {
                 'X-CSRF-Token': identityProvider.getIdentity().token
               },

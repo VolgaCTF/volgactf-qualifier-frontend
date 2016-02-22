@@ -7,7 +7,10 @@ import navigationBar from '../navigation-bar'
 import statusBar from '../status-bar'
 import metadataStore from '../utils/metadata-store'
 import moment from 'moment'
+import categoryProvider from '../providers/category'
 import taskCategoryProvider from '../providers/task-category'
+import taskAnswerProvider from '../providers/task-answer'
+import taskHintProvider from '../providers/task-hint'
 import taskProvider from '../providers/task'
 import contestProvider from '../providers/contest'
 import identityProvider from '../providers/identity'
@@ -21,13 +24,16 @@ class TasksView extends View {
   constructor () {
     super(/^\/tasks$/)
     this.$main = null
-    this.$taskCategoriesSection = null
-    this.$taskCategoriesList = null
+    this.$categoriesSection = null
+    this.$categoriesList = null
 
     this.$taskPreviewsList = null
 
+    this.onCreateCategory = null
+    this.onUpdateCategory = null
+    this.onRemoveCategory = null
+
     this.onCreateTaskCategory = null
-    this.onUpdateTaskCategory = null
     this.onRemoveTaskCategory = null
 
     this.onCreateTask = null
@@ -35,165 +41,164 @@ class TasksView extends View {
     this.onCloseTask = null
     this.onUpdateTask = null
 
-    this.onCreateTeamTaskProgress = null
+    this.onCreateTeamTaskHit = null
     this.onUpdateContest = null
+
+    this.flagRenderTasks = false
+    this.flagRenderingTasks = false
+    this.renderTasksInterval = null
+    this.onRenderTasks = null
   }
 
   getTitle () {
     return `${metadataStore.getMetadata('event-title')} :: Tasks`
   }
 
-  initCreateTaskCategoryModal () {
-    let $createTaskCategoryModal = $('#create-task-category-modal')
-    $createTaskCategoryModal.modal({ show: false })
+  initCreateCategoryModal () {
+    let $createCategoryModal = $('#create-category-modal')
+    $createCategoryModal.modal({ show: false })
 
-    let $createTaskCategorySubmitError = $createTaskCategoryModal.find('.submit-error > p')
-    let $createTaskCategorySubmitButton = $createTaskCategoryModal.find('button[data-action="complete-create-task-category"]')
-    let $createTaskCategoryForm = $createTaskCategoryModal.find('form')
-    $createTaskCategoryForm.parsley()
+    let $createCategorySubmitError = $createCategoryModal.find('.submit-error > p')
+    let $createCategorySubmitButton = $createCategoryModal.find('button[data-action="complete-create-category"]')
+    let $createCategoryForm = $createCategoryModal.find('form')
+    $createCategoryForm.parsley()
 
-    $createTaskCategorySubmitButton.on('click', (e) => {
-      $createTaskCategoryForm.trigger('submit')
+    $createCategorySubmitButton.on('click', (e) => {
+      $createCategoryForm.trigger('submit')
     })
 
-    $createTaskCategoryModal.on('show.bs.modal', (e) => {
-      $createTaskCategorySubmitError.text('')
-      $createTaskCategoryForm.parsley().reset()
+    $createCategoryModal.on('show.bs.modal', (e) => {
+      $createCategorySubmitError.text('')
+      $createCategoryForm.parsley().reset()
     })
 
-    $createTaskCategoryModal.on('shown.bs.modal', (e) => {
-      $('#create-task-category-title').focus()
+    $createCategoryModal.on('shown.bs.modal', (e) => {
+      $('#create-category-title').focus()
     })
 
-    $createTaskCategoryForm.on('submit', (e) => {
+    $createCategoryForm.on('submit', (e) => {
       e.preventDefault()
-      $createTaskCategoryForm.ajaxSubmit({
+      $createCategoryForm.ajaxSubmit({
         beforeSubmit: () => {
-          $createTaskCategorySubmitError.text('')
-          $createTaskCategorySubmitButton.prop('disabled', true)
+          $createCategorySubmitError.text('')
+          $createCategorySubmitButton.prop('disabled', true)
         },
         clearForm: true,
         dataType: 'json',
-        xhrFields: {
-          withCredentials: true
-        },
         headers: {
           'X-CSRF-Token': identityProvider.getIdentity().token
         },
         success: (responseText, textStatus, jqXHR) => {
-          $createTaskCategoryModal.modal('hide')
+          $createCategoryModal.modal('hide')
           if (!dataStore.connectedRealtime()) {
             window.location.reload()
           }
         },
         error: (jqXHR, textStatus, errorThrown) => {
           if (jqXHR.responseJSON) {
-            $createTaskCategorySubmitError.text(jqXHR.responseJSON)
+            $createCategorySubmitError.text(jqXHR.responseJSON)
           } else {
-            $createTaskCategorySubmitError.text('Unknown error. Please try again later.')
+            $createCategorySubmitError.text('Unknown error. Please try again later.')
           }
         },
         complete: () => {
-          $createTaskCategorySubmitButton.prop('disabled', false)
+          $createCategorySubmitButton.prop('disabled', false)
         }
       })
     })
   }
 
-  initEditTaskCategoryModal () {
-    let $editTaskCategoryModal = $('#edit-task-category-modal')
-    $editTaskCategoryModal.modal({ show: false })
+  initEditCategoryModal () {
+    let $editCategoryModal = $('#edit-category-modal')
+    $editCategoryModal.modal({ show: false })
 
-    let $editTaskCategorySubmitError = $editTaskCategoryModal.find('.submit-error > p')
-    let $editTaskCategorySubmitButton = $editTaskCategoryModal.find('button[data-action="complete-edit-task-category"]')
-    let $editTaskCategoryForm = $editTaskCategoryModal.find('form')
-    $editTaskCategoryForm.parsley()
+    let $editCategorySubmitError = $editCategoryModal.find('.submit-error > p')
+    let $editCategorySubmitButton = $editCategoryModal.find('button[data-action="complete-edit-category"]')
+    let $editCategoryForm = $editCategoryModal.find('form')
+    $editCategoryForm.parsley()
 
-    $editTaskCategorySubmitButton.on('click', (e) => {
-      $editTaskCategoryForm.trigger('submit')
+    $editCategorySubmitButton.on('click', (e) => {
+      $editCategoryForm.trigger('submit')
     })
 
-    let $editTaskCategoryTitle = $('#edit-task-category-title')
-    let $editTaskCategoryDescription = $('#edit-task-category-description')
+    let $editCategoryTitle = $('#edit-category-title')
+    let $editCategoryDescription = $('#edit-category-description')
 
-    $editTaskCategoryModal.on('show.bs.modal', (e) => {
-      let taskCategoryId = parseInt($(e.relatedTarget).data('task-category-id'), 10)
-      let taskCategory = _.findWhere(taskCategoryProvider.getTaskCategories(), { id: taskCategoryId })
+    $editCategoryModal.on('show.bs.modal', (e) => {
+      let categoryId = parseInt($(e.relatedTarget).data('category-id'), 10)
+      let category = _.findWhere(categoryProvider.getCategories(), { id: categoryId })
 
-      $editTaskCategoryForm.attr('action', `/api/task/category/${taskCategoryId}/update`)
-      $editTaskCategoryTitle.val(taskCategory.title)
-      $editTaskCategoryDescription.val(taskCategory.description)
-      $editTaskCategorySubmitError.text('')
-      $editTaskCategoryForm.parsley().reset()
+      $editCategoryForm.attr('action', `/api/category/${categoryId}/update`)
+      $editCategoryTitle.val(category.title)
+      $editCategoryDescription.val(category.description)
+      $editCategorySubmitError.text('')
+      $editCategoryForm.parsley().reset()
     })
 
-    $editTaskCategoryModal.on('shown.bs.modal', (e) => {
-      $editTaskCategoryTitle.focus()
+    $editCategoryModal.on('shown.bs.modal', (e) => {
+      $editCategoryTitle.focus()
     })
 
-    $editTaskCategoryForm.on('submit', (e) => {
+    $editCategoryForm.on('submit', (e) => {
       e.preventDefault()
-      $editTaskCategoryForm.ajaxSubmit({
+      $editCategoryForm.ajaxSubmit({
         beforeSubmit: () => {
-          $editTaskCategorySubmitError.text('')
-          $editTaskCategorySubmitButton.prop('disabled', true)
+          $editCategorySubmitError.text('')
+          $editCategorySubmitButton.prop('disabled', true)
         },
         clearForm: true,
         dataType: 'json',
-        xhrFields: {
-          withCredentials: true
-        },
         headers: {
           'X-CSRF-Token': identityProvider.getIdentity().token
         },
         success: (responseText, textStatus, jqXHR) => {
-          $editTaskCategoryModal.modal('hide')
+          $editCategoryModal.modal('hide')
           if (!dataStore.connectedRealtime()) {
             window.location.reload()
           }
         },
         error: (jqXHR, textStatus, errorThrown) => {
           if (jqXHR.responseJSON) {
-            $editTaskCategorySubmitError.text(jqXHR.responseJSON)
+            $editCategorySubmitError.text(jqXHR.responseJSON)
           } else {
-            $editTaskCategorySubmitError.text('Unknown error. Please try again later.')
+            $editCategorySubmitError.text('Unknown error. Please try again later.')
           }
         },
         complete: () => {
-          $editTaskCategorySubmitButton.prop('disabled', false)
+          $editCategorySubmitButton.prop('disabled', false)
         }
       })
     })
   }
 
-  initRemoveTaskCategoryModal () {
-    let $removeTaskCategoryModal = $('#remove-task-category-modal')
-    $removeTaskCategoryModal.modal({ show: false })
+  initRemoveCategoryModal () {
+    let $removeCategoryModal = $('#remove-category-modal')
+    $removeCategoryModal.modal({ show: false })
 
-    let $removeTaskCategoryModalBody = $removeTaskCategoryModal.find('.modal-body p.confirmation')
-    let $removeTaskCategorySubmitError = $removeTaskCategoryModal.find('.submit-error > p')
-    let $removeTaskCategorySubmitButton = $removeTaskCategoryModal.find('button[data-action="complete-remove-task-category"]')
+    let $removeCategoryModalBody = $removeCategoryModal.find('.modal-body p.confirmation')
+    let $removeCategorySubmitError = $removeCategoryModal.find('.submit-error > p')
+    let $removeCategorySubmitButton = $removeCategoryModal.find('button[data-action="complete-remove-category"]')
 
-    $removeTaskCategoryModal.on('show.bs.modal', (e) => {
-      let taskCategoryId = parseInt($(e.relatedTarget).data('task-category-id'), 10)
-      $removeTaskCategoryModal.data('task-category-id', taskCategoryId)
-      let taskCategory = _.findWhere(taskCategoryProvider.getTaskCategories(), { id: taskCategoryId })
-      $removeTaskCategoryModalBody.html(renderTemplate('remove-task-category-confirmation', { title: taskCategory.title }))
-      $removeTaskCategorySubmitError.text('')
+    $removeCategoryModal.on('show.bs.modal', (e) => {
+      let categoryId = parseInt($(e.relatedTarget).data('category-id'), 10)
+      $removeCategoryModal.data('category-id', categoryId)
+      let category = _.findWhere(categoryProvider.getCategories(), { id: categoryId })
+      $removeCategoryModalBody.html(renderTemplate('remove-category-confirmation', { title: category.title }))
+      $removeCategorySubmitError.text('')
     })
 
-    $removeTaskCategorySubmitButton.on('click', (e) => {
-      let taskCategoryId = $removeTaskCategoryModal.data('task-category-id')
+    $removeCategorySubmitButton.on('click', (e) => {
+      let categoryId = $removeCategoryModal.data('category-id')
       $
-        .when(taskCategoryProvider.removeTaskCategory(taskCategoryId, identityProvider.getIdentity().token))
+        .when(categoryProvider.removeCategory(categoryId, identityProvider.getIdentity().token))
         .done(() => {
-          $removeTaskCategoryModal.modal('hide')
+          $removeCategoryModal.modal('hide')
           if (!dataStore.connectedRealtime()) {
             window.location.reload()
           }
         })
         .fail((err) => {
-          $removeTaskCategorySubmitError.text(err)
+          $removeCategorySubmitError.text(err)
         })
     })
   }
@@ -218,15 +223,13 @@ class TasksView extends View {
     let $createTaskTitle = $('#create-task-title')
     let $createTaskDescription = $('#create-task-description')
     let $createTaskValue = $('#create-task-value')
-    let $createTaskCategories = $('#create-task-categories')
+    let $createCategories = $('#create-categories')
 
     let $createTaskHints = $('#create-task-hints')
     let $createTaskHintList = $('#create-task-hint-list')
 
     let $createTaskAnswers = $('#create-task-answers')
     let $createTaskAnswerList = $('#create-task-answer-list')
-
-    let $createTaskCaseSensitive = $('#create-task-case-sensitive')
 
     let $createTaskPreview = $('#create-task-preview')
 
@@ -235,52 +238,81 @@ class TasksView extends View {
 
     $createTaskHints.find('a[data-action="create-task-hint"]').on('click', (e) => {
       e.preventDefault()
-      let number = $createTaskHintList.children().length + 1
-      $createTaskHintList.append($(renderTemplate('create-task-hint-textarea-partial', { number: number })))
+      let options = {
+        number: $createTaskHintList.children().length + 1,
+        hint: ''
+      }
+      $createTaskHintList.append($(renderTemplate('create-task-hint-textarea-partial', options)))
     })
+
+    function getHints () {
+      let hints = []
+      $createTaskHintList.find('.themis-task-hint-group').each((ndx, el) => {
+        let $el = $(el)
+        hints.push($el.find('textarea').val())
+      })
+
+      return hints
+    }
 
     $createTaskHintList.on('click', 'a[data-action="remove-task-hint"]', (e) => {
       e.preventDefault()
       let number = $(e.target).closest('a').attr('data-number')
       $(`#create-task-hint-${number}`).remove()
-      let hints = []
-      $createTaskHintList.find('textarea[name="hints"]').each((ndx, $el) => {
-        hints.push($($el).val())
-      })
-
+      let hints = getHints()
       $createTaskHintList.empty()
       _.each(hints, (hint, ndx) => {
-        $createTaskHintList.append($(renderTemplate('create-task-hint-textarea-partial', { number: ndx + 1 })))
-        $(`#create-task-hint-${ndx + 1} textarea`).val(hint)
+        let options = {
+          number: ndx + 1,
+          hint: hint
+        }
+        $createTaskHintList.append($(renderTemplate('create-task-hint-textarea-partial', options)))
       })
     })
 
     $createTaskAnswers.find('a[data-action="create-task-answer"]').on('click', (e) => {
       e.preventDefault()
-      let number = $createTaskAnswerList.children().length + 1
-      $createTaskAnswerList.append($(renderTemplate('create-task-answer-input-partial', { number: number })))
+      let options = {
+        number: $createTaskAnswerList.children().length + 1,
+        answer: '',
+        caseSensitive: true
+      }
+      $createTaskAnswerList.append($(renderTemplate('create-task-answer-input-partial', options)))
     })
+
+    function getAnswers () {
+      let answers = []
+      $createTaskAnswerList.find('.themis-task-answer-group').each((ndx, el) => {
+        let $el = $(el)
+        answers.push({
+          answer: $el.find('input[type=text]').val(),
+          caseSensitive: $el.find('input[type=checkbox]').prop('checked')
+        })
+      })
+
+      return answers
+    }
 
     $createTaskAnswerList.on('click', 'a[data-action="remove-task-answer"]', (e) => {
       e.preventDefault()
       let number = $(e.target).closest('a').attr('data-number')
       $(`#create-task-answer-${number}`).remove()
-      let answers = []
-      $createTaskAnswerList.find('input[name="answers"]').each((ndx, $el) => {
-        answers.push($($el).val())
-      })
+      let answers = getAnswers()
       $createTaskAnswerList.empty()
-      _.each(answers, (answer, ndx) => {
-        $createTaskAnswerList.append($(renderTemplate('create-task-answer-input-partial', { number: ndx + 1 })))
-        $(`#create-task-answer-${ndx + 1} input`).val(answer)
+      _.each(answers, (entry, ndx) => {
+        let options = {
+          number: ndx + 1,
+          answer: entry.answer,
+          caseSensitive: entry.caseSensitive
+        }
+        $createTaskAnswerList.append($(renderTemplate('create-task-answer-input-partial', options)))
       })
     })
 
     $createTaskTabPreview.on('show.bs.tab', (e) => {
       let md = new MarkdownRenderer()
-      let hintsFormatted = []
-      $createTaskHintList.find('textarea[name="hints"]').each((ndx, $el) => {
-        hintsFormatted.push(md.render($($el).val()))
+      let hintsFormatted = getHints().map((hint) => {
+        return md.render(hint)
       })
 
       let options = {
@@ -298,15 +330,13 @@ class TasksView extends View {
       $createTaskDescription.val('')
       $createTaskValue.val('')
 
-      $createTaskCategories.empty()
-      _.each(taskCategoryProvider.getTaskCategories(), (taskCategory) => {
-        $createTaskCategories.append($('<option></option>').attr('value', taskCategory.id).text(taskCategory.title))
+      $createCategories.empty()
+      _.each(categoryProvider.getCategories(), (category) => {
+        $createCategories.append($('<option></option>').attr('value', category.id).text(category.title))
       })
 
       $createTaskHintList.empty()
       $createTaskAnswerList.empty()
-
-      $createTaskCaseSensitive.val('true')
 
       $createTaskSubmitError.text('')
       $createTaskForm.parsley().reset()
@@ -325,8 +355,9 @@ class TasksView extends View {
         },
         clearForm: true,
         dataType: 'json',
-        xhrFields: {
-          withCredentials: true
+        data: {
+          hints: getHints(),
+          answers: getAnswers()
         },
         headers: {
           'X-CSRF-Token': identityProvider.getIdentity().token
@@ -371,15 +402,13 @@ class TasksView extends View {
     let $editTaskTitle = $('#edit-task-title')
     let $editTaskDescription = $('#edit-task-description')
     let $editTaskValue = $('#edit-task-value')
-    let $editTaskCategories = $('#edit-task-categories')
+    let $editCategories = $('#edit-categories')
 
     let $editTaskHints = $('#edit-task-hints')
     let $editTaskHintList = $('#edit-task-hint-list')
 
     let $editTaskAnswers = $('#edit-task-answers')
     let $editTaskAnswerList = $('#edit-task-answer-list')
-
-    let $editTaskCaseSensitive = $('#edit-task-case-sensitive')
 
     let $editTaskPreview = $('#edit-task-preview')
 
@@ -388,60 +417,105 @@ class TasksView extends View {
 
     $editTaskHints.find('a[data-action="create-task-hint"]').on('click', (e) => {
       e.preventDefault()
-      let number = $editTaskHintList.children().length + 1
-      $editTaskHintList.append($(renderTemplate('edit-task-hint-textarea-partial', { number: number })))
+      let options = {
+        number: $editTaskHintList.children().length + 1,
+        hint: '',
+        editable: true
+      }
+      $editTaskHintList.append($(renderTemplate('edit-task-hint-textarea-partial', options)))
     })
+
+    function getHints () {
+      let hints = []
+      $editTaskHintList.find('.themis-task-hint-group[data-state-disabled=false]').each((ndx, el) => {
+        let $el = $(el)
+        hints.push($el.find('textarea').val())
+      })
+
+      return hints
+    }
+
+    let savedTaskHints = null
 
     $editTaskHintList.on('click', 'a[data-action="remove-task-hint"]', (e) => {
       e.preventDefault()
       let number = $(e.target).closest('a').attr('data-number')
       $(`#edit-task-hint-${number}`).remove()
-      let hints = []
-      $editTaskHintList.find('textarea[name="hints"]').each((ndx, el) => {
-        let $el = $(el)
-        hints.push($el.val())
-      })
+
+      let hints = getHints()
       $editTaskHintList.empty()
+      _.each(savedTaskHints, (entry, ndx) => {
+        $editTaskHintList.append($(renderTemplate('edit-task-hint-textarea-partial', {
+          number: ndx + 1,
+          editable: false,
+          hint: entry.hint
+        })))
+      })
       _.each(hints, (hint, ndx) => {
-        $editTaskHintList.append($(renderTemplate('edit-task-hint-textarea-partial', { number: ndx + 1 })))
-        $(`#edit-task-hint-${ndx + 1} textarea`).val(hint)
+        $editTaskHintList.append($(renderTemplate('edit-task-hint-textarea-partial', {
+          number: savedTaskHints.length + ndx + 1,
+          editable: true,
+          hint: hint
+        })))
       })
     })
 
     $editTaskAnswers.find('a[data-action="create-task-answer"]').on('click', (e) => {
       e.preventDefault()
-      let number = $editTaskAnswerList.children().length + 1
-      $editTaskAnswerList.append($(renderTemplate('edit-task-answer-input-partial', { number: number, editable: true })))
+      let options = {
+        number: $editTaskAnswerList.children().length + 1,
+        editable: true,
+        answer: '',
+        caseSensitive: true
+      }
+      $editTaskAnswerList.append($(renderTemplate('edit-task-answer-input-partial', options)))
     })
+
+    function getAnswers () {
+      let answers = []
+      $editTaskAnswerList.find('.themis-task-answer-group[data-state-disabled=false]').each((ndx, el) => {
+        let $el = $(el)
+        answers.push({
+          answer: $el.find('input[type=text]').val(),
+          caseSensitive: $el.find('input[type=checkbox]').prop('checked')
+        })
+      })
+
+      return answers
+    }
+
+    let savedTaskAnswers = null
 
     $editTaskAnswerList.on('click', 'a[data-action="remove-task-answer"]', (e) => {
       e.preventDefault()
       let number = $(e.target).closest('a').attr('data-number')
       $(`#edit-task-answer-${number}`).remove()
-      let answerParams = []
-      $editTaskAnswerList.find('input[name="answers"]').each((ndx, el) => {
-        let $el = $(el)
-        answerParams.push({
-          value: $el.val(),
-          editable: !$el.prop('disabled')
-        })
-      })
-
+      let answers = getAnswers()
       $editTaskAnswerList.empty()
-      _.each(answerParams, (answerParam, ndx) => {
+      _.each(savedTaskAnswers, (entry, ndx) => {
         $editTaskAnswerList.append($(renderTemplate('edit-task-answer-input-partial', {
           number: ndx + 1,
-          editable: answerParam.editable
+          editable: false,
+          answer: entry.answer,
+          caseSensitive: entry.caseSensitive
         })))
-        $(`#edit-task-answer-${ndx + 1} input`).val(answerParam.value)
+      })
+      _.each(answers, (entry, ndx) => {
+        $editTaskAnswerList.append($(renderTemplate('edit-task-answer-input-partial', {
+          number: savedTaskAnswers.length + ndx + 1,
+          editable: true,
+          answer: entry.answer,
+          caseSensitive: entry.caseSensitive
+        })))
       })
     })
 
     $editTaskTabPreview.on('show.bs.tab', (e) => {
       let md = new MarkdownRenderer()
-      let hintsFormatted = []
-      $editTaskHintList.find('textarea[name="hints"]').each((ndx, el) => {
-        hintsFormatted.push(md.render($(el).val()))
+      let hintsFormatted = savedTaskHints.map((entry) => {
+        return entry.hint
+      }).concat(getHints()).map((hint) => {
+        return md.render(hint)
       })
 
       let options = {
@@ -462,15 +536,13 @@ class TasksView extends View {
       $editTaskDescription.val('')
       $editTaskValue.val('')
 
-      $editTaskCategories.empty()
-      _.each(taskCategoryProvider.getTaskCategories(), (taskCategory) => {
-        $editTaskCategories.append($('<option></option>').attr('value', taskCategory.id).text(taskCategory.title))
+      $editCategories.empty()
+      _.each(categoryProvider.getCategories(), (category) => {
+        $editCategories.append($('<option></option>').attr('value', category.id).text(category.title))
       })
 
       $editTaskHintList.empty()
       $editTaskAnswerList.empty()
-
-      $editTaskCaseSensitive.val('true')
 
       $editTaskSubmitError.text('')
       $editTaskForm.parsley().reset()
@@ -479,32 +551,42 @@ class TasksView extends View {
       $editTaskSubmitButton.prop('disabled', true)
 
       $
-        .when(taskProvider.fetchTask(taskId, { full: true }))
-        .done((task) => {
+        .when(
+          taskProvider.fetchTask(taskId),
+          taskCategoryProvider.fetchTaskCategoriesByTask(taskId),
+          taskAnswerProvider.fetchTaskAnswersByTask(taskId),
+          taskHintProvider.fetchTaskHintsByTask(taskId)
+        )
+        .done((task, taskCategories, taskAnswers, taskHints) => {
+          savedTaskAnswers = taskAnswers
+          savedTaskHints = taskHints
           $editTaskSubmitButton.prop('disabled', false)
 
           $editTaskTitle.val(task.title)
           $editTaskDescription.val(task.description)
           $editTaskValue.val(task.value)
-          $editTaskCategories.val(task.categories)
-          $editTaskCaseSensitive.val(task.caseSensitive.toString())
+
+          $editCategories.val(taskCategories.map((taskCategory) => {
+            return taskCategory.categoryId
+          }))
 
           $editTaskHintList.empty()
-          _.each(task.hints, (hint, ndx) => {
+          _.each(taskHints, (entry, ndx) => {
             $editTaskHintList.append($(renderTemplate('edit-task-hint-textarea-partial', {
               number: ndx + 1,
-              editable: false
+              editable: false,
+              hint: entry.hint
             })))
-            $(`#edit-task-hint-${ndx + 1} textarea`).val(hint)
           })
 
           $editTaskAnswerList.empty()
-          _.each(task.answers, (answer, ndx) => {
+          _.each(taskAnswers, (entry, ndx) => {
             $editTaskAnswerList.append($(renderTemplate('edit-task-answer-input-partial', {
               number: ndx + 1,
-              editable: false
+              editable: false,
+              answer: entry.answer,
+              caseSensitive: entry.caseSensitive
             })))
-            $(`#edit-task-answer-${ndx + 1} input`).val(answer)
           })
         })
         .fail((err) => {
@@ -525,8 +607,9 @@ class TasksView extends View {
         },
         clearForm: true,
         dataType: 'json',
-        xhrFields: {
-          withCredentials: true
+        data: {
+          hints: getHints(),
+          answers: getAnswers()
         },
         headers: {
           'X-CSRF-Token': identityProvider.getIdentity().token
@@ -587,12 +670,15 @@ class TasksView extends View {
       $reviseTaskSubmitButton.prop('disabled', true)
 
       $
-        .when(taskProvider.fetchTask(taskId))
-        .done((task) => {
+        .when(
+          taskProvider.fetchTask(taskId),
+          taskHintProvider.fetchTaskHintsByTask(taskId)
+        )
+        .done((task, taskHints) => {
           let md = new MarkdownRenderer()
           let hintsFormatted = []
-          _.each(task.hints, (hint) => {
-            hintsFormatted.push(md.render(hint))
+          _.each(taskHints, (entry) => {
+            hintsFormatted.push(md.render(entry.hint))
           })
 
           let options = {
@@ -603,9 +689,9 @@ class TasksView extends View {
 
           $reviseTaskContents.html(renderTemplate('task-content-partial', options))
 
-          let teamTaskProgressEntries = _.where(contestProvider.getTeamTaskProgressEntries(), { taskId: task.id })
-          let sortedTeamTaskProgressEntries = _.sortBy(teamTaskProgressEntries, 'createdAt')
-          let teamIds = _.map(sortedTeamTaskProgressEntries, (entry) => {
+          let teamTaskHits = _.where(contestProvider.getTeamTaskHits(), { taskId: task.id })
+          let sortedTeamTaskHits = _.sortBy(teamTaskHits, 'createdAt')
+          let teamIds = _.map(sortedTeamTaskHits, (entry) => {
             return entry.teamId
           })
           let teamNames = []
@@ -639,9 +725,6 @@ class TasksView extends View {
         },
         clearForm: true,
         dataType: 'json',
-        xhrFields: {
-          withCredentials: true
-        },
         headers: {
           'X-CSRF-Token': identityProvider.getIdentity().token
         },
@@ -772,11 +855,11 @@ class TasksView extends View {
       if (taskPreview && identity.role === 'team') {
         if (identity.emailConfirmed) {
           let taskIsSolved = false
-          let taskProgress = _.findWhere(contestProvider.getTeamTaskProgressEntries(), {
+          let taskHit = _.findWhere(contestProvider.getTeamTaskHits(), {
             teamId: identity.id,
             taskId: taskId
           })
-          if (taskProgress) {
+          if (taskHit) {
             taskIsSolved = true
           }
 
@@ -795,7 +878,7 @@ class TasksView extends View {
           }
 
           if (taskIsSolved) {
-            $submitTaskSubmitSuccess.text(`Your team has solved the task on ${moment(taskProgress.createdAt).format('lll')}!`)
+            $submitTaskSubmitSuccess.text(`Your team has solved the task on ${moment(taskHit.createdAt).format('lll')}!`)
           }
         } else {
           $submitTaskSubmitError.text('You should confirm your email before you can submit an answer to the task.')
@@ -817,12 +900,16 @@ class TasksView extends View {
       }
 
       $
-        .when(taskProvider.fetchTask(taskId), contestProvider.fetchSolvedTeamCountByTask(taskId))
-        .done((task, solvedTeamCount) => {
+        .when(
+          taskProvider.fetchTask(taskId),
+          contestProvider.fetchSolvedTeamCountByTask(taskId),
+          taskHintProvider.fetchTaskHintsByTask(taskId)
+        )
+        .done((task, solvedTeamCount, taskHints) => {
           let md = new MarkdownRenderer()
           let hintsFormatted = []
-          _.each(task.hints, (hint) => {
-            hintsFormatted.push(md.render(hint))
+          _.each(taskHints, (entry) => {
+            hintsFormatted.push(md.render(entry.hint))
           })
           let options = {
             title: task.title,
@@ -854,9 +941,6 @@ class TasksView extends View {
         },
         clearForm: true,
         dataType: 'json',
-        xhrFields: {
-          withCredentials: true
-        },
         headers: {
           'X-CSRF-Token': identityProvider.getIdentity().token
         },
@@ -949,12 +1033,15 @@ class TasksView extends View {
 
       if (contest.isFinished()) {
         $
-          .when(taskProvider.fetchTask(taskId))
-          .done((task) => {
+          .when(
+            taskProvider.fetchTask(taskId),
+            taskHintProvider.fetchTaskHintsByTask(taskId)
+          )
+          .done((task, taskHints) => {
             let md = new MarkdownRenderer()
             let hintsFormatted = []
-            _.each(task.hints, (hint) => {
-              hintsFormatted.push(md.render(hint))
+            _.each(taskHints, (entry) => {
+              hintsFormatted.push(md.render(entry.hint))
             })
 
             let options = {
@@ -985,9 +1072,6 @@ class TasksView extends View {
         },
         clearForm: true,
         dataType: 'json',
-        xhrFields: {
-          withCredentials: true
-        },
         headers: {
           'X-CSRF-Token': identityProvider.getIdentity().token
         },
@@ -1018,27 +1102,31 @@ class TasksView extends View {
     })
   }
 
-  renderTaskCategories () {
-    let taskCategories = taskCategoryProvider.getTaskCategories()
-    if (taskCategories.length === 0) {
-      this.$taskCategoriesList.empty()
-      this.$taskCategoriesList.html($('<p></p>').addClass('lead').text('No task categories yet.'))
+  renderCategories () {
+    let categories = categoryProvider.getCategories()
+    if (categories.length === 0) {
+      this.$categoriesList.empty()
+      this.$categoriesList.html($('<p></p>').addClass('lead').text('No task categories yet.'))
     } else {
-      this.$taskCategoriesList.empty()
-      let sortedTaskCategories = _.sortBy(taskCategories, 'createdAt')
+      this.$categoriesList.empty()
+      let sortedCategories = _.sortBy(categories, 'createdAt')
       let manageable = (identityProvider.getIdentity().role === 'admin' && !contestProvider.getContest().isFinished())
-      for (let taskCategory of sortedTaskCategories) {
+      for (let category of sortedCategories) {
         let options = {
-          id: taskCategory.id,
-          title: taskCategory.title,
-          description: taskCategory.description,
-          updatedAt: moment(taskCategory.updatedAt).format('lll'),
+          id: category.id,
+          title: category.title,
+          description: category.description,
+          updatedAt: moment(category.updatedAt).format('lll'),
           manageable: manageable
         }
 
-        this.$taskCategoriesList.append($(renderTemplate('task-category-supervisor-partial', options)))
+        this.$categoriesList.append($(renderTemplate('category-supervisor-partial', options)))
       }
     }
+  }
+
+  requestRenderTasks () {
+    this.flagRenderTasks = true
   }
 
   renderTaskPreviews () {
@@ -1050,9 +1138,9 @@ class TasksView extends View {
       let identity = identityProvider.getIdentity()
       let solvedTaskIds = []
       if (identity.role === 'team') {
-        let taskProgressEntries = _.where(contestProvider.getTeamTaskProgressEntries(), { teamId: identity.id })
-        solvedTaskIds = _.map(taskProgressEntries, (taskProgress) => {
-          return taskProgress.taskId
+        let taskHits = _.where(contestProvider.getTeamTaskHits(), { teamId: identity.id })
+        solvedTaskIds = _.map(taskHits, (taskHit) => {
+          return taskHit.taskId
         })
       }
 
@@ -1100,19 +1188,21 @@ class TasksView extends View {
         }
       }
 
-      let taskCategories = taskCategoryProvider.getTaskCategories()
+      let categories = categoryProvider.getCategories()
+      let allTaskCategories = taskCategoryProvider.getTaskCategories()
 
       this.$taskPreviewsList.empty()
       taskPreviews.sort(sortTaskPreviewsFunc)
       let contest = contestProvider.getContest()
       for (let taskPreview of taskPreviews) {
         let categoriesList = ''
-        for (let categoryId of taskPreview.categories) {
-          let taskCategory = _.findWhere(taskCategories, { id: categoryId })
-          if (taskCategory) {
-            categoriesList += renderTemplate('task-category-partial', {
-              title: taskCategory.title,
-              description: taskCategory.description
+        let taskCategories = _.where(allTaskCategories, { taskId: taskPreview.id })
+        for (let taskCategory of taskCategories) {
+          let category = _.findWhere(categories, { id: taskCategory.categoryId })
+          if (category) {
+            categoriesList += renderTemplate('category-partial', {
+              title: category.title,
+              description: category.description
             })
           }
         }
@@ -1155,33 +1245,33 @@ class TasksView extends View {
 
         let promise = null
         if (isTeam) {
-          promise = $.when(taskProvider.fetchTaskPreviews(), taskCategoryProvider.fetchTaskCategories(), contestProvider.fetchTeamTaskProgressEntries(), contestProvider.fetchTeamScores())
+          promise = $.when(taskProvider.fetchTaskPreviews(), categoryProvider.fetchCategories(), taskCategoryProvider.fetchTaskCategories(), contestProvider.fetchTeamTaskHits(), contestProvider.fetchTeamScores())
         } else if (isSupervisor) {
-          promise = $.when(taskProvider.fetchTaskPreviews(), taskCategoryProvider.fetchTaskCategories(), contestProvider.fetchTeamTaskProgressEntries(), teamProvider.fetchTeams())
+          promise = $.when(taskProvider.fetchTaskPreviews(), categoryProvider.fetchCategories(), taskCategoryProvider.fetchTaskCategories(), contestProvider.fetchTeamTaskHits(), teamProvider.fetchTeams())
         } else {
-          promise = $.when(taskProvider.fetchTaskPreviews(), taskCategoryProvider.fetchTaskCategories())
+          promise = $.when(taskProvider.fetchTaskPreviews(), categoryProvider.fetchCategories(), taskCategoryProvider.fetchTaskCategories())
         }
 
         promise
-          .done((taskPreviews, taskCategories) => {
-            this.$taskCategoriesSection = $('#themis-task-categories')
+          .done((taskPreviews, categories) => {
+            this.$categoriesSection = $('#themis-categories')
             statusBar.present()
 
             if (isSupervisor) {
-              this.$taskCategoriesSection.html(renderTemplate('task-categories-view', {
+              this.$categoriesSection.html(renderTemplate('categories-view', {
                 identity: identity,
                 contest: contest
               }))
-              this.$taskCategoriesList = $('#themis-task-categories-list')
+              this.$categoriesList = $('#themis-categories-list')
 
-              this.renderTaskCategories()
+              this.renderCategories()
               this.initReviseTaskModal()
             }
 
             if (isAdmin) {
-              this.initCreateTaskCategoryModal()
-              this.initEditTaskCategoryModal()
-              this.initRemoveTaskCategoryModal()
+              this.initCreateCategoryModal()
+              this.initEditCategoryModal()
+              this.initRemoveCategoryModal()
 
               this.initCreateTaskModal()
               this.initOpenTaskModal()
@@ -1198,42 +1288,51 @@ class TasksView extends View {
             }
 
             this.$taskPreviewsList = $('#themis-task-previews')
-            this.renderTaskPreviews()
 
-            this.onCreateTaskCategory = (taskCategory) => {
+            this.onCreateCategory = (category) => {
               if (isSupervisor) {
-                this.renderTaskCategories()
+                this.renderCategories()
               }
               return false
             }
 
-            this.onUpdateTaskCategory = (taskCategory) => {
-              if (isSupervisor) {
-                this.renderTaskCategories()
-              }
-
-              this.renderTaskPreviews()
+            this.onCreateTaskCategory = (taskCategory) => {
+              this.requestRenderTasks()
               return false
             }
 
             this.onRemoveTaskCategory = (taskCategoryId) => {
-              if (isSupervisor) {
-                this.renderTaskCategories()
-              }
-
-              this.renderTaskPreviews()
+              this.requestRenderTasks()
               return false
             }
 
-            taskCategoryProvider.subscribe()
-            taskCategoryProvider.on('createTaskCategory', this.onCreateTaskCategory)
-            taskCategoryProvider.on('updateTaskCategory', this.onUpdateTaskCategory)
-            taskCategoryProvider.on('removeTaskCategory', this.onRemoveTaskCategory)
+            this.onUpdateCategory = (category) => {
+              if (isSupervisor) {
+                this.renderCategories()
+              }
+
+              this.requestRenderTasks()
+              return false
+            }
+
+            this.onRemoveCategory = (categoryId) => {
+              if (isSupervisor) {
+                this.renderCategories()
+              }
+
+              this.requestRenderTasks()
+              return false
+            }
+
+            categoryProvider.subscribe()
+            categoryProvider.on('createCategory', this.onCreateCategory)
+            categoryProvider.on('updateCategory', this.onUpdateCategory)
+            categoryProvider.on('removeCategory', this.onRemoveCategory)
 
             taskProvider.subscribe()
             if (isSupervisor) {
               this.onCreateTask = (taskPreview) => {
-                this.renderTaskPreviews()
+                this.requestRenderTasks()
                 return false
               }
 
@@ -1241,44 +1340,59 @@ class TasksView extends View {
             }
 
             this.onOpenTask = (taskPreview) => {
-              this.renderTaskPreviews()
+              this.requestRenderTasks()
               return false
             }
 
             taskProvider.on('openTask', this.onOpenTask)
 
             this.onCloseTask = (taskPreview) => {
-              this.renderTaskPreviews()
+              this.requestRenderTasks()
               return false
             }
 
             taskProvider.on('closeTask', this.onCloseTask)
 
             this.onUpdateTask = (taskPreview) => {
-              this.renderTaskPreviews()
+              this.requestRenderTasks()
               return false
             }
 
             taskProvider.on('updateTask', this.onUpdateTask)
 
             if (isTeam) {
-              this.onCreateTeamTaskProgress = (teamTaskProgress) => {
-                this.renderTaskPreviews()
+              this.onCreateTeamTaskHit = (teamTaskHit) => {
+                this.requestRenderTasks()
                 return false
               }
 
-              contestProvider.on('createTeamTaskProgress', this.onCreateTeamTaskProgress)
+              contestProvider.on('createTeamTaskHit', this.onCreateTeamTaskHit)
             }
 
             this.onUpdateContest = (contest) => {
-              this.renderTaskCategories()
-              this.renderTaskPreviews()
+              this.renderCategories()
+              this.requestRenderTasks()
               return false
             }
 
             contestProvider.on('updateContest', this.onUpdateContest)
 
             teamProvider.subscribe()
+            taskCategoryProvider.subscribe()
+            taskCategoryProvider.on('createTaskCategory', this.onCreateTaskCategory)
+            taskCategoryProvider.on('removeTaskCategory', this.onRemoveTaskCategory)
+
+            this.onRenderTasks = (force = false) => {
+              if ((this.flagRenderTasks || force) && !this.flagRenderingTasks) {
+                this.flagRenderingTasks = true
+                this.renderTaskPreviews()
+                this.flagRenderingTasks = false
+                this.flagRenderTasks = false
+              }
+            }
+
+            this.renderTasksInterval = window.setInterval(this.onRenderTasks, 500)
+            this.requestRenderTasks()
           })
           .fail((err) => {
             console.error(err)
@@ -1295,27 +1409,27 @@ class TasksView extends View {
   dismiss () {
     identityProvider.unsubscribe()
 
-    if (this.onCreateTeamTaskProgress) {
-      contestProvider.off('createTeamTaskProgress', this.onCreateTeamTaskProgress)
-      this.onCreateTeamTaskProgress = null
+    if (this.onCreateTeamTaskHit) {
+      contestProvider.off('createTeamTaskHit', this.onCreateTeamTaskHit)
+      this.onCreateTeamTaskHit = null
     }
 
-    if (this.onCreateTaskCategory) {
-      taskCategoryProvider.off('createTaskCategory', this.onCreateTaskCategory)
-      this.onCreateTaskCategory = null
+    if (this.onCreateCategory) {
+      categoryProvider.off('createCategory', this.onCreateCategory)
+      this.onCreateCategory = null
     }
 
-    if (this.onUpdateTaskCategory) {
-      taskCategoryProvider.off('updateTaskCategory', this.onUpdateTaskCategory)
-      this.onUpdateTaskCategory = null
+    if (this.onUpdateCategory) {
+      categoryProvider.off('updateCategory', this.onUpdateCategory)
+      this.onUpdateCategory = null
     }
 
-    if (this.onRemoveTaskCategory) {
-      taskCategoryProvider.off('removeTaskCategory', this.onRemoveTaskCategory)
-      this.onRemoveTaskCategory = null
+    if (this.onRemoveCategory) {
+      categoryProvider.off('removeCategory', this.onRemoveCategory)
+      this.onRemoveCategory = null
     }
 
-    taskCategoryProvider.unsubscribe()
+    categoryProvider.unsubscribe()
 
     if (this.onCreateTask) {
       taskProvider.off('createTask', this.onCreateTask)
@@ -1345,10 +1459,27 @@ class TasksView extends View {
       this.onUpdateContest = null
     }
 
+    if (this.onCreateTaskCategory) {
+      taskCategoryProvider.off('createTaskCategory', this.onCreateTaskCategory)
+      this.onCreateTaskCategory = null
+    }
+
+    if (this.onRemoveTaskCategory) {
+      taskCategoryProvider.off('removeTaskCategory', this.onRemoveTaskCategory)
+      this.onRemoveTaskCategory = null
+    }
+
+    taskCategoryProvider.unsubscribe()
+
+    window.clearInterval(this.renderTasksInterval)
+    this.onRenderTasks = null
+    this.flagRenderTasks = false
+    this.flagRenderingTasks = false
+
     this.$main.empty()
     this.$main = null
-    this.$taskCategoriesSection = null
-    this.$taskCategoriesList = null
+    this.$categoriesSection = null
+    this.$categoriesList = null
     this.$taskPreviewsList = null
     navigationBar.dismiss()
     statusBar.dismiss()

@@ -40,9 +40,6 @@ class SignupView extends View {
         },
         clearForm: true,
         dataType: 'json',
-        xhrFields: {
-          withCredentials: true
-        },
         headers: {
           'X-CSRF-Token': identityProvider.getIdentity().token
         },

@@ -4,7 +4,7 @@ import EventEmitter from 'wolfy87-eventemitter'
 import dataStore from '../data-store'
 import ContestModel from '../models/contest'
 import TeamScoreModel from '../models/team-score'
-import TeamTaskProgressModel from '../models/team-task-progress'
+import TeamTaskHitModel from '../models/team-task-hit'
 import identityProvider from './identity'
 import teamProvider from './team'
 
@@ -13,13 +13,13 @@ class ContestProvider extends EventEmitter {
     super()
     this.contest = null
     this.teamScores = []
-    this.teamTaskProgressEntries = []
+    this.teamTaskHits = []
 
     this.onUpdate = null
     this.onUpdateTeamScore = null
     this.onQualifyTeam = null
 
-    this.onCreateTeamTaskProgress = null
+    this.onCreateTeamTaskHit = null
   }
 
   getContest () {
@@ -54,8 +54,8 @@ class ContestProvider extends EventEmitter {
     }
   }
 
-  getTeamTaskProgressEntries () {
-    return this.teamTaskProgressEntries
+  getTeamTaskHits () {
+    return this.teamTaskHits
   }
 
   subscribe () {
@@ -103,20 +103,20 @@ class ContestProvider extends EventEmitter {
 
     let identity = identityProvider.getIdentity()
     if (_.contains(['admin', 'manager', 'team'], identity.role)) {
-      this.onCreateTeamTaskProgress = (e) => {
+      this.onCreateTeamTaskHit = (e) => {
         let options = JSON.parse(e.data)
-        let teamTaskProgress = new TeamTaskProgressModel(options)
-        let ndx = _.findIndex(this.teamTaskProgressEntries, { teamId: options.teamId, taskId: options.taskId })
+        let teamTaskHit = new TeamTaskHitModel(options)
+        let ndx = _.findIndex(this.teamTaskHits, { teamId: options.teamId, taskId: options.taskId })
         if (ndx === -1) {
           if (identity.role === 'team' && identity.id !== options.teamId) {
             return
           }
-          this.teamTaskProgressEntries.push(teamTaskProgress)
-          this.trigger('createTeamTaskProgress', [teamTaskProgress])
+          this.teamTaskHits.push(teamTaskHit)
+          this.trigger('createTeamTaskHit', [teamTaskHit])
         }
       }
 
-      realtimeProvider.addEventListener('createTeamTaskProgress', this.onCreateTeamTaskProgress, false)
+      realtimeProvider.addEventListener('createTeamTaskHit', this.onCreateTeamTaskHit, false)
     }
   }
 
@@ -142,14 +142,14 @@ class ContestProvider extends EventEmitter {
       this.onQualifyTeam = null
     }
 
-    if (this.onCreateTeamTaskProgress) {
-      realtimeProvider.removeEventListener('createTeamTaskProgress', this.onCreateTeamTaskProgress)
-      this.onCreateTeamTaskProgress = null
+    if (this.onCreateTeamTaskHit) {
+      realtimeProvider.removeEventListener('createTeamTaskHit', this.onCreateTeamTaskHit)
+      this.onCreateTeamTaskHit = null
     }
 
     this.contest = null
     this.teamScores = []
-    this.teamTaskProgressEntries = []
+    this.teamTaskHits = []
   }
 
   fetchContest () {
@@ -159,9 +159,6 @@ class ContestProvider extends EventEmitter {
     $.ajax({
       url: url,
       dataType: 'json',
-      xhrFields: {
-        withCredentials: true
-      },
       success: (responseJSON, textStatus, jqXHR) => {
         this.contest = new ContestModel(responseJSON)
         promise.resolve(this.contest)
@@ -185,9 +182,6 @@ class ContestProvider extends EventEmitter {
     $.ajax({
       url: url,
       dataType: 'json',
-      xhrFields: {
-        withCredentials: true
-      },
       success: (responseJSON, textStatus, jqXHR) => {
         this.teamScores = _.map(responseJSON, (options) => {
           return new TeamScoreModel(options)
@@ -209,14 +203,11 @@ class ContestProvider extends EventEmitter {
 
   fetchSolvedTeamCountByTask (taskId) {
     let promise = $.Deferred()
-    let url = `/api/contest/task/${taskId}/progress`
+    let url = `/api/contest/task/${taskId}/hits`
 
     $.ajax({
       url: url,
       dataType: 'json',
-      xhrFields: {
-        withCredentials: true
-      },
       success: (responseJSON, textStatus, jqXHR) => {
         promise.resolve(responseJSON)
       },
@@ -232,25 +223,22 @@ class ContestProvider extends EventEmitter {
     return promise
   }
 
-  fetchTeamTaskProgress (teamId) {
+  fetchTeamTaskHit (teamId) {
     let promise = $.Deferred()
 
     let identity = identityProvider.getIdentity()
-    let url = `/api/contest/team/${teamId}/progress`
+    let url = `/api/contest/team/${teamId}/hits`
 
     $.ajax({
       url: url,
       dataType: 'json',
-      xhrFields: {
-        withCredentials: true
-      },
       success: (responseJSON, textStatus, jqXHR) => {
         if (_.contains(['admin', 'manager'], identity.role) || (identity.role === 'team' && identity.id === teamId)) {
-          let teamTaskProgressEntries = _.map(responseJSON, (options) => {
-            return new TeamTaskProgressModel(options)
+          let teamTaskHits = _.map(responseJSON, (options) => {
+            return new TeamTaskHitModel(options)
           })
 
-          promise.resolve(teamTaskProgressEntries)
+          promise.resolve(teamTaskHits)
         } else {
           promise.resolve(responseJSON)
         }
@@ -267,15 +255,15 @@ class ContestProvider extends EventEmitter {
     return promise
   }
 
-  fetchTeamTaskProgressEntries () {
+  fetchTeamTaskHits () {
     let promise = $.Deferred()
     let identity = identityProvider.getIdentity()
     let url = null
 
     if (_.contains(['admin', 'manager'], identity.role)) {
-      url = '/api/contest/progress'
+      url = '/api/contest/hits'
     } else if (identity.role === 'team') {
-      url = `/api/contest/team/${identity.id}/progress`
+      url = `/api/contest/team/${identity.id}/hits`
     } else {
       promise.reject('Unknown error. Please try again later.')
     }
@@ -284,15 +272,12 @@ class ContestProvider extends EventEmitter {
       $.ajax({
         url: url,
         dataType: 'json',
-        xhrFields: {
-          withCredentials: true
-        },
         success: (responseJSON, textStatus, jqXHR) => {
-          this.teamTaskProgressEntries = _.map(responseJSON, (options) => {
-            return new TeamTaskProgressModel(options)
+          this.teamTaskHits = _.map(responseJSON, (options) => {
+            return new TeamTaskHitModel(options)
           })
 
-          promise.resolve(this.teamTaskProgressEntries)
+          promise.resolve(this.teamTaskHits)
         },
         error: (jqXHR, textStatus, errorThrown) => {
           if (jqXHR.responseJSON) {

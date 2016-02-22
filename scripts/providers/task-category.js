@@ -10,7 +10,6 @@ class TaskCategoryProvider extends EventEmitter {
     this.taskCategories = []
 
     this.onCreate = null
-    this.onUpdate = null
     this.onRemove = null
   }
 
@@ -33,19 +32,6 @@ class TaskCategoryProvider extends EventEmitter {
     }
 
     realtimeProvider.addEventListener('createTaskCategory', this.onCreate)
-
-    this.onUpdate = (e) => {
-      let options = JSON.parse(e.data)
-      let taskCategory = new TaskCategoryModel(options)
-      let ndx = _.findIndex(this.taskCategories, { id: taskCategory.id })
-      if (ndx > -1) {
-        this.taskCategories.splice(ndx, 1)
-      }
-      this.taskCategories.push(taskCategory)
-      this.trigger('updateTaskCategory', [taskCategory])
-    }
-
-    realtimeProvider.addEventListener('updateTaskCategory', this.onUpdate)
 
     this.onRemove = (e) => {
       let options = JSON.parse(e.data)
@@ -72,11 +58,6 @@ class TaskCategoryProvider extends EventEmitter {
       this.onCreate = null
     }
 
-    if (this.onUpdate) {
-      realtimeProvider.removeEventListener('updateTaskCategory', this.onUpdate)
-      this.onUpdate = null
-    }
-
     if (this.onRemove) {
       realtimeProvider.removeEventListener('removeTaskCategory', this.onRemove)
       this.onRemove = null
@@ -92,9 +73,6 @@ class TaskCategoryProvider extends EventEmitter {
     $.ajax({
       url: url,
       dataType: 'json',
-      xhrFields: {
-        withCredentials: true
-      },
       success: (responseJSON, textStatus, jqXHR) => {
         this.taskCategories = _.map(responseJSON, (options) => {
           return new TaskCategoryModel(options)
@@ -114,23 +92,19 @@ class TaskCategoryProvider extends EventEmitter {
     return promise
   }
 
-  removeTaskCategory (id, token) {
+  fetchTaskCategoriesByTask (taskId) {
     let promise = $.Deferred()
-    let url = `/api/task/category/${id}/remove`
+    let url = `/api/task/${taskId}/category`
 
     $.ajax({
       url: url,
-      type: 'POST',
       dataType: 'json',
-      data: {},
-      xhrFields: {
-        withCredentials: true
-      },
-      headers: {
-        'X-CSRF-Token': token
-      },
       success: (responseJSON, textStatus, jqXHR) => {
-        promise.resolve()
+        let taskCategories = _.map(responseJSON, (options) => {
+          return new TaskCategoryModel(options)
+        })
+
+        promise.resolve(taskCategories)
       },
       error: (jqXHR, textStatus, errorThrown) => {
         if (jqXHR.responseJSON) {

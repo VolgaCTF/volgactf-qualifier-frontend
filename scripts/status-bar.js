@@ -91,9 +91,6 @@ class StatusBar {
           finishesAt: (valFinishesAt) ? valFinishesAt.valueOf() : null
         },
         dataType: 'json',
-        xhrFields: {
-          withCredentials: true
-        },
         headers: {
           'X-CSRF-Token': identityProvider.getIdentity().token
         },

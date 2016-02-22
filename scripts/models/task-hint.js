@@ -1,7 +1,8 @@
-export default class TeamTaskProgress {
+export default class TaskHintModel {
   constructor (options) {
-    this.teamId = options.teamId
+    this.id = options.id
     this.taskId = options.taskId
+    this.hint = options.hint
     this.createdAt = new Date(options.createdAt)
   }
 }

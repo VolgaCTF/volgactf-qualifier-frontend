@@ -2,20 +2,20 @@ import $ from 'jquery'
 import _ from 'underscore'
 import dataStore from '../data-store'
 import EventEmitter from 'wolfy87-eventemitter'
-import PostModel from '../models/post'
+import CategoryModel from '../models/category'
 
-class PostProvider extends EventEmitter {
+class CategoryProvider extends EventEmitter {
   constructor () {
     super()
-    this.posts = []
+    this.categories = []
 
     this.onCreate = null
     this.onUpdate = null
     this.onRemove = null
   }
 
-  getPosts () {
-    return this.posts
+  getCategories () {
+    return this.categories
   }
 
   subscribe () {
@@ -27,36 +27,37 @@ class PostProvider extends EventEmitter {
 
     this.onCreate = (e) => {
       let options = JSON.parse(e.data)
-      let post = new PostModel(options)
-      this.posts.push(post)
-      this.trigger('createPost', [post])
+      let category = new CategoryModel(options)
+      this.categories.push(category)
+      this.trigger('createCategory', [category])
     }
 
-    realtimeProvider.addEventListener('createPost', this.onCreate)
+    realtimeProvider.addEventListener('createCategory', this.onCreate)
 
     this.onUpdate = (e) => {
       let options = JSON.parse(e.data)
-      let post = new PostModel(options)
-      let ndx = _.findIndex(this.posts, { id: options.id })
+      let category = new CategoryModel(options)
+      let ndx = _.findIndex(this.categories, { id: category.id })
       if (ndx > -1) {
-        this.posts.splice(ndx, 1)
+        this.categories.splice(ndx, 1)
       }
-      this.posts.push(post)
-      this.trigger('updatePost', [post])
+      this.categories.push(category)
+      this.trigger('updateCategory', [category])
     }
 
-    realtimeProvider.addEventListener('updatePost', this.onUpdate)
+    realtimeProvider.addEventListener('updateCategory', this.onUpdate)
 
     this.onRemove = (e) => {
       let options = JSON.parse(e.data)
-      let ndx = _.findIndex(this.posts, { id: options.id })
+      let ndx = _.findIndex(this.categories, { id: options.id })
+
       if (ndx > -1) {
-        this.posts.splice(ndx, 1)
-        this.trigger('removePost', [options.id])
+        this.categories.splice(ndx, 1)
+        this.trigger('removeCategory', [options.id])
       }
     }
 
-    realtimeProvider.addEventListener('removePost', this.onRemove)
+    realtimeProvider.addEventListener('removeCategory', this.onRemove)
   }
 
   unsubscribe () {
@@ -67,36 +68,36 @@ class PostProvider extends EventEmitter {
     let realtimeProvider = dataStore.getRealtimeProvider()
 
     if (this.onCreate) {
-      realtimeProvider.removeEventListener('createPost', this.onCreate)
+      realtimeProvider.removeEventListener('createCategory', this.onCreate)
       this.onCreate = null
     }
 
     if (this.onUpdate) {
-      realtimeProvider.removeEventListener('updatePost', this.onUpdate)
+      realtimeProvider.removeEventListener('updateCategory', this.onUpdate)
       this.onUpdate = null
     }
 
     if (this.onRemove) {
-      realtimeProvider.removeEventListener('removePost', this.onRemove)
+      realtimeProvider.removeEventListener('removeCategory', this.onRemove)
       this.onRemove = null
     }
 
-    this.posts = []
+    this.categories = []
   }
 
-  fetchPosts () {
+  fetchCategories () {
     let promise = $.Deferred()
-    let url = '/api/post/all'
+    let url = '/api/category/all'
 
     $.ajax({
       url: url,
       dataType: 'json',
       success: (responseJSON, textStatus, jqXHR) => {
-        this.posts = _.map(responseJSON, (options) => {
-          return new PostModel(options)
+        this.categories = _.map(responseJSON, (options) => {
+          return new CategoryModel(options)
         })
 
-        promise.resolve(this.posts)
+        promise.resolve(this.categories)
       },
       error: (jqXHR, textStatus, errorThrown) => {
         if (jqXHR.responseJSON) {
@@ -110,9 +111,9 @@ class PostProvider extends EventEmitter {
     return promise
   }
 
-  removePost (id, token) {
+  removeCategory (id, token) {
     let promise = $.Deferred()
-    let url = `/api/post/${id}/remove`
+    let url = `/api/category/${id}/remove`
 
     $.ajax({
       url: url,
@@ -138,4 +139,4 @@ class PostProvider extends EventEmitter {
   }
 }
 
-export default new PostProvider()
+export default new CategoryProvider()

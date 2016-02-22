@@ -29,9 +29,6 @@ class NavigationBar {
           method: 'POST',
           url: url,
           dataType: 'json',
-          xhrFields: {
-            withCredentials: true
-          },
           headers: {
             'X-CSRF-Token': identityProvider.getIdentity().token
           },
