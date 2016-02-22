@@ -1133,7 +1133,7 @@ class TasksView extends View {
     let taskPreviews = taskProvider.getTaskPreviews()
     if (taskPreviews.length === 0) {
       this.$taskPreviewsList.empty()
-      this.$taskPreviewsList.html($('<p></p>').addClass('lead').text('No tasks yet.'))
+      this.$taskPreviewsList.html($('<p></p>').addClass('lead').text('No tasks have been opened yet.'))
     } else {
       let identity = identityProvider.getIdentity()
       let solvedTaskIds = []

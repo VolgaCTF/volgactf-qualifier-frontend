@@ -10,7 +10,7 @@ import 'jquery.form'
 
 class SigninView extends View {
   constructor () {
-    super(/^\/signin$/)
+    super(/^\/team\/signin$/)
     this.$main = null
   }
 

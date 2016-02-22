@@ -34,7 +34,7 @@ class NewsView extends View {
 
     if (posts.length === 0) {
       $section.empty()
-      $section.html($('<p></p>').addClass('lead').text('No news yet.'))
+      $section.html($('<p></p>').addClass('lead').text('No news have been published yet.'))
     } else {
       $section.empty()
       let md = new MarkdownRenderer()

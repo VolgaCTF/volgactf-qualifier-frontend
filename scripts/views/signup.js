@@ -11,7 +11,7 @@ import 'bootstrap-filestyle'
 
 class SignupView extends View {
   constructor () {
-    super(/^\/signup$/)
+    super(/^\/team\/signup$/)
     this.$main = null
   }
 

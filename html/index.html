@@ -36,12 +36,11 @@
         <footer class="footer">
             <div class="container">
                 <div class="pull-left">
-                    <p><span class="glyphicon glyphicon-copyright-mark"></span> 2015, <a href="https://github.com/aspyatkin" target="_blank">Alexander Pyatkin</a></p>
+                    <p><span class="glyphicon glyphicon-copyright-mark"></span> <script>document.write((new Date()).getFullYear())</script>, <a href="https://github.com/aspyatkin" target="_blank">Alexander Pyatkin</a></p>
                 </div>
                 <div class="pull-right">
+                    <!-- Extra links -->
                     <ul class="list-unstyled text-right">
-                        <li><a href="https://volgactf.ru" target="_blank">volgactf.ru</a></li>
-                        <li><a href="https://twitter.com/VolgaCTF" target="_blank">@VolgaCTF</a></li>
                     </ul>
                 </div>
             </div>
@@ -70,7 +69,7 @@
 
                 <ul class="nav navbar-nav navbar-right">
                     <% if (identity === null || identity.role === 'guest') { %>
-                    <li class="<% print((active === 'signin') ? 'active' : ''); %>"><a href="/signin" data-push-history>Sign in</a></li>
+                    <li class="<% print((active === 'signin') ? 'active' : ''); %>"><a href="/team/signin" data-push-history>Sign in</a></li>
                     <% } else { %>
                     <li class="dropdown">
                         <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
@@ -354,7 +353,7 @@
             </script>
 
             <script type="text/x-template" data-name="check-task-guest-error">
-                To view the task, you must be authorized. Please <a href="/signin">sign in</a>. If you have not registered yet, please <a href="/signup">sign up</a>.
+                To view the task, you must be authorized. Please <a href="/team/signin">sign in</a>. If you have not registered yet, please <a href="/team/signup">sign up</a>.
             </script>
 
             <script type="text/x-template" data-name="task-content-partial">
@@ -1191,24 +1190,7 @@
                         <h1>About</h1>
                     </header>
                     <section>
-                        <p class="lead">
-                            Greetings everybody and welcome to VolgaCTF 2015 Quals!
-                        </p>
-                        <p class="lead">
-                            To take part in the contest, you should <a href="/signup" data-push-history>sign up</a> with email, team name and logo. The number of team participants is not limited.
-                        </p>
-                        <p class="lead">
-                            The contest starts on May 1 at 19:00 SAMT/15:00 UTC and lasts for 48 hours. During the competition we will add new tasks that can be solved for the points. Check the <a href="/news" data-push-history>News</a> page periodicaly - there might be some important pieces of information about the competition. We also have an IRC channel at <mark>irc.volgactf.ru</mark>.
-                        </p>
-                        <p class="lead">
-                            Teams are forbidden to perform destructive actions against contest infrastructure and prevent other teams to play the contest. A team might be disqualified for breaking the rules.
-                        </p>
-                        <p class="lead">
-                            Top teams will be invited to take part in VolgaCTF 2015 Finals which will be held on September 7-11 in Samara, Russia. We will invite teams from higher educational institutions: 7 teams from Volga Federal District, 3 teams from other districts of Russian Federation and 2 teams from the Commonwealth of Independent States.
-                        </p>
-                        <p class="lead">
-                            We reserve the right to amend these regulations, order of tasks opened and regulations of final round.
-                        </p>
+                        <p class="lead">This section needs customization for the specific competition</p>
                     </section>
                 </div>
             </script>
@@ -1230,15 +1212,14 @@
                     <div class="jumbotron">
                         <h1>Hello!</h1>
                         <p>Welcome to {{#event}}{{ title }}{{/event}}!</p>
-                        <p>VolgaCTF is an inter-regional inter-university open computer security contest.</p>
                         <% if (!contest.isFinished()) { %>
                         <p>Interested? Please register for the competition!</p>
                         <% } %>
                         <p>
                             <% if (!contest.isFinished()) { %>
-                            <a class="btn btn-primary btn-lg" href="/signup" role="button" data-push-history>Sign up</a>
+                            <a class="btn btn-primary btn-lg" href="/team/signup" role="button" data-push-history>Sign up</a>
                             <% } %>
-                            <a class="btn btn-success btn-lg" href="/signin" role="button" data-push-history>Sign in</a>
+                            <a class="btn btn-success btn-lg" href="/team/signin" role="button" data-push-history>Sign in</a>
                         </p>
                     </div>
                     <% } else if (identity.role === 'team') { %>
@@ -1253,12 +1234,12 @@
                     <h1>Welcome back!</h1>
                     <% if (contest.isInitial()) { %>
                     <p class="lead">
-                        VolgaCTF 2015 Quals will start on May 1 at 19:00 SAMT/15:00 UTC.
+                        {{#event}}{{ title }}{{/event}} hasn't started yet.
                         Now, you can check out the <a href="/news" data-push-history>news</a> or <a href="/profile/<%- identity.id %>" data-push-history>edit your profile</a>.
                     </p>
                     <% } else if (contest.isStarted() || contest.isPaused()) { %>
                     <p class="lead">
-                        VolgaCTF 2015 Quals contest has begun!
+                        {{#event}}{{ title }}{{/event}} has begun!
                     </p>
                     <ul class="lead list-unstyled">
                         <li><a href="/news" data-push-history>Check out news</a></li>
@@ -1267,7 +1248,7 @@
                     </ul>
                     <% } else if (contest.isFinished()) { %>
                     <p class="lead">
-                        VolgaCTF 2015 Quals contest has finished!
+                        {{#event}}{{ title }}{{/event}} has finished!
                     </p>
                     <ul class="lead list-unstyled">
                         <li><a href="/scoreboard" data-push-history>View results scoreboard</a></li>
@@ -1341,7 +1322,7 @@
                             <h2>Restore password</h2>
                         </div>
                         <div class="col-sm-12 alert alert-success">
-                            Password has been successfully reset! Now you can <a href="/signin" data-push-history>sign in</a> to your account.
+                            Password has been successfully reset! Now you can <a href="/team/signin" data-push-history>sign in</a> to your account.
                         </div>
                     </div>
                 </div>
@@ -1788,7 +1769,7 @@
                         </div>
                         <div class="col-sm-12 alert alert-success">
                             You have successfully signed up for the contest!
-                            Now, you can <a href="/signin" data-push-history>sign in</a> to your account.
+                            Now, you can <a href="/team/signin" data-push-history>sign in</a> to your account.
                         </div>
                     </div>
                 </div>
