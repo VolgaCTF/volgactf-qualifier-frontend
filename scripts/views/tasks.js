@@ -10,6 +10,7 @@ import moment from 'moment'
 import categoryProvider from '../providers/category'
 import taskCategoryProvider from '../providers/task-category'
 import taskAnswerProvider from '../providers/task-answer'
+import taskHintProvider from '../providers/task-hint'
 import taskProvider from '../providers/task'
 import contestProvider from '../providers/contest'
 import identityProvider from '../providers/identity'
@@ -237,23 +238,35 @@ class TasksView extends View {
 
     $createTaskHints.find('a[data-action="create-task-hint"]').on('click', (e) => {
       e.preventDefault()
-      let number = $createTaskHintList.children().length + 1
-      $createTaskHintList.append($(renderTemplate('create-task-hint-textarea-partial', { number: number })))
+      let options = {
+        number: $createTaskHintList.children().length + 1,
+        hint: ''
+      }
+      $createTaskHintList.append($(renderTemplate('create-task-hint-textarea-partial', options)))
     })
+
+    function getHints () {
+      let hints = []
+      $createTaskHintList.find('.themis-task-hint-group').each((ndx, el) => {
+        let $el = $(el)
+        hints.push($el.find('textarea').val())
+      })
+
+      return hints
+    }
 
     $createTaskHintList.on('click', 'a[data-action="remove-task-hint"]', (e) => {
       e.preventDefault()
       let number = $(e.target).closest('a').attr('data-number')
       $(`#create-task-hint-${number}`).remove()
-      let hints = []
-      $createTaskHintList.find('textarea[name="hints"]').each((ndx, $el) => {
-        hints.push($($el).val())
-      })
-
+      let hints = getHints()
       $createTaskHintList.empty()
       _.each(hints, (hint, ndx) => {
-        $createTaskHintList.append($(renderTemplate('create-task-hint-textarea-partial', { number: ndx + 1 })))
-        $(`#create-task-hint-${ndx + 1} textarea`).val(hint)
+        let options = {
+          number: ndx + 1,
+          hint: hint
+        }
+        $createTaskHintList.append($(renderTemplate('create-task-hint-textarea-partial', options)))
       })
     })
 
@@ -298,9 +311,8 @@ class TasksView extends View {
 
     $createTaskTabPreview.on('show.bs.tab', (e) => {
       let md = new MarkdownRenderer()
-      let hintsFormatted = []
-      $createTaskHintList.find('textarea[name="hints"]').each((ndx, $el) => {
-        hintsFormatted.push(md.render($($el).val()))
+      let hintsFormatted = getHints().map((hint) => {
+        return md.render(hint)
       })
 
       let options = {
@@ -344,6 +356,7 @@ class TasksView extends View {
         clearForm: true,
         dataType: 'json',
         data: {
+          hints: getHints(),
           answers: getAnswers()
         },
         headers: {
@@ -404,23 +417,46 @@ class TasksView extends View {
 
     $editTaskHints.find('a[data-action="create-task-hint"]').on('click', (e) => {
       e.preventDefault()
-      let number = $editTaskHintList.children().length + 1
-      $editTaskHintList.append($(renderTemplate('edit-task-hint-textarea-partial', { number: number })))
+      let options = {
+        number: $editTaskHintList.children().length + 1,
+        hint: '',
+        editable: true
+      }
+      $editTaskHintList.append($(renderTemplate('edit-task-hint-textarea-partial', options)))
     })
+
+    function getHints () {
+      let hints = []
+      $editTaskHintList.find('.themis-task-hint-group[data-state-disabled=false]').each((ndx, el) => {
+        let $el = $(el)
+        hints.push($el.find('textarea').val())
+      })
+
+      return hints
+    }
+
+    let savedTaskHints = null
 
     $editTaskHintList.on('click', 'a[data-action="remove-task-hint"]', (e) => {
       e.preventDefault()
       let number = $(e.target).closest('a').attr('data-number')
       $(`#edit-task-hint-${number}`).remove()
-      let hints = []
-      $editTaskHintList.find('textarea[name="hints"]').each((ndx, el) => {
-        let $el = $(el)
-        hints.push($el.val())
-      })
+
+      let hints = getHints()
       $editTaskHintList.empty()
+      _.each(savedTaskHints, (entry, ndx) => {
+        $editTaskHintList.append($(renderTemplate('edit-task-hint-textarea-partial', {
+          number: ndx + 1,
+          editable: false,
+          hint: entry.hint
+        })))
+      })
       _.each(hints, (hint, ndx) => {
-        $editTaskHintList.append($(renderTemplate('edit-task-hint-textarea-partial', { number: ndx + 1 })))
-        $(`#edit-task-hint-${ndx + 1} textarea`).val(hint)
+        $editTaskHintList.append($(renderTemplate('edit-task-hint-textarea-partial', {
+          number: savedTaskHints.length + ndx + 1,
+          editable: true,
+          hint: hint
+        })))
       })
     })
 
@@ -476,9 +512,10 @@ class TasksView extends View {
 
     $editTaskTabPreview.on('show.bs.tab', (e) => {
       let md = new MarkdownRenderer()
-      let hintsFormatted = []
-      $editTaskHintList.find('textarea[name="hints"]').each((ndx, el) => {
-        hintsFormatted.push(md.render($(el).val()))
+      let hintsFormatted = savedTaskHints.map((entry) => {
+        return entry.hint
+      }).concat(getHints()).map((hint) => {
+        return md.render(hint)
       })
 
       let options = {
@@ -517,10 +554,12 @@ class TasksView extends View {
         .when(
           taskProvider.fetchTask(taskId),
           taskCategoryProvider.fetchTaskCategoriesByTask(taskId),
-          taskAnswerProvider.fetchTaskAnswersByTask(taskId)
+          taskAnswerProvider.fetchTaskAnswersByTask(taskId),
+          taskHintProvider.fetchTaskHintsByTask(taskId)
         )
-        .done((task, taskCategories, taskAnswers) => {
+        .done((task, taskCategories, taskAnswers, taskHints) => {
           savedTaskAnswers = taskAnswers
+          savedTaskHints = taskHints
           $editTaskSubmitButton.prop('disabled', false)
 
           $editTaskTitle.val(task.title)
@@ -532,12 +571,12 @@ class TasksView extends View {
           }))
 
           $editTaskHintList.empty()
-          _.each(task.hints, (hint, ndx) => {
+          _.each(taskHints, (entry, ndx) => {
             $editTaskHintList.append($(renderTemplate('edit-task-hint-textarea-partial', {
               number: ndx + 1,
-              editable: false
+              editable: false,
+              hint: entry.hint
             })))
-            $(`#edit-task-hint-${ndx + 1} textarea`).val(hint)
           })
 
           $editTaskAnswerList.empty()
@@ -569,6 +608,7 @@ class TasksView extends View {
         clearForm: true,
         dataType: 'json',
         data: {
+          hints: getHints(),
           answers: getAnswers()
         },
         headers: {
@@ -630,12 +670,15 @@ class TasksView extends View {
       $reviseTaskSubmitButton.prop('disabled', true)
 
       $
-        .when(taskProvider.fetchTask(taskId))
-        .done((task) => {
+        .when(
+          taskProvider.fetchTask(taskId),
+          taskHintProvider.fetchTaskHintsByTask(taskId)
+        )
+        .done((task, taskHints) => {
           let md = new MarkdownRenderer()
           let hintsFormatted = []
-          _.each(task.hints, (hint) => {
-            hintsFormatted.push(md.render(hint))
+          _.each(taskHints, (entry) => {
+            hintsFormatted.push(md.render(entry.hint))
           })
 
           let options = {
@@ -857,12 +900,16 @@ class TasksView extends View {
       }
 
       $
-        .when(taskProvider.fetchTask(taskId), contestProvider.fetchSolvedTeamCountByTask(taskId))
-        .done((task, solvedTeamCount) => {
+        .when(
+          taskProvider.fetchTask(taskId),
+          contestProvider.fetchSolvedTeamCountByTask(taskId),
+          taskHintProvider.fetchTaskHintsByTask(taskId)
+        )
+        .done((task, solvedTeamCount, taskHints) => {
           let md = new MarkdownRenderer()
           let hintsFormatted = []
-          _.each(task.hints, (hint) => {
-            hintsFormatted.push(md.render(hint))
+          _.each(taskHints, (entry) => {
+            hintsFormatted.push(md.render(entry.hint))
           })
           let options = {
             title: task.title,
@@ -986,12 +1033,15 @@ class TasksView extends View {
 
       if (contest.isFinished()) {
         $
-          .when(taskProvider.fetchTask(taskId))
-          .done((task) => {
+          .when(
+            taskProvider.fetchTask(taskId),
+            taskHintProvider.fetchTaskHintsByTask(taskId)
+          )
+          .done((task, taskHints) => {
             let md = new MarkdownRenderer()
             let hintsFormatted = []
-            _.each(task.hints, (hint) => {
-              hintsFormatted.push(md.render(hint))
+            _.each(taskHints, (entry) => {
+              hintsFormatted.push(md.render(entry.hint))
             })
 
             let options = {

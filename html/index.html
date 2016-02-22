@@ -40,7 +40,7 @@
                 </div>
                 <div class="pull-right">
                     <ul class="list-unstyled text-right">
-                        <li><a href="http://volgactf.ru" target="_blank">volgactf.ru</a></li>
+                        <li><a href="https://volgactf.ru" target="_blank">volgactf.ru</a></li>
                         <li><a href="https://twitter.com/VolgaCTF" target="_blank">@VolgaCTF</a></li>
                     </ul>
                 </div>
@@ -70,7 +70,7 @@
 
                 <ul class="nav navbar-nav navbar-right">
                     <% if (identity === null || identity.role === 'guest') { %>
-                    <li class="<% print((active === 'signin') ? 'active' : ''); %>"><a href="/signin" data-push-history><span class="glyphicon glyphicon-log-in"></span>&nbsp;Sign in</a></li>
+                    <li class="<% print((active === 'signin') ? 'active' : ''); %>"><a href="/signin" data-push-history>Sign in</a></li>
                     <% } else { %>
                     <li class="dropdown">
                         <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
@@ -278,26 +278,28 @@
             </script>
 
             <script type="text/x-template" data-name="edit-task-hint-textarea-partial">
-                <div id="edit-task-hint-<%- number %>">
+                <div class="themis-task-hint-group" id="edit-task-hint-<%- number %>" data-state-disabled="<% print(editable ? 'false' : 'true') %>">
                     <h5>
                         Hint #<%- number %>
+                        <% if (editable) { %>
                         <a href="#" data-action="remove-task-hint" data-number="<%- number %>">
                             <i class="glyphicon glyphicon-remove text-danger"></i>
                         </a>
+                        <% } %>
                     </h5>
-                    <textarea name="hints" class="form-control" required data-parsley-length="[2,1024]"></textarea>
+                    <textarea class="form-control" required data-parsley-length="[2,1024]"<% print(editable ? '' : ' disabled'); %>><%- hint %></textarea>
                 </div>
             </script>
 
             <script type="text/x-template" data-name="create-task-hint-textarea-partial">
-                <div id="create-task-hint-<%- number %>">
+                <div class="themis-task-hint-group" id="create-task-hint-<%- number %>">
                     <h5>
                         Hint #<%- number %>
                         <a href="#" data-action="remove-task-hint" data-number="<%- number %>">
                             <i class="glyphicon glyphicon-remove text-danger"></i>
                         </a>
                     </h5>
-                    <textarea name="hints" class="form-control" required data-parsley-length="[2,1024]"></textarea>
+                    <textarea class="form-control" required data-parsley-length="[2,1024]"><%- hint %></textarea>
                 </div>
             </script>
 
@@ -1236,7 +1238,7 @@
                             <% if (!contest.isFinished()) { %>
                             <a class="btn btn-primary btn-lg" href="/signup" role="button" data-push-history>Sign up</a>
                             <% } %>
-                            <a class="btn btn-success btn-lg" href="/signin" role="button" data-push-history><span class="glyphicon glyphicon-log-in"></span>&nbsp;Sign in</a>
+                            <a class="btn btn-success btn-lg" href="/signin" role="button" data-push-history>Sign in</a>
                         </p>
                     </div>
                     <% } else if (identity.role === 'team') { %>
@@ -1357,7 +1359,7 @@
                         <div class="submit-error">
                             <p class="text-danger"></p>
                         </div>
-                        <button class="btn btn-lg btn-primary btn-block" type="submit"><span class="glyphicon glyphicon-log-in"></span>&nbsp;Sign in</button>
+                        <button class="btn btn-lg btn-primary btn-block" type="submit">Sign in</button>
                         <div>
                             <p class="text-center"><a href="/restore" data-push-history>Forgot password?</a></p>
                         </div>
