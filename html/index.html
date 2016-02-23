@@ -113,8 +113,8 @@
                             <% } %>
                         </ul>
                         <ul class="list-unstyled">
-                            <% if (team.country !== '') { %>
-                            <li><strong>Country:</strong> <%- team.country %></li>
+                            <% if (country !== '') { %>
+                            <li><strong>Country:</strong> <%- country %></li>
                             <% } %>
                             <% if (team.locality !== '') { %>
                             <li><strong>Locality:</strong> <%- team.locality %></li>
@@ -802,8 +802,8 @@
                         <img class="themis-scoreboard-logo" src="/api/team/<%- id %>/logo">
                         <a href="/profile/<%- id %>" class="themis-team-link" data-push-history><%- name %></a>
                     </td>
-                    <% if (detailed) { %>
                     <td><%- country %></td>
+                    <% if (detailed) { %>
                     <td><%- locality %></td>
                     <td><%- institution %></td>
                     <% } %>
@@ -830,8 +830,8 @@
                             <thead>
                                 <th>#</th>
                                 <th>Team</th>
-                                <% if (detailed) { %>
                                 <th>Country</th>
+                                <% if (detailed) { %>
                                 <th>Locality</th>
                                 <th>Institution</th>
                                 <% } %>
@@ -1465,8 +1465,8 @@
                                 <span class="text-danger" title="Email not verified"><%- team.email %></span>
                                 <% if (identity.role === 'team' && identity.id === team.id) { %>
                                 <br>
-                                <button type="button" class="btn btn-primary btn-xs" data-action="resend-confirmation" data-toggle="modal" data-target="#resend-confirmation-modal">Resend confirmation email</button>
-                                <button type="button" class="btn btn-danger btn-xs" data-action="change-email" data-toggle="modal" data-target="#change-email-modal">Change email</button>
+                                <button type="button" class="btn btn-default btn-xs" data-action="resend-confirmation" data-toggle="modal" data-target="#resend-confirmation-modal">Resend confirmation email</button>
+                                <button type="button" class="btn btn-warning btn-xs" data-action="change-email" data-toggle="modal" data-target="#change-email-modal">Change email</button>
                                 <% } %>
                                 <% } %>
                             </li>
@@ -1474,8 +1474,8 @@
                         </ul>
                         <% } %>
                         <ul class="list-unstyled">
-                            <% if (team.country !== '' || (identity.role === 'team' && identity.id === team.id)) { %>
-                            <li><strong>Country:</strong> <%- team.country %></li>
+                            <% if (country !== '' || (identity.role === 'team' && identity.id === team.id)) { %>
+                            <li><strong>Country:</strong> <%- country %></li>
                             <% } %>
                             <% if (team.locality !== '' || (identity.role === 'team' && identity.id === team.id)) { %>
                             <li><strong>Locality:</strong> <%- team.locality %></li>
@@ -1485,8 +1485,8 @@
                             <% } %>
                             <% if (identity.role === 'team' && identity.id === team.id) { %>
                             <li>
-                                <button type="button" class="btn btn-primary btn-xs" data-action="edit-profile" data-toggle="modal" data-target="#edit-profile-modal"><span class="glyphicon glyphicon-pencil"></span>&nbsp;Edit</button>
-                                <button type="button" class="btn btn-primary btn-xs" data-action="change-password" data-toggle="modal" data-target="#change-password-modal">Change password</button>
+                                <button type="button" class="btn btn-default btn-xs" data-action="edit-profile" data-toggle="modal" data-target="#edit-profile-modal"><span class="glyphicon glyphicon-pencil"></span>&nbsp;Edit</button>
+                                <button type="button" class="btn btn-default btn-xs" data-action="change-password" data-toggle="modal" data-target="#change-password-modal">Change password</button>
                             </li>
                             <% } %>
                         </ul>
@@ -1597,7 +1597,7 @@
                                 <form method="POST" action="/api/team/edit-profile">
                                     <div class="form-group">
                                         <label for="edit-profile-country" class="control-label">Country</label>
-                                        <input type="text" class="form-control" id="edit-profile-country" name="country" autofocus>
+                                        <select required class="form-control" id="edit-profile-country" name="countryId" autofocus></select>
                                     </div>
                                     <div class="form-group">
                                         <label for="edit-profile-locality" class="control-label">Locality</label>
@@ -1730,7 +1730,11 @@
                                 Country
                             </label>
                             <div class="col-sm-9">
-                                <input type="text" class="form-control" id="signup-country" name="country" placeholder="Country">
+                                <select required class="form-control" id="signup-country" name="countryId">
+                                    <% for (var i=0; i<countries.length; ++i) { %>
+                                    <option value="<%- countries[i].id %>"><%- countries[i].getFullName() %></option>
+                                    <% } %>
+                                </select>
                             </div>
                         </div>
 

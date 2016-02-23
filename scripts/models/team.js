@@ -2,7 +2,7 @@ export default class TeamModel {
   constructor (options) {
     this.id = options.id
     this.name = options.name
-    this.country = options.country
+    this.countryId = options.countryId
     this.locality = options.locality
     this.institution = options.institution
     this.createdAt = new Date(options.createdAt)

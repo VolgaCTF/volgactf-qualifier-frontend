@@ -6,6 +6,7 @@ import navigationBar from '../navigation-bar'
 import identityProvider from '../providers/identity'
 import teamProvider from '../providers/team'
 import contestProvider from '../providers/contest'
+import countryProvider from '../providers/country'
 import taskProvider from '../providers/task'
 import History from 'history.js'
 import metadataStore from '../utils/metadata-store'
@@ -202,19 +203,24 @@ class ProfileView extends View {
       let $editProfileForm = $editProfileModal.find('form')
       $editProfileForm.parsley()
 
+      let $editProfileCountry = $('#edit-profile-country')
+      for (let country of countryProvider.getCountries()) {
+        $editProfileCountry.append($('<option></option>').attr('value', country.id).text(country.getFullName()))
+      }
+
       $editProfileSubmitButton.on('click', (e) => {
         $editProfileForm.trigger('submit')
       })
 
       $editProfileModal.on('show.bs.modal', (e) => {
-        $('#edit-profile-country').val(this.team.country).focus()
+        $editProfileCountry.val(this.team.countryId).focus()
         $('#edit-profile-locality').val(this.team.locality)
         $('#edit-profile-institution').val(this.team.institution)
         $editProfileSubmitError.text('')
       })
 
       $editProfileModal.on('shown.bs.modal', (e) => {
-        $('#edit-profile-country').focus()
+        $editProfileCountry.focus()
       })
 
       $editProfileForm.on('submit', (e) => {
@@ -321,9 +327,18 @@ class ProfileView extends View {
         let promise = null
 
         if (_.contains(['admin', 'manager'], identity.role) || (identity.role === 'team' && identity.id === teamId)) {
-          promise = $.when(teamProvider.fetchTeamProfile(teamId), contestProvider.fetchTeamTaskHit(teamId), taskProvider.fetchTaskPreviews())
+          promise = $.when(
+            teamProvider.fetchTeamProfile(teamId),
+            contestProvider.fetchTeamTaskHit(teamId),
+            countryProvider.fetchCountries(),
+            taskProvider.fetchTaskPreviews()
+          )
         } else {
-          promise = $.when(teamProvider.fetchTeamProfile(teamId), contestProvider.fetchTeamTaskHit(teamId))
+          promise = $.when(
+            teamProvider.fetchTeamProfile(teamId),
+            countryProvider.fetchCountries(),
+            contestProvider.fetchTeamTaskHit(teamId)
+          )
         }
 
         promise
@@ -333,6 +348,10 @@ class ProfileView extends View {
               identity: identity,
               team: team
             }
+
+            let countries = countryProvider.getCountries()
+            let country = _.findWhere(countries, { id: team.countryId })
+            opts.country = country.name
 
             if (_.contains(['admin', 'manager'], identity.role) || (identity.role === 'team' && identity.id === teamId)) {
               let tasks = taskProvider.getTaskPreviews()

@@ -9,6 +9,7 @@ import metadataStore from '../utils/metadata-store'
 import contestProvider from '../providers/contest'
 import identityProvider from '../providers/identity'
 import teamProvider from '../providers/team'
+import countryProvider from '../providers/country'
 
 class TeamsView extends View {
   constructor () {
@@ -26,6 +27,7 @@ class TeamsView extends View {
   }
 
   renderTeams () {
+    let countries = countryProvider.getCountries()
     let sortedTeams = _.sortBy(teamProvider.getTeams(), 'createdAt')
     this.$main.find('.themis-team-count').show().html(renderTemplate('team-count-partial', { count: sortedTeams.length }))
 
@@ -35,9 +37,11 @@ class TeamsView extends View {
     let $content = $('<ul></ul>').addClass('themis-teams list-unstyled')
     let identity = identityProvider.getIdentity()
     for (let team of sortedTeams) {
+      let country = _.findWhere(countries, { id: team.countryId })
       $content.append($('<li></li>').html(renderTemplate('team-profile-simplified-partial', {
         identity: identity,
-        team: team
+        team: team,
+        country: country.name
       })))
     }
     $section.html($content)
@@ -52,9 +56,18 @@ class TeamsView extends View {
       .done((identity) => {
         let promise = null
         if (identity.role === 'team') {
-          promise = $.when(contestProvider.fetchContest(), teamProvider.fetchTeams(), contestProvider.fetchTeamScores())
+          promise = $.when(
+            contestProvider.fetchContest(),
+            teamProvider.fetchTeams(),
+            countryProvider.fetchCountries(),
+            contestProvider.fetchTeamScores()
+          )
         } else {
-          promise = $.when(contestProvider.fetchContest(), teamProvider.fetchTeams())
+          promise = $.when(
+            contestProvider.fetchContest(),
+            teamProvider.fetchTeams(),
+            countryProvider.fetchCountries()
+          )
         }
 
         promise

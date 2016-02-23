@@ -5,6 +5,7 @@ import navigationBar from '../navigation-bar'
 import metadataStore from '../utils/metadata-store'
 import contestProvider from '../providers/contest'
 import identityProvider from '../providers/identity'
+import countryProvider from '../providers/country'
 import 'parsley'
 import 'jquery.form'
 import 'bootstrap-filestyle'
@@ -65,8 +66,12 @@ class SignupView extends View {
     this.$main = $('#main')
 
     $
-      .when(identityProvider.fetchIdentity(), contestProvider.fetchContest())
-      .done((identity, contest) => {
+      .when(
+        identityProvider.fetchIdentity(),
+        contestProvider.fetchContest(),
+        countryProvider.fetchCountries()
+      )
+      .done((identity, contest, countries) => {
         identityProvider.subscribe()
         navigationBar.present()
 
@@ -74,7 +79,9 @@ class SignupView extends View {
           if (contest.isFinished()) {
             this.$main.html(renderTemplate('signup-not-available-view'))
           } else {
-            this.$main.html(renderTemplate('signup-view'))
+            this.$main.html(renderTemplate('signup-view', {
+              countries: countries
+            }))
             this.initSignupForm()
           }
         } else {

@@ -11,6 +11,7 @@ import contestProvider from '../providers/contest'
 import identityProvider from '../providers/identity'
 import teamProvider from '../providers/team'
 import History from 'history.js'
+import countryProvider from '../providers/country'
 
 class ScoreboardView extends View {
   constructor () {
@@ -37,6 +38,7 @@ class ScoreboardView extends View {
 
     let teamScores = contestProvider.getTeamScores()
     let teams = teamProvider.getTeams()
+    let countries = countryProvider.getCountries()
 
     let identity = identityProvider.getIdentity()
     let isTeam = (identity.role === 'team')
@@ -45,10 +47,13 @@ class ScoreboardView extends View {
     _.each(teamScores, (teamScore, ndx) => {
       let team = _.findWhere(teams, { id: teamScore.teamId })
       if (team) {
+        let country = _.findWhere(countries, { id: team.countryId })
+
         let obj = {
           rank: ndx + 1,
           id: team.id,
           name: team.name,
+          country: country.name,
           score: teamScore.score,
           updatedAt: (teamScore.updatedAt) ? moment(teamScore.updatedAt).format('lll') : 'never',
           highlight: (isTeam && team.id === identity.id),
@@ -56,7 +61,6 @@ class ScoreboardView extends View {
         }
 
         if (this.detailed) {
-          obj.country = team.country
           obj.locality = team.locality
           obj.institution = team.institution
         }
@@ -75,9 +79,10 @@ class ScoreboardView extends View {
         identityProvider.fetchIdentity(),
         contestProvider.fetchContest(),
         teamProvider.fetchTeams(),
-        contestProvider.fetchTeamScores()
+        contestProvider.fetchTeamScores(),
+        countryProvider.fetchCountries()
       )
-      .done((identity, contest, teams, teamScores) => {
+      .done((identity, contest, teams, teamScores, countries) => {
         if (dataStore.supportsRealtime()) {
           dataStore.connectRealtime()
         }
