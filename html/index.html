@@ -887,17 +887,25 @@
             </script>
 
             <script type="text/x-template" data-name="contest-realtime-state">
-                <% if (state === 'online') { %>
-                    <span class="text-success" data-toggle="tooltip" data-placement="top" title="You are connected to a realtime stream update channel. You do not need to reload the page.">
-                        &#9679;&nbsp;Realtime stream online
+                <% if (state === 'connecting') { %>
+                    <span class="text-warning" data-toggle="tooltip" data-placement="top" title="Your browser is making an attempt to establish the connection to the realtime update channel.">
+                        &#9679;&nbsp;Stream: connecting
                     </span>
-                <% } else if (state === 'offline') { %>
-                    <span class="text-danger" data-toggle="tooltip" data-placement="top" title="Connection to realtime stream update channel has been closed. To get latest updates, you have to reload page manually.">
-                        &#9679;&nbsp;Realtime stream offline
+                <% } else if (state === 'connected') { %>
+                    <span class="text-success" data-toggle="tooltip" data-placement="top" title="Your browser has established the connection to the realtime update channel. You don't need to reload the page.">
+                        &#9679;&nbsp;Stream: connected
+                    </span>
+                <% } else if (state === 'closed') { %>
+                    <span class="text-danger" data-toggle="tooltip" data-placement="top" title="Connection to the realtime update channel has been closed. In order to get the latest updates you have to reload the page.">
+                        &#9679;&nbsp;Stream: closed
                     </span>
                 <% } else if (state === 'not-supported') { %>
-                    <span class="text-warning" data-toggle="tooltip" data-placement="top" title="Your browser does not support Server-Sent Events. To get latest updates, you have to reload page manually.">
-                        &#9679;&nbsp;Realtime stream not supported
+                    <span class="text-muted" data-toggle="tooltip" data-placement="top" title="Your browser doesn't support Server-Sent Events. In order to get the latest updates you have to reload the page from time to time.">
+                        &#9679;&nbsp;Stream: not supported
+                    </span>
+                <% } else if (state === 'n/a') { %>
+                    <span class="text-muted" data-toggle="tooltip" data-placement="top" title="Unknown error. Please reload the page.">
+                        &#9679;&nbsp;Stream: n/a
                     </span>
                 <% } %>
             </script>

@@ -181,10 +181,22 @@ class StatusBar {
   renderRealtimeState () {
     this.$realtimeContainer.empty()
     let state = null
-    if (dataStore.supportsRealtime()) {
-      state = dataStore.connectedRealtime() ? 'online' : 'offline'
-    } else {
-      state = 'not-supported'
+    switch (dataStore.getRealtimeConnectionState()) {
+      case -1:
+        state = 'not-supported'
+        break
+      case 0:
+        state = 'connecting'
+        break
+      case 1:
+        state = 'connected'
+        break
+      case 2:
+        state = 'closed'
+        break
+      default:
+        state = 'n/a'
+        break
     }
 
     this.$realtimeContainer.html(renderTemplate('contest-realtime-state', { state: state }))

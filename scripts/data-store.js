@@ -31,8 +31,16 @@ class DataStore {
     return !!window.EventSource
   }
 
+  getRealtimeConnectionState () {
+    if (this.supportsRealtime() && this.eventSource) {
+      return this.eventSource.readyState
+    } else {
+      return -1
+    }
+  }
+
   connectedRealtime () {
-    return (this.supportsRealtime() && this.eventSource && this.eventSource.readyState !== 2)
+    return (this.supportsRealtime() && this.eventSource && this.eventSource.readyState === 1)
   }
 
   connectRealtime () {
