@@ -12,7 +12,7 @@ class TeamProvider extends EventEmitter {
 
     this.onUpdateProfile = null
     this.onCreate = null
-    this.onChangeEmail = null
+    this.onUpdateEmail = null
     this.onQualify = null
   }
 
@@ -64,7 +64,7 @@ class TeamProvider extends EventEmitter {
 
       realtimeProvider.addEventListener('createTeam', this.onCreate)
 
-      this.onChangeEmail = (e) => {
+      this.onUpdateEmail = (e) => {
         let options = JSON.parse(e.data)
         let team = new TeamModel(options)
         let ndx = _.findIndex(this.teams, { id: options.id })
@@ -72,10 +72,10 @@ class TeamProvider extends EventEmitter {
           this.teams.splice(ndx, 1)
         }
         this.teams.push(team)
-        this.trigger('changeTeamEmail', [team])
+        this.trigger('updateTeamEmail', [team])
       }
 
-      realtimeProvider.addEventListener('changeTeamEmail', this.onChangeEmail)
+      realtimeProvider.addEventListener('updateTeamEmail', this.onUpdateEmail)
     }
   }
 
@@ -96,9 +96,9 @@ class TeamProvider extends EventEmitter {
       this.onCreate = null
     }
 
-    if (this.onChangeEmail) {
-      realtimeProvider.removeEventListener('changeTeamEmail', this.onChangeEmail)
-      this.onChangeEmail = null
+    if (this.onUpdateEmail) {
+      realtimeProvider.removeEventListener('updateTeamEmail', this.onUpdateEmail)
+      this.onUpdateEmail = null
     }
 
     if (this.onQualify) {
