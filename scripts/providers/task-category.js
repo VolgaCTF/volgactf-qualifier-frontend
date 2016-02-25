@@ -3,6 +3,7 @@ import _ from 'underscore'
 import dataStore from '../data-store'
 import EventEmitter from 'wolfy87-eventemitter'
 import TaskCategoryModel from '../models/task-category'
+import identityProvider from './identity'
 
 class TaskCategoryProvider extends EventEmitter {
   constructor () {
@@ -11,6 +12,7 @@ class TaskCategoryProvider extends EventEmitter {
 
     this.onCreate = null
     this.onRemove = null
+    this.onReveal = null
   }
 
   getTaskCategories () {
@@ -32,6 +34,18 @@ class TaskCategoryProvider extends EventEmitter {
     }
 
     realtimeProvider.addEventListener('createTaskCategory', this.onCreate)
+
+    let identity = identityProvider.getIdentity()
+    if (_.contains(['team', 'guest'], identity.role)) {
+      this.onReveal = (e) => {
+        let options = JSON.parse(e.data)
+        let taskCategory = new TaskCategoryModel(options)
+        this.taskCategories.push(taskCategory)
+        this.trigger('revealTaskCategory', [taskCategory])
+      }
+
+      realtimeProvider.addEventListener('revealTaskCategory', this.onReveal)
+    }
 
     this.onRemove = (e) => {
       let options = JSON.parse(e.data)
@@ -56,6 +70,11 @@ class TaskCategoryProvider extends EventEmitter {
     if (this.onCreate) {
       realtimeProvider.removeEventListener('createTaskCategory', this.onCreate)
       this.onCreate = null
+    }
+
+    if (this.onReveal) {
+      realtimeProvider.removeEventListener('revealTaskCategory', this.onReveal)
+      this.onReveal = null
     }
 
     if (this.onRemove) {
