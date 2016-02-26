@@ -44,7 +44,7 @@ class DataStore {
   }
 
   connectRealtime () {
-    this.eventSource = new window.EventSource('/api/events')
+    this.eventSource = new window.EventSource('/api/stream')
   }
 
   disconnectRealtime () {

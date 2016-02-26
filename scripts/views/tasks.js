@@ -34,6 +34,7 @@ class TasksView extends View {
     this.onRemoveCategory = null
 
     this.onCreateTaskCategory = null
+    this.onRevealTaskCategory = null
     this.onRemoveTaskCategory = null
 
     this.onCreateTask = null
@@ -1301,6 +1302,13 @@ class TasksView extends View {
               return false
             }
 
+            if (isTeam || isGuest) {
+              this.onRevealTaskCategory = (taskCategory) => {
+                this.requestRenderTasks()
+                return false
+              }
+            }
+
             this.onRemoveTaskCategory = (taskCategoryId) => {
               this.requestRenderTasks()
               return false
@@ -1467,6 +1475,11 @@ class TasksView extends View {
     if (this.onRemoveTaskCategory) {
       taskCategoryProvider.off('removeTaskCategory', this.onRemoveTaskCategory)
       this.onRemoveTaskCategory = null
+    }
+
+    if (this.onRevealTaskCategory) {
+      taskCategoryProvider.off('revealTaskCategory', this.onRevealTaskCategory)
+      this.onRevealTaskCategory = null
     }
 
     taskCategoryProvider.unsubscribe()

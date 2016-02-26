@@ -18,7 +18,7 @@ class TeamsView extends View {
 
     this.onUpdateTeamProfile = null
     this.onCreateTeam = null
-    this.onChangeTeamEmail = null
+    this.onUpdateTeamEmail = null
     this.onQualifyTeam = null
   }
 
@@ -108,12 +108,12 @@ class TeamsView extends View {
 
               teamProvider.on('createTeam', this.onCreateTeam)
 
-              this.onChangeTeamEmail = (team) => {
+              this.onUpdateTeamEmail = (team) => {
                 this.renderTeams()
                 return false
               }
 
-              teamProvider.on('changeTeamEmail', this.onChangeTeamEmail)
+              teamProvider.on('updateTeamEmail', this.onUpdateTeamEmail)
             }
           })
           .fail((err) => {
@@ -142,9 +142,9 @@ class TeamsView extends View {
       this.onCreateTeam = null
     }
 
-    if (this.onChangeTeamEmail) {
-      teamProvider.off('changeTeamEmail', this.onChangeTeamEmail)
-      this.onChangeTeamEmail = null
+    if (this.onUpdateTeamEmail) {
+      teamProvider.off('updateTeamEmail', this.onUpdateTeamEmail)
+      this.onUpdateTeamEmail = null
     }
 
     if (this.onQualifyTeam) {
