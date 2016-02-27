@@ -18,6 +18,9 @@ import yaml from 'js-yaml'
 import fs from 'fs'
 import del from 'del'
 
+let Customizer = require(process.env.THEMIS_CUSTOMIZER_PACKAGE || 'themis-quals-customizer-default').default
+let customizer = new Customizer()
+
 let paths = {
   scripts: [
     'scripts/themis.js'
@@ -38,7 +41,7 @@ let paths = {
 }
 
 function isProduction () {
-  return process.env['NODE_ENV'] === 'production'
+  return process.env.NODE_ENV === 'production'
 }
 
 gulp.task('clean_scripts', (callback) => {
@@ -98,12 +101,15 @@ gulp.task('clean_html', (callback) => {
 })
 
 gulp.task('html', ['clean_html', 'fonts', 'scripts', 'stylesheets'], () => {
-  let opts = null
+  let opts = {}
 
   try {
-    opts = yaml.safeLoad(fs.readFileSync('./opts.yml', 'utf8'))
     let cachebusting_js = JSON.parse(fs.readFileSync('./public/assets/js/manifest.json', 'utf8'))
     let cachebusting_css = JSON.parse(fs.readFileSync('./public/assets/css/manifest.json', 'utf8'))
+
+    opts.event = {
+      title: customizer.getEventTitle()
+    }
 
     opts.cachebusting = {
       themis: {
@@ -124,15 +130,3 @@ gulp.task('html', ['clean_html', 'fonts', 'scripts', 'stylesheets'], () => {
 })
 
 gulp.task('default', ['html'])
-
-// gulp.task 'watch', ->
-//     extraScripts = [
-//         'scripts/**/*.coffee'
-//     ]
-
-//     gulp.watch paths.html, ['default']
-//     gulp.watch paths.stylesheets, ['default']
-//     gulp.watch paths.scripts.concat(extraScripts), ['default']
-//     gulp.watch paths.fonts, ['default']
-//     gulp.watch paths.app_scripts, ['default']
-//     gulp.watch paths.app_stylesheets, ['default']

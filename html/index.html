@@ -8,7 +8,6 @@
 
         <link rel="stylesheet" href="/assets/css/{{#cachebusting}}{{#themis}}{{ css }}{{/themis}}{{/cachebusting}}">
 
-        <script type="text/x-metadata" data-name="domain-api" data-value="//api.{{ domain }}"></script>
         <script type="text/x-metadata" data-name="event-title" data-value="{{#event}}{{ title }}{{/event}}"></script>
     </head>
     <body>
@@ -36,7 +35,10 @@
         <footer class="footer">
             <div class="container">
                 <div class="pull-left">
-                    <p><span class="glyphicon glyphicon-copyright-mark"></span> <script>document.write((new Date()).getFullYear())</script>, <a href="https://github.com/aspyatkin" target="_blank">Alexander Pyatkin</a></p>
+                    <ul class="list-unstyled text-left">
+                        <li><span class="glyphicon glyphicon-copyright-mark"></span> <script>document.write((new Date()).getFullYear())</script>, <a href="https://github.com/aspyatkin/themis-quals" target="_blank">Themis Quals</a></li>
+                        <li>Proudly made by <a href="https://github.com/aspyatkin" target="_blank">Alexander Pyatkin</a> and contributors</li>
+                    </ul>
                 </div>
                 <div class="pull-right">
                     <!-- Extra links -->
