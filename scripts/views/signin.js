@@ -66,7 +66,7 @@ class SigninView extends View {
 
         navigationBar.present({ active: 'signin' })
 
-        if (identity.role === 'guest') {
+        if (identity.isGuest()) {
           this.$main.html(renderTemplate('signin-view'))
           this.initSigninForm()
         } else {

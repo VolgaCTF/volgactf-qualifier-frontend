@@ -93,7 +93,7 @@ class LogsView extends View {
     $
       .when(identityProvider.fetchIdentity(), contestProvider.fetchContest())
       .done((identity, contest) => {
-        if (_.contains(['admin', 'manager'], identity.role)) {
+        if (identity.isSupervisor()) {
           let params = History.getState().data.params
           let all = (params.all)
           let promise = null

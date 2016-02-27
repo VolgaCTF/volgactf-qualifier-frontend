@@ -116,12 +116,9 @@ class StatusBar {
 
   renderContestState () {
     let contest = contestProvider.getContest()
-    let contestObj = {
-      state: contest.state
-    }
 
     this.$stateContainer.html(renderTemplate('contest-state-partial', {
-      contest: contestObj,
+      contest: contest,
       identity: identityProvider.getIdentity()
     }))
   }
@@ -159,7 +156,7 @@ class StatusBar {
   renderTeamScore () {
     this.$scoreContainer.empty()
     let identity = identityProvider.getIdentity()
-    if (identity.role !== 'team') {
+    if (!identity.isTeam()) {
       return
     }
 
@@ -216,11 +213,11 @@ class StatusBar {
     let identity = identityProvider.getIdentity()
 
     this.$scoreContainer = $('#themis-contest-score')
-    if (identity.role === 'team') {
+    if (identity.isTeam()) {
       this.renderTeamScore()
     }
 
-    if (identity.role === 'admin') {
+    if (identity.isAdmin()) {
       this.initUpdateContestModal()
     }
 
@@ -239,7 +236,7 @@ class StatusBar {
     contestProvider.subscribe()
     contestProvider.on('updateContest', this.onUpdateContest)
 
-    if (identity.role === 'team') {
+    if (identity.isTeam()) {
       this.onUpdateTeamScore = (teamScore) => {
         this.reloadTeamScore = true
         return false

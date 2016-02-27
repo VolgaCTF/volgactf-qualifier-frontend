@@ -64,28 +64,28 @@
                     <li class="<% print((active === 'scoreboard') ? 'active' : ''); %>"><a href="/scoreboard" data-push-history>Scoreboard</a></li>
                     <li class="<% print((active === 'tasks') ? 'active' : ''); %>"><a href="/tasks" data-push-history>Tasks</a></li>
                     <li class="<% print((active === 'about') ? 'active' : ''); %>"><a href="/about" data-push-history>About</a></li>
-                    <% if (identity && (identity.role === 'admin' || identity.role === 'manager')) { %>
+                    <% if (identity && identity.isSupervisor()) { %>
                     <li class="<% print((active === 'logs') ? 'active' : ''); %>"><a href="/logs" data-push-history>Logs</a></li>
                     <% } %>
                 </ul>
 
                 <ul class="nav navbar-nav navbar-right">
-                    <% if (identity === null || identity.role === 'guest') { %>
+                    <% if (identity === null || identity.isGuest()) { %>
                     <li class="<% print((active === 'signin') ? 'active' : ''); %>"><a href="/team/signin" data-push-history>Sign in</a></li>
                     <% } else { %>
                     <li class="dropdown">
                         <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
-                            <% if (identity.role === 'admin') { %>
+                            <% if (identity.isAdmin()) { %>
                             <span class="label label-success">A</span>
-                            <% } else if (identity.role === 'manager') { %>
+                            <% } else if (identity.isManager()) { %>
                             <span class="label label-primary">M</span>
-                            <% } else if (identity.role === 'team') { %>
+                            <% } else if (identity.isTeam()) { %>
                             <img class="profile-image" src="/api/team/<%- identity.id %>/logo">
                             <% } %>
                             <%- identity.name %>&nbsp;<span class="caret"></span>
                         </a>
                         <ul class="dropdown-menu" role="menu">
-                            <% if (identity.role === 'team') { %>
+                            <% if (identity.isTeam()) { %>
                             <li><a href="/profile/<%- identity.id %>" data-push-history><span class="glyphicon glyphicon-cog"></span>&nbsp;Edit profile</a></li>
                             <% } %>
                             <li><a href="#" data-action="signout" data-push-history><span class="glyphicon glyphicon-log-out"></span>&nbsp;Sign out</a></li>
@@ -135,7 +135,7 @@
 
             <script type="text/x-template" data-name="teams-view">
                 <div class="container">
-                    <% if (identity.role === 'team' && !('emailConfirmed' in identity && identity.emailConfirmed)) { %>
+                    <% if (identity.isTeam() && !('emailConfirmed' in identity && identity.emailConfirmed)) { %>
                     <div class="alert alert-warning" role="alert">
                         <p>
                             <span class="glyphicon glyphicon-alert"></span>&nbsp;You need to confirm your email address.
@@ -185,7 +185,7 @@
                         <h3 class="panel-title">Categories</h3>
                     </div>
                     <div class="panel-body">
-                        <% if (identity.role === 'admin' && !contest.isFinished()) { %>
+                        <% if (identity.isAdmin() && !contest.isFinished()) { %>
                         <button type="button" class="btn btn-success btn-xs" data-action="create-category" data-toggle="modal" data-target="#create-category-modal">
                             <i class="glyphicon glyphicon-plus"></i>&nbsp;Create
                         </button>
@@ -194,7 +194,7 @@
                     </div>
                 </div>
 
-                <% if (identity.role === 'admin' && !contest.isFinished()) { %>
+                <% if (identity.isAdmin() && !contest.isFinished()) { %>
                 <div class="modal fade" id="create-category-modal" tabindex="-1" role="dialog">
                     <div class="modal-dialog">
                         <div class="modal-content">
@@ -380,7 +380,7 @@
             </script>
 
             <script type="text/x-template" data-name="task-preview-partial">
-                <% if (identity.role === 'admin' || identity.role === 'manager') { %>
+                <% if (identity.isSupervisor()) { %>
                 <div class="col-sm-4 themis-task-preview-container" data-task-id="<%- task.id %>">
                 <% } else { %>
                 <div class="col-sm-3 themis-task-preview-container" data-task-id="<%- task.id %>">
@@ -398,7 +398,7 @@
                             <h4 class="panel-title themis-task-title">
                                 <%- task.title %>
                                 &nbsp;
-                                <% if (identity.role === 'admin') { %>
+                                <% if (identity.isAdmin()) { %>
                                     <% if (!task.isClosed() && !contest.isFinished()) { %>
                                     <a href="#" data-action="edit-task" data-toggle="modal" data-target="#edit-task-modal" data-task-id="<%- task.id %>"><span class="glyphicon glyphicon-pencil"></span></a>
                                     <% } %>
@@ -412,9 +412,9 @@
                                 <% } %>
                             </h4>
                         </div>
-                        <% if (identity.role === 'admin' || identity.role === 'manager') { %>
+                        <% if (identity.isSupervisor()) { %>
                         <div class="panel-body" data-task-id="<%- task.id %>" data-toggle="modal" data-target="#revise-task-modal">
-                        <% } else if (identity.role === 'team') { %>
+                        <% } else if (identity.isTeam()) { %>
                         <div class="panel-body" data-task-id="<%- task.id %>" data-toggle="modal" data-target="#submit-task-modal">
                         <% } else { %>
                         <div class="panel-body" data-task-id="<%- task.id %>" data-toggle="modal" data-target="#check-task-modal">
@@ -423,9 +423,9 @@
                                 <%- task.value %>
                             </div>
                         </div>
-                        <% if (identity.role === 'admin' || identity.role === 'manager') { %>
+                        <% if (identity.isSupervisor()) { %>
                         <div class="panel-footer" data-task-id="<%- task.id %>" data-toggle="modal" data-target="#revise-task-modal">
-                        <% } else if (identity.role === 'team') { %>
+                        <% } else if (identity.isTeam()) { %>
                         <div class="panel-footer" data-task-id="<%- task.id %>" data-toggle="modal" data-target="#submit-task-modal">
                         <% } else { %>
                         <div class="panel-footer" data-task-id="<%- task.id %>" data-toggle="modal" data-target="#check-task-modal">
@@ -451,7 +451,7 @@
 
             <script type="text/x-template" data-name="tasks-view">
                 <div class="container">
-                    <% if (identity.role === 'team' && !('emailConfirmed' in identity && identity.emailConfirmed)) { %>
+                    <% if (identity.isTeam() && !('emailConfirmed' in identity && identity.emailConfirmed)) { %>
                     <div class="alert alert-warning" role="alert">
                         <p>
                             <span class="glyphicon glyphicon-alert"></span>&nbsp;You need to confirm your email address.
@@ -462,8 +462,8 @@
                     <header>
                         <h1>Tasks</h1>
                     </header>
-                    <section class="<% print((identity.role === 'admin' || identity.role === 'manager') ? 'col-sm-8 themis-no-side-gaps': ''); %>">
-                        <% if (identity.role === 'admin') { %>
+                    <section class="<% print(identity.isSupervisor() ? 'col-sm-8 themis-no-side-gaps': ''); %>">
+                        <% if (identity.isAdmin()) { %>
                         <div class="themis-task-controls">
                             <button type="button" class="btn btn-success btn-xs" data-action="create-task" data-toggle="modal" data-target="#create-task-modal">
                                 <i class="glyphicon glyphicon-plus"></i>&nbsp;Create
@@ -473,12 +473,12 @@
                         <div id="themis-task-previews" class="clearfix">
                         </div>
                     </section>
-                    <% if (identity.role === 'admin' || identity.role === 'manager') { %>
+                    <% if (identity.isSupervisor()) { %>
                     <section class="col-sm-4" id="themis-categories"></section>
                     <% } %>
                 </div>
 
-                <% if (identity.role === 'team') { %>
+                <% if (identity.isTeam()) { %>
                 <div class="modal fade" id="submit-task-modal" tabindex="-1" role="dialog">
                     <div class="modal-dialog">
                         <div class="modal-content">
@@ -516,7 +516,7 @@
                 </div>
                 <% } %>
 
-                <% if (identity.role === 'guest' || identity.role === 'team') { %>
+                <% if (identity.isGuest() || identity.isTeam()) { %>
                 <div class="modal fade" id="check-task-modal" tabindex="-1" role="dialog">
                     <div class="modal-dialog">
                         <div class="modal-content">
@@ -552,7 +552,7 @@
                 </div>
                 <% } %>
 
-                <% if (identity.role === 'admin' || identity.role === 'manager') { %>
+                <% if (identity.isSupervisor()) { %>
                 <div class="modal fade" id="revise-task-modal" tabindex="-1" role="dialog">
                     <div class="modal-dialog">
                         <div class="modal-content">
@@ -588,7 +588,7 @@
                 </div>
                 <% } %>
 
-                <% if (identity.role === 'admin') { %>
+                <% if (identity.isAdmin()) { %>
                 <div class="modal fade" id="open-task-modal" tabindex="-1" role="dialog">
                     <div class="modal-dialog">
                         <div class="modal-content">
@@ -611,7 +611,7 @@
                 </div>
                 <% } %>
 
-                <% if (identity.role === 'admin') { %>
+                <% if (identity.isAdmin()) { %>
                 <div class="modal fade" id="close-task-modal" tabindex="-1" role="dialog">
                     <div class="modal-dialog">
                         <div class="modal-content">
@@ -634,7 +634,7 @@
                 </div>
                 <% } %>
 
-                <% if (identity.role === 'admin') { %>
+                <% if (identity.isAdmin()) { %>
                 <div class="modal fade" id="create-task-modal" tabindex="-1" role="dialog">
                     <div class="modal-dialog modal-lg">
                         <div class="modal-content">
@@ -715,7 +715,7 @@
                 </div>
                 <% } %>
 
-                <% if (identity.role === 'admin') { %>
+                <% if (identity.isAdmin()) { %>
                 <div class="modal fade" id="edit-task-modal" tabindex="-1" role="dialog">
                     <div class="modal-dialog modal-lg">
                         <div class="modal-content">
@@ -816,7 +816,7 @@
 
             <script type="text/x-template" data-name="scoreboard-view">
                 <div class="container">
-                    <% if (identity.role === 'team' && !('emailConfirmed' in identity && identity.emailConfirmed)) { %>
+                    <% if (identity.isTeam() && !('emailConfirmed' in identity && identity.emailConfirmed)) { %>
                     <div class="alert alert-warning" role="alert">
                         <p>
                             <span class="glyphicon glyphicon-alert"></span>&nbsp;You need to confirm your email address.
@@ -848,24 +848,24 @@
             </script>
 
             <script type="text/x-template" data-name="contest-state-partial">
-                <% if (contest.state === 1) { %>
+                <% if (contest.isInitial()) { %>
                     <span class="themis-contest-not-started">
                         &#9679;&nbsp;Not started
                     </span>
-                <% } else if (contest.state === 2) { %>
+                <% } else if (contest.isStarted()) { %>
                     <span class="themis-contest-started">
                         &#9679;&nbsp;Started
                     </span>
-                <% } else if (contest.state === 3) { %>
+                <% } else if (contest.isPaused()) { %>
                     <span class="themis-contest-paused">
                         &#9679;&nbsp;Paused
                     </span>
-                <% } else if (contest.state === 4) { %>
+                <% } else if (contest.isFinished()) { %>
                     <span class="themis-contest-finished">
                         &#9679;&nbsp;Finished
                     </span>
                 <% } %>
-                <% if (identity.role === 'admin') { %>
+                <% if (identity.isAdmin()) { %>
                 <a href="#" class="text-info" data-action="update-contest" data-toggle="modal" data-target="#update-contest-modal">
                     <i class="glyphicon glyphicon-cog"></i>
                 </a>
@@ -1062,7 +1062,7 @@
 
             <script type="text/x-template" data-name="news-view">
                 <div class="container">
-                    <% if (identity.role === 'team' && !('emailConfirmed' in identity && identity.emailConfirmed)) { %>
+                    <% if (identity.isTeam() && !('emailConfirmed' in identity && identity.emailConfirmed)) { %>
                     <div class="alert alert-warning" role="alert">
                         <p>
                             <span class="glyphicon glyphicon-alert"></span>&nbsp;You need to confirm your email address.
@@ -1072,7 +1072,7 @@
                     <% } %>
                     <header>
                         <h1>News</h1>
-                        <% if (identity.role === 'admin' || identity.role === 'manager') { %>
+                        <% if (identity.isSupervisor()) { %>
                         <button type="button" class="btn btn-success btn-xs" data-action="create-post" data-toggle="modal" data-target="#create-post-modal">
                             <i class="glyphicon glyphicon-plus"></i>&nbsp;Create
                         </button>
@@ -1188,7 +1188,7 @@
 
             <script type="text/x-template" data-name="about-view">
                 <div class="container">
-                    <% if (identity.role === 'team' && !('emailConfirmed' in identity && identity.emailConfirmed)) { %>
+                    <% if (identity.isTeam() && !('emailConfirmed' in identity && identity.emailConfirmed)) { %>
                     <div class="alert alert-warning" role="alert">
                         <p>
                             <span class="glyphicon glyphicon-alert"></span>&nbsp;You need to confirm your email address.
@@ -1218,7 +1218,7 @@
 
             <script type="text/x-template" data-name="index-view">
                 <div class="container">
-                    <% if (identity.role === 'guest') { %>
+                    <% if (identity.isGuest()) { %>
                     <div class="jumbotron">
                         <h1>Hello!</h1>
                         <p>Welcome to {{#event}}{{ title }}{{/event}}!</p>
@@ -1232,7 +1232,7 @@
                             <a class="btn btn-success btn-lg" href="/team/signin" role="button" data-push-history>Sign in</a>
                         </p>
                     </div>
-                    <% } else if (identity.role === 'team') { %>
+                    <% } else if (identity.isTeam()) { %>
                     <% if (!('emailConfirmed' in identity) || !identity.emailConfirmed) { %>
                     <div class="alert alert-warning" role="alert">
                         <p>
@@ -1261,18 +1261,18 @@
                         {{#event}}{{ title }}{{/event}} has finished!
                     </p>
                     <ul class="lead list-unstyled">
-                        <li><a href="/scoreboard" data-push-history>View results scoreboard</a></li>
+                        <li><a href="/scoreboard" data-push-history>View result scoreboard</a></li>
                     </ul>
                     <p class="lead">
                         We hope you have enjoyed the <a href="/tasks" data-push-history>tasks</a>! See you the next year!
                     </p>
                     <% } %>
-                    <% } else if (identity.role === 'manager' || identity.role === 'admin') { %>
+                    <% } else if (identity.isSupervisor()) { %>
                     <h1>Welcome back!</h1>
                     <ul class="lead list-unstyled">
                         <li><a href="/news" data-push-history>News management</a></li>
                         <li><a href="/scoreboard" data-push-history>View scoreboard</a></li>
-                        <% if (identity.role === 'admin') { %>
+                        <% if (identity.isAdmin()) { %>
                         <li><a href="/tasks" data-push-history>Task management</a></li>
                         <% } %>
                         <li><a href="/logs" data-push-history>Realtime logs</a></li>
@@ -1433,7 +1433,7 @@
             </script>
 
             <script type="text/x-template" data-name="team-hits-partial">
-                <% if (identity.role === 'admin' || identity.role === 'manager' || (identity.role === 'team' && identity.id === teamId)) { %>
+                <% if (identity.isSupervisor() || identity.isExactTeam(teamId)) { %>
                     <% if (taskNames.length > 0) { %>
                     Team has solved the following tasks:
                     <% for (var i=0; i<taskNames.length; ++i) { %>
@@ -1454,7 +1454,7 @@
             <script type="text/x-template" data-name="team-profile-partial">
                 <div class="clearfix themis-profile">
                     <div class="pull-left logo">
-                        <% if (identity.role === 'team' && identity.id === team.id) { %>
+                        <% if (identity.isExactTeam(team.id)) { %>
                         <a href="#" data-action="upload-logo" data-toggle="modal" data-target="#upload-logo-modal">
                             <img class="img-thumbnail" src="/api/team/<%- team.id %>/logo">
                         </a>
@@ -1464,7 +1464,7 @@
                     </div>
                     <div class="pull-left info">
                         <h4 class="text-primary"><%- team.name %></h4>
-                        <% if ((identity.role === 'team' && identity.id === team.id) || _.contains(['admin', 'manager'], identity.role)) { %>
+                        <% if (identity.isExactTeam(team.id) || identity.isSupervisor()) { %>
                         <ul class="list-unstyled">
                             <% if ('email' in team && 'emailConfirmed' in team) { %>
                             <li>
@@ -1473,7 +1473,7 @@
                                 <span class="text-success" title="Email verified"><%- team.email %></span>
                                 <% } else { %>
                                 <span class="text-danger" title="Email not verified"><%- team.email %></span>
-                                <% if (identity.role === 'team' && identity.id === team.id) { %>
+                                <% if (identity.isExactTeam(team.id)) { %>
                                 <br>
                                 <button type="button" class="btn btn-default btn-xs" data-action="resend-confirmation" data-toggle="modal" data-target="#resend-confirmation-modal">Resend confirmation email</button>
                                 <button type="button" class="btn btn-warning btn-xs" data-action="change-email" data-toggle="modal" data-target="#change-email-modal">Change email</button>
@@ -1484,16 +1484,16 @@
                         </ul>
                         <% } %>
                         <ul class="list-unstyled">
-                            <% if (country !== '' || (identity.role === 'team' && identity.id === team.id)) { %>
+                            <% if (country !== '' || identity.isExactTeam(team.id)) { %>
                             <li><strong>Country:</strong> <%- country %></li>
                             <% } %>
-                            <% if (team.locality !== '' || (identity.role === 'team' && identity.id === team.id)) { %>
+                            <% if (team.locality !== '' || identity.isExactTeam(team.id)) { %>
                             <li><strong>Locality:</strong> <%- team.locality %></li>
                             <% } %>
-                            <% if (team.institution !== '' || (identity.role === 'team' && identity.id === team.id)) { %>
+                            <% if (team.institution !== '' || identity.isExactTeam(team.id)) { %>
                             <li><strong>Institution:</strong> <%- team.institution %></li>
                             <% } %>
-                            <% if (identity.role === 'team' && identity.id === team.id) { %>
+                            <% if (identity.isExactTeam(team.id)) { %>
                             <li>
                                 <button type="button" class="btn btn-default btn-xs" data-action="edit-profile" data-toggle="modal" data-target="#edit-profile-modal"><span class="glyphicon glyphicon-pencil"></span>&nbsp;Edit</button>
                                 <button type="button" class="btn btn-default btn-xs" data-action="change-password" data-toggle="modal" data-target="#change-password-modal">Change password</button>

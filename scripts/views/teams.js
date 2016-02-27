@@ -55,7 +55,7 @@ class TeamsView extends View {
       .when(identityProvider.fetchIdentity())
       .done((identity) => {
         let promise = null
-        if (identity.role === 'team') {
+        if (identity.isTeam()) {
           promise = $.when(
             contestProvider.fetchContest(),
             teamProvider.fetchTeams(),
@@ -100,7 +100,7 @@ class TeamsView extends View {
 
             teamProvider.on('qualifyTeam', this.onQualifyTeam)
 
-            if (_.contains(['admin', 'manager'], identity.role)) {
+            if (identity.isSupervisor()) {
               this.onCreateTeam = (team) => {
                 this.renderTeams()
                 return false

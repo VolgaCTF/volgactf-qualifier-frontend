@@ -36,7 +36,7 @@ class TaskCategoryProvider extends EventEmitter {
     realtimeProvider.addEventListener('createTaskCategory', this.onCreate)
 
     let identity = identityProvider.getIdentity()
-    if (_.contains(['team', 'guest'], identity.role)) {
+    if (identity.isTeam() || identity.isGuest()) {
       this.onReveal = (e) => {
         let options = JSON.parse(e.data)
         let taskCategory = new TaskCategoryModel(options)

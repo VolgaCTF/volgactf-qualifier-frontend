@@ -102,13 +102,13 @@ class ContestProvider extends EventEmitter {
     teamProvider.on('qualifyTeam', this.onQualifyTeam)
 
     let identity = identityProvider.getIdentity()
-    if (_.contains(['admin', 'manager', 'team'], identity.role)) {
+    if (identity.isSupervisor() || identity.isTeam()) {
       this.onCreateTeamTaskHit = (e) => {
         let options = JSON.parse(e.data)
         let teamTaskHit = new TeamTaskHitModel(options)
         let ndx = _.findIndex(this.teamTaskHits, { teamId: options.teamId, taskId: options.taskId })
         if (ndx === -1) {
-          if (identity.role === 'team' && identity.id !== options.teamId) {
+          if (identity.isExactTeam(options.teamId)) {
             return
           }
           this.teamTaskHits.push(teamTaskHit)
@@ -233,7 +233,7 @@ class ContestProvider extends EventEmitter {
       url: url,
       dataType: 'json',
       success: (responseJSON, textStatus, jqXHR) => {
-        if (_.contains(['admin', 'manager'], identity.role) || (identity.role === 'team' && identity.id === teamId)) {
+        if (identity.isSupervisor() || identity.isExactTeam(teamId)) {
           let teamTaskHits = _.map(responseJSON, (options) => {
             return new TeamTaskHitModel(options)
           })
@@ -260,15 +260,15 @@ class ContestProvider extends EventEmitter {
     let identity = identityProvider.getIdentity()
     let url = null
 
-    if (_.contains(['admin', 'manager'], identity.role)) {
+    if (identity.isSupervisor()) {
       url = '/api/contest/hits'
-    } else if (identity.role === 'team') {
+    } else if (identity.isTeam()) {
       url = `/api/contest/team/${identity.id}/hits`
     } else {
       promise.reject('Unknown error. Please try again later.')
     }
 
-    if (_.contains(['admin', 'manager', 'team'], identity.role)) {
+    if (identity.isSupervisor() || identity.isTeam()) {
       $.ajax({
         url: url,
         dataType: 'json',

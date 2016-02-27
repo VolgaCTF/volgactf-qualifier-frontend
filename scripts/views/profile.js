@@ -326,7 +326,7 @@ class ProfileView extends View {
         let teamId = parseInt(urlParts[urlParts.length - 1], 10)
         let promise = null
 
-        if (_.contains(['admin', 'manager'], identity.role) || (identity.role === 'team' && identity.id === teamId)) {
+        if (identity.isSupervisor() || identity.isExactTeam(teamId)) {
           promise = $.when(
             teamProvider.fetchTeamProfile(teamId),
             contestProvider.fetchTeamTaskHit(teamId),
@@ -353,7 +353,7 @@ class ProfileView extends View {
             let country = _.findWhere(countries, { id: team.countryId })
             opts.country = country.name
 
-            if (_.contains(['admin', 'manager'], identity.role) || (identity.role === 'team' && identity.id === teamId)) {
+            if (identity.isSupervisor() || identity.isExactTeam(teamId)) {
               let tasks = taskProvider.getTaskPreviews()
               let taskNames = []
 
@@ -378,7 +378,7 @@ class ProfileView extends View {
             }
 
             this.$main.find('section').html(renderTemplate('team-profile-partial', opts))
-            if (identity.role === 'team' && identity.id === team.id) {
+            if (identity.isExactTeam(team.id)) {
               this.initUploadLogoModal()
 
               if (!identity.emailConfirmed) {

@@ -39,7 +39,7 @@ class NewsView extends View {
       $section.empty()
       let md = new MarkdownRenderer()
       let sortedPosts = _.sortBy(posts, 'createdAt').reverse()
-      let manageable = _.contains(['admin', 'manager'], identityProvider.getIdentity().role)
+      let manageable = identityProvider.getIdentity().isSupervisor()
       for (let post of sortedPosts) {
         let options = {
           id: post.id,
@@ -258,7 +258,7 @@ class NewsView extends View {
       .when(identityProvider.fetchIdentity())
       .done((identity) => {
         let promise = null
-        if (identity.role === 'team') {
+        if (identity.isTeam()) {
           promise = $.when(contestProvider.fetchContest(), postProvider.fetchPosts(), contestProvider.fetchTeamScores())
         } else {
           promise = $.when(contestProvider.fetchContest(), postProvider.fetchPosts())
@@ -276,7 +276,7 @@ class NewsView extends View {
 
             this.$main.html(renderTemplate('news-view', { identity: identity }))
 
-            if (_.contains(['admin', 'manager'], identity.role)) {
+            if (identity.isSupervisor()) {
               this.initCreatePostModal()
               this.initRemovePostModal()
               this.initEditPostModal()

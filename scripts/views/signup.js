@@ -75,7 +75,7 @@ class SignupView extends View {
         identityProvider.subscribe()
         navigationBar.present()
 
-        if (identity.role === 'guest') {
+        if (identity.isGuest()) {
           if (contest.isFinished()) {
             this.$main.html(renderTemplate('signup-not-available-view'))
           } else {

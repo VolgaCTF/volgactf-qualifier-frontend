@@ -54,7 +54,7 @@ class TeamProvider extends EventEmitter {
 
     realtimeProvider.addEventListener('qualifyTeam', this.onQualify)
 
-    if (_.contains(['admin', 'manager'], identity.role)) {
+    if (identity.isSupervisor()) {
       this.onCreate = (e) => {
         let options = JSON.parse(e.data)
         let team = new TeamModel(options)

@@ -1,4 +1,5 @@
 import $ from 'jquery'
+import IdentityModel from '../models/identity'
 
 class IdentityProvider {
   constructor () {
@@ -24,7 +25,7 @@ class IdentityProvider {
       url: url,
       dataType: 'json',
       success: (responseJSON, textStatus, jqXHR) => {
-        this.identity = responseJSON
+        this.identity = new IdentityModel(responseJSON)
         promise.resolve(this.identity)
       },
       error: (jqXHR, textStatus, errorThrown) => {

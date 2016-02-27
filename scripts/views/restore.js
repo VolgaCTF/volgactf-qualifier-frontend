@@ -68,7 +68,7 @@ class RestoreView extends View {
 
         navigationBar.present()
 
-        if (identity.role === 'guest') {
+        if (identity.isGuest()) {
           this.$main.html(renderTemplate('restore-view'))
           this.initRestoreForm()
         } else {

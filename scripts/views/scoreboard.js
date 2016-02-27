@@ -41,7 +41,6 @@ class ScoreboardView extends View {
     let countries = countryProvider.getCountries()
 
     let identity = identityProvider.getIdentity()
-    let isTeam = (identity.role === 'team')
 
     teamScores.sort(contestProvider.teamRankFunc)
     _.each(teamScores, (teamScore, ndx) => {
@@ -56,7 +55,7 @@ class ScoreboardView extends View {
           country: country.name,
           score: teamScore.score,
           updatedAt: (teamScore.updatedAt) ? moment(teamScore.updatedAt).format('lll') : 'never',
-          highlight: (isTeam && team.id === identity.id),
+          highlight: identity.isExactTeam(team.id),
           detailed: this.detailed
         }
 

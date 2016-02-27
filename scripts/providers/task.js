@@ -28,8 +28,7 @@ class TaskProvider extends EventEmitter {
 
     let realtimeProvider = dataStore.getRealtimeProvider()
 
-    let isSupervisor = _.contains(['admin', 'manager'], identityProvider.getIdentity().role)
-    if (isSupervisor) {
+    if (identityProvider.getIdentity().isSupervisor()) {
       this.onCreateTask = (e) => {
         let options = JSON.parse(e.data)
         let taskPreview = new TaskPreviewModel(options)

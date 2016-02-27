@@ -37,7 +37,7 @@ class IndexView extends View {
       .when(identityProvider.fetchIdentity())
       .done((identity) => {
         let promise = null
-        if (identity.role === 'team') {
+        if (identity.isTeam()) {
           promise = $.when(contestProvider.fetchContest(), contestProvider.fetchTeamScores())
         } else {
           promise = $.when(contestProvider.fetchContest())

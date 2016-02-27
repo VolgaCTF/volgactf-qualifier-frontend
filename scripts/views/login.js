@@ -62,7 +62,7 @@ class LoginView extends View {
       .done((identity) => {
         identityProvider.subscribe()
         navigationBar.present()
-        if (identity.role === 'guest') {
+        if (identity.isGuest()) {
           this.$main.html(renderTemplate('login-view'))
           this.initLoginForm()
         } else {

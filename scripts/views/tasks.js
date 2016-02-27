@@ -853,7 +853,7 @@ class TasksView extends View {
       let identity = identityProvider.getIdentity()
       let contest = contestProvider.getContest()
 
-      if (taskPreview && identity.role === 'team') {
+      if (taskPreview && identity.isTeam()) {
         if (identity.emailConfirmed) {
           let taskIsSolved = false
           let taskHit = _.findWhere(contestProvider.getTeamTaskHits(), {
@@ -1005,7 +1005,7 @@ class TasksView extends View {
       let identity = identityProvider.getIdentity()
       let contest = contestProvider.getContest()
 
-      if (taskPreview && identity.role === 'guest') {
+      if (taskPreview && identity.isGuest()) {
         if (contest.isFinished()) {
           if (taskPreview.isOpened()) {
             $checkTaskAnswerGroup.show()
@@ -1111,7 +1111,7 @@ class TasksView extends View {
     } else {
       this.$categoriesList.empty()
       let sortedCategories = _.sortBy(categories, 'createdAt')
-      let manageable = (identityProvider.getIdentity().role === 'admin' && !contestProvider.getContest().isFinished())
+      let manageable = (identityProvider.getIdentity().isAdmin() && !contestProvider.getContest().isFinished())
       for (let category of sortedCategories) {
         let options = {
           id: category.id,
@@ -1138,7 +1138,7 @@ class TasksView extends View {
     } else {
       let identity = identityProvider.getIdentity()
       let solvedTaskIds = []
-      if (identity.role === 'team') {
+      if (identity.isTeam()) {
         let taskHits = _.where(contestProvider.getTeamTaskHits(), { teamId: identity.id })
         solvedTaskIds = _.map(taskHits, (taskHit) => {
           return taskHit.taskId
@@ -1208,7 +1208,7 @@ class TasksView extends View {
           }
         }
 
-        let taskIsSolved = (identity.role === 'team' && _.contains(solvedTaskIds, taskPreview.id))
+        let taskIsSolved = (identity.isTeam() && _.contains(solvedTaskIds, taskPreview.id))
 
         let options = {
           task: taskPreview,
@@ -1237,17 +1237,12 @@ class TasksView extends View {
           dataStore.connectRealtime()
         }
 
-        let isAdmin = (identity.role === 'admin')
-        let isSupervisor = _.contains(['admin', 'manager'], identity.role)
-        let isTeam = (identity.role === 'team')
-        let isGuest = (identity.role === 'guest')
-
         navigationBar.present({ active: 'tasks' })
 
         let promise = null
-        if (isTeam) {
+        if (identity.isTeam()) {
           promise = $.when(taskProvider.fetchTaskPreviews(), categoryProvider.fetchCategories(), taskCategoryProvider.fetchTaskCategories(), contestProvider.fetchTeamTaskHits(), contestProvider.fetchTeamScores())
-        } else if (isSupervisor) {
+        } else if (identity.isSupervisor()) {
           promise = $.when(taskProvider.fetchTaskPreviews(), categoryProvider.fetchCategories(), taskCategoryProvider.fetchTaskCategories(), contestProvider.fetchTeamTaskHits(), teamProvider.fetchTeams())
         } else {
           promise = $.when(taskProvider.fetchTaskPreviews(), categoryProvider.fetchCategories(), taskCategoryProvider.fetchTaskCategories())
@@ -1258,7 +1253,7 @@ class TasksView extends View {
             this.$categoriesSection = $('#themis-categories')
             statusBar.present()
 
-            if (isSupervisor) {
+            if (identity.isSupervisor()) {
               this.$categoriesSection.html(renderTemplate('categories-view', {
                 identity: identity,
                 contest: contest
@@ -1269,7 +1264,7 @@ class TasksView extends View {
               this.initReviseTaskModal()
             }
 
-            if (isAdmin) {
+            if (identity.isAdmin()) {
               this.initCreateCategoryModal()
               this.initEditCategoryModal()
               this.initRemoveCategoryModal()
@@ -1280,18 +1275,18 @@ class TasksView extends View {
               this.initEditTaskModal()
             }
 
-            if (isTeam) {
+            if (identity.isTeam()) {
               this.initSubmitTaskModal()
             }
 
-            if (isGuest) {
+            if (identity.isGuest()) {
               this.initCheckTaskModal()
             }
 
             this.$taskPreviewsList = $('#themis-task-previews')
 
             this.onCreateCategory = (category) => {
-              if (isSupervisor) {
+              if (identity.isSupervisor()) {
                 this.renderCategories()
               }
               return false
@@ -1302,7 +1297,7 @@ class TasksView extends View {
               return false
             }
 
-            if (isTeam || isGuest) {
+            if (identity.isTeam() || identity.isGuest()) {
               this.onRevealTaskCategory = (taskCategory) => {
                 this.requestRenderTasks()
                 return false
@@ -1315,7 +1310,7 @@ class TasksView extends View {
             }
 
             this.onUpdateCategory = (category) => {
-              if (isSupervisor) {
+              if (identity.isSupervisor()) {
                 this.renderCategories()
               }
 
@@ -1324,7 +1319,7 @@ class TasksView extends View {
             }
 
             this.onRemoveCategory = (categoryId) => {
-              if (isSupervisor) {
+              if (identity.isSupervisor()) {
                 this.renderCategories()
               }
 
@@ -1338,7 +1333,7 @@ class TasksView extends View {
             categoryProvider.on('removeCategory', this.onRemoveCategory)
 
             taskProvider.subscribe()
-            if (isSupervisor) {
+            if (identity.isSupervisor()) {
               this.onCreateTask = (taskPreview) => {
                 this.requestRenderTasks()
                 return false
@@ -1368,7 +1363,7 @@ class TasksView extends View {
 
             taskProvider.on('updateTask', this.onUpdateTask)
 
-            if (isTeam) {
+            if (identity.isTeam()) {
               this.onCreateTeamTaskHit = (teamTaskHit) => {
                 this.requestRenderTasks()
                 return false
