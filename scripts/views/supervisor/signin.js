@@ -1,16 +1,16 @@
 import $ from 'jquery'
-import View from './base'
-import renderTemplate from '../utils/render-template'
-import navigationBar from '../navigation-bar'
-import stateController from '../controllers/state'
-import metadataStore from '../utils/metadata-store'
-import identityProvider from '../providers/identity'
+import View from '../base'
+import renderTemplate from '../../utils/render-template'
+import navigationBar from '../../navigation-bar'
+import stateController from '../../controllers/state'
+import metadataStore from '../../utils/metadata-store'
+import identityProvider from '../../providers/identity'
 import 'parsley'
 import 'jquery.form'
 
-class LoginView extends View {
+class SupervisorSigninView extends View {
   constructor () {
-    super(/^\/login$/)
+    super(/^\/supervisor\/signin$/)
     this.$main = null
   }
 
@@ -84,4 +84,4 @@ class LoginView extends View {
   }
 }
 
-export default new LoginView()
+export default new SupervisorSigninView()

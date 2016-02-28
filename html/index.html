@@ -33,19 +33,14 @@
         </div>
 
         <footer class="footer">
-            <div class="container">
-                <div class="pull-left">
-                    <ul class="list-unstyled text-left">
-                        <li><span class="glyphicon glyphicon-copyright-mark"></span> <script>document.write((new Date()).getFullYear())</script>, <a href="https://github.com/aspyatkin/themis-quals" target="_blank">Themis Quals</a></li>
-                        <li>Proudly made by <a href="https://github.com/aspyatkin" target="_blank">Alexander Pyatkin</a> and contributors</li>
-                    </ul>
-                </div>
-                <div class="pull-right">
-                    <!-- Extra links -->
-                    <ul class="list-unstyled text-right">
-                    </ul>
-                </div>
-            </div>
+            {{#partials}}
+            {{#footer}}
+            <!--=include {{{path}}} -->
+            {{/footer}}
+            {{^footer}}
+            <!--=include ../partials/footer.html -->
+            {{/footer}}
+            {{/partials}}
         </footer>
 
         <div class="themis-partials">
@@ -1200,7 +1195,14 @@
                         <h1>About</h1>
                     </header>
                     <section>
-                        <p class="lead">This section needs customization for the specific competition</p>
+                        {{#partials}}
+                        {{#about}}
+                        <!--=include {{{path}}} -->
+                        {{/about}}
+                        {{^about}}
+                        <!--=include ../partials/about.html -->
+                        {{/about}}
+                        {{/partials}}
                     </section>
                 </div>
             </script>
@@ -1220,11 +1222,14 @@
                 <div class="container">
                     <% if (identity.isGuest()) { %>
                     <div class="jumbotron">
-                        <h1>Hello!</h1>
-                        <p>Welcome to {{#event}}{{ title }}{{/event}}!</p>
-                        <% if (!contest.isFinished()) { %>
-                        <p>Interested? Please register for the competition!</p>
-                        <% } %>
+                        {{#partials}}
+                        {{#intro}}
+                        <!--=include {{{path}}} -->
+                        {{/intro}}
+                        {{^intro}}
+                        <!--=include ../partials/intro.html -->
+                        {{/intro}}
+                        {{/partials}}
                         <p>
                             <% if (!contest.isFinished()) { %>
                             <a class="btn btn-primary btn-lg" href="/team/signup" role="button" data-push-history>Sign up</a>
@@ -1252,9 +1257,9 @@
                         {{#event}}{{ title }}{{/event}} has begun!
                     </p>
                     <ul class="lead list-unstyled">
-                        <li><a href="/news" data-push-history>Check out news</a></li>
-                        <li><a href="/scoreboard" data-push-history>View scoreboard</a></li>
-                        <li><a href="/tasks" data-push-history>Get tasks!</a></li>
+                        <li><a href="/news" data-push-history>Check out the news</a></li>
+                        <li><a href="/scoreboard" data-push-history>View current scoreboard</a></li>
+                        <li><a href="/tasks" data-push-history>Get to the tasks!</a></li>
                     </ul>
                     <% } else if (contest.isFinished()) { %>
                     <p class="lead">
@@ -1264,7 +1269,7 @@
                         <li><a href="/scoreboard" data-push-history>View result scoreboard</a></li>
                     </ul>
                     <p class="lead">
-                        We hope you have enjoyed the <a href="/tasks" data-push-history>tasks</a>! See you the next year!
+                        We hope you've enjoyed the <a href="/tasks" data-push-history>tasks</a>! See you the next year!
                     </p>
                     <% } %>
                     <% } else if (identity.isSupervisor()) { %>
@@ -1667,7 +1672,7 @@
 
             <script type="text/x-template" data-name="login-view">
                 <div class="container">
-                    <form class="themis-form-login" method="POST" action="/api/login">
+                    <form class="themis-form-login" method="POST" action="/api/supervisor/signin">
                         <h1>Please log in</h1>
                         <label for="login-team" class="sr-only">Username</label>
                         <input type="text" id="login-username" name="username" class="form-control" placeholder="Username" required autofocus minlength="2" maxlength="100">

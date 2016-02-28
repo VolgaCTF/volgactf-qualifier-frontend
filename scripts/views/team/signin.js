@@ -1,14 +1,14 @@
 import $ from 'jquery'
-import View from './base'
-import renderTemplate from '../utils/render-template'
-import navigationBar from '../navigation-bar'
-import stateController from '../controllers/state'
-import metadataStore from '../utils/metadata-store'
-import identityProvider from '../providers/identity'
+import View from '../base'
+import renderTemplate from '../../utils/render-template'
+import navigationBar from '../../navigation-bar'
+import stateController from '../../controllers/state'
+import metadataStore from '../../utils/metadata-store'
+import identityProvider from '../../providers/identity'
 import 'parsley'
 import 'jquery.form'
 
-class SigninView extends View {
+class TeamSigninView extends View {
   constructor () {
     super(/^\/team\/signin$/)
     this.$main = null
@@ -88,4 +88,4 @@ class SigninView extends View {
   }
 }
 
-export default new SigninView()
+export default new TeamSigninView()

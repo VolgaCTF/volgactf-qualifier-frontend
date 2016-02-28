@@ -14,9 +14,10 @@ import babelify from 'babelify'
 import source from 'vinyl-source-stream'
 import buffer from 'vinyl-buffer'
 
-import yaml from 'js-yaml'
 import fs from 'fs'
 import del from 'del'
+import include from 'gulp-include'
+import path from 'path'
 
 let Customizer = require(process.env.THEMIS_CUSTOMIZER_PACKAGE || 'themis-quals-customizer-default').default
 let customizer = new Customizer()
@@ -35,9 +36,7 @@ let paths = {
   stylesheets: [
     'stylesheets/themis.sass'
   ],
-  html: [
-    'html/index.html'
-  ]
+  html: 'html/index.html'
 }
 
 function isProduction () {
@@ -100,6 +99,18 @@ gulp.task('clean_html', (callback) => {
   del(['public/html/*'], callback)
 })
 
+function preparePartialsConfig (config) {
+  let result = {}
+  let basedir = path.dirname(path.join(process.cwd(), paths.html))
+  for (let key in config) {
+    result[key] = {
+      path: path.relative(basedir, config[key].path)
+    }
+  }
+
+  return result
+}
+
 gulp.task('html', ['clean_html', 'fonts', 'scripts', 'stylesheets'], () => {
   let opts = {}
 
@@ -110,6 +121,8 @@ gulp.task('html', ['clean_html', 'fonts', 'scripts', 'stylesheets'], () => {
     opts.event = {
       title: customizer.getEventTitle()
     }
+
+    opts.partials = preparePartialsConfig(customizer.getPartials())
 
     opts.cachebusting = {
       themis: {
@@ -125,6 +138,7 @@ gulp.task('html', ['clean_html', 'fonts', 'scripts', 'stylesheets'], () => {
   gulp
     .src(paths.html)
     .pipe(mustache(opts))
+    .pipe(include())
     .pipe(gulpIf(isProduction, minifyHTML()))
     .pipe(gulp.dest('public/html'))
 })

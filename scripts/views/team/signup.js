@@ -1,16 +1,16 @@
 import $ from 'jquery'
-import View from './base'
-import renderTemplate from '../utils/render-template'
-import navigationBar from '../navigation-bar'
-import metadataStore from '../utils/metadata-store'
-import contestProvider from '../providers/contest'
-import identityProvider from '../providers/identity'
-import countryProvider from '../providers/country'
+import View from '../base'
+import renderTemplate from '../../utils/render-template'
+import navigationBar from '../../navigation-bar'
+import metadataStore from '../../utils/metadata-store'
+import contestProvider from '../../providers/contest'
+import identityProvider from '../../providers/identity'
+import countryProvider from '../../providers/country'
 import 'parsley'
 import 'jquery.form'
 import 'bootstrap-filestyle'
 
-class SignupView extends View {
+class TeamSignupView extends View {
   constructor () {
     super(/^\/team\/signup$/)
     this.$main = null
@@ -103,4 +103,4 @@ class SignupView extends View {
   }
 }
 
-export default new SignupView()
+export default new TeamSignupView()

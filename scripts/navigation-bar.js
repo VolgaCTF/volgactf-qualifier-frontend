@@ -24,7 +24,14 @@ class NavigationBar {
         e.preventDefault()
         e.stopPropagation()
 
-        let url = '/api/signout'
+        let identity = identityProvider.getIdentity()
+        let url = null
+        if (identity.isTeam()) {
+          url = '/api/team/signout'
+        } else if (identity.isSupervisor()) {
+          url = '/api/supervisor/signout'
+        }
+
         $.ajax({
           method: 'POST',
           url: url,

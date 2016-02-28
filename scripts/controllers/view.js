@@ -1,8 +1,8 @@
 import ViewControllerBase from './view-base'
 import indexView from '../views/index'
-import signinView from '../views/signin'
-import signupView from '../views/signup'
-import loginView from '../views/login'
+import teamSigninView from '../views/team/signin'
+import teamSignupView from '../views/team/signup'
+import supervisorSigninView from '../views/supervisor/signin'
 import newsView from '../views/news'
 import verifyEmailView from '../views/verify-email'
 import profileView from '../views/profile'
@@ -18,9 +18,9 @@ import notFoundView from '../views/not-found'
 let viewController = new ViewControllerBase()
 
 viewController.view(indexView)
-viewController.view(signinView)
-viewController.view(signupView)
-viewController.view(loginView)
+viewController.view(teamSigninView)
+viewController.view(teamSignupView)
+viewController.view(supervisorSigninView)
 viewController.view(newsView)
 viewController.view(verifyEmailView)
 viewController.view(profileView)
