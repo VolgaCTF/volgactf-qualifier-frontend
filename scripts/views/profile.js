@@ -1,0 +1,414 @@
+import $ from 'jquery'
+import _ from 'underscore'
+import View from './base'
+import renderTemplate from '../utils/render-template'
+import navigationBar from '../navigation-bar'
+import identityProvider from '../providers/identity'
+import teamProvider from '../providers/team'
+import contestProvider from '../providers/contest'
+import countryProvider from '../providers/country'
+import taskProvider from '../providers/task'
+import History from 'history.js'
+import metadataStore from '../utils/metadata-store'
+import 'parsley'
+import 'jquery.form'
+import 'bootstrap-filestyle'
+
+class ProfileView extends View {
+  constructor () {
+    super(/^\/profile\/[0-9]+$/)
+    this.$main = null
+    this.team = null
+  }
+
+  getTitle () {
+    return `${metadataStore.getMetadata('event-title')} :: Team profile`
+  }
+
+  initUploadLogoModal () {
+    let $buttonUploadLogo = this.$main.find('a[data-action="upload-logo"]')
+
+    if ($buttonUploadLogo.length) {
+      let $uploadLogoModal = $('#upload-logo-modal')
+      $uploadLogoModal.modal({ show: false })
+
+      let $uploadLogoSubmitError = $uploadLogoModal.find('.submit-error > p')
+      let $uploadLogoSubmitButton = $uploadLogoModal.find('button[data-action="complete-upload-logo"]')
+      let $uploadLogoForm = $uploadLogoModal.find('form')
+      $uploadLogoForm.find('input:file').filestyle()
+      $uploadLogoForm.parsley()
+
+      $uploadLogoSubmitButton.on('click', (e) => {
+        $uploadLogoForm.trigger('submit')
+      })
+
+      $uploadLogoModal.on('show.bs.modal', (e) => {
+        $uploadLogoForm.find('input:file').filestyle('clear')
+        $uploadLogoForm.parsley().reset()
+      })
+
+      $uploadLogoForm.on('submit', (e) => {
+        e.preventDefault()
+        $uploadLogoForm.ajaxSubmit({
+          beforeSubmit: () => {
+            $uploadLogoSubmitError.text('')
+            $uploadLogoSubmitButton.prop('disabled', true)
+          },
+          clearForm: true,
+          dataType: 'json',
+          headers: {
+            'X-CSRF-Token': identityProvider.getIdentity().token
+          },
+          success: (responseText, textStatus, jqXHR) => {
+            let onTimeout = () => {
+              $uploadLogoModal.modal('hide')
+              window.location.reload()
+            }
+
+            setTimeout(onTimeout, 1500)
+          },
+          error: (jqXHR, textStatus, errorThrown) => {
+            if (jqXHR.responseJSON) {
+              $uploadLogoSubmitError.text(jqXHR.responseJSON)
+            } else {
+              $uploadLogoSubmitError.text('Unknown error. Please try again later.')
+            }
+          },
+          complete: () => {
+            $uploadLogoSubmitButton.prop('disabled', false)
+          }
+        })
+      })
+    }
+  }
+
+  initChangeEmailModal () {
+    let $buttonChangeEmail = this.$main.find('button[data-action="change-email"]')
+    if ($buttonChangeEmail.length) {
+      let $changeEmailModal = $('#change-email-modal')
+      $changeEmailModal.modal({ show: false })
+
+      let $changeEmailSubmitError = $changeEmailModal.find('.submit-error > p')
+      let $changeEmailSubmitButton = $changeEmailModal.find('button[data-action="complete-change-email"]')
+      let $changeEmailForm = $changeEmailModal.find('form')
+      $changeEmailForm.parsley()
+
+      $changeEmailSubmitButton.on('click', (e) => {
+        $changeEmailForm.trigger('submit')
+      })
+
+      $changeEmailModal.on('show.bs.modal', (e) => {
+        $('#change-email-new').val('')
+        $changeEmailSubmitError.text('')
+        $changeEmailForm.parsley().reset()
+      })
+
+      $changeEmailModal.on('shown.bs.modal', (e) => {
+        $('#change-email-new').focus()
+      })
+
+      $changeEmailForm.on('submit', (e) => {
+        e.preventDefault()
+        $changeEmailForm.ajaxSubmit({
+          beforeSubmit: () => {
+            $changeEmailSubmitError.text('')
+            $changeEmailSubmitButton.prop('disabled', true)
+          },
+          clearForm: true,
+          dataType: 'json',
+          headers: {
+            'X-CSRF-Token': identityProvider.getIdentity().token
+          },
+          success: (responseText, textStatus, jqXHR) => {
+            $changeEmailModal.modal('hide')
+            window.location.reload()
+          },
+          error: (jqXHR, textStatus, errorThrown) => {
+            if (jqXHR.responseJSON) {
+              $changeEmailSubmitError.text(jqXHR.responseJSON)
+            } else {
+              $changeEmailSubmitError.text('Unknown error. Please try again later.')
+            }
+          },
+          complete: () => {
+            $changeEmailSubmitButton.prop('disabled', false)
+          }
+        })
+      })
+    }
+  }
+
+  initResendConfirmationModal () {
+    let $buttonResendConfirmation = this.$main.find('button[data-action="resend-confirmation"]')
+    if ($buttonResendConfirmation.length) {
+      let $resendConfirmationModal = $('#resend-confirmation-modal')
+      $resendConfirmationModal.modal({ show: false })
+
+      let $resendConfirmationSubmitError = $resendConfirmationModal.find('.submit-error > p')
+      let $resendConfirmationSubmitButton = $resendConfirmationModal.find('button[data-action="complete-resend-confirmation"]')
+      let $resendConfirmationForm = $resendConfirmationModal.find('form')
+
+      $resendConfirmationSubmitButton.on('click', (e) => {
+        $resendConfirmationForm.trigger('submit')
+      })
+
+      $resendConfirmationModal.on('show.bs.modal', (e) => {
+        $('#resend-confirmation-email').val(this.team.email)
+        $resendConfirmationSubmitError.text('')
+      })
+
+      $resendConfirmationModal.on('shown.bs.modal', (e) => {
+        $('#resend-confirmation-email').focus()
+      })
+
+      $resendConfirmationForm.on('submit', (e) => {
+        e.preventDefault()
+        $resendConfirmationForm.ajaxSubmit({
+          beforeSubmit: () => {
+            $resendConfirmationSubmitError.text('')
+            $resendConfirmationSubmitButton.prop('disabled', true)
+          },
+          clearForm: true,
+          dataType: 'json',
+          headers: {
+            'X-CSRF-Token': identityProvider.getIdentity().token
+          },
+          success: (responseText, textStatus, jqXHR) => {
+            $resendConfirmationModal.modal('hide')
+            window.location.reload()
+          },
+          error: (jqXHR, textStatus, errorThrown) => {
+            if (jqXHR.responseJSON) {
+              $resendConfirmationSubmitError.text(jqXHR.responseJSON)
+            } else {
+              $resendConfirmationSubmitError.text('Unknown error. Please try again later.')
+            }
+          },
+          complete: () => {
+            $resendConfirmationSubmitButton.prop('disabled', false)
+          }
+        })
+      })
+    }
+  }
+
+  initEditProfileModal () {
+    let $buttonEditProfile = this.$main.find('button[data-action="edit-profile"]')
+    if ($buttonEditProfile.length) {
+      let $editProfileModal = $('#edit-profile-modal')
+      $editProfileModal.modal({ show: false })
+
+      let $editProfileSubmitError = $editProfileModal.find('.submit-error > p')
+      let $editProfileSubmitButton = $editProfileModal.find('button[data-action="complete-edit-profile"]')
+      let $editProfileForm = $editProfileModal.find('form')
+      $editProfileForm.parsley()
+
+      let $editProfileCountry = $('#edit-profile-country')
+      for (let country of countryProvider.getCountries()) {
+        $editProfileCountry.append($('<option></option>').attr('value', country.id).text(country.getFullName()))
+      }
+
+      $editProfileSubmitButton.on('click', (e) => {
+        $editProfileForm.trigger('submit')
+      })
+
+      $editProfileModal.on('show.bs.modal', (e) => {
+        $editProfileCountry.val(this.team.countryId).focus()
+        $('#edit-profile-locality').val(this.team.locality)
+        $('#edit-profile-institution').val(this.team.institution)
+        $editProfileSubmitError.text('')
+      })
+
+      $editProfileModal.on('shown.bs.modal', (e) => {
+        $editProfileCountry.focus()
+      })
+
+      $editProfileForm.on('submit', (e) => {
+        e.preventDefault()
+        $editProfileForm.ajaxSubmit({
+          beforeSubmit: () => {
+            $editProfileSubmitError.text('')
+            $editProfileSubmitButton.prop('disabled', true)
+          },
+          clearForm: true,
+          dataType: 'json',
+          headers: {
+            'X-CSRF-Token': identityProvider.getIdentity().token
+          },
+          success: (responseText, textStatus, jqXHR) => {
+            $editProfileModal.modal('hide')
+            window.location.reload()
+          },
+          error: (jqXHR, textStatus, errorThrown) => {
+            if (jqXHR.responseJSON) {
+              $editProfileSubmitError.text(jqXHR.responseJSON)
+            } else {
+              $editProfileSubmitError.text('Unknown error. Please try again later.')
+            }
+          },
+          complete: () => {
+            $editProfileSubmitButton.prop('disabled', false)
+          }
+        })
+      })
+    }
+  }
+
+  initChangePasswordModal () {
+    let $buttonChangePassword = this.$main.find('button[data-action="change-password"]')
+    if ($buttonChangePassword.length) {
+      let $changePasswordModal = $('#change-password-modal')
+      $changePasswordModal.modal({ show: false })
+
+      let $changePasswordSubmitError = $changePasswordModal.find('.submit-error > p')
+      let $changePasswordSubmitButton = $changePasswordModal.find('button[data-action="complete-change-password"]')
+      let $changePasswordForm = $changePasswordModal.find('form')
+      $changePasswordForm.parsley()
+
+      $changePasswordSubmitButton.on('click', (e) => {
+        $changePasswordForm.trigger('submit')
+      })
+
+      $changePasswordModal.on('show.bs.modal', (e) => {
+        $('#change-pwd-current').val('')
+        $('#change-pwd-new').val('')
+        $('#change-pwd-confirm-new').val('')
+        $changePasswordSubmitError.text('')
+        $changePasswordForm.parsley().reset()
+      })
+
+      $changePasswordModal.on('shown.bs.modal', (e) => {
+        $('#change-pwd-current').focus()
+      })
+
+      $changePasswordForm.on('submit', (e) => {
+        e.preventDefault()
+        $changePasswordForm.ajaxSubmit({
+          beforeSubmit: () => {
+            $changePasswordSubmitError.text('')
+            $changePasswordSubmitButton.prop('disabled', true)
+          },
+          clearForm: true,
+          dataType: 'json',
+          headers: {
+            'X-CSRF-Token': identityProvider.getIdentity().token
+          },
+          success: (responseText, textStatus, jqXHR) => {
+            $changePasswordModal.modal('hide')
+          },
+          error: (jqXHR, textStatus, errorThrown) => {
+            if (jqXHR.responseJSON) {
+              $changePasswordSubmitError.text(jqXHR.responseJSON)
+            } else {
+              $changePasswordSubmitError.text('Unknown error. Please try again later.')
+            }
+          },
+          complete: () => {
+            $changePasswordSubmitButton.prop('disabled', false)
+          }
+        })
+      })
+    }
+  }
+
+  present () {
+    this.$main = $('#main')
+    this.$main.html(renderTemplate('profile-view'))
+
+    $
+      .when(identityProvider.fetchIdentity())
+      .done((identity) => {
+        identityProvider.subscribe()
+        navigationBar.present()
+
+        let url = History.getState().data.urlPath
+        let urlParts = url.split('/')
+        let teamId = parseInt(urlParts[urlParts.length - 1], 10)
+        let promise = null
+
+        if (identity.isSupervisor() || identity.isExactTeam(teamId)) {
+          promise = $.when(
+            teamProvider.fetchTeamProfile(teamId),
+            contestProvider.fetchTeamTaskHit(teamId),
+            countryProvider.fetchCountries(),
+            taskProvider.fetchTaskPreviews()
+          )
+        } else {
+          promise = $.when(
+            teamProvider.fetchTeamProfile(teamId),
+            countryProvider.fetchCountries(),
+            contestProvider.fetchTeamTaskHit(teamId)
+          )
+        }
+
+        promise
+          .done((team, teamTaskHits) => {
+            this.team = team
+            let opts = {
+              identity: identity,
+              team: team
+            }
+
+            let countries = countryProvider.getCountries()
+            let country = _.findWhere(countries, { id: team.countryId })
+            opts.country = country.name
+
+            if (identity.isSupervisor() || identity.isExactTeam(teamId)) {
+              let tasks = taskProvider.getTaskPreviews()
+              let taskNames = []
+
+              for (let entry of teamTaskHits) {
+                let task = _.findWhere(tasks, { id: entry.taskId })
+                if (task && !_.contains(taskNames, task.title)) {
+                  taskNames.push(task.title)
+                }
+              }
+
+              opts.teamHitsInfo = renderTemplate('team-hits-partial', {
+                identity: identity,
+                teamId: team.id,
+                taskNames: taskNames
+              })
+            } else {
+              opts.teamHitsInfo = renderTemplate('team-hits-partial', {
+                identity: identity,
+                teamId: team.id,
+                count: teamTaskHits
+              })
+            }
+
+            this.$main.find('section').html(renderTemplate('team-profile-partial', opts))
+            if (identity.isExactTeam(team.id)) {
+              this.initUploadLogoModal()
+
+              if (!identity.emailConfirmed) {
+                this.initResendConfirmationModal()
+                this.initChangeEmailModal()
+              }
+
+              this.initEditProfileModal()
+              this.initChangePasswordModal()
+            }
+          })
+          .fail((err) => {
+            console.error(err)
+            this.$main.html(renderTemplate('internal-error-view'))
+          })
+      })
+      .fail((err) => {
+        console.error(err)
+        navigationBar.present()
+        this.$main.html(renderTemplate('internal-error-view'))
+      })
+  }
+
+  dismiss () {
+    identityProvider.unsubscribe()
+    this.$main.empty()
+    this.$main = null
+    this.team = null
+    navigationBar.dismiss()
+  }
+}
+
+export default new ProfileView()

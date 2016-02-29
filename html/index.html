@@ -3,18 +3,12 @@
     <head>
         <title>{{#event}}{{ title }}{{/event}} :: Main</title>
 
-        <meta charset="utf8">
+        <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
 
-        <link rel="stylesheet" href="//cdn.{{ domain }}/css/bootstrap.css">
-        <link rel="stylesheet" href="//cdn.{{ domain }}/css/bootstrap-datetimepicker.css">
-        <link rel="stylesheet" href="//cdn.{{ domain }}/css/{{#cachebusting}}{{#themis}}{{ css }}{{/themis}}{{/cachebusting}}">
-        <link rel="stylesheet" href="//cdn.{{ domain }}/css/animate.css">
+        <link rel="stylesheet" href="/assets/css/{{#cachebusting}}{{#themis}}{{ css }}{{/themis}}{{/cachebusting}}">
 
-        <script type="text/x-metadata" data-name="domain-api" data-value="//api.{{ domain }}"></script>
         <script type="text/x-metadata" data-name="event-title" data-value="{{#event}}{{ title }}{{/event}}"></script>
-
-        <script src="//cdn.{{ domain }}/js/require.js" data-main='//cdn.{{ domain }}/js/{{#cachebusting}}{{#themis}}{{ js }}{{/themis}}{{/cachebusting}}'></script>
     </head>
     <body>
         <div class="navbar navbar-default navbar-static-top themis-navbar">
@@ -39,17 +33,14 @@
         </div>
 
         <footer class="footer">
-            <div class="container">
-                <div class="pull-left">
-                    <p><span class="glyphicon glyphicon-copyright-mark"></span> 2015, <a href="https://github.com/aspyatkin" target="_blank">Alexander Pyatkin</a></p>
-                </div>
-                <div class="pull-right">
-                    <ul class="list-unstyled text-right">
-                        <li><a href="http://volgactf.ru" target="_blank">volgactf.ru</a></li>
-                        <li><a href="https://twitter.com/VolgaCTF" target="_blank">@VolgaCTF</a></li>
-                    </ul>
-                </div>
-            </div>
+            {{#partials}}
+            {{#footer}}
+            <!--=include {{{path}}} -->
+            {{/footer}}
+            {{^footer}}
+            <!--=include ../partials/footer.html -->
+            {{/footer}}
+            {{/partials}}
         </footer>
 
         <div class="themis-partials">
@@ -68,28 +59,28 @@
                     <li class="<% print((active === 'scoreboard') ? 'active' : ''); %>"><a href="/scoreboard" data-push-history>Scoreboard</a></li>
                     <li class="<% print((active === 'tasks') ? 'active' : ''); %>"><a href="/tasks" data-push-history>Tasks</a></li>
                     <li class="<% print((active === 'about') ? 'active' : ''); %>"><a href="/about" data-push-history>About</a></li>
-                    <% if (identity && (identity.role === 'admin' || identity.role === 'manager')) { %>
+                    <% if (identity && identity.isSupervisor()) { %>
                     <li class="<% print((active === 'logs') ? 'active' : ''); %>"><a href="/logs" data-push-history>Logs</a></li>
                     <% } %>
                 </ul>
 
                 <ul class="nav navbar-nav navbar-right">
-                    <% if (identity === null || identity.role === 'guest') { %>
-                    <li class="<% print((active === 'signin') ? 'active' : ''); %>"><a href="/signin" data-push-history><span class="glyphicon glyphicon-log-in"></span>&nbsp;Sign in</a></li>
+                    <% if (identity === null || identity.isGuest()) { %>
+                    <li class="<% print((active === 'signin') ? 'active' : ''); %>"><a href="/team/signin" data-push-history>Sign in</a></li>
                     <% } else { %>
                     <li class="dropdown">
                         <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
-                            <% if (identity.role === 'admin') { %>
+                            <% if (identity.isAdmin()) { %>
                             <span class="label label-success">A</span>
-                            <% } else if (identity.role === 'manager') { %>
+                            <% } else if (identity.isManager()) { %>
                             <span class="label label-primary">M</span>
-                            <% } else if (identity.role === 'team') { %>
-                            <img class="profile-image" src="//api.{{ domain }}/team/<%- identity.id %>/logo">
+                            <% } else if (identity.isTeam()) { %>
+                            <img class="profile-image" src="/api/team/<%- identity.id %>/logo">
                             <% } %>
                             <%- identity.name %>&nbsp;<span class="caret"></span>
                         </a>
                         <ul class="dropdown-menu" role="menu">
-                            <% if (identity.role === 'team') { %>
+                            <% if (identity.isTeam()) { %>
                             <li><a href="/profile/<%- identity.id %>" data-push-history><span class="glyphicon glyphicon-cog"></span>&nbsp;Edit profile</a></li>
                             <% } %>
                             <li><a href="#" data-action="signout" data-push-history><span class="glyphicon glyphicon-log-out"></span>&nbsp;Sign out</a></li>
@@ -102,7 +93,7 @@
             <script type="text/x-template" data-name="team-profile-simplified-partial">
                 <div class="clearfix themis-profile">
                     <div class="pull-left logo">
-                        <img class="img-thumbnail" src="//api.{{ domain }}/team/<%- team.id %>/logo">
+                        <img class="img-thumbnail" src="/api/team/<%- team.id %>/logo">
                     </div>
                     <div class="pull-left info">
                         <h4 class="text-primary"><a href="/profile/<%- team.id %>" data-push-history><%- team.name %></a></h4>
@@ -119,8 +110,8 @@
                             <% } %>
                         </ul>
                         <ul class="list-unstyled">
-                            <% if (team.country !== '') { %>
-                            <li><strong>Country:</strong> <%- team.country %></li>
+                            <% if (country !== '') { %>
+                            <li><strong>Country:</strong> <%- country %></li>
                             <% } %>
                             <% if (team.locality !== '') { %>
                             <li><strong>Locality:</strong> <%- team.locality %></li>
@@ -139,7 +130,7 @@
 
             <script type="text/x-template" data-name="teams-view">
                 <div class="container">
-                    <% if (identity.role === 'team' && !('emailConfirmed' in identity && identity.emailConfirmed)) { %>
+                    <% if (identity.isTeam() && !('emailConfirmed' in identity && identity.emailConfirmed)) { %>
                     <div class="alert alert-warning" role="alert">
                         <p>
                             <span class="glyphicon glyphicon-alert"></span>&nbsp;You need to confirm your email address.
@@ -155,8 +146,8 @@
                 </div>
             </script>
 
-            <script type="text/x-template" data-name="task-category-supervisor-partial">
-                <div class="themis-task-category">
+            <script type="text/x-template" data-name="category-supervisor-partial">
+                <div class="themis-category">
                     <header>
                         <h4><%- title %></h4>
                     </header>
@@ -167,10 +158,10 @@
                         <p class="text-muted"><small>Updated on <%- updatedAt %></small>
                             <% if (manageable) { %>
                             &nbsp;
-                            <button type="button" class="btn btn-success btn-xs" data-action="edit-task-category" data-toggle="modal" data-target="#edit-task-category-modal" data-task-category-id="<%- id %>">
+                            <button type="button" class="btn btn-default btn-xs" data-action="edit-category" data-toggle="modal" data-target="#edit-category-modal" data-category-id="<%- id %>">
                                 <i class="glyphicon glyphicon-pencil"></i>&nbsp;Edit
                             </button>
-                            <button type="button" class="btn btn-danger btn-xs" data-action="remove-task-category" data-toggle="modal" data-target="#remove-task-category-modal" data-task-category-id="<%- id %>">
+                            <button type="button" class="btn btn-danger btn-xs" data-action="remove-category" data-toggle="modal" data-target="#remove-category-modal" data-category-id="<%- id %>">
                                 <i class="glyphicon glyphicon-remove"></i>&nbsp;Remove
                             </button>
                             <% } %>
@@ -179,27 +170,27 @@
                 </div>
             </script>
 
-            <script type="text/x-template" data-name="remove-task-category-confirmation">
-                You are about to remove the task category <mark><%- title %></mark>. Continue?
+            <script type="text/x-template" data-name="remove-category-confirmation">
+                You are about to remove the category <mark><%- title %></mark>. Continue?
             </script>
 
-            <script type="text/x-template" data-name="task-categories-view">
+            <script type="text/x-template" data-name="categories-view">
                 <div class="panel panel-info">
                     <div class="panel-heading">
-                        <h3 class="panel-title">Task categories</h3>
+                        <h3 class="panel-title">Categories</h3>
                     </div>
                     <div class="panel-body">
-                        <% if (identity.role === 'admin' && !contest.isFinished()) { %>
-                        <button type="button" class="btn btn-primary btn-xs" data-action="create-task-category" data-toggle="modal" data-target="#create-task-category-modal">
+                        <% if (identity.isAdmin() && !contest.isFinished()) { %>
+                        <button type="button" class="btn btn-success btn-xs" data-action="create-category" data-toggle="modal" data-target="#create-category-modal">
                             <i class="glyphicon glyphicon-plus"></i>&nbsp;Create
                         </button>
                         <% } %>
-                        <div id="themis-task-categories-list"></div>
+                        <div id="themis-categories-list"></div>
                     </div>
                 </div>
 
-                <% if (identity.role === 'admin' && !contest.isFinished()) { %>
-                <div class="modal fade" id="create-task-category-modal" tabindex="-1" role="dialog">
+                <% if (identity.isAdmin() && !contest.isFinished()) { %>
+                <div class="modal fade" id="create-category-modal" tabindex="-1" role="dialog">
                     <div class="modal-dialog">
                         <div class="modal-content">
                             <div class="modal-header">
@@ -207,14 +198,14 @@
                                 <h4 class="modal-title">Create task category</h4>
                             </div>
                             <div class="modal-body">
-                                <form method="POST" action="//api.{{ domain }}/task/category/create">
+                                <form method="POST" action="/api/category/create">
                                     <div class="form-group">
-                                        <label for="create-task-category-title" class="control-label">Title</label>
-                                        <input type="text" class="form-control" id="create-task-category-title" name="title" autofocus required minlength="2" maxlength="20">
+                                        <label for="create-category-title" class="control-label">Title</label>
+                                        <input type="text" class="form-control" id="create-category-title" name="title" autofocus required minlength="2" maxlength="20">
                                     </div>
                                     <div class="form-group">
-                                        <label for="create-task-category-description" class="control-label">Description</label>
-                                        <textarea class="form-control themis-task-category-description" id="create-task-category-description" minlength="0" maxlength="150" name="description"></textarea>
+                                        <label for="create-category-description" class="control-label">Description</label>
+                                        <textarea class="form-control themis-category-description" id="create-category-description" minlength="0" maxlength="150" name="description"></textarea>
                                     </div>
                                     <div class="submit-error">
                                         <p class="text-danger"></p>
@@ -223,13 +214,13 @@
                             </div>
                             <div class="modal-footer">
                                 <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                                <button type="button" class="btn btn-primary" data-action="complete-create-task-category">Create</button>
+                                <button type="button" class="btn btn-primary" data-action="complete-create-category">Create</button>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <div class="modal fade" id="remove-task-category-modal" tabindex="-1" role="dialog">
+                <div class="modal fade" id="remove-category-modal" tabindex="-1" role="dialog">
                     <div class="modal-dialog">
                         <div class="modal-content">
                             <div class="modal-header">
@@ -244,13 +235,13 @@
                             </div>
                             <div class="modal-footer">
                                 <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                                <button type="button" class="btn btn-danger" data-action="complete-remove-task-category">Remove</button>
+                                <button type="button" class="btn btn-danger" data-action="complete-remove-category">Remove</button>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <div class="modal fade" id="edit-task-category-modal" tabindex="-1" role="dialog">
+                <div class="modal fade" id="edit-category-modal" tabindex="-1" role="dialog">
                     <div class="modal-dialog">
                         <div class="modal-content">
                             <div class="modal-header">
@@ -260,12 +251,12 @@
                             <div class="modal-body">
                                 <form method="POST">
                                     <div class="form-group">
-                                        <label for="edir-task-category-title" class="control-label">Title</label>
-                                        <input type="text" class="form-control" id="edit-task-category-title" name="title" autofocus required minlength="2" maxlength="20">
+                                        <label for="edit-category-title" class="control-label">Title</label>
+                                        <input type="text" class="form-control" id="edit-category-title" name="title" autofocus required minlength="2" maxlength="20">
                                     </div>
                                     <div class="form-group">
-                                        <label for="edit-task-category-description" class="control-label">Description</label>
-                                        <textarea class="form-control themis-task-category-description" id="edit-task-category-description" minlength="0" maxlength="150" name="description"></textarea>
+                                        <label for="edit-category-description" class="control-label">Description</label>
+                                        <textarea class="form-control themis-category-description" id="edit-category-description" minlength="0" maxlength="150" name="description"></textarea>
                                     </div>
                                     <div class="submit-error">
                                         <p class="text-danger"></p>
@@ -274,7 +265,7 @@
                             </div>
                             <div class="modal-footer">
                                 <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                                <button type="button" class="btn btn-primary" data-action="complete-edit-task-category">Save</button>
+                                <button type="button" class="btn btn-primary" data-action="complete-edit-category">Save</button>
                             </div>
                         </div>
                     </div>
@@ -283,38 +274,46 @@
             </script>
 
             <script type="text/x-template" data-name="edit-task-hint-textarea-partial">
-                <div id="edit-task-hint-<%- number %>">
+                <div class="themis-task-hint-group" id="edit-task-hint-<%- number %>" data-state-disabled="<% print(editable ? 'false' : 'true') %>">
                     <h5>
                         Hint #<%- number %>
+                        <% if (editable) { %>
                         <a href="#" data-action="remove-task-hint" data-number="<%- number %>">
-                            <i class="glyphicon glyphicon-remove"></i>
+                            <i class="glyphicon glyphicon-remove text-danger"></i>
                         </a>
+                        <% } %>
                     </h5>
-                    <textarea name="hints" class="form-control" required data-parsley-length="[2,1024]"></textarea>
+                    <textarea class="form-control" required data-parsley-length="[2,1024]"<% print(editable ? '' : ' disabled'); %>><%- hint %></textarea>
                 </div>
             </script>
 
             <script type="text/x-template" data-name="create-task-hint-textarea-partial">
-                <div id="create-task-hint-<%- number %>">
+                <div class="themis-task-hint-group" id="create-task-hint-<%- number %>">
                     <h5>
                         Hint #<%- number %>
                         <a href="#" data-action="remove-task-hint" data-number="<%- number %>">
-                            <i class="glyphicon glyphicon-remove"></i>
+                            <i class="glyphicon glyphicon-remove text-danger"></i>
                         </a>
                     </h5>
-                    <textarea name="hints" class="form-control" required data-parsley-length="[2,1024]"></textarea>
+                    <textarea class="form-control" required data-parsley-length="[2,1024]"><%- hint %></textarea>
                 </div>
             </script>
 
             <script type="text/x-template" data-name="edit-task-answer-input-partial">
                 <div id="edit-task-answer-<%- number %>">
-                    <div class="input-group themis-task-answer-group" >
+                    <div class="input-group themis-task-answer-group" data-state-disabled="<% print(editable ? 'false' : 'true') %>">
                         <div class="input-group-addon"><%- number %></div>
-                        <input type="text" name="answers" class="form-control" required data-parsley-errors-container="#edit-task-answer-errors-<%- number %>" data-parsley-length="[2,256]"<% print(editable ? '' : ' disabled'); %>>
+                        <input type="text" class="form-control" required data-parsley-errors-container="#edit-task-answer-errors-<%- number %>" data-parsley-length="[2,256]" value="<%- answer %>"<% print(editable ? '' : ' disabled'); %>>
+                        <div class="input-group-addon checkbox">
+                            <label>
+                                <input type="checkbox" data-parsley-excluded="true" value=""<% print(caseSensitive ? ' checked' : '') %><% print(editable ? '' : ' disabled'); %>>
+                                Aa
+                            </label>
+                        </div>
                         <% if (editable) { %>
                         <div class="input-group-addon">
                             <a href="#" data-action="remove-task-answer" data-number="<%- number %>">
-                                <i class="glyphicon glyphicon-remove"></i>
+                                <i class="glyphicon glyphicon-remove text-danger"></i>
                             </a>
                         </div>
                         <% } %>
@@ -328,10 +327,16 @@
                 <div id="create-task-answer-<%- number %>">
                     <div class="input-group themis-task-answer-group" >
                         <div class="input-group-addon"><%- number %></div>
-                        <input type="text" name="answers" class="form-control" required data-parsley-errors-container="#create-task-answer-errors-<%- number %>" data-parsley-length="[2,256]">
+                        <input type="text" class="form-control" required data-parsley-errors-container="#create-task-answer-errors-<%- number %>" data-parsley-length="[2,256]" value="<%- answer %>">
+                        <div class="input-group-addon checkbox">
+                            <label>
+                                <input type="checkbox" data-parsley-excluded="true" value=""<% print(caseSensitive ? ' checked' : '') %>>
+                                Aa
+                            </label>
+                        </div>
                         <div class="input-group-addon">
                             <a href="#" data-action="remove-task-answer" data-number="<%- number %>">
-                                <i class="glyphicon glyphicon-remove"></i>
+                                <i class="glyphicon glyphicon-remove text-danger"></i>
                             </a>
                         </div>
                     </div>
@@ -340,12 +345,12 @@
                 </div>
             </script>
 
-            <script type="text/x-template" data-name="task-category-partial">
+            <script type="text/x-template" data-name="category-partial">
                 <span class="label label-default" title="<%- description %>"><span class="glyphicon glyphicon-tag"></span>&nbsp;<%- title %></span>&nbsp;
             </script>
 
             <script type="text/x-template" data-name="check-task-guest-error">
-                To view the task, you must be authorized. Please <a href="/signin">sign in</a>. If you have not registered yet, please <a href="/signup">sign up</a>.
+                To view the task, you must be authorized. Please <a href="/team/signin">sign in</a>. If you have not registered yet, please <a href="/team/signup">sign up</a>.
             </script>
 
             <script type="text/x-template" data-name="task-content-partial">
@@ -370,7 +375,7 @@
             </script>
 
             <script type="text/x-template" data-name="task-preview-partial">
-                <% if (identity.role === 'admin' || identity.role === 'manager') { %>
+                <% if (identity.isSupervisor()) { %>
                 <div class="col-sm-4 themis-task-preview-container" data-task-id="<%- task.id %>">
                 <% } else { %>
                 <div class="col-sm-3 themis-task-preview-container" data-task-id="<%- task.id %>">
@@ -388,7 +393,7 @@
                             <h4 class="panel-title themis-task-title">
                                 <%- task.title %>
                                 &nbsp;
-                                <% if (identity.role === 'admin') { %>
+                                <% if (identity.isAdmin()) { %>
                                     <% if (!task.isClosed() && !contest.isFinished()) { %>
                                     <a href="#" data-action="edit-task" data-toggle="modal" data-target="#edit-task-modal" data-task-id="<%- task.id %>"><span class="glyphicon glyphicon-pencil"></span></a>
                                     <% } %>
@@ -402,9 +407,9 @@
                                 <% } %>
                             </h4>
                         </div>
-                        <% if (identity.role === 'admin' || identity.role === 'manager') { %>
+                        <% if (identity.isSupervisor()) { %>
                         <div class="panel-body" data-task-id="<%- task.id %>" data-toggle="modal" data-target="#revise-task-modal">
-                        <% } else if (identity.role === 'team') { %>
+                        <% } else if (identity.isTeam()) { %>
                         <div class="panel-body" data-task-id="<%- task.id %>" data-toggle="modal" data-target="#submit-task-modal">
                         <% } else { %>
                         <div class="panel-body" data-task-id="<%- task.id %>" data-toggle="modal" data-target="#check-task-modal">
@@ -413,14 +418,14 @@
                                 <%- task.value %>
                             </div>
                         </div>
-                        <% if (identity.role === 'admin' || identity.role === 'manager') { %>
+                        <% if (identity.isSupervisor()) { %>
                         <div class="panel-footer" data-task-id="<%- task.id %>" data-toggle="modal" data-target="#revise-task-modal">
-                        <% } else if (identity.role === 'team') { %>
+                        <% } else if (identity.isTeam()) { %>
                         <div class="panel-footer" data-task-id="<%- task.id %>" data-toggle="modal" data-target="#submit-task-modal">
                         <% } else { %>
                         <div class="panel-footer" data-task-id="<%- task.id %>" data-toggle="modal" data-target="#check-task-modal">
                         <% } %>
-                            <div class="themis-task-categories">
+                            <div class="themis-categories">
                                 <%= categoriesList %>
                             </div>
                         </div>
@@ -441,7 +446,7 @@
 
             <script type="text/x-template" data-name="tasks-view">
                 <div class="container">
-                    <% if (identity.role === 'team' && !('emailConfirmed' in identity && identity.emailConfirmed)) { %>
+                    <% if (identity.isTeam() && !('emailConfirmed' in identity && identity.emailConfirmed)) { %>
                     <div class="alert alert-warning" role="alert">
                         <p>
                             <span class="glyphicon glyphicon-alert"></span>&nbsp;You need to confirm your email address.
@@ -452,10 +457,10 @@
                     <header>
                         <h1>Tasks</h1>
                     </header>
-                    <section class="<% print((identity.role === 'admin' || identity.role === 'manager') ? 'col-sm-8 themis-no-side-gaps': ''); %>">
-                        <% if (identity.role === 'admin') { %>
+                    <section class="<% print(identity.isSupervisor() ? 'col-sm-8 themis-no-side-gaps': ''); %>">
+                        <% if (identity.isAdmin()) { %>
                         <div class="themis-task-controls">
-                            <button type="button" class="btn btn-primary btn-xs" data-action="create-task" data-toggle="modal" data-target="#create-task-modal">
+                            <button type="button" class="btn btn-success btn-xs" data-action="create-task" data-toggle="modal" data-target="#create-task-modal">
                                 <i class="glyphicon glyphicon-plus"></i>&nbsp;Create
                             </button>
                         </div>
@@ -463,12 +468,12 @@
                         <div id="themis-task-previews" class="clearfix">
                         </div>
                     </section>
-                    <% if (identity.role === 'admin' || identity.role === 'manager') { %>
-                    <section class="col-sm-4" id="themis-task-categories"></section>
+                    <% if (identity.isSupervisor()) { %>
+                    <section class="col-sm-4" id="themis-categories"></section>
                     <% } %>
                 </div>
 
-                <% if (identity.role === 'team') { %>
+                <% if (identity.isTeam()) { %>
                 <div class="modal fade" id="submit-task-modal" tabindex="-1" role="dialog">
                     <div class="modal-dialog">
                         <div class="modal-content">
@@ -506,7 +511,7 @@
                 </div>
                 <% } %>
 
-                <% if (identity.role === 'guest' || identity.role === 'team') { %>
+                <% if (identity.isGuest() || identity.isTeam()) { %>
                 <div class="modal fade" id="check-task-modal" tabindex="-1" role="dialog">
                     <div class="modal-dialog">
                         <div class="modal-content">
@@ -542,7 +547,7 @@
                 </div>
                 <% } %>
 
-                <% if (identity.role === 'admin' || identity.role === 'manager') { %>
+                <% if (identity.isSupervisor()) { %>
                 <div class="modal fade" id="revise-task-modal" tabindex="-1" role="dialog">
                     <div class="modal-dialog">
                         <div class="modal-content">
@@ -578,7 +583,7 @@
                 </div>
                 <% } %>
 
-                <% if (identity.role === 'admin') { %>
+                <% if (identity.isAdmin()) { %>
                 <div class="modal fade" id="open-task-modal" tabindex="-1" role="dialog">
                     <div class="modal-dialog">
                         <div class="modal-content">
@@ -601,7 +606,7 @@
                 </div>
                 <% } %>
 
-                <% if (identity.role === 'admin') { %>
+                <% if (identity.isAdmin()) { %>
                 <div class="modal fade" id="close-task-modal" tabindex="-1" role="dialog">
                     <div class="modal-dialog">
                         <div class="modal-content">
@@ -624,7 +629,7 @@
                 </div>
                 <% } %>
 
-                <% if (identity.role === 'admin') { %>
+                <% if (identity.isAdmin()) { %>
                 <div class="modal fade" id="create-task-modal" tabindex="-1" role="dialog">
                     <div class="modal-dialog modal-lg">
                         <div class="modal-content">
@@ -641,7 +646,7 @@
 
                                     <div class="tab-content">
                                         <div role="tabpanel" class="tab-pane" id="create-task-data">
-                                            <form method="POST" action="//api.{{ domain }}/task/create">
+                                            <form method="POST" action="/api/task/create">
                                                 <div class="container-fluid">
                                                     <div class="col-sm-6">
                                                         <div class="form-group">
@@ -656,18 +661,18 @@
                                                             <label for="create-task-value" class="control-label">Value</label>
                                                             <input type="number" class="form-control" id="create-task-value" name="value" required data-parsley-type="integer" data-parsley-min="10" data-parsley-max="1000">
                                                         </div>
+                                                        <div class="form-group">
+                                                            <label for="create-categories" class="control-label">Categories</label>
+                                                            <select class="form-control" multiple size="5" id="create-categories" required name="categories"></select>
+                                                        </div>
                                                     </div>
                                                     <div class="col-sm-6">
-                                                        <div class="form-group">
-                                                            <label for="create-task-categories" class="control-label">Categories</label>
-                                                            <select class="form-control" multiple size="4" id="create-task-categories" required name="categories"></select>
-                                                        </div>
                                                         <div class="form-group" id="create-task-hints">
                                                             <label class="control-label">
                                                                 Hints
                                                                 &nbsp;
                                                                 <a href="#" data-action="create-task-hint">
-                                                                    <i class="glyphicon glyphicon-plus"></i>
+                                                                    <i class="glyphicon glyphicon-plus text-success"></i>
                                                                 </a>
                                                             </label>
                                                             <div id="create-task-hint-list">
@@ -678,18 +683,11 @@
                                                                 Answers
                                                                 &nbsp;
                                                                 <a href="#" data-action="create-task-answer">
-                                                                    <i class="glyphicon glyphicon-plus"></i>
+                                                                    <i class="glyphicon glyphicon-plus text-success"></i>
                                                                 </a>
                                                             </label>
                                                             <div id="create-task-answer-list">
                                                             </div>
-                                                        </div>
-                                                        <div class="form-group">
-                                                            <label for="create-task-case-sensitive" class="control-label">Answers are case sensitive</label>
-                                                            <select class="form-control" id="create-task-case-sensitive" required name="caseSensitive">
-                                                                <option value="true">yes</option>
-                                                                <option value="false">no</option>
-                                                            </select>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -712,7 +710,7 @@
                 </div>
                 <% } %>
 
-                <% if (identity.role === 'admin') { %>
+                <% if (identity.isAdmin()) { %>
                 <div class="modal fade" id="edit-task-modal" tabindex="-1" role="dialog">
                     <div class="modal-dialog modal-lg">
                         <div class="modal-content">
@@ -744,18 +742,18 @@
                                                             <label for="edit-task-value" class="control-label">Value</label>
                                                             <input type="number" class="form-control" id="edit-task-value" name="value" required data-parsley-type="integer" data-parsley-min="10" data-parsley-max="1000" disabled>
                                                         </div>
+                                                        <div class="form-group">
+                                                            <label for="edit-categories" class="control-label">Categories</label>
+                                                            <select class="form-control" multiple size="5" id="edit-categories" required name="categories"></select>
+                                                        </div>
                                                     </div>
                                                     <div class="col-sm-6">
-                                                        <div class="form-group">
-                                                            <label for="edit-task-categories" class="control-label">Categories</label>
-                                                            <select class="form-control" multiple size="4" id="edit-task-categories" required name="categories"></select>
-                                                        </div>
                                                         <div class="form-group" id="edit-task-hints">
                                                             <label class="control-label">
                                                                 Hints
                                                                 &nbsp;
                                                                 <a href="#" data-action="create-task-hint">
-                                                                    <i class="glyphicon glyphicon-plus"></i>
+                                                                    <i class="glyphicon glyphicon-plus text-success"></i>
                                                                 </a>
                                                             </label>
                                                             <div id="edit-task-hint-list">
@@ -766,18 +764,11 @@
                                                                 Answers
                                                                 &nbsp;
                                                                 <a href="#" data-action="create-task-answer">
-                                                                    <i class="glyphicon glyphicon-plus"></i>
+                                                                    <i class="glyphicon glyphicon-plus text-success"></i>
                                                                 </a>
                                                             </label>
                                                             <div id="edit-task-answer-list">
                                                             </div>
-                                                        </div>
-                                                        <div class="form-group">
-                                                            <label for="edit-task-case-sensitive" class="control-label">Answers are case sensitive</label>
-                                                            <select class="form-control" id="edit-task-case-sensitive" required name="caseSensitive" disabled>
-                                                                <option value="true">yes</option>
-                                                                <option value="false">no</option>
-                                                            </select>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -805,11 +796,11 @@
                 <tr class="themis-scoreboard-row<% print(highlight ? ' info': ''); %>">
                     <td><%- rank %></td>
                     <td>
-                        <img class="themis-scoreboard-logo" src="//api.{{ domain }}/team/<%- id %>/logo">
+                        <img class="themis-scoreboard-logo" src="/api/team/<%- id %>/logo">
                         <a href="/profile/<%- id %>" class="themis-team-link" data-push-history><%- name %></a>
                     </td>
-                    <% if (detailed) { %>
                     <td><%- country %></td>
+                    <% if (detailed) { %>
                     <td><%- locality %></td>
                     <td><%- institution %></td>
                     <% } %>
@@ -820,7 +811,7 @@
 
             <script type="text/x-template" data-name="scoreboard-view">
                 <div class="container">
-                    <% if (identity.role === 'team' && !('emailConfirmed' in identity && identity.emailConfirmed)) { %>
+                    <% if (identity.isTeam() && !('emailConfirmed' in identity && identity.emailConfirmed)) { %>
                     <div class="alert alert-warning" role="alert">
                         <p>
                             <span class="glyphicon glyphicon-alert"></span>&nbsp;You need to confirm your email address.
@@ -836,8 +827,8 @@
                             <thead>
                                 <th>#</th>
                                 <th>Team</th>
-                                <% if (detailed) { %>
                                 <th>Country</th>
+                                <% if (detailed) { %>
                                 <th>Locality</th>
                                 <th>Institution</th>
                                 <% } %>
@@ -852,24 +843,24 @@
             </script>
 
             <script type="text/x-template" data-name="contest-state-partial">
-                <% if (contest.state === 1) { %>
+                <% if (contest.isInitial()) { %>
                     <span class="themis-contest-not-started">
                         &#9679;&nbsp;Not started
                     </span>
-                <% } else if (contest.state === 2) { %>
+                <% } else if (contest.isStarted()) { %>
                     <span class="themis-contest-started">
                         &#9679;&nbsp;Started
                     </span>
-                <% } else if (contest.state === 3) { %>
+                <% } else if (contest.isPaused()) { %>
                     <span class="themis-contest-paused">
                         &#9679;&nbsp;Paused
                     </span>
-                <% } else if (contest.state === 4) { %>
+                <% } else if (contest.isFinished()) { %>
                     <span class="themis-contest-finished">
                         &#9679;&nbsp;Finished
                     </span>
                 <% } %>
-                <% if (identity.role === 'admin') { %>
+                <% if (identity.isAdmin()) { %>
                 <a href="#" class="text-info" data-action="update-contest" data-toggle="modal" data-target="#update-contest-modal">
                     <i class="glyphicon glyphicon-cog"></i>
                 </a>
@@ -893,17 +884,25 @@
             </script>
 
             <script type="text/x-template" data-name="contest-realtime-state">
-                <% if (state === 'online') { %>
-                    <span class="text-success" data-toggle="tooltip" data-placement="top" title="You are connected to a realtime stream update channel. You do not need to reload the page.">
-                        &#9679;&nbsp;Realtime stream online
+                <% if (state === 'connecting') { %>
+                    <span class="text-warning" data-toggle="tooltip" data-placement="top" title="Your browser is making an attempt to establish the connection to the realtime update channel.">
+                        &#9679;&nbsp;Stream: connecting
                     </span>
-                <% } else if (state === 'offline') { %>
-                    <span class="text-danger" data-toggle="tooltip" data-placement="top" title="Connection to realtime stream update channel has been closed. To get latest updates, you have to reload page manually.">
-                        &#9679;&nbsp;Realtime stream offline
+                <% } else if (state === 'connected') { %>
+                    <span class="text-success" data-toggle="tooltip" data-placement="top" title="Your browser has established the connection to the realtime update channel. You don't need to reload the page.">
+                        &#9679;&nbsp;Stream: connected
+                    </span>
+                <% } else if (state === 'closed') { %>
+                    <span class="text-danger" data-toggle="tooltip" data-placement="top" title="Connection to the realtime update channel has been closed. In order to get the latest updates you have to reload the page.">
+                        &#9679;&nbsp;Stream: closed
                     </span>
                 <% } else if (state === 'not-supported') { %>
-                    <span class="text-warning" data-toggle="tooltip" data-placement="top" title="Your browser does not support Server-Sent Events. To get latest updates, you have to reload page manually.">
-                        &#9679;&nbsp;Realtime stream not supported
+                    <span class="text-muted" data-toggle="tooltip" data-placement="top" title="Your browser doesn't support Server-Sent Events. In order to get the latest updates you have to reload the page from time to time.">
+                        &#9679;&nbsp;Stream: not supported
+                    </span>
+                <% } else if (state === 'n/a') { %>
+                    <span class="text-muted" data-toggle="tooltip" data-placement="top" title="Unknown error. Please reload the page.">
+                        &#9679;&nbsp;Stream: n/a
                     </span>
                 <% } %>
             </script>
@@ -936,7 +935,7 @@
                                 <h4 class="modal-title">Update contest</h4>
                             </div>
                             <div class="modal-body">
-                                <form method="POST" action="//api.{{ domain }}/contest/update">
+                                <form method="POST" action="/api/contest/update">
                                     <div class="form-group">
                                         <label for="update-contest-state" class="control-label">State</label>
                                         <select id="update-contest-state" class="form-control" name="state" autofocus required>
@@ -1043,7 +1042,7 @@
                             <small>Updated on <%- updatedAt %></small>
                             <% if (manageable) { %>
                             &nbsp;
-                            <button type="button" class="btn btn-success btn-xs" data-action="edit-post" data-toggle="modal" data-target="#edit-post-modal" data-post-id="<%- id %>">
+                            <button type="button" class="btn btn-default btn-xs" data-action="edit-post" data-toggle="modal" data-target="#edit-post-modal" data-post-id="<%- id %>">
                                 <i class="glyphicon glyphicon-pencil"></i>&nbsp;Edit
                             </button>
                             <button type="button" class="btn btn-danger btn-xs" data-action="remove-post" data-toggle="modal" data-target="#remove-post-modal" data-post-id="<%- id %>">
@@ -1058,7 +1057,7 @@
 
             <script type="text/x-template" data-name="news-view">
                 <div class="container">
-                    <% if (identity.role === 'team' && !('emailConfirmed' in identity && identity.emailConfirmed)) { %>
+                    <% if (identity.isTeam() && !('emailConfirmed' in identity && identity.emailConfirmed)) { %>
                     <div class="alert alert-warning" role="alert">
                         <p>
                             <span class="glyphicon glyphicon-alert"></span>&nbsp;You need to confirm your email address.
@@ -1068,8 +1067,8 @@
                     <% } %>
                     <header>
                         <h1>News</h1>
-                        <% if (identity.role === 'admin' || identity.role === 'manager') { %>
-                        <button type="button" class="btn btn-primary btn-xs" data-action="create-post" data-toggle="modal" data-target="#create-post-modal">
+                        <% if (identity.isSupervisor()) { %>
+                        <button type="button" class="btn btn-success btn-xs" data-action="create-post" data-toggle="modal" data-target="#create-post-modal">
                             <i class="glyphicon glyphicon-plus"></i>&nbsp;Create
                         </button>
                         <% } %>
@@ -1094,7 +1093,7 @@
 
                                     <div class="tab-content">
                                         <div role="tabpanel" class="tab-pane" id="create-post-data">
-                                            <form method="POST" action="//api.{{ domain }}/post/create">
+                                            <form method="POST" action="/api/post/create">
                                                 <div class="form-group">
                                                     <label for="create-post-title" class="control-label">Title</label>
                                                     <input type="text" class="form-control" id="create-post-title" required minlength="2" maxlength="250" name="title">
@@ -1184,7 +1183,7 @@
 
             <script type="text/x-template" data-name="about-view">
                 <div class="container">
-                    <% if (identity.role === 'team' && !('emailConfirmed' in identity && identity.emailConfirmed)) { %>
+                    <% if (identity.isTeam() && !('emailConfirmed' in identity && identity.emailConfirmed)) { %>
                     <div class="alert alert-warning" role="alert">
                         <p>
                             <span class="glyphicon glyphicon-alert"></span>&nbsp;You need to confirm your email address.
@@ -1196,24 +1195,14 @@
                         <h1>About</h1>
                     </header>
                     <section>
-                        <p class="lead">
-                            Greetings everybody and welcome to VolgaCTF 2015 Quals!
-                        </p>
-                        <p class="lead">
-                            To take part in the contest, you should <a href="/signup" data-push-history>sign up</a> with email, team name and logo. The number of team participants is not limited.
-                        </p>
-                        <p class="lead">
-                            The contest starts on May 1 at 19:00 SAMT/15:00 UTC and lasts for 48 hours. During the competition we will add new tasks that can be solved for the points. Check the <a href="/news" data-push-history>News</a> page periodicaly - there might be some important pieces of information about the competition. We also have an IRC channel at <mark>irc.volgactf.ru</mark>.
-                        </p>
-                        <p class="lead">
-                            Teams are forbidden to perform destructive actions against contest infrastructure and prevent other teams to play the contest. A team might be disqualified for breaking the rules.
-                        </p>
-                        <p class="lead">
-                            Top teams will be invited to take part in VolgaCTF 2015 Finals which will be held on September 7-11 in Samara, Russia. We will invite teams from higher educational institutions: 7 teams from Volga Federal District, 3 teams from other districts of Russian Federation and 2 teams from the Commonwealth of Independent States.
-                        </p>
-                        <p class="lead">
-                            We reserve the right to amend these regulations, order of tasks opened and regulations of final round.
-                        </p>
+                        {{#partials}}
+                        {{#about}}
+                        <!--=include {{{path}}} -->
+                        {{/about}}
+                        {{^about}}
+                        <!--=include ../partials/about.html -->
+                        {{/about}}
+                        {{/partials}}
                     </section>
                 </div>
             </script>
@@ -1231,22 +1220,24 @@
 
             <script type="text/x-template" data-name="index-view">
                 <div class="container">
-                    <% if (identity.role === 'guest') { %>
+                    <% if (identity.isGuest()) { %>
                     <div class="jumbotron">
-                        <h1>Hello!</h1>
-                        <p>Welcome to {{#event}}{{ title }}{{/event}}!</p>
-                        <p>VolgaCTF is an inter-regional inter-university open computer security contest.</p>
-                        <% if (!contest.isFinished()) { %>
-                        <p>Interested? Please register for the competition!</p>
-                        <% } %>
+                        {{#partials}}
+                        {{#intro}}
+                        <!--=include {{{path}}} -->
+                        {{/intro}}
+                        {{^intro}}
+                        <!--=include ../partials/intro.html -->
+                        {{/intro}}
+                        {{/partials}}
                         <p>
                             <% if (!contest.isFinished()) { %>
-                            <a class="btn btn-primary btn-lg" href="/signup" role="button" data-push-history>Sign up</a>
+                            <a class="btn btn-primary btn-lg" href="/team/signup" role="button" data-push-history>Sign up</a>
                             <% } %>
-                            <a class="btn btn-success btn-lg" href="/signin" role="button" data-push-history><span class="glyphicon glyphicon-log-in"></span>&nbsp;Sign in</a>
+                            <a class="btn btn-success btn-lg" href="/team/signin" role="button" data-push-history>Sign in</a>
                         </p>
                     </div>
-                    <% } else if (identity.role === 'team') { %>
+                    <% } else if (identity.isTeam()) { %>
                     <% if (!('emailConfirmed' in identity) || !identity.emailConfirmed) { %>
                     <div class="alert alert-warning" role="alert">
                         <p>
@@ -1258,35 +1249,35 @@
                     <h1>Welcome back!</h1>
                     <% if (contest.isInitial()) { %>
                     <p class="lead">
-                        VolgaCTF 2015 Quals will start on May 1 at 19:00 SAMT/15:00 UTC.
+                        {{#event}}{{ title }}{{/event}} hasn't started yet.
                         Now, you can check out the <a href="/news" data-push-history>news</a> or <a href="/profile/<%- identity.id %>" data-push-history>edit your profile</a>.
                     </p>
                     <% } else if (contest.isStarted() || contest.isPaused()) { %>
                     <p class="lead">
-                        VolgaCTF 2015 Quals contest has begun!
+                        {{#event}}{{ title }}{{/event}} has begun!
                     </p>
                     <ul class="lead list-unstyled">
-                        <li><a href="/news" data-push-history>Check out news</a></li>
-                        <li><a href="/scoreboard" data-push-history>View scoreboard</a></li>
-                        <li><a href="/tasks" data-push-history>Get tasks!</a></li>
+                        <li><a href="/news" data-push-history>Check out the news</a></li>
+                        <li><a href="/scoreboard" data-push-history>View current scoreboard</a></li>
+                        <li><a href="/tasks" data-push-history>Get to the tasks!</a></li>
                     </ul>
                     <% } else if (contest.isFinished()) { %>
                     <p class="lead">
-                        VolgaCTF 2015 Quals contest has finished!
+                        {{#event}}{{ title }}{{/event}} has finished!
                     </p>
                     <ul class="lead list-unstyled">
-                        <li><a href="/scoreboard" data-push-history>View results scoreboard</a></li>
+                        <li><a href="/scoreboard" data-push-history>View result scoreboard</a></li>
                     </ul>
                     <p class="lead">
-                        We hope you have enjoyed the <a href="/tasks" data-push-history>tasks</a>! See you the next year!
+                        We hope you've enjoyed the <a href="/tasks" data-push-history>tasks</a>! See you the next year!
                     </p>
                     <% } %>
-                    <% } else if (identity.role === 'manager' || identity.role === 'admin') { %>
+                    <% } else if (identity.isSupervisor()) { %>
                     <h1>Welcome back!</h1>
                     <ul class="lead list-unstyled">
                         <li><a href="/news" data-push-history>News management</a></li>
                         <li><a href="/scoreboard" data-push-history>View scoreboard</a></li>
-                        <% if (identity.role === 'admin') { %>
+                        <% if (identity.isAdmin()) { %>
                         <li><a href="/tasks" data-push-history>Task management</a></li>
                         <% } %>
                         <li><a href="/logs" data-push-history>Realtime logs</a></li>
@@ -1297,7 +1288,7 @@
 
             <script type="text/x-template" data-name="restore-view">
                 <div class="container">
-                    <form class="themis-form-restore" method="POST" action="//api.{{ domain }}/team/restore">
+                    <form class="themis-form-restore" method="POST" action="/api/team/restore">
                         <h2>Restore password</h2>
                         <div class="alert alert-warning">
                             <span class="glyphicon glyphicon-alert"></span>&nbsp;If you have already requested password reset, please wait 10-15 minutes for email to be sent.
@@ -1322,7 +1313,7 @@
 
             <script type="text/x-template" data-name="reset-password-view">
                 <div class="container">
-                    <form class="themis-form-reset" method="POST" action="//api.{{ domain }}/team/reset-password">
+                    <form class="themis-form-reset" method="POST" action="/api/team/reset-password">
                         <h2>Reset password</h2>
                         <label for="reset-password" class="sr-only">Password</label>
                         <input type="password" id="reset-password" name="password" class="form-control" placeholder="Password" required minlength="6" maxlength="40" pattern="^[A-Za-z0-9\x5b\x5d\x28\x29\x7b\x7d\x7e\x60\x21\x40\x23\x24\x25\x5e\x26\x2a\x2d\x5f\x3d\x2b\x27\x22\x3a\x3b\x7c\x2f\x5c\x2e\x2c\x3f\x3c\x3e]+$">
@@ -1346,7 +1337,7 @@
                             <h2>Restore password</h2>
                         </div>
                         <div class="col-sm-12 alert alert-success">
-                            Password has been successfully reset! Now you can <a href="/signin" data-push-history>sign in</a> to your account.
+                            Password has been successfully reset! Now you can <a href="/team/signin" data-push-history>sign in</a> to your account.
                         </div>
                     </div>
                 </div>
@@ -1355,7 +1346,7 @@
 
             <script type="text/x-template" data-name="signin-view">
                 <div class="container">
-                    <form class="themis-form-signin" method="POST" action="//api.{{ domain }}/team/signin">
+                    <form class="themis-form-signin" method="POST" action="/api/team/signin">
                         <h1>Please sign in</h1>
                         <label for="signin-team" class="sr-only">Team</label>
                         <input type="text" id="signin-team" name="team" class="form-control" placeholder="Team" required autofocus minlength="2" maxlength="100">
@@ -1364,7 +1355,7 @@
                         <div class="submit-error">
                             <p class="text-danger"></p>
                         </div>
-                        <button class="btn btn-lg btn-primary btn-block" type="submit"><span class="glyphicon glyphicon-log-in"></span>&nbsp;Sign in</button>
+                        <button class="btn btn-lg btn-primary btn-block" type="submit">Sign in</button>
                         <div>
                             <p class="text-center"><a href="/restore" data-push-history>Forgot password?</a></p>
                         </div>
@@ -1446,8 +1437,8 @@
                 </div>
             </script>
 
-            <script type="text/x-template" data-name="team-progress-partial">
-                <% if (identity.role === 'admin' || identity.role === 'manager' || (identity.role === 'team' && identity.id === teamId)) { %>
+            <script type="text/x-template" data-name="team-hits-partial">
+                <% if (identity.isSupervisor() || identity.isExactTeam(teamId)) { %>
                     <% if (taskNames.length > 0) { %>
                     Team has solved the following tasks:
                     <% for (var i=0; i<taskNames.length; ++i) { %>
@@ -1468,17 +1459,17 @@
             <script type="text/x-template" data-name="team-profile-partial">
                 <div class="clearfix themis-profile">
                     <div class="pull-left logo">
-                        <% if (identity.role === 'team' && identity.id === team.id) { %>
+                        <% if (identity.isExactTeam(team.id)) { %>
                         <a href="#" data-action="upload-logo" data-toggle="modal" data-target="#upload-logo-modal">
-                            <img class="img-thumbnail" src="//api.{{ domain }}/team/<%- team.id %>/logo">
+                            <img class="img-thumbnail" src="/api/team/<%- team.id %>/logo">
                         </a>
                         <% } else { %>
-                            <img class="img-thumbnail" src="//api.{{ domain }}/team/<%- team.id %>/logo">
+                            <img class="img-thumbnail" src="/api/team/<%- team.id %>/logo">
                         <% } %>
                     </div>
                     <div class="pull-left info">
                         <h4 class="text-primary"><%- team.name %></h4>
-                        <% if ((identity.role === 'team' && identity.id === team.id) || _.contains(['admin', 'manager'], identity.role)) { %>
+                        <% if (identity.isExactTeam(team.id) || identity.isSupervisor()) { %>
                         <ul class="list-unstyled">
                             <% if ('email' in team && 'emailConfirmed' in team) { %>
                             <li>
@@ -1487,10 +1478,10 @@
                                 <span class="text-success" title="Email verified"><%- team.email %></span>
                                 <% } else { %>
                                 <span class="text-danger" title="Email not verified"><%- team.email %></span>
-                                <% if (identity.role === 'team' && identity.id === team.id) { %>
+                                <% if (identity.isExactTeam(team.id)) { %>
                                 <br>
-                                <button type="button" class="btn btn-primary btn-xs" data-action="resend-confirmation" data-toggle="modal" data-target="#resend-confirmation-modal">Resend confirmation email</button>
-                                <button type="button" class="btn btn-danger btn-xs" data-action="change-email" data-toggle="modal" data-target="#change-email-modal">Change email</button>
+                                <button type="button" class="btn btn-default btn-xs" data-action="resend-confirmation" data-toggle="modal" data-target="#resend-confirmation-modal">Resend confirmation email</button>
+                                <button type="button" class="btn btn-warning btn-xs" data-action="change-email" data-toggle="modal" data-target="#change-email-modal">Change email</button>
                                 <% } %>
                                 <% } %>
                             </li>
@@ -1498,24 +1489,24 @@
                         </ul>
                         <% } %>
                         <ul class="list-unstyled">
-                            <% if (team.country !== '' || (identity.role === 'team' && identity.id === team.id)) { %>
-                            <li><strong>Country:</strong> <%- team.country %></li>
+                            <% if (country !== '' || identity.isExactTeam(team.id)) { %>
+                            <li><strong>Country:</strong> <%- country %></li>
                             <% } %>
-                            <% if (team.locality !== '' || (identity.role === 'team' && identity.id === team.id)) { %>
+                            <% if (team.locality !== '' || identity.isExactTeam(team.id)) { %>
                             <li><strong>Locality:</strong> <%- team.locality %></li>
                             <% } %>
-                            <% if (team.institution !== '' || (identity.role === 'team' && identity.id === team.id)) { %>
+                            <% if (team.institution !== '' || identity.isExactTeam(team.id)) { %>
                             <li><strong>Institution:</strong> <%- team.institution %></li>
                             <% } %>
-                            <% if (identity.role === 'team' && identity.id === team.id) { %>
+                            <% if (identity.isExactTeam(team.id)) { %>
                             <li>
-                                <button type="button" class="btn btn-primary btn-xs" data-action="edit-profile" data-toggle="modal" data-target="#edit-profile-modal"><span class="glyphicon glyphicon-pencil"></span>&nbsp;Edit</button>
-                                <button type="button" class="btn btn-primary btn-xs" data-action="change-password" data-toggle="modal" data-target="#change-password-modal">Change password</button>
+                                <button type="button" class="btn btn-default btn-xs" data-action="edit-profile" data-toggle="modal" data-target="#edit-profile-modal"><span class="glyphicon glyphicon-pencil"></span>&nbsp;Edit</button>
+                                <button type="button" class="btn btn-default btn-xs" data-action="change-password" data-toggle="modal" data-target="#change-password-modal">Change password</button>
                             </li>
                             <% } %>
                         </ul>
                         <p class="text-muted">
-                            <%= teamProgressInfo %>
+                            <%= teamHitsInfo %>
                         </p>
                     </div>
                 </div>
@@ -1538,7 +1529,7 @@
                                 <h4 class="modal-title">Upload logo</h4>
                             </div>
                             <div class="modal-body">
-                                <form method="POST" action="//api.{{ domain }}/team/upload-logo">
+                                <form method="POST" action="/api/team/upload-logo">
                                     <div class="form-group">
                                         <label for="upload-logo-logo" class="control-label">Logo</label>
                                         <input type="file" id="upload-logo-logo" name="logo" class="filestyle" data-buttonText="&nbsp;Choose file" data-iconName="glyphicon-picture" accept="image/jpeg,image/png,image/gif" required data-parsley-errors-container="#upload-logo-errors">
@@ -1566,7 +1557,7 @@
                                 <h4 class="modal-title">Resend confirmation email</h4>
                             </div>
                             <div class="modal-body">
-                                <form method="POST" action="//api.{{ domain }}/team/resend-confirmation-email">
+                                <form method="POST" action="/api/team/resend-confirmation-email">
                                     <div class="form-group">
                                         <label for="resend-confirmation-email" class="control-label">Email</label>
                                         <input type="email" class="form-control" id="resend-confirmation-email" disabled>
@@ -1592,7 +1583,7 @@
                                 <h4 class="modal-title">Change email</h4>
                             </div>
                             <div class="modal-body">
-                                <form method="POST" action="//api.{{ domain }}/team/change-email">
+                                <form method="POST" action="/api/team/change-email">
                                     <div class="form-group">
                                         <label for="change-email-new" class="control-label">New email</label>
                                         <input type="email" class="form-control" id="change-email-new" name="email" required autofocus>
@@ -1618,10 +1609,10 @@
                                 <h4 class="modal-title">Edit profile</h4>
                             </div>
                             <div class="modal-body">
-                                <form method="POST" action="//api.{{ domain }}/team/edit-profile">
+                                <form method="POST" action="/api/team/edit-profile">
                                     <div class="form-group">
                                         <label for="edit-profile-country" class="control-label">Country</label>
-                                        <input type="text" class="form-control" id="edit-profile-country" name="country" autofocus>
+                                        <select required class="form-control" id="edit-profile-country" name="countryId" autofocus></select>
                                     </div>
                                     <div class="form-group">
                                         <label for="edit-profile-locality" class="control-label">Locality</label>
@@ -1652,7 +1643,7 @@
                                 <h4 class="modal-title">Change password</h4>
                             </div>
                             <div class="modal-body">
-                                <form method="POST" action="//api.{{ domain }}/team/change-password">
+                                <form method="POST" action="/api/team/change-password">
                                     <div class="form-group">
                                         <label for="change-pwd-current" class="control-label">Current password</label>
                                         <input type="password" class="form-control" id="change-pwd-current" name="currentPassword" required autofocus minlength="6" maxlength="40" pattern="^[A-Za-z0-9\x5b\x5d\x28\x29\x7b\x7d\x7e\x60\x21\x40\x23\x24\x25\x5e\x26\x2a\x2d\x5f\x3d\x2b\x27\x22\x3a\x3b\x7c\x2f\x5c\x2e\x2c\x3f\x3c\x3e]+$">
@@ -1681,7 +1672,7 @@
 
             <script type="text/x-template" data-name="login-view">
                 <div class="container">
-                    <form class="themis-form-login" method="POST" action="//api.{{ domain }}/login">
+                    <form class="themis-form-login" method="POST" action="/api/supervisor/signin">
                         <h1>Please log in</h1>
                         <label for="login-team" class="sr-only">Username</label>
                         <input type="text" id="login-username" name="username" class="form-control" placeholder="Username" required autofocus minlength="2" maxlength="100">
@@ -1697,7 +1688,7 @@
 
             <script type="text/x-template" data-name="signup-view">
                 <div class="container">
-                    <form class="form-horizontal themis-form-signup" method="POST" enctype="multipart/form-data" action="//api.{{ domain }}/team/signup">
+                    <form class="form-horizontal themis-form-signup" method="POST" enctype="multipart/form-data" action="/api/team/signup">
                         <div class="form-group">
                             <div class="col-sm-offset-3 col-sm-9">
                                 <h1>Sign up</h1>
@@ -1751,10 +1742,14 @@
 
                         <div class="form-group">
                             <label for="signup-country" class="col-sm-3 control-label">
-                                Country
+                                Country&nbsp;<sup>*</sup>
                             </label>
                             <div class="col-sm-9">
-                                <input type="text" class="form-control" id="signup-country" name="country" placeholder="Country">
+                                <select required class="form-control" id="signup-country" name="countryId">
+                                    <% for (var i=0; i<countries.length; ++i) { %>
+                                    <option value="<%- countries[i].id %>"><%- countries[i].getFullName() %></option>
+                                    <% } %>
+                                </select>
                             </div>
                         </div>
 
@@ -1793,11 +1788,13 @@
                         </div>
                         <div class="col-sm-12 alert alert-success">
                             You have successfully signed up for the contest!
-                            Now, you can <a href="/signin" data-push-history>sign in</a> to your account.
+                            Now, you can <a href="/team/signin" data-push-history>sign in</a> to your account.
                         </div>
                     </div>
                 </div>
             </script>
         </div>
+
+        <script src="/assets/js/{{#cachebusting}}{{#themis}}{{ js }}{{/themis}}{{/cachebusting}}"></script>
     </body>
 </html>
