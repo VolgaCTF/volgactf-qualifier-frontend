@@ -36,6 +36,8 @@ let paths = {
   stylesheets: [
     'stylesheets/themis.sass'
   ],
+  images: [
+  ],
   html: 'html/index.html'
 }
 
@@ -95,6 +97,18 @@ gulp.task('fonts', ['clean_fonts'], () => {
     .pipe(gulp.dest('public/assets/fonts'))
 })
 
+gulp.task('clean_images', (callback) => {
+  del(['public/assets/images/*'], callback)
+})
+
+gulp.task('images', ['clean_images'], () => {
+  gulp
+    .src(paths.images.concat(customizer.getImages().map((imagePath) => {
+      return path.relative(process.cwd(), imagePath)
+    })))
+    .pipe(gulp.dest('public/assets/images'))
+})
+
 gulp.task('clean_html', (callback) => {
   del(['public/html/*'], callback)
 })
@@ -111,7 +125,7 @@ function preparePartialsConfig (config) {
   return result
 }
 
-gulp.task('html', ['clean_html', 'fonts', 'scripts', 'stylesheets'], () => {
+gulp.task('html', ['clean_html', 'fonts', 'images', 'scripts', 'stylesheets'], () => {
   let opts = {}
 
   try {
