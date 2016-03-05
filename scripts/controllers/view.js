@@ -8,6 +8,7 @@ import verifyEmailView from '../views/verify-email'
 import profileView from '../views/profile'
 import aboutView from '../views/about'
 import teamsView from '../views/teams'
+import categoriesView from '../views/categories'
 import tasksView from '../views/tasks'
 import scoreboardView from '../views/scoreboard'
 import logsView from '../views/logs'
@@ -26,6 +27,7 @@ viewController.view(verifyEmailView)
 viewController.view(profileView)
 viewController.view(aboutView)
 viewController.view(teamsView)
+viewController.view(categoriesView)
 viewController.view(tasksView)
 viewController.view(logsView)
 viewController.view(scoreboardView)

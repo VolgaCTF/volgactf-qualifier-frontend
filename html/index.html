@@ -58,13 +58,30 @@
 
             <script type="text/x-template" data-name="navbar-view">
                 <ul class="nav navbar-nav">
-                    <li class="<% print((active === 'teams') ? 'active' : ''); %>"><a href="/teams" data-push-history>Teams</a></li>
-                    <li class="<% print((active === 'news') ? 'active' : ''); %>"><a href="/news" data-push-history>News</a></li>
-                    <li class="<% print((active === 'scoreboard') ? 'active' : ''); %>"><a href="/scoreboard" data-push-history>Scoreboard</a></li>
-                    <li class="<% print((active === 'tasks') ? 'active' : ''); %>"><a href="/tasks" data-push-history>Tasks</a></li>
-                    <li class="<% print((active === 'about') ? 'active' : ''); %>"><a href="/about" data-push-history>About</a></li>
+                    <li class="<% print((active === 'teams') ? 'active' : ''); %>">
+                        <a href="/teams" data-push-history>Teams</a>
+                    </li>
+                    <li class="<% print((active === 'news') ? 'active' : ''); %>">
+                        <a href="/news" data-push-history>News</a>
+                    </li>
+                    <li class="<% print((active === 'scoreboard') ? 'active' : ''); %>">
+                        <a href="/scoreboard" data-push-history>Scoreboard</a>
+                    </li>
                     <% if (identity && identity.isSupervisor()) { %>
-                    <li class="<% print((active === 'logs') ? 'active' : ''); %>"><a href="/logs" data-push-history>Logs</a></li>
+                    <li class="<% print((active === 'categories') ? 'active' : ''); %>">
+                        <a href="/categories" data-push-history>Categories</a>
+                    </li>
+                    <% } %>
+                    <li class="<% print((active === 'tasks') ? 'active' : ''); %>">
+                        <a href="/tasks" data-push-history>Tasks</a>
+                    </li>
+                    <li class="<% print((active === 'about') ? 'active' : ''); %>">
+                        <a href="/about" data-push-history>About</a>
+                    </li>
+                    <% if (identity && identity.isSupervisor()) { %>
+                    <li class="<% print((active === 'logs') ? 'active' : ''); %>">
+                        <a href="/logs" data-push-history>Logs</a>
+                    </li>
                     <% } %>
                 </ul>
 
@@ -163,10 +180,10 @@
                             <% if (manageable) { %>
                             &nbsp;
                             <button type="button" class="btn btn-default btn-xs" data-action="edit-category" data-toggle="modal" data-target="#edit-category-modal" data-category-id="<%- id %>">
-                                <i class="glyphicon glyphicon-pencil"></i>&nbsp;Edit
+                                Edit
                             </button>
-                            <button type="button" class="btn btn-danger btn-xs" data-action="remove-category" data-toggle="modal" data-target="#remove-category-modal" data-category-id="<%- id %>">
-                                <i class="glyphicon glyphicon-remove"></i>&nbsp;Remove
+                            <button type="button" class="btn btn-danger btn-xs" data-action="delete-category" data-toggle="modal" data-target="#delete-category-modal" data-category-id="<%- id %>">
+                                Delete
                             </button>
                             <% } %>
                         </p>
@@ -174,107 +191,8 @@
                 </div>
             </script>
 
-            <script type="text/x-template" data-name="remove-category-confirmation">
-                You are about to remove the category <mark><%- title %></mark>. Continue?
-            </script>
-
-            <script type="text/x-template" data-name="categories-view">
-                <div class="panel panel-info">
-                    <div class="panel-heading">
-                        <h3 class="panel-title">Categories</h3>
-                    </div>
-                    <div class="panel-body">
-                        <% if (identity.isAdmin() && !contest.isFinished()) { %>
-                        <button type="button" class="btn btn-success btn-xs" data-action="create-category" data-toggle="modal" data-target="#create-category-modal">
-                            <i class="glyphicon glyphicon-plus"></i>&nbsp;Create
-                        </button>
-                        <% } %>
-                        <div id="themis-categories-list"></div>
-                    </div>
-                </div>
-
-                <% if (identity.isAdmin() && !contest.isFinished()) { %>
-                <div class="modal fade" id="create-category-modal" tabindex="-1" role="dialog">
-                    <div class="modal-dialog">
-                        <div class="modal-content">
-                            <div class="modal-header">
-                                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                                <h4 class="modal-title">Create task category</h4>
-                            </div>
-                            <div class="modal-body">
-                                <form method="POST" action="/api/category/create">
-                                    <div class="form-group">
-                                        <label for="create-category-title" class="control-label">Title</label>
-                                        <input type="text" class="form-control" id="create-category-title" name="title" autofocus required minlength="2" maxlength="20">
-                                    </div>
-                                    <div class="form-group">
-                                        <label for="create-category-description" class="control-label">Description</label>
-                                        <textarea class="form-control themis-category-description" id="create-category-description" minlength="0" maxlength="150" name="description"></textarea>
-                                    </div>
-                                    <div class="submit-error">
-                                        <p class="text-danger"></p>
-                                    </div>
-                                </form>
-                            </div>
-                            <div class="modal-footer">
-                                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                                <button type="button" class="btn btn-primary" data-action="complete-create-category">Create</button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="modal fade" id="remove-category-modal" tabindex="-1" role="dialog">
-                    <div class="modal-dialog">
-                        <div class="modal-content">
-                            <div class="modal-header">
-                                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                                <h4 class="modal-title">Remove task category</h4>
-                            </div>
-                            <div class="modal-body">
-                                <p class="confirmation"></p>
-                                <div class="submit-error">
-                                    <p class="text-danger"></p>
-                                </div>
-                            </div>
-                            <div class="modal-footer">
-                                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                                <button type="button" class="btn btn-danger" data-action="complete-remove-category">Remove</button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="modal fade" id="edit-category-modal" tabindex="-1" role="dialog">
-                    <div class="modal-dialog">
-                        <div class="modal-content">
-                            <div class="modal-header">
-                                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                                <h4 class="modal-title">Edit task category</h4>
-                            </div>
-                            <div class="modal-body">
-                                <form method="POST">
-                                    <div class="form-group">
-                                        <label for="edit-category-title" class="control-label">Title</label>
-                                        <input type="text" class="form-control" id="edit-category-title" name="title" autofocus required minlength="2" maxlength="20">
-                                    </div>
-                                    <div class="form-group">
-                                        <label for="edit-category-description" class="control-label">Description</label>
-                                        <textarea class="form-control themis-category-description" id="edit-category-description" minlength="0" maxlength="150" name="description"></textarea>
-                                    </div>
-                                    <div class="submit-error">
-                                        <p class="text-danger"></p>
-                                    </div>
-                                </form>
-                            </div>
-                            <div class="modal-footer">
-                                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                                <button type="button" class="btn btn-primary" data-action="complete-edit-category">Save</button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <% } %>
+            <script type="text/x-template" data-name="delete-category-confirmation">
+                You are about to delete the category <mark><%- title %></mark>. Continue?
             </script>
 
             <script type="text/x-template" data-name="edit-task-hint-textarea-partial">
@@ -379,11 +297,7 @@
             </script>
 
             <script type="text/x-template" data-name="task-preview-partial">
-                <% if (identity.isSupervisor()) { %>
-                <div class="col-sm-4 themis-task-preview-container" data-task-id="<%- task.id %>">
-                <% } else { %>
                 <div class="col-sm-3 themis-task-preview-container" data-task-id="<%- task.id %>">
-                <% } %>
                     <% if (task.isInitial()) { %>
                     <div class="panel panel-default">
                     <% } else if (task.isOpened() && !taskIsSolved) { %>
@@ -448,6 +362,105 @@
                 scores earned will not be recalculated. Continue?
             </script>
 
+            <script type="text/x-template" data-name="categories-view">
+                <div class="container">
+                    <header>
+                        <h1>Categories</h1>
+                    </header>
+                    <section>
+                        <% if (identity.isAdmin() && !contest.isFinished()) { %>
+                        <button type="button" class="btn btn-success btn-xs" data-action="create-category" data-toggle="modal" data-target="#create-category-modal">
+                            Create
+                        </button>
+                        <% } %>
+                        <div id="themis-categories-list"></div>
+                    </section>
+                </div>
+
+                <% if (identity.isAdmin() && !contest.isFinished()) { %>
+                <div class="modal fade" id="create-category-modal" tabindex="-1" role="dialog">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                                <h4 class="modal-title">Create task category</h4>
+                            </div>
+                            <div class="modal-body">
+                                <form method="POST" action="/api/category/create">
+                                    <div class="form-group">
+                                        <label for="create-category-title" class="control-label">Title</label>
+                                        <input type="text" class="form-control" id="create-category-title" name="title" autofocus required minlength="2" maxlength="20">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="create-category-description" class="control-label">Description</label>
+                                        <textarea class="form-control themis-category-description" id="create-category-description" minlength="0" maxlength="150" name="description"></textarea>
+                                    </div>
+                                    <div class="submit-error">
+                                        <p class="text-danger"></p>
+                                    </div>
+                                </form>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                                <button type="button" class="btn btn-primary" data-action="complete-create-category">Create</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="modal fade" id="delete-category-modal" tabindex="-1" role="dialog">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                                <h4 class="modal-title">Delete category</h4>
+                            </div>
+                            <div class="modal-body">
+                                <p class="confirmation"></p>
+                                <div class="submit-error">
+                                    <p class="text-danger"></p>
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                                <button type="button" class="btn btn-danger" data-action="complete-delete-category">Delete</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="modal fade" id="edit-category-modal" tabindex="-1" role="dialog">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                                <h4 class="modal-title">Edit task category</h4>
+                            </div>
+                            <div class="modal-body">
+                                <form method="POST">
+                                    <div class="form-group">
+                                        <label for="edit-category-title" class="control-label">Title</label>
+                                        <input type="text" class="form-control" id="edit-category-title" name="title" autofocus required minlength="2" maxlength="20">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="edit-category-description" class="control-label">Description</label>
+                                        <textarea class="form-control themis-category-description" id="edit-category-description" minlength="0" maxlength="150" name="description"></textarea>
+                                    </div>
+                                    <div class="submit-error">
+                                        <p class="text-danger"></p>
+                                    </div>
+                                </form>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                                <button type="button" class="btn btn-primary" data-action="complete-edit-category">Save</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <% } %>
+            </script>
+
             <script type="text/x-template" data-name="tasks-view">
                 <div class="container">
                     <% if (identity.isTeam() && !('emailConfirmed' in identity && identity.emailConfirmed)) { %>
@@ -461,20 +474,17 @@
                     <header>
                         <h1>Tasks</h1>
                     </header>
-                    <section class="<% print(identity.isSupervisor() ? 'col-sm-8 themis-no-side-gaps': ''); %>">
+                    <section>
                         <% if (identity.isAdmin()) { %>
                         <div class="themis-task-controls">
                             <button type="button" class="btn btn-success btn-xs" data-action="create-task" data-toggle="modal" data-target="#create-task-modal">
-                                <i class="glyphicon glyphicon-plus"></i>&nbsp;Create
+                                Create
                             </button>
                         </div>
                         <% } %>
                         <div id="themis-task-previews" class="clearfix">
                         </div>
                     </section>
-                    <% if (identity.isSupervisor()) { %>
-                    <section class="col-sm-4" id="themis-categories"></section>
-                    <% } %>
                 </div>
 
                 <% if (identity.isTeam()) { %>
@@ -918,15 +928,15 @@
             <script type="text/x-template" data-name="statusbar-view">
                 <div class="container themis-statusbar">
                     <div class="row">
-                        <div class="col-md-3 themis-no-side-gaps" id="themis-contest-state">
+                        <div class="col-md-3" id="themis-contest-state">
                         </div>
-                        <div class="col-md-6 themis-no-side-gaps" id="themis-contest-timer">
+                        <div class="col-md-6" id="themis-contest-timer">
                         </div>
-                        <div class="col-md-3 themis-no-side-gaps" id="themis-contest-score">
+                        <div class="col-md-3" id="themis-contest-score">
                         </div>
                     </div>
                     <div class="row">
-                        <div class="col-md-3 themis-no-side-gaps" id="themis-realtime-state">
+                        <div class="col-md-3" id="themis-realtime-state">
                         </div>
                     </div>
                 </div>
@@ -1346,7 +1356,6 @@
                     </div>
                 </div>
             </script>
-
 
             <script type="text/x-template" data-name="signin-view">
                 <div class="container">

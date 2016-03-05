@@ -24,14 +24,9 @@ class TasksView extends View {
   constructor () {
     super(/^\/tasks$/)
     this.$main = null
-    this.$categoriesSection = null
-    this.$categoriesList = null
-
     this.$taskPreviewsList = null
 
-    this.onCreateCategory = null
     this.onUpdateCategory = null
-    this.onRemoveCategory = null
 
     this.onCreateTaskCategory = null
     this.onRevealTaskCategory = null
@@ -53,155 +48,6 @@ class TasksView extends View {
 
   getTitle () {
     return `${metadataStore.getMetadata('event-title')} :: Tasks`
-  }
-
-  initCreateCategoryModal () {
-    let $createCategoryModal = $('#create-category-modal')
-    $createCategoryModal.modal({ show: false })
-
-    let $createCategorySubmitError = $createCategoryModal.find('.submit-error > p')
-    let $createCategorySubmitButton = $createCategoryModal.find('button[data-action="complete-create-category"]')
-    let $createCategoryForm = $createCategoryModal.find('form')
-    $createCategoryForm.parsley()
-
-    $createCategorySubmitButton.on('click', (e) => {
-      $createCategoryForm.trigger('submit')
-    })
-
-    $createCategoryModal.on('show.bs.modal', (e) => {
-      $createCategorySubmitError.text('')
-      $createCategoryForm.parsley().reset()
-    })
-
-    $createCategoryModal.on('shown.bs.modal', (e) => {
-      $('#create-category-title').focus()
-    })
-
-    $createCategoryForm.on('submit', (e) => {
-      e.preventDefault()
-      $createCategoryForm.ajaxSubmit({
-        beforeSubmit: () => {
-          $createCategorySubmitError.text('')
-          $createCategorySubmitButton.prop('disabled', true)
-        },
-        clearForm: true,
-        dataType: 'json',
-        headers: {
-          'X-CSRF-Token': identityProvider.getIdentity().token
-        },
-        success: (responseText, textStatus, jqXHR) => {
-          $createCategoryModal.modal('hide')
-          if (!dataStore.connectedRealtime()) {
-            window.location.reload()
-          }
-        },
-        error: (jqXHR, textStatus, errorThrown) => {
-          if (jqXHR.responseJSON) {
-            $createCategorySubmitError.text(jqXHR.responseJSON)
-          } else {
-            $createCategorySubmitError.text('Unknown error. Please try again later.')
-          }
-        },
-        complete: () => {
-          $createCategorySubmitButton.prop('disabled', false)
-        }
-      })
-    })
-  }
-
-  initEditCategoryModal () {
-    let $editCategoryModal = $('#edit-category-modal')
-    $editCategoryModal.modal({ show: false })
-
-    let $editCategorySubmitError = $editCategoryModal.find('.submit-error > p')
-    let $editCategorySubmitButton = $editCategoryModal.find('button[data-action="complete-edit-category"]')
-    let $editCategoryForm = $editCategoryModal.find('form')
-    $editCategoryForm.parsley()
-
-    $editCategorySubmitButton.on('click', (e) => {
-      $editCategoryForm.trigger('submit')
-    })
-
-    let $editCategoryTitle = $('#edit-category-title')
-    let $editCategoryDescription = $('#edit-category-description')
-
-    $editCategoryModal.on('show.bs.modal', (e) => {
-      let categoryId = parseInt($(e.relatedTarget).data('category-id'), 10)
-      let category = _.findWhere(categoryProvider.getCategories(), { id: categoryId })
-
-      $editCategoryForm.attr('action', `/api/category/${categoryId}/update`)
-      $editCategoryTitle.val(category.title)
-      $editCategoryDescription.val(category.description)
-      $editCategorySubmitError.text('')
-      $editCategoryForm.parsley().reset()
-    })
-
-    $editCategoryModal.on('shown.bs.modal', (e) => {
-      $editCategoryTitle.focus()
-    })
-
-    $editCategoryForm.on('submit', (e) => {
-      e.preventDefault()
-      $editCategoryForm.ajaxSubmit({
-        beforeSubmit: () => {
-          $editCategorySubmitError.text('')
-          $editCategorySubmitButton.prop('disabled', true)
-        },
-        clearForm: true,
-        dataType: 'json',
-        headers: {
-          'X-CSRF-Token': identityProvider.getIdentity().token
-        },
-        success: (responseText, textStatus, jqXHR) => {
-          $editCategoryModal.modal('hide')
-          if (!dataStore.connectedRealtime()) {
-            window.location.reload()
-          }
-        },
-        error: (jqXHR, textStatus, errorThrown) => {
-          if (jqXHR.responseJSON) {
-            $editCategorySubmitError.text(jqXHR.responseJSON)
-          } else {
-            $editCategorySubmitError.text('Unknown error. Please try again later.')
-          }
-        },
-        complete: () => {
-          $editCategorySubmitButton.prop('disabled', false)
-        }
-      })
-    })
-  }
-
-  initRemoveCategoryModal () {
-    let $removeCategoryModal = $('#remove-category-modal')
-    $removeCategoryModal.modal({ show: false })
-
-    let $removeCategoryModalBody = $removeCategoryModal.find('.modal-body p.confirmation')
-    let $removeCategorySubmitError = $removeCategoryModal.find('.submit-error > p')
-    let $removeCategorySubmitButton = $removeCategoryModal.find('button[data-action="complete-remove-category"]')
-
-    $removeCategoryModal.on('show.bs.modal', (e) => {
-      let categoryId = parseInt($(e.relatedTarget).data('category-id'), 10)
-      $removeCategoryModal.data('category-id', categoryId)
-      let category = _.findWhere(categoryProvider.getCategories(), { id: categoryId })
-      $removeCategoryModalBody.html(renderTemplate('remove-category-confirmation', { title: category.title }))
-      $removeCategorySubmitError.text('')
-    })
-
-    $removeCategorySubmitButton.on('click', (e) => {
-      let categoryId = $removeCategoryModal.data('category-id')
-      $
-        .when(categoryProvider.removeCategory(categoryId, identityProvider.getIdentity().token))
-        .done(() => {
-          $removeCategoryModal.modal('hide')
-          if (!dataStore.connectedRealtime()) {
-            window.location.reload()
-          }
-        })
-        .fail((err) => {
-          $removeCategorySubmitError.text(err)
-        })
-    })
   }
 
   initCreateTaskModal () {
@@ -1103,40 +949,25 @@ class TasksView extends View {
     })
   }
 
-  renderCategories () {
-    let categories = categoryProvider.getCategories()
-    if (categories.length === 0) {
-      this.$categoriesList.empty()
-      this.$categoriesList.html($('<p></p>').addClass('lead').text('No task categories yet.'))
-    } else {
-      this.$categoriesList.empty()
-      let sortedCategories = _.sortBy(categories, 'createdAt')
-      let manageable = (identityProvider.getIdentity().isAdmin() && !contestProvider.getContest().isFinished())
-      for (let category of sortedCategories) {
-        let options = {
-          id: category.id,
-          title: category.title,
-          description: category.description,
-          updatedAt: moment(category.updatedAt).format('lll'),
-          manageable: manageable
-        }
-
-        this.$categoriesList.append($(renderTemplate('category-supervisor-partial', options)))
-      }
-    }
-  }
-
   requestRenderTasks () {
     this.flagRenderTasks = true
   }
 
   renderTaskPreviews () {
     let taskPreviews = taskProvider.getTaskPreviews()
+    let identity = identityProvider.getIdentity()
+
     if (taskPreviews.length === 0) {
       this.$taskPreviewsList.empty()
-      this.$taskPreviewsList.html($('<p></p>').addClass('lead').text('No tasks have been opened yet.'))
+      let text = null
+      if (identity.isGuest() || identity.isTeam()) {
+        text = 'No tasks have been opened yet.'
+      } else if (identity.isSupervisor()) {
+        text = 'No tasks have been created yet.'
+      }
+
+      this.$taskPreviewsList.html($('<p></p>').addClass('lead').text(text))
     } else {
-      let identity = identityProvider.getIdentity()
       let solvedTaskIds = []
       if (identity.isTeam()) {
         let taskHits = _.where(contestProvider.getTeamTaskHits(), { teamId: identity.id })
@@ -1250,25 +1081,13 @@ class TasksView extends View {
 
         promise
           .done((taskPreviews, categories) => {
-            this.$categoriesSection = $('#themis-categories')
             statusBar.present()
 
             if (identity.isSupervisor()) {
-              this.$categoriesSection.html(renderTemplate('categories-view', {
-                identity: identity,
-                contest: contest
-              }))
-              this.$categoriesList = $('#themis-categories-list')
-
-              this.renderCategories()
               this.initReviseTaskModal()
             }
 
             if (identity.isAdmin()) {
-              this.initCreateCategoryModal()
-              this.initEditCategoryModal()
-              this.initRemoveCategoryModal()
-
               this.initCreateTaskModal()
               this.initOpenTaskModal()
               this.initCloseTaskModal()
@@ -1284,13 +1103,6 @@ class TasksView extends View {
             }
 
             this.$taskPreviewsList = $('#themis-task-previews')
-
-            this.onCreateCategory = (category) => {
-              if (identity.isSupervisor()) {
-                this.renderCategories()
-              }
-              return false
-            }
 
             this.onCreateTaskCategory = (taskCategory) => {
               this.requestRenderTasks()
@@ -1310,27 +1122,12 @@ class TasksView extends View {
             }
 
             this.onUpdateCategory = (category) => {
-              if (identity.isSupervisor()) {
-                this.renderCategories()
-              }
-
-              this.requestRenderTasks()
-              return false
-            }
-
-            this.onRemoveCategory = (categoryId) => {
-              if (identity.isSupervisor()) {
-                this.renderCategories()
-              }
-
               this.requestRenderTasks()
               return false
             }
 
             categoryProvider.subscribe()
-            categoryProvider.on('createCategory', this.onCreateCategory)
             categoryProvider.on('updateCategory', this.onUpdateCategory)
-            categoryProvider.on('removeCategory', this.onRemoveCategory)
 
             taskProvider.subscribe()
             if (identity.isSupervisor()) {
@@ -1373,7 +1170,6 @@ class TasksView extends View {
             }
 
             this.onUpdateContest = (contest) => {
-              this.renderCategories()
               this.requestRenderTasks()
               return false
             }
@@ -1417,19 +1213,9 @@ class TasksView extends View {
       this.onCreateTeamTaskHit = null
     }
 
-    if (this.onCreateCategory) {
-      categoryProvider.off('createCategory', this.onCreateCategory)
-      this.onCreateCategory = null
-    }
-
     if (this.onUpdateCategory) {
       categoryProvider.off('updateCategory', this.onUpdateCategory)
       this.onUpdateCategory = null
-    }
-
-    if (this.onRemoveCategory) {
-      categoryProvider.off('removeCategory', this.onRemoveCategory)
-      this.onRemoveCategory = null
     }
 
     categoryProvider.unsubscribe()
@@ -1486,8 +1272,6 @@ class TasksView extends View {
 
     this.$main.empty()
     this.$main = null
-    this.$categoriesSection = null
-    this.$categoriesList = null
     this.$taskPreviewsList = null
     navigationBar.dismiss()
     statusBar.dismiss()
