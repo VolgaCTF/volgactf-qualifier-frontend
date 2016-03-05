@@ -21,7 +21,7 @@ class NewsView extends View {
 
     this.onCreatePost = null
     this.onUpdatePost = null
-    this.onRemovePost = null
+    this.onDeletePost = null
   }
 
   getTitle () {
@@ -34,7 +34,7 @@ class NewsView extends View {
 
     if (posts.length === 0) {
       $section.empty()
-      $section.html($('<p></p>').addClass('lead').text('No news have been published yet.'))
+      $section.html($('<p></p>').addClass('lead').text('No posts have been published yet.'))
     } else {
       $section.empty()
       let md = new MarkdownRenderer()
@@ -54,34 +54,34 @@ class NewsView extends View {
     }
   }
 
-  initRemovePostModal () {
-    let $removePostModal = $('#remove-post-modal')
-    $removePostModal.modal({ show: false })
+  initDeletePostModal () {
+    let $modal = $('#delete-post-modal')
+    $modal.modal({ show: false })
 
-    let $removePostModalBody = $removePostModal.find('.modal-body p.confirmation')
-    let $removePostSubmitError = $removePostModal.find('.submit-error > p')
-    let $removePostSubmitButton = $removePostModal.find('button[data-action="complete-remove-post"]')
+    let $modalBody = $modal.find('.modal-body p.confirmation')
+    let $submitError = $modal.find('.submit-error > p')
+    let $submitButton = $modal.find('button[data-action="complete-delete-post"]')
 
-    $removePostModal.on('show.bs.modal', (e) => {
+    $modal.on('show.bs.modal', (e) => {
       let postId = parseInt($(e.relatedTarget).data('post-id'), 10)
-      $removePostModal.data('post-id', postId)
+      $modal.data('post-id', postId)
       let post = _.findWhere(postProvider.getPosts(), { id: postId })
-      $removePostModalBody.html(renderTemplate('remove-post-confirmation', { title: post.title }))
-      $removePostSubmitError.text('')
+      $modalBody.html(renderTemplate('delete-post-confirmation', { title: post.title }))
+      $submitError.text('')
     })
 
-    $removePostSubmitButton.on('click', (e) => {
-      let postId = $removePostModal.data('post-id')
+    $submitButton.on('click', (e) => {
+      let postId = $modal.data('post-id')
       $
-        .when(postProvider.removePost(postId, identityProvider.getIdentity().token))
+        .when(postProvider.deletePost(postId, identityProvider.getIdentity().token))
         .done(() => {
-          $removePostModal.modal('hide')
+          $modal.modal('hide')
           if (!dataStore.connectedRealtime()) {
             window.location.reload()
           }
         })
         .fail((err) => {
-          $removePostSubmitError.text(err)
+          $submitError.text(err)
         })
     })
   }
@@ -278,7 +278,7 @@ class NewsView extends View {
 
             if (identity.isSupervisor()) {
               this.initCreatePostModal()
-              this.initRemovePostModal()
+              this.initDeletePostModal()
               this.initEditPostModal()
             }
 
@@ -294,7 +294,7 @@ class NewsView extends View {
               return false
             }
 
-            this.onRemovePost = (postId) => {
+            this.onDeletePost = (postId) => {
               this.renderPosts()
               return false
             }
@@ -302,7 +302,7 @@ class NewsView extends View {
             postProvider.subscribe()
             postProvider.on('createPost', this.onCreatePost)
             postProvider.on('updatePost', this.onUpdatePost)
-            postProvider.on('removePost', this.onRemovePost)
+            postProvider.on('deletePost', this.onDeletePost)
           })
           .fail((err) => {
             console.error(err)
@@ -325,9 +325,9 @@ class NewsView extends View {
       this.onCreatePost = null
     }
 
-    if (this.onRemovePost) {
-      postProvider.off('removePost', this.onRemovePost)
-      this.onRemovePost = null
+    if (this.onDeletePost) {
+      postProvider.off('deletePost', this.onDeletePost)
+      this.onDeletePost = null
     }
 
     if (this.onUpdatePost) {

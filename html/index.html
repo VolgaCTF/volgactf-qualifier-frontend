@@ -369,7 +369,7 @@
                     </header>
                     <section>
                         <% if (identity.isAdmin() && !contest.isFinished()) { %>
-                        <button type="button" class="btn btn-success btn-xs" data-action="create-category" data-toggle="modal" data-target="#create-category-modal">
+                        <button type="button" class="btn btn-success" data-action="create-category" data-toggle="modal" data-target="#create-category-modal">
                             Create
                         </button>
                         <% } %>
@@ -477,7 +477,7 @@
                     <section>
                         <% if (identity.isAdmin()) { %>
                         <div class="themis-task-controls">
-                            <button type="button" class="btn btn-success btn-xs" data-action="create-task" data-toggle="modal" data-target="#create-task-modal">
+                            <button type="button" class="btn btn-success" data-action="create-task" data-toggle="modal" data-target="#create-task-modal">
                                 Create
                             </button>
                         </div>
@@ -1020,8 +1020,8 @@
                 </div>
             </script>
 
-            <script type="text/x-template" data-name="remove-post-confirmation">
-                You are about to remove the post <mark><%- title %></mark>. Continue?
+            <script type="text/x-template" data-name="delete-post-confirmation">
+                You are about to delete the post <mark><%- title %></mark>. Continue?
             </script>
 
             <script type="text/x-template" data-name="revise-task-status-partial">
@@ -1057,10 +1057,10 @@
                             <% if (manageable) { %>
                             &nbsp;
                             <button type="button" class="btn btn-default btn-xs" data-action="edit-post" data-toggle="modal" data-target="#edit-post-modal" data-post-id="<%- id %>">
-                                <i class="glyphicon glyphicon-pencil"></i>&nbsp;Edit
+                                Edit
                             </button>
-                            <button type="button" class="btn btn-danger btn-xs" data-action="remove-post" data-toggle="modal" data-target="#remove-post-modal" data-post-id="<%- id %>">
-                                <i class="glyphicon glyphicon-remove"></i>&nbsp;Remove
+                            <button type="button" class="btn btn-danger btn-xs" data-action="delete-post" data-toggle="modal" data-target="#delete-post-modal" data-post-id="<%- id %>">
+                                Delete
                             </button>
                             <% } %>
                         </p>
@@ -1082,8 +1082,8 @@
                     <header>
                         <h1>News</h1>
                         <% if (identity.isSupervisor()) { %>
-                        <button type="button" class="btn btn-success btn-xs" data-action="create-post" data-toggle="modal" data-target="#create-post-modal">
-                            <i class="glyphicon glyphicon-plus"></i>&nbsp;Create
+                        <button type="button" class="btn btn-success" data-action="create-post" data-toggle="modal" data-target="#create-post-modal">
+                            Create
                         </button>
                         <% } %>
                     </header>
@@ -1132,12 +1132,12 @@
                     </div>
                 </div>
 
-                <div class="modal fade" id="remove-post-modal" tabindex="-1" role="dialog">
+                <div class="modal fade" id="delete-post-modal" tabindex="-1" role="dialog">
                     <div class="modal-dialog">
                         <div class="modal-content">
                             <div class="modal-header">
                                 <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                                <h4 class="modal-title">Remove post</h4>
+                                <h4 class="modal-title">Delete post</h4>
                             </div>
                             <div class="modal-body">
                                 <p class="confirmation"></p>
@@ -1147,7 +1147,7 @@
                             </div>
                             <div class="modal-footer">
                                 <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                                <button type="button" class="btn btn-danger" data-action="complete-remove-post">Remove</button>
+                                <button type="button" class="btn btn-danger" data-action="complete-delete-post">Delete</button>
                             </div>
                         </div>
                     </div>
