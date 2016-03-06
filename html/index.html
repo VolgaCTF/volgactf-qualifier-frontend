@@ -1521,7 +1521,7 @@
                                 <h4 class="modal-title">Upload logo</h4>
                             </div>
                             <div class="modal-body">
-                                <form method="POST" action="/api/team/upload-logo">
+                                <form method="POST" action="/api/team/update-logo">
                                     <div class="form-group">
                                         <label for="upload-logo-logo" class="control-label">Logo</label>
                                         <input type="file" id="upload-logo-logo" name="logo" class="filestyle" data-buttonText="&nbsp;Choose file" data-iconName="glyphicon-picture" accept="image/jpeg,image/png,image/gif" required data-parsley-errors-container="#upload-logo-errors">
@@ -1575,7 +1575,7 @@
                                 <h4 class="modal-title">Change email</h4>
                             </div>
                             <div class="modal-body">
-                                <form method="POST" action="/api/team/change-email">
+                                <form method="POST" action="/api/team/update-email">
                                     <div class="form-group">
                                         <label for="change-email-new" class="control-label">New email</label>
                                         <input type="email" class="form-control" id="change-email-new" name="email" required autofocus>
@@ -1601,7 +1601,7 @@
                                 <h4 class="modal-title">Edit profile</h4>
                             </div>
                             <div class="modal-body">
-                                <form method="POST" action="/api/team/edit-profile">
+                                <form method="POST" action="/api/team/update-profile">
                                     <div class="form-group">
                                         <label for="edit-profile-country" class="control-label">Country</label>
                                         <select required class="form-control" id="edit-profile-country" name="countryId" autofocus></select>
@@ -1635,7 +1635,7 @@
                                 <h4 class="modal-title">Change password</h4>
                             </div>
                             <div class="modal-body">
-                                <form method="POST" action="/api/team/change-password">
+                                <form method="POST" action="/api/team/update-password">
                                     <div class="form-group">
                                         <label for="change-pwd-current" class="control-label">Current password</label>
                                         <input type="password" class="form-control" id="change-pwd-current" name="currentPassword" required autofocus minlength="6" maxlength="40" pattern="^[A-Za-z0-9\x5b\x5d\x28\x29\x7b\x7d\x7e\x60\x21\x40\x23\x24\x25\x5e\x26\x2a\x2d\x5f\x3d\x2b\x27\x22\x3a\x3b\x7c\x2f\x5c\x2e\x2c\x3f\x3c\x3e]+$">

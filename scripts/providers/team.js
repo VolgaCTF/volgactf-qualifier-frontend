@@ -131,7 +131,7 @@ class TeamProvider extends EventEmitter {
 
   fetchTeams (callback) {
     let promise = $.Deferred()
-    let url = '/api/team/all'
+    let url = '/api/team/index'
 
     $.ajax({
       url: url,
