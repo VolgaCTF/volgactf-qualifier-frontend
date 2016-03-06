@@ -32,33 +32,33 @@ class CategoriesView extends View {
   }
 
   initCreateCategoryModal () {
-    let $createCategoryModal = $('#create-category-modal')
-    $createCategoryModal.modal({ show: false })
+    let $modal = $('#create-category-modal')
+    $modal.modal({ show: false })
 
-    let $createCategorySubmitError = $createCategoryModal.find('.submit-error > p')
-    let $createCategorySubmitButton = $createCategoryModal.find('button[data-action="complete-create-category"]')
-    let $createCategoryForm = $createCategoryModal.find('form')
-    $createCategoryForm.parsley()
+    let $submitError = $modal.find('.submit-error > p')
+    let $submitButton = $modal.find('button[data-action="complete-create-category"]')
+    let $form = $modal.find('form')
+    $form.parsley()
 
-    $createCategorySubmitButton.on('click', (e) => {
-      $createCategoryForm.trigger('submit')
+    $submitButton.on('click', (e) => {
+      $form.trigger('submit')
     })
 
-    $createCategoryModal.on('show.bs.modal', (e) => {
-      $createCategorySubmitError.text('')
-      $createCategoryForm.parsley().reset()
+    $modal.on('show.bs.modal', (e) => {
+      $submitError.text('')
+      $form.parsley().reset()
     })
 
-    $createCategoryModal.on('shown.bs.modal', (e) => {
+    $modal.on('shown.bs.modal', (e) => {
       $('#create-category-title').focus()
     })
 
-    $createCategoryForm.on('submit', (e) => {
+    $form.on('submit', (e) => {
       e.preventDefault()
-      $createCategoryForm.ajaxSubmit({
+      $form.ajaxSubmit({
         beforeSubmit: () => {
-          $createCategorySubmitError.text('')
-          $createCategorySubmitButton.prop('disabled', true)
+          $submitError.text('')
+          $submitButton.prop('disabled', true)
         },
         clearForm: true,
         dataType: 'json',
@@ -66,62 +66,62 @@ class CategoriesView extends View {
           'X-CSRF-Token': identityProvider.getIdentity().token
         },
         success: (responseText, textStatus, jqXHR) => {
-          $createCategoryModal.modal('hide')
+          $modal.modal('hide')
           if (!dataStore.connectedRealtime()) {
             window.location.reload()
           }
         },
         error: (jqXHR, textStatus, errorThrown) => {
           if (jqXHR.responseJSON) {
-            $createCategorySubmitError.text(jqXHR.responseJSON)
+            $submitError.text(jqXHR.responseJSON)
           } else {
-            $createCategorySubmitError.text('Unknown error. Please try again later.')
+            $submitError.text('Unknown error. Please try again later.')
           }
         },
         complete: () => {
-          $createCategorySubmitButton.prop('disabled', false)
+          $submitButton.prop('disabled', false)
         }
       })
     })
   }
 
   initEditCategoryModal () {
-    let $editCategoryModal = $('#edit-category-modal')
-    $editCategoryModal.modal({ show: false })
+    let $modal = $('#edit-category-modal')
+    $modal.modal({ show: false })
 
-    let $editCategorySubmitError = $editCategoryModal.find('.submit-error > p')
-    let $editCategorySubmitButton = $editCategoryModal.find('button[data-action="complete-edit-category"]')
-    let $editCategoryForm = $editCategoryModal.find('form')
-    $editCategoryForm.parsley()
+    let $submitError = $modal.find('.submit-error > p')
+    let $submitButton = $modal.find('button[data-action="complete-edit-category"]')
+    let $form = $modal.find('form')
+    $form.parsley()
 
-    $editCategorySubmitButton.on('click', (e) => {
-      $editCategoryForm.trigger('submit')
+    $submitButton.on('click', (e) => {
+      $form.trigger('submit')
     })
 
     let $editCategoryTitle = $('#edit-category-title')
     let $editCategoryDescription = $('#edit-category-description')
 
-    $editCategoryModal.on('show.bs.modal', (e) => {
+    $modal.on('show.bs.modal', (e) => {
       let categoryId = parseInt($(e.relatedTarget).data('category-id'), 10)
       let category = _.findWhere(categoryProvider.getCategories(), { id: categoryId })
 
-      $editCategoryForm.attr('action', `/api/category/${categoryId}/update`)
+      $form.attr('action', `/api/category/${categoryId}/update`)
       $editCategoryTitle.val(category.title)
       $editCategoryDescription.val(category.description)
-      $editCategorySubmitError.text('')
-      $editCategoryForm.parsley().reset()
+      $submitError.text('')
+      $form.parsley().reset()
     })
 
-    $editCategoryModal.on('shown.bs.modal', (e) => {
+    $modal.on('shown.bs.modal', (e) => {
       $editCategoryTitle.focus()
     })
 
-    $editCategoryForm.on('submit', (e) => {
+    $form.on('submit', (e) => {
       e.preventDefault()
-      $editCategoryForm.ajaxSubmit({
+      $form.ajaxSubmit({
         beforeSubmit: () => {
-          $editCategorySubmitError.text('')
-          $editCategorySubmitButton.prop('disabled', true)
+          $submitError.text('')
+          $submitButton.prop('disabled', true)
         },
         clearForm: true,
         dataType: 'json',
@@ -129,20 +129,20 @@ class CategoriesView extends View {
           'X-CSRF-Token': identityProvider.getIdentity().token
         },
         success: (responseText, textStatus, jqXHR) => {
-          $editCategoryModal.modal('hide')
+          $modal.modal('hide')
           if (!dataStore.connectedRealtime()) {
             window.location.reload()
           }
         },
         error: (jqXHR, textStatus, errorThrown) => {
           if (jqXHR.responseJSON) {
-            $editCategorySubmitError.text(jqXHR.responseJSON)
+            $submitError.text(jqXHR.responseJSON)
           } else {
-            $editCategorySubmitError.text('Unknown error. Please try again later.')
+            $submitError.text('Unknown error. Please try again later.')
           }
         },
         complete: () => {
-          $editCategorySubmitButton.prop('disabled', false)
+          $submitButton.prop('disabled', false)
         }
       })
     })
