@@ -102,7 +102,7 @@
                         </a>
                         <ul class="dropdown-menu" role="menu">
                             <% if (identity.isTeam()) { %>
-                            <li><a href="/profile/<%- identity.id %>" data-push-history><span class="glyphicon glyphicon-cog"></span>&nbsp;Edit profile</a></li>
+                            <li><a href="/team/<%- identity.id %>/profile" data-push-history><span class="glyphicon glyphicon-cog"></span>&nbsp;Edit profile</a></li>
                             <% } %>
                             <li><a href="#" data-action="signout" data-push-history><span class="glyphicon glyphicon-log-out"></span>&nbsp;Sign out</a></li>
                         </ul>
@@ -117,7 +117,7 @@
                         <img class="img-thumbnail" src="/api/team/<%- team.id %>/logo">
                     </div>
                     <div class="pull-left info">
-                        <h4 class="text-primary"><a href="/profile/<%- team.id %>" data-push-history><%- team.name %></a></h4>
+                        <h4 class="text-primary"><a href="/team/<%- team.id %>/profile" data-push-history><%- team.name %></a></h4>
                         <ul class="list-unstyled">
                             <% if ('email' in team && typeof team.email !== 'undefined' && team.email !== null) { %>
                             <li>
@@ -151,13 +151,8 @@
 
             <script type="text/x-template" data-name="teams-view">
                 <div class="container">
-                    <% if (identity.isTeam() && !('emailConfirmed' in identity && identity.emailConfirmed)) { %>
-                    <div class="alert alert-warning" role="alert">
-                        <p>
-                            <span class="glyphicon glyphicon-alert"></span>&nbsp;You need to confirm your email address.
-                            Please check your inbox and follow the provided instructions.
-                        </p>
-                    </div>
+                    <% if (identity.isTeam() && !identity.emailConfirmed) { %>
+                    <!--=include ../partials/alert_email_verification.html -->
                     <% } %>
                     <header>
                         <h2>Teams<span class="themis-team-count"></span></h2>
@@ -463,13 +458,8 @@
 
             <script type="text/x-template" data-name="tasks-view">
                 <div class="container">
-                    <% if (identity.isTeam() && !('emailConfirmed' in identity && identity.emailConfirmed)) { %>
-                    <div class="alert alert-warning" role="alert">
-                        <p>
-                            <span class="glyphicon glyphicon-alert"></span>&nbsp;You need to confirm your email address.
-                            Please check your inbox and follow the provided instructions.
-                        </p>
-                    </div>
+                    <% if (identity.isTeam() && !identity.emailConfirmed) { %>
+                    <!--=include ../partials/alert_email_verification.html -->
                     <% } %>
                     <header>
                         <h1>Tasks</h1>
@@ -811,7 +801,7 @@
                     <td><%- rank %></td>
                     <td>
                         <img class="themis-scoreboard-logo" src="/api/team/<%- id %>/logo">
-                        <a href="/profile/<%- id %>" class="themis-team-link" data-push-history><%- name %></a>
+                        <a href="/team/<%- id %>/profile" class="themis-team-link" data-push-history><%- name %></a>
                     </td>
                     <td><%- country %></td>
                     <% if (detailed) { %>
@@ -825,13 +815,8 @@
 
             <script type="text/x-template" data-name="scoreboard-view">
                 <div class="container">
-                    <% if (identity.isTeam() && !('emailConfirmed' in identity && identity.emailConfirmed)) { %>
-                    <div class="alert alert-warning" role="alert">
-                        <p>
-                            <span class="glyphicon glyphicon-alert"></span>&nbsp;You need to confirm your email address.
-                            Please check your inbox and follow the provided instructions.
-                        </p>
-                    </div>
+                    <% if (identity.isTeam() && !identity.emailConfirmed) { %>
+                    <!--=include ../partials/alert_email_verification.html -->
                     <% } %>
                     <header>
                         <h1>Scoreboard</h1>
@@ -1071,13 +1056,8 @@
 
             <script type="text/x-template" data-name="news-view">
                 <div class="container">
-                    <% if (identity.isTeam() && !('emailConfirmed' in identity && identity.emailConfirmed)) { %>
-                    <div class="alert alert-warning" role="alert">
-                        <p>
-                            <span class="glyphicon glyphicon-alert"></span>&nbsp;You need to confirm your email address.
-                            Please check your inbox and follow the provided instructions.
-                        </p>
-                    </div>
+                    <% if (identity.isTeam() && !identity.emailConfirmed) { %>
+                    <!--=include ../partials/alert_email_verification.html -->
                     <% } %>
                     <header>
                         <h1>News</h1>
@@ -1197,13 +1177,8 @@
 
             <script type="text/x-template" data-name="about-view">
                 <div class="container">
-                    <% if (identity.isTeam() && !('emailConfirmed' in identity && identity.emailConfirmed)) { %>
-                    <div class="alert alert-warning" role="alert">
-                        <p>
-                            <span class="glyphicon glyphicon-alert"></span>&nbsp;You need to confirm your email address.
-                            Please check your inbox and follow the provided instructions.
-                        </p>
-                    </div>
+                    <% if (identity.isTeam() && !identity.emailConfirmed) { %>
+                    <!--=include ../partials/alert_email_verification.html -->
                     <% } %>
                     <header>
                         <h1>About</h1>
@@ -1252,19 +1227,14 @@
                         </p>
                     </div>
                     <% } else if (identity.isTeam()) { %>
-                    <% if (!('emailConfirmed' in identity) || !identity.emailConfirmed) { %>
-                    <div class="alert alert-warning" role="alert">
-                        <p>
-                            <span class="glyphicon glyphicon-alert"></span>&nbsp;You need to confirm your email address.
-                            Please check your inbox and follow the provided instructions.
-                        </p>
-                    </div>
+                    <% if (!identity.emailConfirmed) { %>
+                    <!--=include ../partials/alert_email_verification.html -->
                     <% } %>
                     <h1>Welcome back!</h1>
                     <% if (contest.isInitial()) { %>
                     <p class="lead">
                         {{#event}}{{ title }}{{/event}} hasn't started yet.
-                        Now, you can check out the <a href="/news" data-push-history>news</a> or <a href="/profile/<%- identity.id %>" data-push-history>edit your profile</a>.
+                        Now, you can check out the <a href="/news" data-push-history>news</a> or <a href="/team/<%- identity.id %>/profile" data-push-history>edit your profile</a>.
                     </p>
                     <% } else if (contest.isStarted() || contest.isPaused()) { %>
                     <p class="lead">
@@ -1473,7 +1443,7 @@
                 <div class="clearfix themis-profile">
                     <div class="pull-left logo">
                         <% if (identity.isExactTeam(team.id)) { %>
-                        <a href="#" data-action="upload-logo" data-toggle="modal" data-target="#upload-logo-modal">
+                        <a href="#" title="Click to upload new logo" data-action="upload-logo" data-toggle="modal" data-target="#upload-logo-modal">
                             <img class="img-thumbnail" src="/api/team/<%- team.id %>/logo">
                         </a>
                         <% } else { %>
@@ -1493,8 +1463,8 @@
                                 <span class="text-danger" title="Email not verified"><%- team.email %></span>
                                 <% if (identity.isExactTeam(team.id)) { %>
                                 <br>
-                                <button type="button" class="btn btn-default btn-xs" data-action="resend-confirmation" data-toggle="modal" data-target="#resend-confirmation-modal">Resend confirmation email</button>
-                                <button type="button" class="btn btn-warning btn-xs" data-action="change-email" data-toggle="modal" data-target="#change-email-modal">Change email</button>
+                                <button type="button" class="btn btn-default btn-sm" data-action="resend-confirmation" data-toggle="modal" data-target="#resend-confirmation-modal">Resend confirmation email</button>
+                                <button type="button" class="btn btn-warning btn-sm" data-action="change-email" data-toggle="modal" data-target="#change-email-modal">Change email</button>
                                 <% } %>
                                 <% } %>
                             </li>
@@ -1513,20 +1483,29 @@
                             <% } %>
                             <% if (identity.isExactTeam(team.id)) { %>
                             <li>
-                                <button type="button" class="btn btn-default btn-xs" data-action="edit-profile" data-toggle="modal" data-target="#edit-profile-modal"><span class="glyphicon glyphicon-pencil"></span>&nbsp;Edit</button>
-                                <button type="button" class="btn btn-default btn-xs" data-action="change-password" data-toggle="modal" data-target="#change-password-modal">Change password</button>
+                                <button type="button" class="btn btn-default btn-sm" data-action="edit-profile" data-toggle="modal" data-target="#edit-profile-modal">
+                                    Edit
+                                </button>
+                                <button type="button" class="btn btn-default btn-sm" data-action="change-password" data-toggle="modal" data-target="#change-password-modal">
+                                    Change password
+                                </button>
                             </li>
                             <% } %>
                         </ul>
+                        <% if (teamHitsInfo) { %>
                         <p class="text-muted">
                             <%= teamHitsInfo %>
                         </p>
+                        <% } %>
                     </div>
                 </div>
             </script>
 
             <script type="text/x-template" data-name="profile-view">
                 <div class="container">
+                    <% if (identity.isTeam() && !identity.emailConfirmed) { %>
+                    <!--=include ../partials/alert_email_verification.html -->
+                    <% } %>
                     <header>
                         <h1>Team profile</h1>
                     </header>

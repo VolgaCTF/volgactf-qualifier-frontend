@@ -156,7 +156,9 @@ class StatusBar {
   renderTeamScore () {
     this.$scoreContainer.empty()
     let identity = identityProvider.getIdentity()
-    if (!identity.isTeam()) {
+    let contest = contestProvider.getContest()
+
+    if (!identity.isTeam() || contest.isInitial()) {
       return
     }
 
