@@ -87,7 +87,7 @@ class TaskCategoryProvider extends EventEmitter {
 
   fetchTaskCategories () {
     let promise = $.Deferred()
-    let url = '/api/task/category/all'
+    let url = '/api/task/category/index'
 
     $.ajax({
       url: url,

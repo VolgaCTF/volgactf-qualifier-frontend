@@ -111,7 +111,7 @@ class TaskProvider extends EventEmitter {
 
   fetchTaskPreviews () {
     let promise = $.Deferred()
-    let url = '/api/task/all'
+    let url = '/api/task/index'
 
     $.ajax({
       url: url,
