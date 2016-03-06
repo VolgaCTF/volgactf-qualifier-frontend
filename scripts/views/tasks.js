@@ -51,50 +51,50 @@ class TasksView extends View {
   }
 
   initCreateTaskModal () {
-    let $createTaskModal = $('#create-task-modal')
-    $createTaskModal.modal({ show: false })
+    let $modal = $('#create-task-modal')
+    $modal.modal({ show: false })
 
-    let $createTaskSubmitError = $createTaskModal.find('.submit-error > p')
-    let $createTaskSubmitButton = $createTaskModal.find('button[data-action="complete-create-task"]')
-    let $createTaskForm = $createTaskModal.find('form')
-    $createTaskForm.parsley()
+    let $submitError = $modal.find('.submit-error > p')
+    let $submitButton = $modal.find('button[data-action="complete-create-task"]')
+    let $form = $modal.find('form')
+    $form.parsley()
 
-    $createTaskSubmitButton.on('click', (e) => {
-      $createTaskForm.trigger('submit')
+    $submitButton.on('click', (e) => {
+      $form.trigger('submit')
     })
 
-    let $createTaskTablist = $('#create-task-tablist')
-    let $createTaskTabData = $createTaskTablist.find('a[href="#create-task-data"]')
-    let $createTaskTabPreview = $createTaskTablist.find('a[href="#create-task-preview"]')
+    let $tabList = $('#create-task-tablist')
+    let $tabData = $tabList.find('a[href="#create-task-data"]')
+    let $tabPreview = $tabList.find('a[href="#create-task-preview"]')
 
-    let $createTaskTitle = $('#create-task-title')
-    let $createTaskDescription = $('#create-task-description')
-    let $createTaskValue = $('#create-task-value')
-    let $createCategories = $('#create-categories')
+    let $taskTitle = $('#create-task-title')
+    let $taskDescription = $('#create-task-description')
+    let $taskValue = $('#create-task-value')
+    let $categories = $('#create-categories')
 
-    let $createTaskHints = $('#create-task-hints')
-    let $createTaskHintList = $('#create-task-hint-list')
+    let $taskHints = $('#create-task-hints')
+    let $taskHintList = $('#create-task-hint-list')
 
-    let $createTaskAnswers = $('#create-task-answers')
-    let $createTaskAnswerList = $('#create-task-answer-list')
+    let $taskAnswers = $('#create-task-answers')
+    let $taskAnswerList = $('#create-task-answer-list')
 
-    let $createTaskPreview = $('#create-task-preview')
+    let $taskPreview = $('#create-task-preview')
 
-    $createTaskTabData.tab()
-    $createTaskTabPreview.tab()
+    $tabData.tab()
+    $tabPreview.tab()
 
-    $createTaskHints.find('a[data-action="create-task-hint"]').on('click', (e) => {
+    $taskHints.find('a[data-action="create-task-hint"]').on('click', (e) => {
       e.preventDefault()
       let options = {
-        number: $createTaskHintList.children().length + 1,
+        number: $taskHintList.children().length + 1,
         hint: ''
       }
-      $createTaskHintList.append($(renderTemplate('create-task-hint-textarea-partial', options)))
+      $taskHintList.append($(renderTemplate('create-task-hint-textarea-partial', options)))
     })
 
     function getHints () {
       let hints = []
-      $createTaskHintList.find('.themis-task-hint-group').each((ndx, el) => {
+      $taskHintList.find('.themis-task-hint-group').each((ndx, el) => {
         let $el = $(el)
         hints.push($el.find('textarea').val())
       })
@@ -102,34 +102,34 @@ class TasksView extends View {
       return hints
     }
 
-    $createTaskHintList.on('click', 'a[data-action="remove-task-hint"]', (e) => {
+    $taskHintList.on('click', 'a[data-action="remove-task-hint"]', (e) => {
       e.preventDefault()
       let number = $(e.target).closest('a').attr('data-number')
       $(`#create-task-hint-${number}`).remove()
       let hints = getHints()
-      $createTaskHintList.empty()
+      $taskHintList.empty()
       _.each(hints, (hint, ndx) => {
         let options = {
           number: ndx + 1,
           hint: hint
         }
-        $createTaskHintList.append($(renderTemplate('create-task-hint-textarea-partial', options)))
+        $taskHintList.append($(renderTemplate('create-task-hint-textarea-partial', options)))
       })
     })
 
-    $createTaskAnswers.find('a[data-action="create-task-answer"]').on('click', (e) => {
+    $taskAnswers.find('a[data-action="create-task-answer"]').on('click', (e) => {
       e.preventDefault()
       let options = {
-        number: $createTaskAnswerList.children().length + 1,
+        number: $taskAnswerList.children().length + 1,
         answer: '',
         caseSensitive: true
       }
-      $createTaskAnswerList.append($(renderTemplate('create-task-answer-input-partial', options)))
+      $taskAnswerList.append($(renderTemplate('create-task-answer-input-partial', options)))
     })
 
     function getAnswers () {
       let answers = []
-      $createTaskAnswerList.find('.themis-task-answer-group').each((ndx, el) => {
+      $taskAnswerList.find('.themis-task-answer-group').each((ndx, el) => {
         let $el = $(el)
         answers.push({
           answer: $el.find('input[type=text]').val(),
@@ -140,65 +140,65 @@ class TasksView extends View {
       return answers
     }
 
-    $createTaskAnswerList.on('click', 'a[data-action="remove-task-answer"]', (e) => {
+    $taskAnswerList.on('click', 'a[data-action="remove-task-answer"]', (e) => {
       e.preventDefault()
       let number = $(e.target).closest('a').attr('data-number')
       $(`#create-task-answer-${number}`).remove()
       let answers = getAnswers()
-      $createTaskAnswerList.empty()
+      $taskAnswerList.empty()
       _.each(answers, (entry, ndx) => {
         let options = {
           number: ndx + 1,
           answer: entry.answer,
           caseSensitive: entry.caseSensitive
         }
-        $createTaskAnswerList.append($(renderTemplate('create-task-answer-input-partial', options)))
+        $taskAnswerList.append($(renderTemplate('create-task-answer-input-partial', options)))
       })
     })
 
-    $createTaskTabPreview.on('show.bs.tab', (e) => {
+    $tabPreview.on('show.bs.tab', (e) => {
       let md = new MarkdownRenderer()
       let hintsFormatted = getHints().map((hint) => {
         return md.render(hint)
       })
 
       let options = {
-        title: $createTaskTitle.val(),
-        description: md.render($createTaskDescription.val()),
+        title: $taskTitle.val(),
+        description: md.render($taskDescription.val()),
         hints: hintsFormatted
       }
 
-      $createTaskPreview.html(renderTemplate('task-content-partial', options))
+      $taskPreview.html(renderTemplate('task-content-partial', options))
     })
 
-    $createTaskModal.on('show.bs.modal', (e) => {
-      $createTaskTabData.tab('show')
-      $createTaskTitle.val('')
-      $createTaskDescription.val('')
-      $createTaskValue.val('')
+    $modal.on('show.bs.modal', (e) => {
+      $tabData.tab('show')
+      $taskTitle.val('')
+      $taskDescription.val('')
+      $taskValue.val('')
 
-      $createCategories.empty()
+      $categories.empty()
       _.each(categoryProvider.getCategories(), (category) => {
-        $createCategories.append($('<option></option>').attr('value', category.id).text(category.title))
+        $categories.append($('<option></option>').attr('value', category.id).text(category.title))
       })
 
-      $createTaskHintList.empty()
-      $createTaskAnswerList.empty()
+      $taskHintList.empty()
+      $taskAnswerList.empty()
 
-      $createTaskSubmitError.text('')
-      $createTaskForm.parsley().reset()
+      $submitError.text('')
+      $form.parsley().reset()
     })
 
-    $createTaskModal.on('shown.bs.modal', (e) => {
-      $createTaskTitle.focus()
+    $modal.on('shown.bs.modal', (e) => {
+      $taskTitle.focus()
     })
 
-    $createTaskForm.on('submit', (e) => {
+    $form.on('submit', (e) => {
       e.preventDefault()
-      $createTaskForm.ajaxSubmit({
+      $form.ajaxSubmit({
         beforeSubmit: () => {
-          $createTaskSubmitError.text('')
-          $createTaskSubmitButton.prop('disabled', true)
+          $submitError.text('')
+          $submitButton.prop('disabled', true)
         },
         clearForm: true,
         dataType: 'json',
@@ -210,71 +210,71 @@ class TasksView extends View {
           'X-CSRF-Token': identityProvider.getIdentity().token
         },
         success: (responseText, textStatus, jqXHR) => {
-          $createTaskModal.modal('hide')
+          $modal.modal('hide')
           if (!dataStore.connectedRealtime()) {
             window.location.reload()
           }
         },
         error: (jqXHR, textStatus, errorThrown) => {
           if (jqXHR.responseJSON) {
-            $createTaskSubmitError.text(jqXHR.responseJSON)
+            $submitError.text(jqXHR.responseJSON)
           } else {
-            $createTaskSubmitError.text('Unknown error. Please try again later.')
+            $submitError.text('Unknown error. Please try again later.')
           }
         },
         complete: () => {
-          $createTaskSubmitButton.prop('disabled', false)
+          $submitButton.prop('disabled', false)
         }
       })
     })
   }
 
   initEditTaskModal () {
-    let $editTaskModal = $('#edit-task-modal')
-    $editTaskModal.modal({ show: false })
+    let $modal = $('#edit-task-modal')
+    $modal.modal({ show: false })
 
-    let $editTaskSubmitError = $editTaskModal.find('.submit-error > p')
-    let $editTaskSubmitButton = $editTaskModal.find('button[data-action="complete-edit-task"]')
-    let $editTaskForm = $editTaskModal.find('form')
-    $editTaskForm.parsley()
+    let $submitError = $modal.find('.submit-error > p')
+    let $submitButton = $modal.find('button[data-action="complete-edit-task"]')
+    let $form = $modal.find('form')
+    $form.parsley()
 
-    $editTaskSubmitButton.on('click', (e) => {
-      $editTaskForm.trigger('submit')
+    $submitButton.on('click', (e) => {
+      $form.trigger('submit')
     })
 
-    let $editTaskTablist = $('#edit-task-tablist')
-    let $editTaskTabData = $editTaskTablist.find('a[href="#edit-task-data"]')
-    let $editTaskTabPreview = $editTaskTablist.find('a[href="#edit-task-preview"]')
+    let $tabList = $('#edit-task-tablist')
+    let $tabData = $tabList.find('a[href="#edit-task-data"]')
+    let $tabPreview = $tabList.find('a[href="#edit-task-preview"]')
 
-    let $editTaskTitle = $('#edit-task-title')
-    let $editTaskDescription = $('#edit-task-description')
-    let $editTaskValue = $('#edit-task-value')
-    let $editCategories = $('#edit-categories')
+    let $taskTitle = $('#edit-task-title')
+    let $taskDescription = $('#edit-task-description')
+    let $taskValue = $('#edit-task-value')
+    let $categories = $('#edit-categories')
 
-    let $editTaskHints = $('#edit-task-hints')
-    let $editTaskHintList = $('#edit-task-hint-list')
+    let $taskHints = $('#edit-task-hints')
+    let $taskHintList = $('#edit-task-hint-list')
 
-    let $editTaskAnswers = $('#edit-task-answers')
-    let $editTaskAnswerList = $('#edit-task-answer-list')
+    let $taskAnswers = $('#edit-task-answers')
+    let $taskAnswerList = $('#edit-task-answer-list')
 
-    let $editTaskPreview = $('#edit-task-preview')
+    let $taskPreview = $('#edit-task-preview')
 
-    $editTaskTabData.tab()
-    $editTaskTabPreview.tab()
+    $tabData.tab()
+    $tabPreview.tab()
 
-    $editTaskHints.find('a[data-action="create-task-hint"]').on('click', (e) => {
+    $taskHints.find('a[data-action="create-task-hint"]').on('click', (e) => {
       e.preventDefault()
       let options = {
-        number: $editTaskHintList.children().length + 1,
+        number: $taskHintList.children().length + 1,
         hint: '',
         editable: true
       }
-      $editTaskHintList.append($(renderTemplate('edit-task-hint-textarea-partial', options)))
+      $taskHintList.append($(renderTemplate('edit-task-hint-textarea-partial', options)))
     })
 
     function getHints () {
       let hints = []
-      $editTaskHintList.find('.themis-task-hint-group[data-state-disabled=false]').each((ndx, el) => {
+      $taskHintList.find('.themis-task-hint-group[data-state-disabled=false]').each((ndx, el) => {
         let $el = $(el)
         hints.push($el.find('textarea').val())
       })
@@ -284,22 +284,22 @@ class TasksView extends View {
 
     let savedTaskHints = null
 
-    $editTaskHintList.on('click', 'a[data-action="remove-task-hint"]', (e) => {
+    $taskHintList.on('click', 'a[data-action="remove-task-hint"]', (e) => {
       e.preventDefault()
       let number = $(e.target).closest('a').attr('data-number')
       $(`#edit-task-hint-${number}`).remove()
 
       let hints = getHints()
-      $editTaskHintList.empty()
+      $taskHintList.empty()
       _.each(savedTaskHints, (entry, ndx) => {
-        $editTaskHintList.append($(renderTemplate('edit-task-hint-textarea-partial', {
+        $taskHintList.append($(renderTemplate('edit-task-hint-textarea-partial', {
           number: ndx + 1,
           editable: false,
           hint: entry.hint
         })))
       })
       _.each(hints, (hint, ndx) => {
-        $editTaskHintList.append($(renderTemplate('edit-task-hint-textarea-partial', {
+        $taskHintList.append($(renderTemplate('edit-task-hint-textarea-partial', {
           number: savedTaskHints.length + ndx + 1,
           editable: true,
           hint: hint
@@ -307,20 +307,20 @@ class TasksView extends View {
       })
     })
 
-    $editTaskAnswers.find('a[data-action="create-task-answer"]').on('click', (e) => {
+    $taskAnswers.find('a[data-action="create-task-answer"]').on('click', (e) => {
       e.preventDefault()
       let options = {
-        number: $editTaskAnswerList.children().length + 1,
+        number: $taskAnswerList.children().length + 1,
         editable: true,
         answer: '',
         caseSensitive: true
       }
-      $editTaskAnswerList.append($(renderTemplate('edit-task-answer-input-partial', options)))
+      $taskAnswerList.append($(renderTemplate('edit-task-answer-input-partial', options)))
     })
 
     function getAnswers () {
       let answers = []
-      $editTaskAnswerList.find('.themis-task-answer-group[data-state-disabled=false]').each((ndx, el) => {
+      $taskAnswerList.find('.themis-task-answer-group[data-state-disabled=false]').each((ndx, el) => {
         let $el = $(el)
         answers.push({
           answer: $el.find('input[type=text]').val(),
@@ -333,14 +333,14 @@ class TasksView extends View {
 
     let savedTaskAnswers = null
 
-    $editTaskAnswerList.on('click', 'a[data-action="remove-task-answer"]', (e) => {
+    $taskAnswerList.on('click', 'a[data-action="remove-task-answer"]', (e) => {
       e.preventDefault()
       let number = $(e.target).closest('a').attr('data-number')
       $(`#edit-task-answer-${number}`).remove()
       let answers = getAnswers()
-      $editTaskAnswerList.empty()
+      $taskAnswerList.empty()
       _.each(savedTaskAnswers, (entry, ndx) => {
-        $editTaskAnswerList.append($(renderTemplate('edit-task-answer-input-partial', {
+        $taskAnswerList.append($(renderTemplate('edit-task-answer-input-partial', {
           number: ndx + 1,
           editable: false,
           answer: entry.answer,
@@ -348,7 +348,7 @@ class TasksView extends View {
         })))
       })
       _.each(answers, (entry, ndx) => {
-        $editTaskAnswerList.append($(renderTemplate('edit-task-answer-input-partial', {
+        $taskAnswerList.append($(renderTemplate('edit-task-answer-input-partial', {
           number: savedTaskAnswers.length + ndx + 1,
           editable: true,
           answer: entry.answer,
@@ -357,7 +357,7 @@ class TasksView extends View {
       })
     })
 
-    $editTaskTabPreview.on('show.bs.tab', (e) => {
+    $tabPreview.on('show.bs.tab', (e) => {
       let md = new MarkdownRenderer()
       let hintsFormatted = savedTaskHints.map((entry) => {
         return entry.hint
@@ -366,36 +366,36 @@ class TasksView extends View {
       })
 
       let options = {
-        title: $editTaskTitle.val(),
-        description: md.render($editTaskDescription.val()),
+        title: $taskTitle.val(),
+        description: md.render($taskDescription.val()),
         hints: hintsFormatted
       }
 
-      $editTaskPreview.html(renderTemplate('task-content-partial', options))
+      $taskPreview.html(renderTemplate('task-content-partial', options))
     })
 
-    $editTaskModal.on('show.bs.modal', (e) => {
+    $modal.on('show.bs.modal', (e) => {
       let taskId = parseInt($(e.relatedTarget).data('task-id'), 10)
-      $editTaskModal.data('task-id', taskId)
+      $modal.data('task-id', taskId)
 
-      $editTaskTabData.tab('show')
-      $editTaskTitle.val('')
-      $editTaskDescription.val('')
-      $editTaskValue.val('')
+      $tabData.tab('show')
+      $taskTitle.val('')
+      $taskDescription.val('')
+      $taskValue.val('')
 
-      $editCategories.empty()
+      $categories.empty()
       _.each(categoryProvider.getCategories(), (category) => {
-        $editCategories.append($('<option></option>').attr('value', category.id).text(category.title))
+        $categories.append($('<option></option>').attr('value', category.id).text(category.title))
       })
 
-      $editTaskHintList.empty()
-      $editTaskAnswerList.empty()
+      $taskHintList.empty()
+      $taskAnswerList.empty()
 
-      $editTaskSubmitError.text('')
-      $editTaskForm.parsley().reset()
-      $editTaskForm.attr('action', `/api/task/${taskId}/update`)
+      $submitError.text('')
+      $form.parsley().reset()
+      $form.attr('action', `/api/task/${taskId}/update`)
 
-      $editTaskSubmitButton.prop('disabled', true)
+      $submitButton.prop('disabled', true)
 
       $
         .when(
@@ -407,28 +407,28 @@ class TasksView extends View {
         .done((task, taskCategories, taskAnswers, taskHints) => {
           savedTaskAnswers = taskAnswers
           savedTaskHints = taskHints
-          $editTaskSubmitButton.prop('disabled', false)
+          $submitButton.prop('disabled', false)
 
-          $editTaskTitle.val(task.title)
-          $editTaskDescription.val(task.description)
-          $editTaskValue.val(task.value)
+          $taskTitle.val(task.title)
+          $taskDescription.val(task.description)
+          $taskValue.val(task.value)
 
-          $editCategories.val(taskCategories.map((taskCategory) => {
+          $categories.val(taskCategories.map((taskCategory) => {
             return taskCategory.categoryId
           }))
 
-          $editTaskHintList.empty()
+          $taskHintList.empty()
           _.each(taskHints, (entry, ndx) => {
-            $editTaskHintList.append($(renderTemplate('edit-task-hint-textarea-partial', {
+            $taskHintList.append($(renderTemplate('edit-task-hint-textarea-partial', {
               number: ndx + 1,
               editable: false,
               hint: entry.hint
             })))
           })
 
-          $editTaskAnswerList.empty()
+          $taskAnswerList.empty()
           _.each(taskAnswers, (entry, ndx) => {
-            $editTaskAnswerList.append($(renderTemplate('edit-task-answer-input-partial', {
+            $taskAnswerList.append($(renderTemplate('edit-task-answer-input-partial', {
               number: ndx + 1,
               editable: false,
               answer: entry.answer,
@@ -437,20 +437,20 @@ class TasksView extends View {
           })
         })
         .fail((err) => {
-          $editTaskSubmitError.text(err)
+          $submitError.text(err)
         })
     })
 
-    $editTaskModal.on('shown.bs.modal', (e) => {
-      $editTaskTitle.focus()
+    $modal.on('shown.bs.modal', (e) => {
+      $taskTitle.focus()
     })
 
-    $editTaskForm.on('submit', (e) => {
+    $form.on('submit', (e) => {
       e.preventDefault()
-      $editTaskForm.ajaxSubmit({
+      $form.ajaxSubmit({
         beforeSubmit: () => {
-          $editTaskSubmitError.text('')
-          $editTaskSubmitButton.prop('disabled', true)
+          $submitError.text('')
+          $submitButton.prop('disabled', true)
         },
         clearForm: true,
         dataType: 'json',
@@ -462,59 +462,59 @@ class TasksView extends View {
           'X-CSRF-Token': identityProvider.getIdentity().token
         },
         success: (responseText, textStatus, jqXHR) => {
-          $editTaskModal.modal('hide')
+          $modal.modal('hide')
           if (!dataStore.connectedRealtime()) {
             window.location.reload()
           }
         },
         error: (jqXHR, textStatus, errorThrown) => {
           if (jqXHR.responseJSON) {
-            $editTaskSubmitError.text(jqXHR.responseJSON)
+            $submitError.text(jqXHR.responseJSON)
           } else {
-            $editTaskSubmitError.text('Unknown error. Please try again later.')
+            $submitError.text('Unknown error. Please try again later.')
           }
         },
         complete: () => {
-          $editTaskSubmitButton.prop('disabled', false)
+          $submitButton.prop('disabled', false)
         }
       })
     })
   }
 
   initReviseTaskModal () {
-    let $reviseTaskModal = $('#revise-task-modal')
-    $reviseTaskModal.modal({ show: false })
+    let $modal = $('#revise-task-modal')
+    $modal.modal({ show: false })
 
-    let $reviseTaskSubmitError = $reviseTaskModal.find('.submit-error > p')
-    let $reviseTaskSubmitSuccess = $reviseTaskModal.find('.submit-success > p')
-    let $reviseTaskStatus = $reviseTaskModal.find('#revise-task-status')
-    let $reviseTaskSubmitButton = $reviseTaskModal.find('button[data-action="complete-revise-task"]')
-    let $reviseTaskForm = $reviseTaskModal.find('form')
-    $reviseTaskForm.parsley()
+    let $submitError = $modal.find('.submit-error > p')
+    let $submitSuccess = $modal.find('.submit-success > p')
+    let $taskStatus = $modal.find('#revise-task-status')
+    let $submitButton = $modal.find('button[data-action="complete-revise-task"]')
+    let $form = $modal.find('form')
+    $form.parsley()
 
-    $reviseTaskSubmitButton.on('click', (e) => {
-      $reviseTaskForm.trigger('submit')
+    $submitButton.on('click', (e) => {
+      $form.trigger('submit')
     })
 
-    let $reviseTaskAnswerGroup = $('#revise-task-answer-group')
-    let $reviseTaskAnswer = $('#revise-task-answer')
-    let $reviseTaskContents = $reviseTaskModal.find('.themis-task-contents')
+    let $taskAnswerGroup = $('#revise-task-answer-group')
+    let $taskAnswer = $('#revise-task-answer')
+    let $taskContents = $modal.find('.themis-task-contents')
 
-    $reviseTaskModal.on('show.bs.modal', (e) => {
+    $modal.on('show.bs.modal', (e) => {
       let taskId = parseInt($(e.relatedTarget).data('task-id'), 10)
-      $reviseTaskModal.data('task-id', taskId)
+      $modal.data('task-id', taskId)
 
-      $reviseTaskForm.parsley().reset()
-      $reviseTaskForm.attr('action', `/api/task/${taskId}/revise`)
+      $form.parsley().reset()
+      $form.attr('action', `/api/task/${taskId}/revise`)
 
-      $reviseTaskContents.empty()
-      $reviseTaskAnswerGroup.show()
-      $reviseTaskSubmitButton.show()
-      $reviseTaskAnswer.val('')
-      $reviseTaskSubmitError.text('')
-      $reviseTaskSubmitSuccess.text('')
-      $reviseTaskStatus.text('')
-      $reviseTaskSubmitButton.prop('disabled', true)
+      $taskContents.empty()
+      $taskAnswerGroup.show()
+      $submitButton.show()
+      $taskAnswer.val('')
+      $submitError.text('')
+      $submitSuccess.text('')
+      $taskStatus.text('')
+      $submitButton.prop('disabled', true)
 
       $
         .when(
@@ -534,7 +534,7 @@ class TasksView extends View {
             hints: hintsFormatted
           }
 
-          $reviseTaskContents.html(renderTemplate('task-content-partial', options))
+          $taskContents.html(renderTemplate('task-content-partial', options))
 
           let teamTaskHits = _.where(contestProvider.getTeamTaskHits(), { taskId: task.id })
           let sortedTeamTaskHits = _.sortBy(teamTaskHits, 'createdAt')
@@ -550,25 +550,25 @@ class TasksView extends View {
             }
           }
 
-          $reviseTaskStatus.html(renderTemplate('revise-task-status-partial', { teamNames: teamNames }))
-          $reviseTaskSubmitButton.prop('disabled', false)
+          $taskStatus.html(renderTemplate('revise-task-status-partial', { teamNames: teamNames }))
+          $submitButton.prop('disabled', false)
         })
         .fail((err) => {
-          $reviseTaskSubmitError.text(err)
+          $submitError.text(err)
         })
     })
 
-    $reviseTaskModal.on('shown.bs.modal', (e) => {
-      $reviseTaskAnswer.focus()
+    $modal.on('shown.bs.modal', (e) => {
+      $taskAnswer.focus()
     })
 
-    $reviseTaskForm.on('submit', (e) => {
+    $form.on('submit', (e) => {
       e.preventDefault()
-      $reviseTaskForm.ajaxSubmit({
+      $form.ajaxSubmit({
         beforeSubmit: () => {
-          $reviseTaskSubmitError.text('')
-          $reviseTaskSubmitSuccess.text('')
-          $reviseTaskSubmitButton.prop('disabled', true)
+          $submitError.text('')
+          $submitSuccess.text('')
+          $submitButton.prop('disabled', true)
         },
         clearForm: true,
         dataType: 'json',
@@ -576,11 +576,11 @@ class TasksView extends View {
           'X-CSRF-Token': identityProvider.getIdentity().token
         },
         success: (responseText, textStatus, jqXHR) => {
-          $reviseTaskAnswerGroup.hide()
-          $reviseTaskSubmitButton.hide()
-          $reviseTaskSubmitSuccess.text('Answer is correct!')
+          $taskAnswerGroup.hide()
+          $submitButton.hide()
+          $submitSuccess.text('Answer is correct!')
           let hideModal = () => {
-            $reviseTaskModal.modal('hide')
+            $modal.modal('hide')
             if (!dataStore.connectedRealtime()) {
               window.location.reload()
             }
@@ -590,110 +590,110 @@ class TasksView extends View {
         },
         error: (jqXHR, textStatus, errorThrown) => {
           if (jqXHR.responseJSON) {
-            $reviseTaskSubmitError.text(jqXHR.responseJSON)
+            $submitError.text(jqXHR.responseJSON)
           } else {
-            $reviseTaskSubmitError.text('Unknown error. Please try again later.')
+            $submitError.text('Unknown error. Please try again later.')
           }
         },
         complete: () => {
-          $reviseTaskSubmitButton.prop('disabled', false)
+          $submitButton.prop('disabled', false)
         }
       })
     })
   }
 
   initOpenTaskModal () {
-    let $openTaskModal = $('#open-task-modal')
-    $openTaskModal.modal({ show: false })
+    let $modal = $('#open-task-modal')
+    $modal.modal({ show: false })
 
-    let $openTaskModalBody = $openTaskModal.find('.modal-body p.confirmation')
-    let $openTaskSubmitError = $openTaskModal.find('.submit-error > p')
-    let $openTaskSubmitButton = $openTaskModal.find('button[data-action="complete-open-task"]')
+    let $modalBody = $modal.find('.modal-body p.confirmation')
+    let $submitError = $modal.find('.submit-error > p')
+    let $submitButton = $modal.find('button[data-action="complete-open-task"]')
 
-    $openTaskModal.on('show.bs.modal', (e) => {
+    $modal.on('show.bs.modal', (e) => {
       let taskId = parseInt($(e.relatedTarget).data('task-id'), 10)
-      $openTaskModal.data('task-id', taskId)
+      $modal.data('task-id', taskId)
       let taskPreview = _.findWhere(taskProvider.getTaskPreviews(), { id: taskId })
-      $openTaskModalBody.html(renderTemplate('open-task-confirmation', { title: taskPreview.title }))
-      $openTaskSubmitError.text('')
+      $modalBody.html(renderTemplate('open-task-confirmation', { title: taskPreview.title }))
+      $submitError.text('')
     })
 
-    $openTaskSubmitButton.on('click', (e) => {
-      let taskId = $openTaskModal.data('task-id')
+    $submitButton.on('click', (e) => {
+      let taskId = $modal.data('task-id')
       $
         .when(taskProvider.openTask(taskId, identityProvider.getIdentity().token))
         .done(() => {
-          $openTaskModal.modal('hide')
+          $modal.modal('hide')
           if (!dataStore.connectedRealtime()) {
             window.location.reload()
           }
         })
         .fail((err) => {
-          $openTaskSubmitError.text(err)
+          $submitError.text(err)
         })
     })
   }
 
   initCloseTaskModal () {
-    let $closeTaskModal = $('#close-task-modal')
-    $closeTaskModal.modal({ show: false })
+    let $modal = $('#close-task-modal')
+    $modal.modal({ show: false })
 
-    let $closeTaskModalBody = $closeTaskModal.find('.modal-body p.confirmation')
-    let $closeTaskSubmitError = $closeTaskModal.find('.submit-error > p')
-    let $closeTaskSubmitButton = $closeTaskModal.find('button[data-action="complete-close-task"]')
+    let $modalBody = $modal.find('.modal-body p.confirmation')
+    let $submitError = $modal.find('.submit-error > p')
+    let $submitButton = $modal.find('button[data-action="complete-close-task"]')
 
-    $closeTaskModal.on('show.bs.modal', (e) => {
+    $modal.on('show.bs.modal', (e) => {
       let taskId = parseInt($(e.relatedTarget).data('task-id'), 10)
-      $closeTaskModal.data('task-id', taskId)
+      $modal.data('task-id', taskId)
       let taskPreview = _.findWhere(taskProvider.getTaskPreviews(), { id: taskId })
-      $closeTaskModalBody.html(renderTemplate('close-task-confirmation', { title: taskPreview.title }))
-      $closeTaskSubmitError.text('')
+      $modalBody.html(renderTemplate('close-task-confirmation', { title: taskPreview.title }))
+      $submitError.text('')
     })
 
-    $closeTaskSubmitButton.on('click', (e) => {
-      let taskId = $closeTaskModal.data('task-id')
+    $submitButton.on('click', (e) => {
+      let taskId = $modal.data('task-id')
       $
         .when(taskProvider.closeTask(taskId, identityProvider.getIdentity().token))
         .done(() => {
-          $closeTaskModal.modal('hide')
+          $modal.modal('hide')
           if (!dataStore.connectedRealtime()) {
             window.location.reload()
           }
         })
         .fail((err) => {
-          $closeTaskSubmitError.text(err)
+          $submitError.text(err)
         })
     })
   }
 
   initSubmitTaskModal () {
-    let $submitTaskModal = $('#submit-task-modal')
-    $submitTaskModal.modal({ show: false })
+    let $modal = $('#submit-task-modal')
+    $modal.modal({ show: false })
 
-    let $submitTaskSubmitError = $submitTaskModal.find('.submit-error > p')
-    let $submitTaskInfo = $submitTaskModal.find('.submit-info > p')
-    let $submitTaskSubmitSuccess = $submitTaskModal.find('.submit-success > p')
-    let $submitTaskSubmitButton = $submitTaskModal.find('button[data-action="complete-submit-task"]')
-    let $submitTaskForm = $submitTaskModal.find('form')
-    $submitTaskForm.parsley()
+    let $submitError = $modal.find('.submit-error > p')
+    let $taskInfo = $modal.find('.submit-info > p')
+    let $submitSuccess = $modal.find('.submit-success > p')
+    let $submitButton = $modal.find('button[data-action="complete-submit-task"]')
+    let $form = $modal.find('form')
+    $form.parsley()
 
-    $submitTaskSubmitButton.on('click', (e) => {
-      $submitTaskForm.trigger('submit')
+    $submitButton.on('click', (e) => {
+      $form.trigger('submit')
     })
 
-    let $submitTaskAnswerGroup = $('#submit-task-answer-group')
-    let $submitTaskAnswer = $('#submit-task-answer')
-    let $submitTaskContents = $submitTaskModal.find('.themis-task-contents')
+    let $taskAnswerGroup = $('#submit-task-answer-group')
+    let $taskAnswer = $('#submit-task-answer')
+    let $taskContents = $modal.find('.themis-task-contents')
 
-    $submitTaskModal.on('show.bs.modal', (e) => {
+    $modal.on('show.bs.modal', (e) => {
       let taskId = parseInt($(e.relatedTarget).data('task-id'), 10)
 
-      $submitTaskContents.empty()
-      $submitTaskAnswer.val('')
-      $submitTaskSubmitError.text('')
-      $submitTaskInfo.text('')
-      $submitTaskSubmitSuccess.text('')
-      $submitTaskSubmitButton.prop('disabled', true)
+      $taskContents.empty()
+      $taskAnswer.val('')
+      $submitError.text('')
+      $taskInfo.text('')
+      $submitSuccess.text('')
+      $submitButton.prop('disabled', true)
 
       let taskPreview = _.findWhere(taskProvider.getTaskPreviews(), { id: taskId })
       let identity = identityProvider.getIdentity()
@@ -711,39 +711,39 @@ class TasksView extends View {
           }
 
           if (taskPreview.isOpened() && ((!taskIsSolved && contest.isStarted()) || contest.isFinished())) {
-            $submitTaskAnswerGroup.show()
-            $submitTaskSubmitButton.show()
+            $taskAnswerGroup.show()
+            $submitButton.show()
           } else {
-            $submitTaskAnswerGroup.hide()
-            $submitTaskSubmitButton.hide()
+            $taskAnswerGroup.hide()
+            $submitButton.hide()
             if (contest.isPaused() && !taskIsSolved) {
-              $submitTaskSubmitError.text('Contest has been paused.')
+              $submitError.text('Contest has been paused.')
             }
             if (taskPreview.isClosed()) {
-              $submitTaskSubmitError.text('Task has been closed by the event organizers.')
+              $submitError.text('Task has been closed by the event organizers.')
             }
           }
 
           if (taskIsSolved) {
-            $submitTaskSubmitSuccess.text(`Your team has solved the task on ${moment(taskHit.createdAt).format('lll')}!`)
+            $submitSuccess.text(`Your team has solved the task on ${moment(taskHit.createdAt).format('lll')}!`)
           }
         } else {
-          $submitTaskSubmitError.text('You should confirm your email before you can submit an answer to the task.')
-          $submitTaskAnswerGroup.hide()
-          $submitTaskSubmitButton.hide()
+          $submitError.text('You should confirm your email before you can submit an answer to the task.')
+          $taskAnswerGroup.hide()
+          $submitButton.hide()
         }
       } else {
-        $submitTaskAnswerGroup.hide()
-        $submitTaskSubmitButton.hide()
+        $taskAnswerGroup.hide()
+        $submitButton.hide()
       }
 
-      $submitTaskModal.data('task-id', taskId)
+      $modal.data('task-id', taskId)
 
-      $submitTaskForm.parsley().reset()
+      $form.parsley().reset()
       if (contest.isFinished()) {
-        $submitTaskForm.attr('action', `/api/task/${taskId}/check`)
+        $form.attr('action', `/api/task/${taskId}/check`)
       } else {
-        $submitTaskForm.attr('action', `/api/task/${taskId}/submit`)
+        $form.attr('action', `/api/task/${taskId}/submit`)
       }
 
       $
@@ -763,28 +763,28 @@ class TasksView extends View {
             description: md.render(task.description),
             hints: hintsFormatted
           }
-          $submitTaskContents.html(renderTemplate('task-content-partial', options))
+          $taskContents.html(renderTemplate('task-content-partial', options))
 
-          $submitTaskInfo.text(renderTemplate('submit-task-status-partial', { solvedTeamCount: solvedTeamCount }))
+          $taskInfo.text(renderTemplate('submit-task-status-partial', { solvedTeamCount: solvedTeamCount }))
 
-          $submitTaskSubmitButton.prop('disabled', false)
+          $submitButton.prop('disabled', false)
         })
         .fail((err) => {
-          $submitTaskSubmitError.text(err)
+          $submitError.text(err)
         })
     })
 
-    $submitTaskModal.on('shown.bs.modal', (e) => {
-      $submitTaskAnswer.focus()
+    $modal.on('shown.bs.modal', (e) => {
+      $taskAnswer.focus()
     })
 
-    $submitTaskForm.on('submit', (e) => {
+    $form.on('submit', (e) => {
       e.preventDefault()
-      $submitTaskForm.ajaxSubmit({
+      $form.ajaxSubmit({
         beforeSubmit: () => {
-          $submitTaskSubmitError.text('')
-          $submitTaskSubmitSuccess.text('')
-          $submitTaskSubmitButton.prop('disabled', true)
+          $submitError.text('')
+          $submitSuccess.text('')
+          $submitButton.prop('disabled', true)
         },
         clearForm: true,
         dataType: 'json',
@@ -792,11 +792,11 @@ class TasksView extends View {
           'X-CSRF-Token': identityProvider.getIdentity().token
         },
         success: (responseText, textStatus, jqXHR) => {
-          $submitTaskAnswerGroup.hide()
-          $submitTaskSubmitButton.hide()
-          $submitTaskSubmitSuccess.text('Answer is correct!')
+          $taskAnswerGroup.hide()
+          $submitButton.hide()
+          $submitSuccess.text('Answer is correct!')
           let hideModal = () => {
-            $submitTaskModal.modal('hide')
+            $modal.modal('hide')
             if (!dataStore.connectedRealtime()) {
               window.location.reload()
             }
@@ -806,46 +806,46 @@ class TasksView extends View {
         },
         error: (jqXHR, textStatus, errorThrown) => {
           if (jqXHR.responseJSON) {
-            $submitTaskSubmitError.text(jqXHR.responseJSON)
+            $submitError.text(jqXHR.responseJSON)
           } else {
-            $submitTaskSubmitError.text('Unknown error. Please try again later.')
+            $submitError.text('Unknown error. Please try again later.')
           }
         },
         complete: () => {
-          $submitTaskSubmitButton.prop('disabled', false)
+          $submitButton.prop('disabled', false)
         }
       })
     })
   }
 
   initCheckTaskModal () {
-    let $checkTaskModal = $('#check-task-modal')
-    $checkTaskModal.modal({ show: false })
+    let $modal = $('#check-task-modal')
+    $modal.modal({ show: false })
 
-    let $checkTaskSubmitError = $checkTaskModal.find('.submit-error > p')
-    let $checkTaskInfo = $checkTaskModal.find('.submit-info > p')
-    let $checkTaskSubmitSuccess = $checkTaskModal.find('.submit-success > p')
-    let $checkTaskSubmitButton = $checkTaskModal.find('button[data-action="complete-check-task"]')
-    let $checkTaskForm = $checkTaskModal.find('form')
-    $checkTaskForm.parsley()
+    let $submitError = $modal.find('.submit-error > p')
+    let $taskInfo = $modal.find('.submit-info > p')
+    let $submitSuccess = $modal.find('.submit-success > p')
+    let $submitButton = $modal.find('button[data-action="complete-check-task"]')
+    let $form = $modal.find('form')
+    $form.parsley()
 
-    $checkTaskSubmitButton.on('click', (e) => {
-      $checkTaskForm.trigger('submit')
+    $submitButton.on('click', (e) => {
+      $form.trigger('submit')
     })
 
-    let $checkTaskAnswerGroup = $('#check-task-answer-group')
-    let $checkTaskAnswer = $('#check-task-answer')
-    let $checkTaskContents = $checkTaskModal.find('.themis-task-contents')
+    let $taskAnswerGroup = $('#check-task-answer-group')
+    let $taskAnswer = $('#check-task-answer')
+    let $taskContents = $modal.find('.themis-task-contents')
 
-    $checkTaskModal.on('show.bs.modal', (e) => {
+    $modal.on('show.bs.modal', (e) => {
       let taskId = parseInt($(e.relatedTarget).data('task-id'), 10)
 
-      $checkTaskContents.empty()
-      $checkTaskAnswer.val('')
-      $checkTaskSubmitError.text('')
-      $checkTaskInfo.text('')
-      $checkTaskSubmitSuccess.text('')
-      $checkTaskSubmitButton.prop('disabled', true)
+      $taskContents.empty()
+      $taskAnswer.val('')
+      $submitError.text('')
+      $taskInfo.text('')
+      $submitSuccess.text('')
+      $submitButton.prop('disabled', true)
 
       let taskPreview = _.findWhere(taskProvider.getTaskPreviews(), { id: taskId })
       let identity = identityProvider.getIdentity()
@@ -854,29 +854,29 @@ class TasksView extends View {
       if (taskPreview && identity.isGuest()) {
         if (contest.isFinished()) {
           if (taskPreview.isOpened()) {
-            $checkTaskAnswerGroup.show()
-            $checkTaskSubmitButton.show()
+            $taskAnswerGroup.show()
+            $submitButton.show()
           } else {
-            $checkTaskAnswerGroup.hide()
-            $checkTaskSubmitButton.hide()
+            $taskAnswerGroup.hide()
+            $submitButton.hide()
             if (taskPreview.isClosed()) {
-              $checkTaskSubmitError.text('Task has been closed by the event organizers.')
+              $submitError.text('Task has been closed by the event organizers.')
             }
           }
         } else {
-          $checkTaskAnswerGroup.hide()
-          $checkTaskSubmitButton.hide()
-          $checkTaskSubmitError.html(renderTemplate('check-task-guest-error'))
+          $taskAnswerGroup.hide()
+          $submitButton.hide()
+          $submitError.html(renderTemplate('check-task-guest-error'))
         }
       } else {
-        $checkTaskAnswerGroup.hide()
-        $checkTaskSubmitButton.hide()
+        $taskAnswerGroup.hide()
+        $submitButton.hide()
       }
 
-      $checkTaskModal.data('task-id', taskId)
+      $modal.data('task-id', taskId)
 
-      $checkTaskForm.parsley().reset()
-      $checkTaskForm.attr('action', `/api/task/${taskId}/check`)
+      $form.parsley().reset()
+      $form.attr('action', `/api/task/${taskId}/check`)
 
       if (contest.isFinished()) {
         $
@@ -896,26 +896,26 @@ class TasksView extends View {
               description: md.render(task.description),
               hints: hintsFormatted
             }
-            $checkTaskContents.html(renderTemplate('task-content-partial', options))
-            $checkTaskSubmitButton.prop('disabled', false)
+            $taskContents.html(renderTemplate('task-content-partial', options))
+            $submitButton.prop('disabled', false)
           })
           .fail((err) => {
-            $checkTaskSubmitError.text(err)
+            $submitError.text(err)
           })
       }
     })
 
-    $checkTaskModal.on('shown.bs.modal', (e) => {
-      $checkTaskAnswer.focus()
+    $modal.on('shown.bs.modal', (e) => {
+      $taskAnswer.focus()
     })
 
-    $checkTaskForm.on('submit', (e) => {
+    $form.on('submit', (e) => {
       e.preventDefault()
-      $checkTaskForm.ajaxSubmit({
+      $form.ajaxSubmit({
         beforeSubmit: () => {
-          $checkTaskSubmitError.text('')
-          $checkTaskSubmitSuccess.text('')
-          $checkTaskSubmitButton.prop('disabled', true)
+          $submitError.text('')
+          $submitSuccess.text('')
+          $submitButton.prop('disabled', true)
         },
         clearForm: true,
         dataType: 'json',
@@ -923,11 +923,11 @@ class TasksView extends View {
           'X-CSRF-Token': identityProvider.getIdentity().token
         },
         success: (responseText, textStatus, jqXHR) => {
-          $checkTaskAnswerGroup.hide()
-          $checkTaskSubmitButton.hide()
-          $checkTaskSubmitSuccess.text('Answer is correct!')
+          $taskAnswerGroup.hide()
+          $submitButton.hide()
+          $submitSuccess.text('Answer is correct!')
           let hideModal = () => {
-            $checkTaskModal.modal('hide')
+            $modal.modal('hide')
             if (!dataStore.connectedRealtime()) {
               window.location.reload()
             }
@@ -937,13 +937,13 @@ class TasksView extends View {
         },
         error: (jqXHR, textStatus, errorThrown) => {
           if (jqXHR.responseJSON) {
-            $checkTaskSubmitError.text(jqXHR.responseJSON)
+            $submitError.text(jqXHR.responseJSON)
           } else {
-            $checkTaskSubmitError.text('Unknown error. Please try again later.')
+            $submitError.text('Unknown error. Please try again later.')
           }
         },
         complete: () => {
-          $checkTaskSubmitButton.prop('disabled', false)
+          $submitButton.prop('disabled', false)
         }
       })
     })

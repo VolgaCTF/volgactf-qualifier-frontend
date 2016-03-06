@@ -31,59 +31,57 @@ class StatusBar {
   }
 
   initUpdateContestModal () {
-    let $updateContestModal = $('#update-contest-modal')
-    $updateContestModal.modal({
-      show: false
-    })
+    let $modal = $('#update-contest-modal')
+    $modal.modal({ show: false })
 
-    let $updateContestSubmitError = $updateContestModal.find('.submit-error > p')
-    let $updateContestSubmitButton = $updateContestModal.find('button[data-action="complete-update-contest"]')
-    let $updateContestForm = $updateContestModal.find('form')
-    $updateContestForm.parsley()
+    let $submitError = $modal.find('.submit-error > p')
+    let $submitButton = $modal.find('button[data-action="complete-update-contest"]')
+    let $form = $modal.find('form')
+    $form.parsley()
 
-    let $updateContestState = $('#update-contest-state')
-    let $updateContestStartsAt = $('#update-contest-starts')
-    let $updateContestFinishesAt = $('#update-contest-finishes')
+    let $contestState = $('#update-contest-state')
+    let $contestStartsAt = $('#update-contest-starts')
+    let $contestFinishesAt = $('#update-contest-finishes')
 
     let pickerFormat = 'D MMM YYYY [at] HH:mm'
 
-    $updateContestStartsAt.datetimepicker({
+    $contestStartsAt.datetimepicker({
       showClose: true,
       sideBySide: true,
       format: pickerFormat
     })
 
-    $updateContestFinishesAt.datetimepicker({
+    $contestFinishesAt.datetimepicker({
       showClose: true,
       sideBySide: true,
       format: pickerFormat
     })
 
-    $updateContestSubmitButton.on('click', (e) => {
-      $updateContestForm.trigger('submit')
+    $submitButton.on('click', (e) => {
+      $form.trigger('submit')
     })
 
-    $updateContestModal.on('show.bs.modal', (e) => {
+    $modal.on('show.bs.modal', (e) => {
       let contest = contestProvider.getContest()
-      $updateContestState.val(contest.state)
-      $updateContestStartsAt.data('DateTimePicker').date(contest.startsAt)
-      $updateContestFinishesAt.data('DateTimePicker').date(contest.finishesAt)
-      $updateContestSubmitError.text('')
+      $contestState.val(contest.state)
+      $contestStartsAt.data('DateTimePicker').date(contest.startsAt)
+      $contestFinishesAt.data('DateTimePicker').date(contest.finishesAt)
+      $submitError.text('')
     })
 
-    $updateContestModal.on('shown.bs.modal', (e) => {
-      $updateContestState.focus()
+    $modal.on('shown.bs.modal', (e) => {
+      $contestState.focus()
     })
 
-    $updateContestForm.on('submit', (e) => {
-      let valStartsAt = $updateContestStartsAt.data('DateTimePicker').date()
-      let valFinishesAt = $updateContestFinishesAt.data('DateTimePicker').date()
+    $form.on('submit', (e) => {
+      let valStartsAt = $contestStartsAt.data('DateTimePicker').date()
+      let valFinishesAt = $contestFinishesAt.data('DateTimePicker').date()
 
       e.preventDefault()
-      $updateContestForm.ajaxSubmit({
+      $form.ajaxSubmit({
         beforeSubmit: () => {
-          $updateContestSubmitError.text('')
-          $updateContestSubmitButton.prop('disabled', true)
+          $submitError.text('')
+          $submitButton.prop('disabled', true)
         },
         clearForm: true,
         data: {
@@ -95,20 +93,20 @@ class StatusBar {
           'X-CSRF-Token': identityProvider.getIdentity().token
         },
         success: (responseJSON, textStatus, jqXHR) => {
-          $updateContestModal.modal('hide')
+          $modal.modal('hide')
           if (!dataStore.connectedRealtime()) {
             window.location.reload()
           }
         },
         error: (jqXHR, textStatus, errorThrown) => {
           if (jqXHR.responseJSON) {
-            $updateContestSubmitError.text(jqXHR.responseJSON)
+            $submitError.text(jqXHR.responseJSON)
           } else {
-            $updateContestSubmitError.text('Unknown error. Please try again later.')
+            $submitError.text('Unknown error. Please try again later.')
           }
         },
         complete: () => {
-          $updateContestSubmitButton.prop('disabled', false)
+          $submitButton.prop('disabled', false)
         }
       })
     })
