@@ -87,59 +87,59 @@ class NewsView extends View {
   }
 
   initCreatePostModal () {
-    let $createPostModal = $('#create-post-modal')
-    $createPostModal.modal({ show: false })
+    let $modal = $('#create-post-modal')
+    $modal.modal({ show: false })
 
-    let $createPostSubmitError = $createPostModal.find('.submit-error > p')
-    let $createPostSubmitButton = $createPostModal.find('button[data-action="complete-create-post"]')
-    let $createPostForm = $createPostModal.find('form')
-    $createPostForm.parsley()
+    let $submitError = $modal.find('.submit-error > p')
+    let $submitButton = $modal.find('button[data-action="complete-create-post"]')
+    let $form = $modal.find('form')
+    $form.parsley()
 
-    $createPostSubmitButton.on('click', (e) => {
-      $createPostForm.trigger('submit')
+    $submitButton.on('click', (e) => {
+      $form.trigger('submit')
     })
 
-    let $createPostTablist = $('#create-post-tablist')
-    let $createPostTabData = $createPostTablist.find('a[href="#create-post-data"]')
-    let $createPostTabPreview = $createPostTablist.find('a[href="#create-post-preview"]')
+    let $tabList = $('#create-post-tablist')
+    let $tabData = $tabList.find('a[href="#create-post-data"]')
+    let $tabPreview = $tabList.find('a[href="#create-post-preview"]')
 
-    let $createPostTitle = $('#create-post-title')
-    let $createPostDescription = $('#create-post-description')
+    let $postTitle = $('#create-post-title')
+    let $postDescription = $('#create-post-description')
 
-    let $createPostPreview = $('#create-post-preview')
+    let $postPreview = $('#create-post-preview')
 
-    $createPostTabData.tab()
-    $createPostTabPreview.tab()
+    $tabData.tab()
+    $tabPreview.tab()
 
-    $createPostTabPreview.on('show.bs.tab', (e) => {
+    $tabPreview.on('show.bs.tab', (e) => {
       let md = new MarkdownRenderer()
       let options = {
-        title: $createPostTitle.val(),
-        description: md.render($createPostDescription.val()),
+        title: $postTitle.val(),
+        description: md.render($postDescription.val()),
         updatedAt: moment(new Date()).format('lll')
       }
 
-      $createPostPreview.html(renderTemplate('post-simplified-partial', options))
+      $postPreview.html(renderTemplate('post-simplified-partial', options))
     })
 
-    $createPostModal.on('show.bs.modal', (e) => {
-      $createPostTabData.tab('show')
-      $createPostTitle.val('')
-      $createPostDescription.val('')
-      $createPostSubmitError.text('')
-      $createPostForm.parsley().reset()
+    $modal.on('show.bs.modal', (e) => {
+      $tabData.tab('show')
+      $postTitle.val('')
+      $postDescription.val('')
+      $submitError.text('')
+      $form.parsley().reset()
     })
 
-    $createPostModal.on('shown.bs.modal', (e) => {
-      $createPostTitle.focus()
+    $modal.on('shown.bs.modal', (e) => {
+      $postTitle.focus()
     })
 
-    $createPostForm.on('submit', (e) => {
+    $form.on('submit', (e) => {
       e.preventDefault()
-      $createPostForm.ajaxSubmit({
+      $form.ajaxSubmit({
         beforeSubmit: () => {
-          $createPostSubmitError.text('')
-          $createPostSubmitButton.prop('disabled', true)
+          $submitError.text('')
+          $submitButton.prop('disabled', true)
         },
         clearForm: true,
         dataType: 'json',
@@ -147,83 +147,83 @@ class NewsView extends View {
           'X-CSRF-Token': identityProvider.getIdentity().token
         },
         success: (responseText, textStatus, jqXHR) => {
-          $createPostModal.modal('hide')
+          $modal.modal('hide')
           if (!dataStore.connectedRealtime()) {
             window.location.reload()
           }
         },
         error: (jqXHR, textStatus, errorThrown) => {
           if (jqXHR.responseJSON) {
-            $createPostSubmitError.text(jqXHR.responseJSON)
+            $submitError.text(jqXHR.responseJSON)
           } else {
-            $createPostSubmitError.text('Unknown error. Please try again later.')
+            $submitError.text('Unknown error. Please try again later.')
           }
         },
         complete: () => {
-          $createPostSubmitButton.prop('disabled', false)
+          $submitButton.prop('disabled', false)
         }
       })
     })
   }
 
   initEditPostModal () {
-    let $editPostModal = $('#edit-post-modal')
-    $editPostModal.modal({ show: false })
+    let $modal = $('#edit-post-modal')
+    $modal.modal({ show: false })
 
-    let $editPostSubmitError = $editPostModal.find('.submit-error > p')
-    let $editPostSubmitButton = $editPostModal.find('button[data-action="complete-edit-post"]')
-    let $editPostForm = $editPostModal.find('form')
-    $editPostForm.parsley()
+    let $submitError = $modal.find('.submit-error > p')
+    let $submitButton = $modal.find('button[data-action="complete-edit-post"]')
+    let $form = $modal.find('form')
+    $form.parsley()
 
-    $editPostSubmitButton.on('click', (e) => {
-      $editPostForm.trigger('submit')
+    $submitButton.on('click', (e) => {
+      $form.trigger('submit')
     })
 
-    let $editPostTablist = $('#edit-post-tablist')
-    let $editPostTabData = $editPostTablist.find('a[href="#edit-post-data"]')
-    let $editPostTabPreview = $editPostTablist.find('a[href="#edit-post-preview"]')
+    let $tabList = $('#edit-post-tablist')
+    let $tabData = $tabList.find('a[href="#edit-post-data"]')
+    let $tabPreview = $tabList.find('a[href="#edit-post-preview"]')
 
-    let $editPostTitle = $('#edit-post-title')
-    let $editPostDescription = $('#edit-post-description')
+    let $postTitle = $('#edit-post-title')
+    let $postDescription = $('#edit-post-description')
 
-    let $editPostPreview = $('#edit-post-preview')
+    let $postPreview = $('#edit-post-preview')
 
-    $editPostTabData.tab()
-    $editPostTabPreview.tab()
+    $tabData.tab()
+    $tabPreview.tab()
 
-    $editPostTabPreview.on('show.bs.tab', (e) => {
+    $tabPreview.on('show.bs.tab', (e) => {
       let md = new MarkdownRenderer()
       let options = {
-        title: $editPostTitle.val(),
-        description: md.render($editPostDescription.val()),
+        title: $postTitle.val(),
+        description: md.render($postDescription.val()),
         updatedAt: moment(new Date()).format('lll')
       }
 
-      $editPostPreview.html(renderTemplate('post-simplified-partial', options))
+      $postPreview.html(renderTemplate('post-simplified-partial', options))
     })
 
-    $editPostModal.on('show.bs.modal', (e) => {
-      $editPostTabData.tab('show')
+    $modal.on('show.bs.modal', (e) => {
+      $tabData.tab('show')
       let postId = parseInt($(e.relatedTarget).data('post-id'), 10)
       let post = _.findWhere(postProvider.getPosts(), { id: postId })
 
-      $editPostForm.attr('action', `/api/post/${postId}/update`)
-      $editPostTitle.val(post.title)
-      $editPostDescription.val(post.description)
-      $editPostSubmitError.text('')
-      $editPostForm.parsley().reset()
+      $form.attr('action', `/api/post/${postId}/update`)
+      $postTitle.val(post.title)
+      $postDescription.val(post.description)
+      $submitError.text('')
+      $form.parsley().reset()
     })
 
-    $editPostModal.on('shown.bs.modal', (e) => {
-      $editPostTitle.focus()
+    $modal.on('shown.bs.modal', (e) => {
+      $postTitle.focus()
     })
 
-    $editPostForm.on('submit', (e) => {
+    $form.on('submit', (e) => {
       e.preventDefault()
-      $editPostForm.ajaxSubmit({
+      $form.ajaxSubmit({
         beforeSubmit: () => {
-          $editPostSubmitError.text('')
-          $editPostSubmitButton.prop('disabled', true)
+          $submitError.text('')
+          $submitButton.prop('disabled', true)
         },
         clearForm: true,
         dataType: 'json',
@@ -231,20 +231,20 @@ class NewsView extends View {
           'X-CSRF-Token': identityProvider.getIdentity().token
         },
         success: (responseText, textStatus, jqXHR) => {
-          $editPostModal.modal('hide')
+          $modal.modal('hide')
           if (!dataStore.connectedRealtime()) {
             window.location.reload()
           }
         },
         error: (jqXHR, textStatus, errorThrown) => {
           if (jqXHR.responseJSON) {
-            $editPostSubmitError.text(jqXHR.responseJSON)
+            $submitError.text(jqXHR.responseJSON)
           } else {
-            $editPostSubmitError.text('Unknown error. Please try again later.')
+            $submitError.text('Unknown error. Please try again later.')
           }
         },
         complete: () => {
-          $editPostSubmitButton.prop('disabled', false)
+          $submitButton.prop('disabled', false)
         }
       })
     })
