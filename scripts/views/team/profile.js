@@ -267,6 +267,7 @@ class TeamProfileView extends View {
       $modal.modal({ show: false })
 
       let $submitError = $modal.find('.submit-error > p')
+      let $submitSuccess = $modal.find('.submit-success > p')
       let $submitButton = $modal.find('button[data-action="complete-change-password"]')
       let $form = $modal.find('form')
       $form.parsley()
@@ -280,6 +281,8 @@ class TeamProfileView extends View {
         $('#change-pwd-new').val('')
         $('#change-pwd-confirm-new').val('')
         $submitError.text('')
+        $submitSuccess.text('')
+        $submitButton.show()
         $form.parsley().reset()
       })
 
@@ -292,6 +295,7 @@ class TeamProfileView extends View {
         $form.ajaxSubmit({
           beforeSubmit: () => {
             $submitError.text('')
+            $submitSuccess.text('')
             $submitButton.prop('disabled', true)
           },
           clearForm: true,
@@ -300,7 +304,13 @@ class TeamProfileView extends View {
             'X-CSRF-Token': identityProvider.getIdentity().token
           },
           success: (responseText, textStatus, jqXHR) => {
-            $modal.modal('hide')
+            $submitButton.hide()
+            $submitSuccess.text('Password has been successfully changed!')
+            let hideModal = () => {
+              $modal.modal('hide')
+            }
+
+            setTimeout(hideModal, 1000)
           },
           error: (jqXHR, textStatus, errorThrown) => {
             if (jqXHR.responseJSON) {
