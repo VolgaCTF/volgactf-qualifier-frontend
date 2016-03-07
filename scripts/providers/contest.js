@@ -177,7 +177,7 @@ class ContestProvider extends EventEmitter {
 
   fetchTeamScores () {
     let promise = $.Deferred()
-    let url = '/api/contest/scores'
+    let url = '/api/team/score/index'
 
     $.ajax({
       url: url,
