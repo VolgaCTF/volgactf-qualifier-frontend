@@ -374,7 +374,7 @@ class TeamProfileView extends View {
               countryProvider.fetchCountries(),
               contestProvider.fetchTeamTaskHit(teamId),
               contestProvider.fetchTeamScores(),
-              contestProvider.fetchTaskPreviews()
+              taskProvider.fetchTaskPreviews()
             )
           }
         } else if (identity.isTeam()) {

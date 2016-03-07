@@ -700,38 +700,33 @@ class TasksView extends View {
       let contest = contestProvider.getContest()
 
       if (taskPreview && identity.isTeam()) {
-        if (identity.emailConfirmed) {
-          let taskIsSolved = false
-          let taskHit = _.findWhere(contestProvider.getTeamTaskHits(), {
-            teamId: identity.id,
-            taskId: taskId
-          })
-          if (taskHit) {
-            taskIsSolved = true
-          }
+        let taskIsSolved = false
+        let taskHit = _.findWhere(contestProvider.getTeamTaskHits(), {
+          teamId: identity.id,
+          taskId: taskId
+        })
+        if (taskHit) {
+          taskIsSolved = true
+        }
 
-          if (taskPreview.isOpened() && ((!taskIsSolved && contest.isStarted()) || contest.isFinished())) {
-            $taskAnswerGroup.show()
-            $submitButton.show()
-          } else {
-            $taskAnswerGroup.hide()
-            $submitButton.hide()
-            if (contest.isPaused() && !taskIsSolved) {
-              $submitError.text('Contest has been paused.')
-            }
-            if (taskPreview.isClosed()) {
-              $submitError.text('Task has been closed by the event organizers.')
-            }
-          }
-
-          if (taskIsSolved) {
-            $submitSuccess.text(`Your team has solved the task on ${moment(taskHit.createdAt).format('lll')}!`)
-          }
+        if (taskPreview.isOpened() && ((!taskIsSolved && contest.isStarted()) || contest.isFinished())) {
+          $taskAnswerGroup.show()
+          $submitButton.show()
         } else {
-          $submitError.text('You should confirm your email before you can submit an answer to the task.')
           $taskAnswerGroup.hide()
           $submitButton.hide()
+          if (contest.isPaused() && !taskIsSolved) {
+            $submitError.text('Contest has been paused.')
+          }
+          if (taskPreview.isClosed()) {
+            $submitError.text('Task has been closed by the event organizers.')
+          }
         }
+
+        if (taskIsSolved) {
+          $submitSuccess.text(`Your team has solved the task on ${moment(taskHit.createdAt).format('lll')}!`)
+        }
+
       } else {
         $taskAnswerGroup.hide()
         $submitButton.hide()
@@ -1062,7 +1057,7 @@ class TasksView extends View {
       .when(identityProvider.fetchIdentity(), contestProvider.fetchContest())
       .done((identity, contest) => {
         identityProvider.subscribe()
-        this.$main.html(renderTemplate('tasks-view', { identity: identity }))
+        this.$main.html(renderTemplate('tasks-view', { identity: identity, contest: contest }))
 
         if (dataStore.supportsRealtime()) {
           dataStore.connectRealtime()

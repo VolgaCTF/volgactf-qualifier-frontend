@@ -465,7 +465,7 @@
                         <h1>Tasks</h1>
                     </header>
                     <section>
-                        <% if (identity.isAdmin()) { %>
+                        <% if (identity.isAdmin() && !contest.isFinished()) { %>
                         <div class="themis-task-controls">
                             <button type="button" class="btn btn-success" data-action="create-task" data-toggle="modal" data-target="#create-task-modal">
                                 Create
