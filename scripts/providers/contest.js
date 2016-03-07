@@ -203,7 +203,7 @@ class ContestProvider extends EventEmitter {
 
   fetchSolvedTeamCountByTask (taskId) {
     let promise = $.Deferred()
-    let url = `/api/contest/task/${taskId}/hits`
+    let url = `/api/task/${taskId}/hits`
 
     $.ajax({
       url: url,
@@ -227,7 +227,7 @@ class ContestProvider extends EventEmitter {
     let promise = $.Deferred()
 
     let identity = identityProvider.getIdentity()
-    let url = `/api/contest/team/${teamId}/hits`
+    let url = `/api/team/${teamId}/hits`
 
     $.ajax({
       url: url,
@@ -261,9 +261,9 @@ class ContestProvider extends EventEmitter {
     let url = null
 
     if (identity.isSupervisor()) {
-      url = '/api/contest/hits'
+      url = '/api/task/hit/index'
     } else if (identity.isTeam()) {
-      url = `/api/contest/team/${identity.id}/hits`
+      url = `/api/team/${identity.id}/hits`
     } else {
       promise.reject('Unknown error. Please try again later.')
     }

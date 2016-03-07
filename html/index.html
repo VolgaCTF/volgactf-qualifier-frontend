@@ -1423,18 +1423,18 @@
             <script type="text/x-template" data-name="team-hits-partial">
                 <% if (identity.isSupervisor() || identity.isExactTeam(teamId)) { %>
                     <% if (taskNames.length > 0) { %>
-                    Team has solved the following tasks:
+                    Team has solved the following <% print((taskNames.length === 1) ? 'task' : 'tasks') %>:
                     <% for (var i=0; i<taskNames.length; ++i) { %>
-                        <i><%- taskNames[i] %></i><% if (i < taskNames.length - 1) { %>, <% } else { %>.<% } %>
+                        <strong><%- taskNames[i] %></strong><% if (i < taskNames.length - 1) { %>, <% } else { %>.<% } %>
                     <% } %>
                     <% } else { %>
-                    Team did not solve a single task
+                    Team hasn't solved any tasks
                     <% } %>
                 <% } else { %>
                     <% if (count > 0) { %>
-                    Team solved <strong><%- count %></strong> <% print((count === 1) ? 'task' : 'tasks') %>
+                    Team has solved <strong><%- count %></strong> <% print((count === 1) ? 'task' : 'tasks') %>
                     <% } else { %>
-                    Team did not solve a single task
+                    Team hasn't solved any tasks
                     <% } %>
                 <% } %>
             </script>
