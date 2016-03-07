@@ -61,9 +61,27 @@ class StatusBar {
       $form.trigger('submit')
     })
 
+    let updateOptions = (initial, started, paused, finished) => {
+      $contestState.find('option[value="1"]').prop('disabled', !initial)
+      $contestState.find('option[value="2"]').prop('disabled', !started)
+      $contestState.find('option[value="3"]').prop('disabled', !paused)
+      $contestState.find('option[value="4"]').prop('disabled', !finished)
+    }
+
     $modal.on('show.bs.modal', (e) => {
       let contest = contestProvider.getContest()
       $contestState.val(contest.state)
+
+      if (contest.isInitial()) {
+        updateOptions(true, true, false, false)
+      } else if (contest.isStarted()) {
+        updateOptions(false, true, true, true)
+      } else if (contest.isPaused()) {
+        updateOptions(false, true, true, true)
+      } else if (contest.isFinished()) {
+        updateOptions(false, false, false, true)
+      }
+
       $contestStartsAt.data('DateTimePicker').date(contest.startsAt)
       $contestFinishesAt.data('DateTimePicker').date(contest.finishesAt)
       $submitError.text('')
