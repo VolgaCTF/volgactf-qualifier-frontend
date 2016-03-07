@@ -149,6 +149,7 @@ class TeamProfileView extends View {
       $modal.modal({ show: false })
 
       let $submitError = $modal.find('.submit-error > p')
+      let $submitSuccess = $modal.find('.submit-success > p')
       let $submitButton = $modal.find('button[data-action="complete-resend-confirmation"]')
       let $form = $modal.find('form')
 
@@ -159,6 +160,8 @@ class TeamProfileView extends View {
       $modal.on('show.bs.modal', (e) => {
         $('#resend-confirmation-email').val(this.team.email)
         $submitError.text('')
+        $submitSuccess.text('')
+        $submitButton.show()
       })
 
       $modal.on('shown.bs.modal', (e) => {
@@ -170,6 +173,7 @@ class TeamProfileView extends View {
         $form.ajaxSubmit({
           beforeSubmit: () => {
             $submitError.text('')
+            $submitSuccess.text('')
             $submitButton.prop('disabled', true)
           },
           clearForm: true,
@@ -178,8 +182,13 @@ class TeamProfileView extends View {
             'X-CSRF-Token': identityProvider.getIdentity().token
           },
           success: (responseText, textStatus, jqXHR) => {
-            $modal.modal('hide')
-            window.location.reload()
+            $submitButton.hide()
+            $submitSuccess.text('A new confirmation email will be sent soon!')
+            let hideModal = () => {
+              $modal.modal('hide')
+            }
+
+            setTimeout(hideModal, 1000)
           },
           error: (jqXHR, textStatus, errorThrown) => {
             if (jqXHR.responseJSON) {
