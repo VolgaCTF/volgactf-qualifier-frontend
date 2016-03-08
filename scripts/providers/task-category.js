@@ -30,7 +30,7 @@ class TaskCategoryProvider extends EventEmitter {
       let options = JSON.parse(e.data)
       let taskCategory = new TaskCategoryModel(options)
       this.taskCategories.push(taskCategory)
-      this.trigger('createTaskCategory', [taskCategory])
+      this.trigger('createTaskCategory', [taskCategory, new Date(options.__metadataCreatedAt)])
     }
 
     realtimeProvider.addEventListener('createTaskCategory', this.onCreate)
@@ -41,7 +41,7 @@ class TaskCategoryProvider extends EventEmitter {
         let options = JSON.parse(e.data)
         let taskCategory = new TaskCategoryModel(options)
         this.taskCategories.push(taskCategory)
-        this.trigger('revealTaskCategory', [taskCategory])
+        this.trigger('revealTaskCategory', [taskCategory, new Date(options.__metadataCreatedAt)])
       }
 
       realtimeProvider.addEventListener('revealTaskCategory', this.onReveal)
@@ -52,8 +52,10 @@ class TaskCategoryProvider extends EventEmitter {
       let ndx = _.findIndex(this.taskCategories, { id: options.id })
 
       if (ndx > -1) {
+        let categoryId = this.taskCategories[ndx].categoryId
+        let taskId = this.taskCategories[ndx].taskId
         this.taskCategories.splice(ndx, 1)
-        this.trigger('removeTaskCategory', [options.id])
+        this.trigger('removeTaskCategory', [{ id: options.id, categoryId: categoryId, taskId: taskId }, new Date(options.__metadataCreatedAt)])
       }
     }
 

@@ -81,42 +81,42 @@
             <script type="text/x-template" data-name="event-log-create-category">
                 <p>
                     <span><code><%- createdAt %></code>&nbsp;&nbsp;</span>
-                    <span class="text-success">Category <strong><%- category.title %></strong> <code>#<%- category.id %></code> has been created</span>
+                    <span class="text-success">Category <strong><%- category.title %></strong> has been created</span>
                 </p>
             </script>
 
             <script type="text/x-template" data-name="event-log-update-category">
                 <p>
                     <span><code><%- createdAt %></code>&nbsp;&nbsp;</span>
-                    <span>Category <strong><%- category.title %></strong> <code>#<%- category.id %></code> has been updated</span>
+                    <span class="text-primary">Category <strong><%- category.title %></strong> has been updated</span>
                 </p>
             </script>
 
             <script type="text/x-template" data-name="event-log-delete-category">
                 <p>
                     <span><code><%- createdAt %></code>&nbsp;&nbsp;</span>
-                    <span class="text-danger">Category <strong><%- category.title %></strong> <code>#<%- category.id %></code> has been deleted</span>
+                    <span class="text-danger">Category <strong><%- category.title %></strong> has been deleted</span>
                 </p>
             </script>
 
             <script type="text/x-template" data-name="event-log-create-post">
                 <p>
                     <span><code><%- createdAt %></code>&nbsp;&nbsp;</span>
-                    <span class="text-success">Post <strong><%- post.title %></strong> <code>#<%- post.id %></code> has been created</span>
+                    <span class="text-success">Post <strong><%- post.title %></strong> has been created</span>
                 </p>
             </script>
 
             <script type="text/x-template" data-name="event-log-update-post">
                 <p>
                     <span><code><%- createdAt %></code>&nbsp;&nbsp;</span>
-                    <span>Post <strong><%- post.title %></strong> <code>#<%- post.id %></code> has been updated</span>
+                    <span class="text-primary">Post <strong><%- post.title %></strong> has been updated</span>
                 </p>
             </script>
 
             <script type="text/x-template" data-name="event-log-delete-post">
                 <p>
                     <span><code><%- createdAt %></code>&nbsp;&nbsp;</span>
-                    <span class="text-danger">Post <strong><%- post.title %></strong> <code>#<%- post.id %></code> has been deleted</span>
+                    <span class="text-danger">Post <strong><%- post.title %></strong> has been deleted</span>
                 </p>
             </script>
 
@@ -145,6 +145,48 @@
                 <p>
                     <span><code><%- createdAt %></code>&nbsp;&nbsp;</span>
                     <span class="text-primary">Supervisor <strong><%- supervisor.username %></strong> has logged out</span>
+                </p>
+            </script>
+
+            <script type="text/x-template" data-name="event-log-create-task">
+                <p>
+                    <span><code><%- createdAt %></code>&nbsp;&nbsp;</span>
+                    <span class="text-success">Task <strong><%- task.title %></strong> has been created</span>
+                </p>
+            </script>
+
+            <script type="text/x-template" data-name="event-log-update-task">
+                <p>
+                    <span><code><%- createdAt %></code>&nbsp;&nbsp;</span>
+                    <span class="text-primary">Task <strong><%- task.title %></strong> has been updated</span>
+                </p>
+            </script>
+
+            <script type="text/x-template" data-name="event-log-open-task">
+                <p>
+                    <span><code><%- createdAt %></code>&nbsp;&nbsp;</span>
+                    <span class="text-primary">Task <strong><%- task.title %></strong> has been opened</span>
+                </p>
+            </script>
+
+            <script type="text/x-template" data-name="event-log-close-task">
+                <p>
+                    <span><code><%- createdAt %></code>&nbsp;&nbsp;</span>
+                    <span class="text-danger">Task <strong><%- task.title %></strong> has been closed</span>
+                </p>
+            </script>
+
+            <script type="text/x-template" data-name="event-log-create-task-category">
+                <p>
+                    <span><code><%- createdAt %></code>&nbsp;&nbsp;</span>
+                    <span class="text-success">Category <strong><%- category.title %></strong> has been attached to the task <strong><%- task.title %></strong></span>
+                </p>
+            </script>
+
+            <script type="text/x-template" data-name="event-log-remove-task-category">
+                <p>
+                    <span><code><%- createdAt %></code>&nbsp;&nbsp;</span>
+                    <span class="text-danger">Category <strong><%- category.title %></strong> has been detached from the task <strong><%- task.title %></strong></span>
                 </p>
             </script>
 

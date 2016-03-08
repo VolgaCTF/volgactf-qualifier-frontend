@@ -1,4 +1,5 @@
 import $ from 'jquery'
+import _ from 'underscore'
 import View from './base'
 import renderTemplate from '../utils/render-template'
 import dataStore from '../data-store'
@@ -11,6 +12,8 @@ import moment from 'moment'
 import categoryProvider from '../providers/category'
 import postProvider from '../providers/post'
 import supervisorProvider from '../providers/supervisor'
+import taskProvider from '../providers/task'
+import taskCategoryProvider from '../providers/task-category'
 
 class EventsView extends View {
   constructor () {
@@ -31,6 +34,14 @@ class EventsView extends View {
     this.onRemoveSupervisor = null
     this.onLoginSupervisor = null
     this.onLogoutSupervisor = null
+
+    this.onCreateTask = null
+    this.onUpdateTask = null
+    this.onOpenTask = null
+    this.onCloseTask = null
+
+    this.onCreateTaskCategory = null
+    this.onRemoveTaskCategory = null
 
     this.$eventsContainer = null
   }
@@ -108,6 +119,50 @@ class EventsView extends View {
           supervisor: eventData
         }))
         break
+      case 'createTask':
+        $el = $(renderTemplate('event-log-create-task', {
+          createdAt: moment(createdAt).format(),
+          task: eventData
+        }))
+        break
+      case 'updateTask':
+        $el = $(renderTemplate('event-log-update-task', {
+          createdAt: moment(createdAt).format(),
+          task: eventData
+        }))
+        break
+      case 'openTask':
+        $el = $(renderTemplate('event-log-open-task', {
+          createdAt: moment(createdAt).format(),
+          task: eventData
+        }))
+        break
+      case 'closeTask':
+        $el = $(renderTemplate('event-log-close-task', {
+          createdAt: moment(createdAt).format(),
+          task: eventData
+        }))
+        break
+      case 'createTaskCategory': {
+        let task = _.findWhere(taskProvider.getTaskPreviews(), { id: eventData.taskId })
+        let category = _.findWhere(categoryProvider.getCategories(), { id: eventData.categoryId })
+        $el = $(renderTemplate('event-log-create-task-category', {
+          createdAt: moment(createdAt).format(),
+          task: task,
+          category: category
+        }))
+        break
+      }
+      case 'removeTaskCategory': {
+        let task = _.findWhere(taskProvider.getTaskPreviews(), { id: eventData.taskId })
+        let category = _.findWhere(categoryProvider.getCategories(), { id: eventData.categoryId })
+        $el = $(renderTemplate('event-log-remove-task-category', {
+          createdAt: moment(createdAt).format(),
+          task: task,
+          category: category
+        }))
+        break
+      }
       default:
         $el = $(renderTemplate('event-log-unknown', {
           eventName: eventName,
@@ -123,6 +178,7 @@ class EventsView extends View {
     let $el = this.renderEvent(eventName, eventData, createdAt)
     if ($el && $el.length > 0) {
       this.$eventsContainer.append($el)
+      // $el.get(0).scrollIntoView()
     }
   }
 
@@ -267,7 +323,95 @@ class EventsView extends View {
       this.onLogoutSupervisor = null
     }
 
-    postProvider.unsubscribe()
+    supervisorProvider.unsubscribe()
+  }
+
+  subscribeToTaskEvents () {
+    taskProvider.subscribe()
+
+    this.onCreateTask = (e, createdAt) => {
+      this.appendLog('createTask', e, createdAt)
+      return false
+    }
+
+    taskProvider.on('createTask', this.onCreateTask)
+
+    this.onUpdateTask = (e, createdAt) => {
+      this.appendLog('updateTask', e, createdAt)
+      return false
+    }
+
+    taskProvider.on('updateTask', this.onUpdateTask)
+
+    this.onOpenTask = (e, createdAt) => {
+      this.appendLog('openTask', e, createdAt)
+      return false
+    }
+
+    taskProvider.on('openTask', this.onOpenTask)
+
+    this.onCloseTask = (e, createdAt) => {
+      this.appendLog('closeTask', e, createdAt)
+      return false
+    }
+
+    taskProvider.on('closeTask', this.onCloseTask)
+  }
+
+  unsubscribeFromTaskEvents () {
+    if (this.onCreateTask) {
+      taskProvider.off('createTask', this.onCreateTask)
+      this.onCreateTask = null
+    }
+
+    if (this.onUpdateTask) {
+      taskProvider.off('updateTask', this.onUpdateTask)
+      this.onUpdateTask = null
+    }
+
+    if (this.onOpenTask) {
+      taskProvider.off('openTask', this.onOpenTask)
+      this.onOpenTask = null
+    }
+
+    if (this.onCloseTask) {
+      taskProvider.off('closeTask', this.onCloseTask)
+      this.onCloseTask = null
+    }
+
+    taskProvider.unsubscribe()
+  }
+
+  subscribeToTaskCategoryEvents () {
+    taskCategoryProvider.subscribe()
+
+    this.onCreateTaskCategory = (e, createdAt) => {
+      this.appendLog('createTaskCategory', e, createdAt)
+      return false
+    }
+
+    taskCategoryProvider.on('createTaskCategory', this.onCreateTaskCategory)
+
+    this.onRemoveTaskCategory = (e, createdAt) => {
+      this.appendLog('removeTaskCategory', e, createdAt)
+      return false
+    }
+
+    taskCategoryProvider.on('removeTaskCategory', this.onRemoveTaskCategory)
+  }
+
+  unsubscribeFromTaskCategoryEvents () {
+    if (this.onCreateTaskCategory) {
+      taskCategoryProvider.off('createTaskCategory', this.onCreateTaskCategory)
+      this.onCreateTaskCategory = null
+    }
+
+    if (this.onRemoveTaskCategory) {
+      taskCategoryProvider.off('removeTaskCategory', this.onRemoveTaskCategory)
+      this.onRemoveTaskCategory = null
+    }
+
+    taskCategoryProvider.unsubscribe()
   }
 
   present () {
@@ -279,7 +423,9 @@ class EventsView extends View {
         identityProvider.fetchIdentity(),
         contestProvider.fetchContest(),
         categoryProvider.fetchCategories(),
-        postProvider.fetchPosts()
+        postProvider.fetchPosts(),
+        taskProvider.fetchTaskPreviews(),
+        taskCategoryProvider.fetchTaskCategories()
       )
       .done((identity, contest) => {
         if (identity.isSupervisor()) {
@@ -302,6 +448,8 @@ class EventsView extends View {
           this.subscribeToCategoryEvents()
           this.subscribeToPostEvents()
           this.subscribeToSupervisorEvents()
+          this.subscribeToTaskEvents()
+          this.subscribeToTaskCategoryEvents()
 
           this.$main.html(renderTemplate('events-view'))
           this.$eventsContainer = $('#themis-events')
@@ -332,6 +480,8 @@ class EventsView extends View {
     this.unsubscribeFromCategoryEvents()
     this.unsubscribeFromPostEvents()
     this.unsubscribeFromSupervisorEvents()
+    this.unsubscribeFromTaskEvents()
+    this.unsubscribeFromTaskCategoryEvents()
 
     navigationBar.dismiss()
     statusBar.dismiss()
