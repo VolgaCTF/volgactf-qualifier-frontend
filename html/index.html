@@ -120,6 +120,34 @@
                 </p>
             </script>
 
+            <script type="text/x-template" data-name="event-log-create-supervisor">
+                <p>
+                    <span><code><%- createdAt %></code>&nbsp;&nbsp;</span>
+                    <span class="text-success">Supervisor <strong><%- supervisor.username %></strong> has been created</span>
+                </p>
+            </script>
+
+            <script type="text/x-template" data-name="event-log-remove-supervisor">
+                <p>
+                    <span><code><%- createdAt %></code>&nbsp;&nbsp;</span>
+                    <span class="text-danger">Supervisor <strong><%- supervisor.username %></strong> has been removed</span>
+                </p>
+            </script>
+
+            <script type="text/x-template" data-name="event-log-login-supervisor">
+                <p>
+                    <span><code><%- createdAt %></code>&nbsp;&nbsp;</span>
+                    <span class="text-primary">Supervisor <strong><%- supervisor.username %></strong> has logged in</span>
+                </p>
+            </script>
+
+            <script type="text/x-template" data-name="event-log-logout-supervisor">
+                <p>
+                    <span><code><%- createdAt %></code>&nbsp;&nbsp;</span>
+                    <span class="text-primary">Supervisor <strong><%- supervisor.username %></strong> has logged out</span>
+                </p>
+            </script>
+
             <script type="text/x-template" data-name="navbar-view">
                 <ul class="nav navbar-nav">
                     <li class="<% print((active === 'teams') ? 'active' : ''); %>">

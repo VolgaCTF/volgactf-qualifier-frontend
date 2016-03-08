@@ -10,6 +10,7 @@ import identityProvider from '../providers/identity'
 import moment from 'moment'
 import categoryProvider from '../providers/category'
 import postProvider from '../providers/post'
+import supervisorProvider from '../providers/supervisor'
 
 class EventsView extends View {
   constructor () {
@@ -25,6 +26,11 @@ class EventsView extends View {
     this.onCreatePost = null
     this.onUpdatePost = null
     this.onDeletePost = null
+
+    this.onCreateSupervisor = null
+    this.onRemoveSupervisor = null
+    this.onLoginSupervisor = null
+    this.onLogoutSupervisor = null
 
     this.$eventsContainer = null
   }
@@ -76,6 +82,30 @@ class EventsView extends View {
         $el = $(renderTemplate('event-log-delete-post', {
           createdAt: moment(createdAt).format(),
           post: eventData
+        }))
+        break
+      case 'createSupervisor':
+        $el = $(renderTemplate('event-log-create-supervisor', {
+          createdAt: moment(createdAt).format(),
+          supervisor: eventData
+        }))
+        break
+      case 'removeSupervisor':
+        $el = $(renderTemplate('event-log-remove-supervisor', {
+          createdAt: moment(createdAt).format(),
+          supervisor: eventData
+        }))
+        break
+      case 'loginSupervisor':
+        $el = $(renderTemplate('event-log-login-supervisor', {
+          createdAt: moment(createdAt).format(),
+          supervisor: eventData
+        }))
+        break
+      case 'logoutSupervisor':
+        $el = $(renderTemplate('event-log-logout-supervisor', {
+          createdAt: moment(createdAt).format(),
+          supervisor: eventData
         }))
         break
       default:
@@ -184,6 +214,62 @@ class EventsView extends View {
     postProvider.unsubscribe()
   }
 
+  subscribeToSupervisorEvents () {
+    supervisorProvider.subscribe()
+
+    this.onCreateSupervisor = (e, createdAt) => {
+      this.appendLog('createSupervisor', e, createdAt)
+      return false
+    }
+
+    supervisorProvider.on('createSupervisor', this.onCreateSupervisor)
+
+    this.onRemoveSupervisor = (e, createdAt) => {
+      this.appendLog('removeSupervisor', e, createdAt)
+      return false
+    }
+
+    supervisorProvider.on('removeSupervisor', this.onRemoveSupervisor)
+
+    this.onLoginSupervisor = (e, createdAt) => {
+      this.appendLog('loginSupervisor', e, createdAt)
+      return false
+    }
+
+    supervisorProvider.on('loginSupervisor', this.onLoginSupervisor)
+
+    this.onLogoutSupervisor = (e, createdAt) => {
+      this.appendLog('logoutSupervisor', e, createdAt)
+      return false
+    }
+
+    supervisorProvider.on('logoutSupervisor', this.onLogoutSupervisor)
+  }
+
+  unsubscribeFromSupervisorEvents () {
+    if (this.onCreateSupervisor) {
+      supervisorProvider.off('createSupervisor', this.onCreateSupervisor)
+      this.onCreateSupervisor = null
+    }
+
+    if (this.onRemoveSupervisor) {
+      supervisorProvider.off('removeSupervisor', this.onRemoveSupervisor)
+      this.onRemoveSupervisor = null
+    }
+
+    if (this.onLoginSupervisor) {
+      supervisorProvider.off('loginSupervisor', this.onLoginSupervisor)
+      this.onLoginSupervisor = null
+    }
+
+    if (this.onLogoutSupervisor) {
+      supervisorProvider.off('logoutSupervisor', this.onLogoutSupervisor)
+      this.onLogoutSupervisor = null
+    }
+
+    postProvider.unsubscribe()
+  }
+
   present () {
     this.$main = $('#main')
     this.$main.html(renderTemplate('loading-view'))
@@ -215,6 +301,7 @@ class EventsView extends View {
 
           this.subscribeToCategoryEvents()
           this.subscribeToPostEvents()
+          this.subscribeToSupervisorEvents()
 
           this.$main.html(renderTemplate('events-view'))
           this.$eventsContainer = $('#themis-events')
@@ -244,6 +331,7 @@ class EventsView extends View {
 
     this.unsubscribeFromCategoryEvents()
     this.unsubscribeFromPostEvents()
+    this.unsubscribeFromSupervisorEvents()
 
     navigationBar.dismiss()
     statusBar.dismiss()
