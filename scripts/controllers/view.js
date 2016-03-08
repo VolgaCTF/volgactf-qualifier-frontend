@@ -11,7 +11,7 @@ import teamsView from '../views/teams'
 import categoriesView from '../views/categories'
 import tasksView from '../views/tasks'
 import scoreboardView from '../views/scoreboard'
-import logsView from '../views/logs'
+import eventsView from '../views/events'
 import restoreView from '../views/restore'
 import resetPasswordView from '../views/reset-password'
 import notFoundView from '../views/not-found'
@@ -29,7 +29,7 @@ viewController.view(aboutView)
 viewController.view(teamsView)
 viewController.view(categoriesView)
 viewController.view(tasksView)
-viewController.view(logsView)
+viewController.view(eventsView)
 viewController.view(scoreboardView)
 viewController.view(restoreView)
 viewController.view(resetPasswordView)

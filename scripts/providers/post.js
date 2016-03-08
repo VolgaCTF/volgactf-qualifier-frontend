@@ -29,7 +29,7 @@ class PostProvider extends EventEmitter {
       let options = JSON.parse(e.data)
       let post = new PostModel(options)
       this.posts.push(post)
-      this.trigger('createPost', [post])
+      this.trigger('createPost', [post, new Date(options.__metadataCreatedAt)])
     }
 
     realtimeProvider.addEventListener('createPost', this.onCreate)
@@ -42,7 +42,7 @@ class PostProvider extends EventEmitter {
         this.posts.splice(ndx, 1)
       }
       this.posts.push(post)
-      this.trigger('updatePost', [post])
+      this.trigger('updatePost', [post, new Date(options.__metadataCreatedAt)])
     }
 
     realtimeProvider.addEventListener('updatePost', this.onUpdate)
@@ -51,8 +51,9 @@ class PostProvider extends EventEmitter {
       let options = JSON.parse(e.data)
       let ndx = _.findIndex(this.posts, { id: options.id })
       if (ndx > -1) {
+        let title = this.posts[ndx].title
         this.posts.splice(ndx, 1)
-        this.trigger('deletePost', [options.id])
+        this.trigger('deletePost', [{ id: options.id, title: title }, new Date(options.__metadataCreatedAt)])
       }
     }
 

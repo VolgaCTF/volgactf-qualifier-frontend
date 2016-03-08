@@ -56,6 +56,70 @@
                 </div>
             </script>
 
+            <script type="text/x-template" data-name="event-log-unknown">
+                <p>
+                    <span><code><%- createdAt %></code>&nbsp;&nbsp;</span>
+                    <span class="text-muted">Unknown event <%- eventName %>!</span>
+                </p>
+            </script>
+
+            <script type="text/x-template" data-name="event-log-update-contest">
+                <p>
+                    <span><code><%- createdAt %></code>&nbsp;&nbsp;</span>
+                    <% if (contest.isInitial()) { %>
+                    <span>Contest state has been set to <strong>Not started</strong></span>
+                    <% } else if (contest.isStarted()) { %>
+                    <span class="text-success">Contest state has been set to <strong>Started</strong></span>
+                    <% } else if (contest.isPaused()) { %>
+                    <span class="text-warning">Contest state has been set to <strong>Paused</strong></span>
+                    <% } else if (contest.isFinished()) { %>
+                    <span class="text-danger">Contest state has been set to <strong>Finished</strong></span>
+                    <% } %>
+                </p>
+            </script>
+
+            <script type="text/x-template" data-name="event-log-create-category">
+                <p>
+                    <span><code><%- createdAt %></code>&nbsp;&nbsp;</span>
+                    <span class="text-success">Category <strong><%- category.title %></strong> <code>#<%- category.id %></code> has been created</span>
+                </p>
+            </script>
+
+            <script type="text/x-template" data-name="event-log-update-category">
+                <p>
+                    <span><code><%- createdAt %></code>&nbsp;&nbsp;</span>
+                    <span>Category <strong><%- category.title %></strong> <code>#<%- category.id %></code> has been updated</span>
+                </p>
+            </script>
+
+            <script type="text/x-template" data-name="event-log-delete-category">
+                <p>
+                    <span><code><%- createdAt %></code>&nbsp;&nbsp;</span>
+                    <span class="text-danger">Category <strong><%- category.title %></strong> <code>#<%- category.id %></code> has been deleted</span>
+                </p>
+            </script>
+
+            <script type="text/x-template" data-name="event-log-create-post">
+                <p>
+                    <span><code><%- createdAt %></code>&nbsp;&nbsp;</span>
+                    <span class="text-success">Post <strong><%- post.title %></strong> <code>#<%- post.id %></code> has been created</span>
+                </p>
+            </script>
+
+            <script type="text/x-template" data-name="event-log-update-post">
+                <p>
+                    <span><code><%- createdAt %></code>&nbsp;&nbsp;</span>
+                    <span>Post <strong><%- post.title %></strong> <code>#<%- post.id %></code> has been updated</span>
+                </p>
+            </script>
+
+            <script type="text/x-template" data-name="event-log-delete-post">
+                <p>
+                    <span><code><%- createdAt %></code>&nbsp;&nbsp;</span>
+                    <span class="text-danger">Post <strong><%- post.title %></strong> <code>#<%- post.id %></code> has been deleted</span>
+                </p>
+            </script>
+
             <script type="text/x-template" data-name="navbar-view">
                 <ul class="nav navbar-nav">
                     <li class="<% print((active === 'teams') ? 'active' : ''); %>">
@@ -79,8 +143,8 @@
                         <a href="/about" data-push-history>About</a>
                     </li>
                     <% if (identity && identity.isSupervisor()) { %>
-                    <li class="<% print((active === 'logs') ? 'active' : ''); %>">
-                        <a href="/logs" data-push-history>Logs</a>
+                    <li class="<% print((active === 'events') ? 'active' : ''); %>">
+                        <a href="/events" data-push-history>Events</a>
                     </li>
                     <% } %>
                 </ul>
@@ -979,13 +1043,13 @@
                 </div>
             </script>
 
-            <script type="text/x-template" data-name="logs-view">
+            <script type="text/x-template" data-name="events-view">
                 <div class="container">
                     <header>
-                        <h1>Logs</h1>
+                        <h1>Events</h1>
                     </header>
                     <section>
-                        <div id="themis-logs">
+                        <div id="themis-events">
                         </div>
                     </section>
                 </div>
@@ -1264,7 +1328,7 @@
                         <% if (identity.isAdmin()) { %>
                         <li><a href="/tasks" data-push-history>Task management</a></li>
                         <% } %>
-                        <li><a href="/logs" data-push-history>Realtime logs</a></li>
+                        <li><a href="/events" data-push-history>Realtime event log</a></li>
                     </ul>
                     <% } %>
                 </div>
@@ -1388,24 +1452,6 @@
                         <p class="lead">We are really sorry, but the contest has finished.</p>
                     </section>
                 </div>
-            </script>
-
-            <script type="text/x-template" data-name="log-entry-1">
-                <p>
-                    <span><%- createdAt %></span>&nbsp;&nbsp;
-                    <span class="text-danger">
-                        Team <strong><%- team.name %></strong> has provided wrong answer <mark><%- answer %></mark> for task <strong><%- task.title %></strong>
-                    </span>
-                </p>
-            </script>
-
-            <script type="text/x-template" data-name="log-entry-2">
-                <p>
-                    <span><%- createdAt %></span>&nbsp;&nbsp;
-                    <span class="text-success">
-                        Team <strong><%- team.name %></strong> has solved task <strong><%- task.title %></strong> and earned <strong><%- task.value %></strong> points!
-                    </span>
-                </p>
             </script>
 
             <script type="text/x-template" data-name="verify-email-view">

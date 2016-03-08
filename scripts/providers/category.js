@@ -29,7 +29,7 @@ class CategoryProvider extends EventEmitter {
       let options = JSON.parse(e.data)
       let category = new CategoryModel(options)
       this.categories.push(category)
-      this.trigger('createCategory', [category])
+      this.trigger('createCategory', [category, new Date(options.__metadataCreatedAt)])
     }
 
     realtimeProvider.addEventListener('createCategory', this.onCreate)
@@ -42,7 +42,7 @@ class CategoryProvider extends EventEmitter {
         this.categories.splice(ndx, 1)
       }
       this.categories.push(category)
-      this.trigger('updateCategory', [category])
+      this.trigger('updateCategory', [category, new Date(options.__metadataCreatedAt)])
     }
 
     realtimeProvider.addEventListener('updateCategory', this.onUpdate)
@@ -52,8 +52,9 @@ class CategoryProvider extends EventEmitter {
       let ndx = _.findIndex(this.categories, { id: options.id })
 
       if (ndx > -1) {
+        let title = this.categories[ndx].title
         this.categories.splice(ndx, 1)
-        this.trigger('deleteCategory', [options.id])
+        this.trigger('deleteCategory', [{ id: options.id, title: title }, new Date(options.__metadataCreatedAt)])
       }
     }
 

@@ -68,7 +68,7 @@ class ContestProvider extends EventEmitter {
     this.onUpdate = (e) => {
       let options = JSON.parse(e.data)
       this.contest = new ContestModel(options)
-      this.trigger('updateContest', [this.contest])
+      this.trigger('updateContest', [this.contest, new Date(options.__metadataCreatedAt)])
     }
 
     realtimeProvider.addEventListener('updateContest', this.onUpdate)

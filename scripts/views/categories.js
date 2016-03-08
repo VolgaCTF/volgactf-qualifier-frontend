@@ -233,17 +233,17 @@ class CategoriesView extends View {
               this.initEditCategoryModal()
               this.initDeleteCategoryModal()
 
-              this.onCreateCategory = (category) => {
+              this.onCreateCategory = () => {
                 this.renderCategories()
                 return false
               }
 
-              this.onUpdateCategory = (category) => {
+              this.onUpdateCategory = () => {
                 this.renderCategories()
                 return false
               }
 
-              this.onDeleteCategory = (categoryId) => {
+              this.onDeleteCategory = () => {
                 this.renderCategories()
                 return false
               }

@@ -284,17 +284,17 @@ class NewsView extends View {
 
             this.renderPosts()
 
-            this.onCreatePost = (post) => {
+            this.onCreatePost = () => {
               this.renderPosts()
               return false
             }
 
-            this.onUpdatePost = (post) => {
+            this.onUpdatePost = () => {
               this.renderPosts()
               return false
             }
 
-            this.onDeletePost = (postId) => {
+            this.onDeletePost = () => {
               this.renderPosts()
               return false
             }
