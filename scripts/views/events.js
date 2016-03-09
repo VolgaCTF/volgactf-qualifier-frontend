@@ -31,7 +31,7 @@ class EventsView extends View {
     this.onDeletePost = null
 
     this.onCreateSupervisor = null
-    this.onRemoveSupervisor = null
+    this.onDeleteSupervisor = null
     this.onLoginSupervisor = null
     this.onLogoutSupervisor = null
 
@@ -101,8 +101,8 @@ class EventsView extends View {
           supervisor: eventData
         }))
         break
-      case 'removeSupervisor':
-        $el = $(renderTemplate('event-log-remove-supervisor', {
+      case 'deleteSupervisor':
+        $el = $(renderTemplate('event-log-delete-supervisor', {
           createdAt: moment(createdAt).format(),
           supervisor: eventData
         }))
@@ -280,12 +280,12 @@ class EventsView extends View {
 
     supervisorProvider.on('createSupervisor', this.onCreateSupervisor)
 
-    this.onRemoveSupervisor = (e, createdAt) => {
-      this.appendLog('removeSupervisor', e, createdAt)
+    this.onDeleteSupervisor = (e, createdAt) => {
+      this.appendLog('deleteSupervisor', e, createdAt)
       return false
     }
 
-    supervisorProvider.on('removeSupervisor', this.onRemoveSupervisor)
+    supervisorProvider.on('deleteSupervisor', this.onDeleteSupervisor)
 
     this.onLoginSupervisor = (e, createdAt) => {
       this.appendLog('loginSupervisor', e, createdAt)
@@ -308,9 +308,9 @@ class EventsView extends View {
       this.onCreateSupervisor = null
     }
 
-    if (this.onRemoveSupervisor) {
-      supervisorProvider.off('removeSupervisor', this.onRemoveSupervisor)
-      this.onRemoveSupervisor = null
+    if (this.onDeleteSupervisor) {
+      supervisorProvider.off('deleteSupervisor', this.onDeleteSupervisor)
+      this.onDeleteSupervisor = null
     }
 
     if (this.onLoginSupervisor) {

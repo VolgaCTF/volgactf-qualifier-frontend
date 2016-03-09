@@ -28,12 +28,13 @@ class SupervisorProvider extends EventEmitter {
 
     realtimeProvider.addEventListener('createSupervisor', this.onCreate)
 
-    this.onRemove = (e) => {
+    this.onDelete = (e) => {
       let options = JSON.parse(e.data)
-      this.trigger('removeSupervisor', [{ username: options.username }, new Date(options.__metadataCreatedAt)])
+      let supervisor = new SupervisorModel(options)
+      this.trigger('deleteSupervisor', [supervisor, new Date(options.__metadataCreatedAt)])
     }
 
-    realtimeProvider.addEventListener('removeSupervisor', this.onRemove)
+    realtimeProvider.addEventListener('deleteSupervisor', this.onDelete)
 
     this.onLogin = (e) => {
       let options = JSON.parse(e.data)
@@ -64,9 +65,9 @@ class SupervisorProvider extends EventEmitter {
       this.onCreate = null
     }
 
-    if (this.onRemove) {
-      realtimeProvider.removeEventListener('removeSupervisor', this.onRemove)
-      this.onRemove = null
+    if (this.onDelete) {
+      realtimeProvider.removeEventListener('deleteSupervisor', this.onDelete)
+      this.onDelete = null
     }
 
     if (this.onLogin) {
