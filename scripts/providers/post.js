@@ -51,9 +51,9 @@ class PostProvider extends EventEmitter {
       let options = JSON.parse(e.data)
       let ndx = _.findIndex(this.posts, { id: options.id })
       if (ndx > -1) {
-        let title = this.posts[ndx].title
         this.posts.splice(ndx, 1)
-        this.trigger('deletePost', [{ id: options.id, title: title }, new Date(options.__metadataCreatedAt)])
+        let post = new PostModel(options)
+        this.trigger('deletePost', [post, new Date(options.__metadataCreatedAt)])
       }
     }
 

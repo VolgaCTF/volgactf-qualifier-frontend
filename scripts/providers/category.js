@@ -52,9 +52,9 @@ class CategoryProvider extends EventEmitter {
       let ndx = _.findIndex(this.categories, { id: options.id })
 
       if (ndx > -1) {
-        let title = this.categories[ndx].title
         this.categories.splice(ndx, 1)
-        this.trigger('deleteCategory', [{ id: options.id, title: title }, new Date(options.__metadataCreatedAt)])
+        let category = new CategoryModel(options)
+        this.trigger('deleteCategory', [category, new Date(options.__metadataCreatedAt)])
       }
     }
 
