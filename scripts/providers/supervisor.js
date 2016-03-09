@@ -7,7 +7,7 @@ class SupervisorProvider extends EventEmitter {
     super()
 
     this.onCreate = null
-    this.onRemove = null
+    this.onDelete = null
 
     this.onLogin = null
     this.onLogout = null

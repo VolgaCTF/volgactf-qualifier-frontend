@@ -30,7 +30,7 @@ class TasksView extends View {
 
     this.onCreateTaskCategory = null
     this.onRevealTaskCategory = null
-    this.onRemoveTaskCategory = null
+    this.onDeleteTaskCategory = null
 
     this.onCreateTask = null
     this.onOpenTask = null
@@ -1111,7 +1111,7 @@ class TasksView extends View {
               }
             }
 
-            this.onRemoveTaskCategory = (taskCategoryId) => {
+            this.onDeleteTaskCategory = () => {
               this.requestRenderTasks()
               return false
             }
@@ -1174,7 +1174,7 @@ class TasksView extends View {
             teamProvider.subscribe()
             taskCategoryProvider.subscribe()
             taskCategoryProvider.on('createTaskCategory', this.onCreateTaskCategory)
-            taskCategoryProvider.on('removeTaskCategory', this.onRemoveTaskCategory)
+            taskCategoryProvider.on('deleteTaskCategory', this.onDeleteTaskCategory)
 
             this.onRenderTasks = (force = false) => {
               if ((this.flagRenderTasks || force) && !this.flagRenderingTasks) {
@@ -1248,9 +1248,9 @@ class TasksView extends View {
       this.onCreateTaskCategory = null
     }
 
-    if (this.onRemoveTaskCategory) {
-      taskCategoryProvider.off('removeTaskCategory', this.onRemoveTaskCategory)
-      this.onRemoveTaskCategory = null
+    if (this.onDeleteTaskCategory) {
+      taskCategoryProvider.off('deleteTaskCategory', this.onDeleteTaskCategory)
+      this.onDeleteTaskCategory = null
     }
 
     if (this.onRevealTaskCategory) {

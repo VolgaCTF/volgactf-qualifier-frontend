@@ -41,7 +41,7 @@ class EventsView extends View {
     this.onCloseTask = null
 
     this.onCreateTaskCategory = null
-    this.onRemoveTaskCategory = null
+    this.onDeleteTaskCategory = null
 
     this.$eventsContainer = null
   }
@@ -153,10 +153,10 @@ class EventsView extends View {
         }))
         break
       }
-      case 'removeTaskCategory': {
+      case 'deleteTaskCategory': {
         let task = _.findWhere(taskProvider.getTaskPreviews(), { id: eventData.taskId })
         let category = _.findWhere(categoryProvider.getCategories(), { id: eventData.categoryId })
-        $el = $(renderTemplate('event-log-remove-task-category', {
+        $el = $(renderTemplate('event-log-delete-task-category', {
           createdAt: moment(createdAt).format(),
           task: task,
           category: category
@@ -392,12 +392,12 @@ class EventsView extends View {
 
     taskCategoryProvider.on('createTaskCategory', this.onCreateTaskCategory)
 
-    this.onRemoveTaskCategory = (e, createdAt) => {
-      this.appendLog('removeTaskCategory', e, createdAt)
+    this.onDeleteTaskCategory = (e, createdAt) => {
+      this.appendLog('deleteTaskCategory', e, createdAt)
       return false
     }
 
-    taskCategoryProvider.on('removeTaskCategory', this.onRemoveTaskCategory)
+    taskCategoryProvider.on('deleteTaskCategory', this.onDeleteTaskCategory)
   }
 
   unsubscribeFromTaskCategoryEvents () {
@@ -406,9 +406,9 @@ class EventsView extends View {
       this.onCreateTaskCategory = null
     }
 
-    if (this.onRemoveTaskCategory) {
-      taskCategoryProvider.off('removeTaskCategory', this.onRemoveTaskCategory)
-      this.onRemoveTaskCategory = null
+    if (this.onDeleteTaskCategory) {
+      taskCategoryProvider.off('deleteTaskCategory', this.onDeleteTaskCategory)
+      this.onDeleteTaskCategory = null
     }
 
     taskCategoryProvider.unsubscribe()
