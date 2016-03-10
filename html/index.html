@@ -246,6 +246,27 @@
                 </p>
             </script>
 
+            <script type="text/x-template" data-name="event-log-update-team-score">
+                <p>
+                    <span><code><%- createdAt %></code>&nbsp;&nbsp;</span>
+                    <span class="text-primary">Team <strong><%- team.name %></strong> score has been adjusted to <strong><%- teamScore.score %></strong> points</span>
+                </p>
+            </script>
+
+            <script type="text/x-template" data-name="event-log-create-team-task-hit">
+                <p>
+                    <span><code><%- createdAt %></code>&nbsp;&nbsp;</span>
+                    <span class="text-success">Team <strong><%- team.name %></strong> has just solved the task <strong><%- task.title %></strong> and has earned <strong><%- task.value %></strong> points</span>
+                </p>
+            </script>
+
+            <script type="text/x-template" data-name="event-log-create-team-task-hit-attempt">
+                <p>
+                    <span><code><%- createdAt %></code>&nbsp;&nbsp;</span>
+                    <span class="text-warning">Team <strong><%- team.name %></strong> has provided wrong answer <strong><%- teamTaskHitAttempt.wrongAnswer %></strong> for the task <strong><%- task.title %></strong></span>
+                </p>
+            </script>
+
             <script type="text/x-template" data-name="navbar-view">
                 <ul class="nav navbar-nav">
                     <li class="<% print((active === 'teams') ? 'active' : ''); %>">

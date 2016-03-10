@@ -3,10 +3,11 @@ import _ from 'underscore'
 import EventEmitter from 'wolfy87-eventemitter'
 import dataStore from '../data-store'
 import ContestModel from '../models/contest'
+import TeamModel from '../models/team'
 import TeamScoreModel from '../models/team-score'
 import TeamTaskHitModel from '../models/team-task-hit'
+import TeamTaskHitAttemptModel from '../models/team-task-hit-attempt'
 import identityProvider from './identity'
-import teamProvider from './team'
 
 class ContestProvider extends EventEmitter {
   constructor () {
@@ -20,6 +21,7 @@ class ContestProvider extends EventEmitter {
     this.onQualifyTeam = null
 
     this.onCreateTeamTaskHit = null
+    this.onCreateTeamTaskHitAttempt = null
   }
 
   getContest () {
@@ -81,12 +83,14 @@ class ContestProvider extends EventEmitter {
         this.teamScores.splice(ndx, 1)
       }
       this.teamScores.push(teamScore)
-      this.trigger('updateTeamScore', [teamScore])
+      this.trigger('updateTeamScore', [teamScore, new Date(options.__metadataCreatedAt)])
     }
 
     realtimeProvider.addEventListener('updateTeamScore', this.onUpdateTeamScore)
 
-    this.onQualifyTeam = (team) => {
+    this.onQualifyTeam = (e) => {
+      let options = JSON.parse(e.data)
+      let team = new TeamModel(options)
       let ndx = _.findIndex(this.teamScores, { teamId: team.id })
       if (ndx === -1) {
         let teamScore = new TeamScoreModel({
@@ -95,11 +99,11 @@ class ContestProvider extends EventEmitter {
           updatedAt: null
         })
         this.teamScores.push(teamScore)
-        this.trigger('updateTeamScore', [teamScore])
+        this.trigger('updateTeamScore', [teamScore, new Date(options.__metadataCreatedAt)])
       }
     }
 
-    teamProvider.on('qualifyTeam', this.onQualifyTeam)
+    realtimeProvider.addEventListener('qualifyTeam', this.onQualifyTeam)
 
     let identity = identityProvider.getIdentity()
     if (identity.isSupervisor() || identity.isTeam()) {
@@ -108,15 +112,25 @@ class ContestProvider extends EventEmitter {
         let teamTaskHit = new TeamTaskHitModel(options)
         let ndx = _.findIndex(this.teamTaskHits, { teamId: options.teamId, taskId: options.taskId })
         if (ndx === -1) {
-          if (identity.isExactTeam(options.teamId)) {
+          if (identity.isTeam() && !identity.isExactTeam(options.teamId)) {
             return
           }
           this.teamTaskHits.push(teamTaskHit)
-          this.trigger('createTeamTaskHit', [teamTaskHit])
+          this.trigger('createTeamTaskHit', [teamTaskHit, new Date(options.__metadataCreatedAt)])
         }
       }
 
-      realtimeProvider.addEventListener('createTeamTaskHit', this.onCreateTeamTaskHit, false)
+      realtimeProvider.addEventListener('createTeamTaskHit', this.onCreateTeamTaskHit)
+    }
+
+    if (identity.isSupervisor()) {
+      this.onCreateTeamTaskHitAttempt = (e) => {
+        let options = JSON.parse(e.data)
+        let teamTaskHitAttempt = new TeamTaskHitAttemptModel(options)
+        this.trigger('createTeamTaskHitAttempt', [teamTaskHitAttempt, new Date(options.__metadataCreatedAt)])
+      }
+
+      realtimeProvider.addEventListener('createTeamTaskHitAttempt', this.onCreateTeamTaskHitAttempt)
     }
   }
 
@@ -138,13 +152,18 @@ class ContestProvider extends EventEmitter {
     }
 
     if (this.onQualifyTeam) {
-      teamProvider.off('qualifyTeam', this.onQualifyTeam)
+      realtimeProvider.removeEventListener('qualifyTeam', this.onQualifyTeam)
       this.onQualifyTeam = null
     }
 
     if (this.onCreateTeamTaskHit) {
       realtimeProvider.removeEventListener('createTeamTaskHit', this.onCreateTeamTaskHit)
       this.onCreateTeamTaskHit = null
+    }
+
+    if (this.onCreateTeamTaskHitAttempt) {
+      realtimeProvider.removeEventListener('createTeamTaskHitAttempt', this.onCreateTeamTaskHitAttempt)
+      this.onCreateTeamTaskHitAttempt = null
     }
 
     this.contest = null

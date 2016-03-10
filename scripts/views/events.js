@@ -22,6 +22,9 @@ class EventsView extends View {
     this.$main = null
 
     this.onUpdateContest = null
+    this.onUpdateTeamScore = null
+    this.onCreateTeamTaskHit = null
+    this.onCreateTeamTaskHitAttempt = null
 
     this.onCreateCategory = null
     this.onUpdateCategory = null
@@ -230,6 +233,37 @@ class EventsView extends View {
         }))
         break
       }
+      case 'updateTeamScore': {
+        let team = _.findWhere(teamProvider.getTeams(), { id: eventData.teamId })
+        $el = $(renderTemplate('event-log-update-team-score', {
+          createdAt: moment(createdAt).format(formatStr),
+          team: team,
+          teamScore: eventData
+        }))
+        break
+      }
+      case 'createTeamTaskHit': {
+        let team = _.findWhere(teamProvider.getTeams(), { id: eventData.teamId })
+        let task = _.findWhere(taskProvider.getTaskPreviews(), { id: eventData.taskId })
+        $el = $(renderTemplate('event-log-create-team-task-hit', {
+          createdAt: moment(createdAt).format(formatStr),
+          team: team,
+          task: task,
+          teamTaskHit: eventData
+        }))
+        break
+      }
+      case 'createTeamTaskHitAttempt': {
+        let team = _.findWhere(teamProvider.getTeams(), { id: eventData.teamId })
+        let task = _.findWhere(taskProvider.getTaskPreviews(), { id: eventData.taskId })
+        $el = $(renderTemplate('event-log-create-team-task-hit-attempt', {
+          createdAt: moment(createdAt).format(formatStr),
+          team: team,
+          task: task,
+          teamTaskHitAttempt: eventData
+        }))
+        break
+      }
       default:
         $el = $(renderTemplate('event-log-unknown', {
           eventName: moment(createdAt).format(formatStr),
@@ -246,6 +280,58 @@ class EventsView extends View {
     if ($el && $el.length > 0) {
       this.$eventsContainer.append($el)
       // $el.get(0).scrollIntoView()
+    }
+  }
+
+  subscribeToContestEvents () {
+    this.onUpdateContest = (e, createdAt) => {
+      this.appendLog('updateContest', e, createdAt)
+      return false
+    }
+
+    contestProvider.on('updateContest', this.onUpdateContest)
+
+    this.onUpdateTeamScore = (e, createdAt) => {
+      this.appendLog('updateTeamScore', e, createdAt)
+      return false
+    }
+
+    contestProvider.on('updateTeamScore', this.onUpdateTeamScore)
+
+    this.onCreateTeamTaskHit = (e, createdAt) => {
+      this.appendLog('createTeamTaskHit', e, createdAt)
+      return false
+    }
+
+    contestProvider.on('createTeamTaskHit', this.onCreateTeamTaskHit)
+
+    this.onCreateTeamTaskHitAttempt = (e, createdAt) => {
+      this.appendLog('createTeamTaskHitAttempt', e, createdAt)
+      return false
+    }
+
+    contestProvider.on('createTeamTaskHitAttempt', this.onCreateTeamTaskHitAttempt)
+  }
+
+  unsubscribeFromContestEvents () {
+    if (this.onUpdateContest) {
+      contestProvider.off('updateContest', this.onUpdateContest)
+      this.onUpdateContest = null
+    }
+
+    if (this.onUpdateTeamScore) {
+      contestProvider.off('updateTeamScore', this.onUpdateTeamScore)
+      this.onUpdateTeamScore = null
+    }
+
+    if (this.onCreateTeamTaskHit) {
+      contestProvider.off('createTeamTaskHit', this.onCreateTeamTaskHit)
+      this.onCreateTeamTaskHit = null
+    }
+
+    if (this.onCreateTeamTaskHitAttempt) {
+      contestProvider.off('createTeamTaskHitAttempt', this.onCreateTeamTaskHitAttempt)
+      this.onCreateTeamTaskHitAttempt = null
     }
   }
 
@@ -596,7 +682,8 @@ class EventsView extends View {
         categoryProvider.fetchCategories(),
         postProvider.fetchPosts(),
         taskProvider.fetchTaskPreviews(),
-        taskCategoryProvider.fetchTaskCategories()
+        taskCategoryProvider.fetchTaskCategories(),
+        teamProvider.fetchTeams()
       )
       .done((identity, contest) => {
         if (identity.isSupervisor()) {
@@ -609,13 +696,7 @@ class EventsView extends View {
           navigationBar.present({ active: 'events' })
           statusBar.present()
 
-          this.onUpdateContest = (e, createdAt) => {
-            this.appendLog('updateContest', e, createdAt)
-            return false
-          }
-
-          contestProvider.on('updateContest', this.onUpdateContest)
-
+          this.subscribeToContestEvents()
           this.subscribeToCategoryEvents()
           this.subscribeToPostEvents()
           this.subscribeToSupervisorEvents()
@@ -644,11 +725,7 @@ class EventsView extends View {
     this.$main.empty()
     this.$main = null
 
-    if (this.onUpdateContest) {
-      contestProvider.off('updateContest', this.onUpdateContest)
-      this.onUpdateContest = null
-    }
-
+    this.unsubscribeFromContestEvents()
     this.unsubscribeFromCategoryEvents()
     this.unsubscribeFromPostEvents()
     this.unsubscribeFromSupervisorEvents()

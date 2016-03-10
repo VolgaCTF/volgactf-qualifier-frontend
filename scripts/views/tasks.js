@@ -726,7 +726,6 @@ class TasksView extends View {
         if (taskIsSolved) {
           $submitSuccess.text(`Your team has solved the task on ${moment(taskHit.createdAt).format('lll')}!`)
         }
-
       } else {
         $taskAnswerGroup.hide()
         $submitButton.hide()
