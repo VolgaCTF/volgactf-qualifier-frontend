@@ -190,6 +190,62 @@
                 </p>
             </script>
 
+            <script type="text/x-template" data-name="event-log-create-team">
+                <p>
+                    <span><code><%- createdAt %></code>&nbsp;&nbsp;</span>
+                    <span class="text-success">Team <strong><%- team.name %></strong> has registered for the competition</span>
+                </p>
+            </script>
+
+            <script type="text/x-template" data-name="event-log-update-team-email">
+                <p>
+                    <span><code><%- createdAt %></code>&nbsp;&nbsp;</span>
+                    <span class="text-primary">Team <strong><%- team.name %></strong> has updated its email</span>
+                </p>
+            </script>
+
+            <script type="text/x-template" data-name="event-log-update-team-profile">
+                <p>
+                    <span><code><%- createdAt %></code>&nbsp;&nbsp;</span>
+                    <span class="text-primary">Team <strong><%- team.name %></strong> has updated its profile</span>
+                </p>
+            </script>
+
+            <script type="text/x-template" data-name="event-log-update-team-password">
+                <p>
+                    <span><code><%- createdAt %></code>&nbsp;&nbsp;</span>
+                    <span class="text-primary">Team <strong><%- team.name %></strong> has changed its password</span>
+                </p>
+            </script>
+
+            <script type="text/x-template" data-name="event-log-update-team-logo">
+                <p>
+                    <span><code><%- createdAt %></code>&nbsp;&nbsp;</span>
+                    <span class="text-primary">Team <strong><%- team.name %></strong> has uploaded another logo</span>
+                </p>
+            </script>
+
+            <script type="text/x-template" data-name="event-log-qualify-team">
+                <p>
+                    <span><code><%- createdAt %></code>&nbsp;&nbsp;</span>
+                    <span class="text-success">Team <strong><%- team.name %></strong> has qualified for the competition</span>
+                </p>
+            </script>
+
+            <script type="text/x-template" data-name="event-log-login-team">
+                <p>
+                    <span><code><%- createdAt %></code>&nbsp;&nbsp;</span>
+                    <span class="text-primary">Team <strong><%- team.name %></strong> has logged in</span>
+                </p>
+            </script>
+
+            <script type="text/x-template" data-name="event-log-logout-team">
+                <p>
+                    <span><code><%- createdAt %></code>&nbsp;&nbsp;</span>
+                    <span class="text-primary">Team <strong><%- team.name %></strong> has logged out</span>
+                </p>
+            </script>
+
             <script type="text/x-template" data-name="navbar-view">
                 <ul class="nav navbar-nav">
                     <li class="<% print((active === 'teams') ? 'active' : ''); %>">

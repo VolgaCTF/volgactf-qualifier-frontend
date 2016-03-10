@@ -14,6 +14,7 @@ import postProvider from '../providers/post'
 import supervisorProvider from '../providers/supervisor'
 import taskProvider from '../providers/task'
 import taskCategoryProvider from '../providers/task-category'
+import teamProvider from '../providers/team'
 
 class EventsView extends View {
   constructor () {
@@ -43,6 +44,15 @@ class EventsView extends View {
     this.onCreateTaskCategory = null
     this.onDeleteTaskCategory = null
 
+    this.onCreateTeam = null
+    this.onUpdateTeamEmail = null
+    this.onUpdateTeamProfile = null
+    this.onUpdateTeamPassword = null
+    this.onUpdateTeamLogo = null
+    this.onQualifyTeam = null
+    this.onLoginTeam = null
+    this.onLogoutTeam = null
+
     this.$eventsContainer = null
   }
 
@@ -52,94 +62,95 @@ class EventsView extends View {
 
   renderEvent (eventName, eventData, createdAt) {
     let $el = null
+    let formatStr = 'MM/DD HH:mm:ss.SSS'
     switch (eventName) {
       case 'updateContest':
         $el = $(renderTemplate('event-log-update-contest', {
-          createdAt: moment(createdAt).format(),
+          createdAt: moment(createdAt).format(formatStr),
           contest: eventData
         }))
         break
       case 'createCategory':
         $el = $(renderTemplate('event-log-create-category', {
-          createdAt: moment(createdAt).format(),
+          createdAt: moment(createdAt).format(formatStr),
           category: eventData
         }))
         break
       case 'updateCategory':
         $el = $(renderTemplate('event-log-update-category', {
-          createdAt: moment(createdAt).format(),
+          createdAt: moment(createdAt).format(formatStr),
           category: eventData
         }))
         break
       case 'deleteCategory':
         $el = $(renderTemplate('event-log-delete-category', {
-          createdAt: moment(createdAt).format(),
+          createdAt: moment(createdAt).format(formatStr),
           category: eventData
         }))
         break
       case 'createPost':
         $el = $(renderTemplate('event-log-create-post', {
-          createdAt: moment(createdAt).format(),
+          createdAt: moment(createdAt).format(formatStr),
           post: eventData
         }))
         break
       case 'updatePost':
         $el = $(renderTemplate('event-log-update-post', {
-          createdAt: moment(createdAt).format(),
+          createdAt: moment(createdAt).format(formatStr),
           post: eventData
         }))
         break
       case 'deletePost':
         $el = $(renderTemplate('event-log-delete-post', {
-          createdAt: moment(createdAt).format(),
+          createdAt: moment(createdAt).format(formatStr),
           post: eventData
         }))
         break
       case 'createSupervisor':
         $el = $(renderTemplate('event-log-create-supervisor', {
-          createdAt: moment(createdAt).format(),
+          createdAt: moment(createdAt).format(formatStr),
           supervisor: eventData
         }))
         break
       case 'deleteSupervisor':
         $el = $(renderTemplate('event-log-delete-supervisor', {
-          createdAt: moment(createdAt).format(),
+          createdAt: moment(createdAt).format(formatStr),
           supervisor: eventData
         }))
         break
       case 'loginSupervisor':
         $el = $(renderTemplate('event-log-login-supervisor', {
-          createdAt: moment(createdAt).format(),
+          createdAt: moment(createdAt).format(formatStr),
           supervisor: eventData
         }))
         break
       case 'logoutSupervisor':
         $el = $(renderTemplate('event-log-logout-supervisor', {
-          createdAt: moment(createdAt).format(),
+          createdAt: moment(createdAt).format(formatStr),
           supervisor: eventData
         }))
         break
       case 'createTask':
         $el = $(renderTemplate('event-log-create-task', {
-          createdAt: moment(createdAt).format(),
+          createdAt: moment(createdAt).format(formatStr),
           task: eventData
         }))
         break
       case 'updateTask':
         $el = $(renderTemplate('event-log-update-task', {
-          createdAt: moment(createdAt).format(),
+          createdAt: moment(createdAt).format(formatStr),
           task: eventData
         }))
         break
       case 'openTask':
         $el = $(renderTemplate('event-log-open-task', {
-          createdAt: moment(createdAt).format(),
+          createdAt: moment(createdAt).format(formatStr),
           task: eventData
         }))
         break
       case 'closeTask':
         $el = $(renderTemplate('event-log-close-task', {
-          createdAt: moment(createdAt).format(),
+          createdAt: moment(createdAt).format(formatStr),
           task: eventData
         }))
         break
@@ -147,7 +158,7 @@ class EventsView extends View {
         let task = _.findWhere(taskProvider.getTaskPreviews(), { id: eventData.taskId })
         let category = _.findWhere(categoryProvider.getCategories(), { id: eventData.categoryId })
         $el = $(renderTemplate('event-log-create-task-category', {
-          createdAt: moment(createdAt).format(),
+          createdAt: moment(createdAt).format(formatStr),
           task: task,
           category: category
         }))
@@ -157,15 +168,71 @@ class EventsView extends View {
         let task = _.findWhere(taskProvider.getTaskPreviews(), { id: eventData.taskId })
         let category = _.findWhere(categoryProvider.getCategories(), { id: eventData.categoryId })
         $el = $(renderTemplate('event-log-delete-task-category', {
-          createdAt: moment(createdAt).format(),
+          createdAt: moment(createdAt).format(formatStr),
           task: task,
           category: category
         }))
         break
       }
+      case 'createTeam': {
+        $el = $(renderTemplate('event-log-create-team', {
+          createdAt: moment(createdAt).format(formatStr),
+          team: eventData
+        }))
+        break
+      }
+      case 'updateTeamEmail': {
+        $el = $(renderTemplate('event-log-update-team-email', {
+          createdAt: moment(createdAt).format(formatStr),
+          team: eventData
+        }))
+        break
+      }
+      case 'updateTeamProfile': {
+        $el = $(renderTemplate('event-log-update-team-profile', {
+          createdAt: moment(createdAt).format(formatStr),
+          team: eventData
+        }))
+        break
+      }
+      case 'updateTeamPassword': {
+        $el = $(renderTemplate('event-log-update-team-password', {
+          createdAt: moment(createdAt).format(formatStr),
+          team: eventData
+        }))
+        break
+      }
+      case 'updateTeamLogo': {
+        $el = $(renderTemplate('event-log-update-team-logo', {
+          createdAt: moment(createdAt).format(formatStr),
+          team: eventData
+        }))
+        break
+      }
+      case 'qualifyTeam': {
+        $el = $(renderTemplate('event-log-qualify-team', {
+          createdAt: moment(createdAt).format(formatStr),
+          team: eventData
+        }))
+        break
+      }
+      case 'loginTeam': {
+        $el = $(renderTemplate('event-log-login-team', {
+          createdAt: moment(createdAt).format(formatStr),
+          team: eventData
+        }))
+        break
+      }
+      case 'logoutTeam': {
+        $el = $(renderTemplate('event-log-logout-team', {
+          createdAt: moment(createdAt).format(formatStr),
+          team: eventData
+        }))
+        break
+      }
       default:
         $el = $(renderTemplate('event-log-unknown', {
-          eventName: eventName,
+          eventName: moment(createdAt).format(formatStr),
           createdAt: moment(createdAt).format()
         }))
         break
@@ -414,6 +481,110 @@ class EventsView extends View {
     taskCategoryProvider.unsubscribe()
   }
 
+  subscribeToTeamEvents () {
+    teamProvider.subscribe()
+
+    this.onCreateTeam = (e, createdAt) => {
+      this.appendLog('createTeam', e, createdAt)
+      return false
+    }
+
+    teamProvider.on('createTeam', this.onCreateTeam)
+
+    this.onUpdateTeamEmail = (e, createdAt) => {
+      this.appendLog('updateTeamEmail', e, createdAt)
+      return false
+    }
+
+    teamProvider.on('updateTeamEmail', this.onUpdateTeamEmail)
+
+    this.onUpdateTeamProfile = (e, createdAt) => {
+      this.appendLog('updateTeamProfile', e, createdAt)
+      return false
+    }
+
+    teamProvider.on('updateTeamProfile', this.onUpdateTeamProfile)
+
+    this.onUpdateTeamPassword = (e, createdAt) => {
+      this.appendLog('updateTeamPassword', e, createdAt)
+      return false
+    }
+
+    teamProvider.on('updateTeamPassword', this.onUpdateTeamPassword)
+
+    this.onUpdateTeamLogo = (e, createdAt) => {
+      this.appendLog('updateTeamLogo', e, createdAt)
+      return false
+    }
+
+    teamProvider.on('updateTeamLogo', this.onUpdateTeamLogo)
+
+    this.onQualifyTeam = (e, createdAt) => {
+      this.appendLog('qualifyTeam', e, createdAt)
+      return false
+    }
+
+    teamProvider.on('qualifyTeam', this.onQualifyTeam)
+
+    this.onLoginTeam = (e, createdAt) => {
+      this.appendLog('loginTeam', e, createdAt)
+      return false
+    }
+
+    teamProvider.on('loginTeam', this.onLoginTeam)
+
+    this.onLogoutTeam = (e, createdAt) => {
+      this.appendLog('logoutTeam', e, createdAt)
+      return false
+    }
+
+    teamProvider.on('logoutTeam', this.onLogoutTeam)
+  }
+
+  unsubscribeFromTeamEvents () {
+    if (this.onCreateTeam) {
+      teamProvider.off('createTeam', this.onCreateTeam)
+      this.onCreateTeam = null
+    }
+
+    if (this.onUpdateTeamEmail) {
+      teamProvider.off('updateTeamEmail', this.onUpdateTeamEmail)
+      this.onUpdateTeamEmail = null
+    }
+
+    if (this.onUpdateTeamProfile) {
+      teamProvider.off('updateTeamProfile', this.onUpdateTeamProfile)
+      this.onUpdateTeamProfile = null
+    }
+
+    if (this.onUpdateTeamPassword) {
+      teamProvider.off('updateTeamPassword', this.onUpdateTeamPassword)
+      this.onUpdateTeamPassword = null
+    }
+
+    if (this.onUpdateTeamLogo) {
+      teamProvider.off('updateTeamLogo', this.onUpdateTeamLogo)
+      this.onUpdateTeamLogo = null
+    }
+
+    if (this.onQualifyTeam) {
+      teamProvider.off('qualifyTeam', this.onQualifyTeam)
+      this.onQualifyTeam = null
+    }
+
+    if (this.onLoginTeam) {
+      teamProvider.off('loginTeam', this.onLoginTeam)
+      this.onLoginTeam = null
+    }
+
+    if (this.onLogoutTeam) {
+      teamProvider.off('logoutTeam', this.onLogoutTeam)
+      this.onLogoutTeam = null
+    }
+
+    teamProvider.unsubscribe()
+  }
+
   present () {
     this.$main = $('#main')
     this.$main.html(renderTemplate('loading-view'))
@@ -450,6 +621,7 @@ class EventsView extends View {
           this.subscribeToSupervisorEvents()
           this.subscribeToTaskEvents()
           this.subscribeToTaskCategoryEvents()
+          this.subscribeToTeamEvents()
 
           this.$main.html(renderTemplate('events-view'))
           this.$eventsContainer = $('#themis-events')
@@ -482,6 +654,7 @@ class EventsView extends View {
     this.unsubscribeFromSupervisorEvents()
     this.unsubscribeFromTaskEvents()
     this.unsubscribeFromTaskCategoryEvents()
+    this.unsubscribeFromTeamEvents()
 
     navigationBar.dismiss()
     statusBar.dismiss()
