@@ -45,6 +45,10 @@ function isProduction () {
   return process.env.NODE_ENV === 'production'
 }
 
+function isSass (file) {
+  return path.extname(file.path) === '.sass'
+}
+
 gulp.task('clean_scripts', (callback) => {
   del(['public/assets/js/*'], callback)
 })
@@ -74,8 +78,13 @@ gulp.task('clean_stylesheets', (callback) => {
 
 gulp.task('stylesheets', ['clean_stylesheets'], () => {
   return gulp
-    .src(paths.stylesheets)
-    .pipe(sass({ indentedSyntax: true, errLogToConsole: true }))
+    .src(paths.stylesheets.concat(customizer.getStylesheets().map((stylesheetPath) => {
+      return path.relative(process.cwd(), stylesheetPath)
+    })))
+    .pipe(gulpIf(isSass, sass({
+      indentedSyntax: true,
+      errLogToConsole: true
+    })))
     .pipe(concatCss('themis.css', {
       rebaseUrls: false
     }))
@@ -93,7 +102,9 @@ gulp.task('clean_fonts', (callback) => {
 
 gulp.task('fonts', ['clean_fonts'], () => {
   gulp
-    .src(paths.fonts)
+    .src(paths.fonts.concat(customizer.getFonts().map((fontPath) => {
+      return path.relative(process.cwd(), fontPath)
+    })))
     .pipe(gulp.dest('public/assets/fonts'))
 })
 
