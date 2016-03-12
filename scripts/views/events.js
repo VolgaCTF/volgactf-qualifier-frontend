@@ -54,6 +54,7 @@ class EventsView extends View {
     this.onUpdateTeamPassword = null
     this.onUpdateTeamLogo = null
     this.onQualifyTeam = null
+    this.onDisqualifyTeam = null
     this.onLoginTeam = null
     this.onLogoutTeam = null
 
@@ -221,6 +222,13 @@ class EventsView extends View {
       }
       case 'qualifyTeam': {
         $el = $(renderTemplate('event-log-qualify-team', {
+          createdAt: moment(createdAt).format(formatStr),
+          team: eventData
+        }))
+        break
+      }
+      case 'disqualifyTeam': {
+        $el = $(renderTemplate('event-log-disqualify-team', {
           createdAt: moment(createdAt).format(formatStr),
           team: eventData
         }))
@@ -631,6 +639,13 @@ class EventsView extends View {
 
     teamProvider.on('qualifyTeam', this.onQualifyTeam)
 
+    this.onDisqualifyTeam = (e, createdAt) => {
+      this.appendLog('disqualifyTeam', e, createdAt)
+      return false
+    }
+
+    teamProvider.on('disqualifyTeam', this.onDisqualifyTeam)
+
     this.onLoginTeam = (e, createdAt) => {
       this.appendLog('loginTeam', e, createdAt)
       return false
@@ -675,6 +690,11 @@ class EventsView extends View {
     if (this.onQualifyTeam) {
       teamProvider.off('qualifyTeam', this.onQualifyTeam)
       this.onQualifyTeam = null
+    }
+
+    if (this.onDisqualifyTeam) {
+      teamProvider.off('disqualifyTeam', this.onDisqualifyTeam)
+      this.onDisqualifyTeam = null
     }
 
     if (this.onLoginTeam) {

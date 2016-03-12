@@ -19,6 +19,7 @@ class ContestProvider extends EventEmitter {
     this.onUpdate = null
     this.onUpdateTeamScore = null
     this.onQualifyTeam = null
+    this.onDisqualifyTeam = null
 
     this.onCreateTeamTaskHit = null
     this.onCreateTeamTaskHitAttempt = null
@@ -105,6 +106,23 @@ class ContestProvider extends EventEmitter {
 
     realtimeProvider.addEventListener('qualifyTeam', this.onQualifyTeam)
 
+    this.onDisqualifyTeam = (e) => {
+      let options = JSON.parse(e.data)
+      let team = new TeamModel(options)
+      let ndx = _.findIndex(this.teamScores, { teamId: team.id })
+      if (ndx > -1) {
+        this.teamScores.splice(ndx, 1)
+      }
+      let teamScore = new TeamScoreModel({
+        teamId: team.id,
+        score: 0,
+        updatedAt: null
+      })
+      this.trigger('updateTeamScore', [teamScore, new Date(options.__metadataCreatedAt)])
+    }
+
+    realtimeProvider.addEventListener('disqualifyTeam', this.onDisqualifyTeam)
+
     let identity = identityProvider.getIdentity()
     if (identity.isSupervisor() || identity.isTeam()) {
       this.onCreateTeamTaskHit = (e) => {
@@ -154,6 +172,11 @@ class ContestProvider extends EventEmitter {
     if (this.onQualifyTeam) {
       realtimeProvider.removeEventListener('qualifyTeam', this.onQualifyTeam)
       this.onQualifyTeam = null
+    }
+
+    if (this.onDisqualifyTeam) {
+      realtimeProvider.removeEventListener('disqualifyTeam', this.onDisqualifyTeam)
+      this.onDisqualifyTeam = null
     }
 
     if (this.onCreateTeamTaskHit) {

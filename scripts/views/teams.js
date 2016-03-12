@@ -20,6 +20,7 @@ class TeamsView extends View {
     this.onCreateTeam = null
     this.onUpdateTeamEmail = null
     this.onQualifyTeam = null
+    this.onDisqualifyTeam = null
   }
 
   getTitle () {
@@ -100,6 +101,13 @@ class TeamsView extends View {
 
             teamProvider.on('qualifyTeam', this.onQualifyTeam)
 
+            this.onDisqualifyTeam = (team) => {
+              this.renderTeams()
+              return false
+            }
+
+            teamProvider.on('disqualifyTeam', this.onDisqualifyTeam)
+
             if (identity.isSupervisor()) {
               this.onCreateTeam = (team) => {
                 this.renderTeams()
@@ -150,6 +158,11 @@ class TeamsView extends View {
     if (this.onQualifyTeam) {
       teamProvider.off('qualifyTeam', this.onQualifyTeam)
       this.onQualifyTeam = null
+    }
+
+    if (this.onDisqualifyTeam) {
+      teamProvider.off('disqualifyTeam', this.onDisqualifyTeam)
+      this.onDisqualifyTeam = null
     }
 
     teamProvider.unsubscribe()

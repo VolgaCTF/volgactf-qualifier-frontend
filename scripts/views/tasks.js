@@ -740,6 +740,10 @@ class TasksView extends View {
         $form.attr('action', `/api/task/${taskId}/submit`)
       }
 
+      if (taskPreview.isClosed()) {
+        return
+      }
+
       $
         .when(
           taskProvider.fetchTask(taskId),
@@ -871,6 +875,10 @@ class TasksView extends View {
 
       $form.parsley().reset()
       $form.attr('action', `/api/task/${taskId}/check`)
+
+      if (taskPreview.isClosed()) {
+        return
+      }
 
       if (contest.isFinished()) {
         $

@@ -239,6 +239,13 @@
                 </p>
             </script>
 
+            <script type="text/x-template" data-name="event-log-disqualify-team">
+                <p>
+                    <span><code><%- createdAt %></code>&nbsp;&nbsp;</span>
+                    <span class="text-danger">Team <strong><%- team.name %></strong> has been disqualified</span>
+                </p>
+            </script>
+
             <script type="text/x-template" data-name="event-log-login-team">
                 <p>
                     <span><code><%- createdAt %></code>&nbsp;&nbsp;</span>
@@ -335,7 +342,10 @@
                         <img class="img-thumbnail" src="/api/team/<%- team.id %>/logo">
                     </div>
                     <div class="pull-left info">
-                        <h4 class="text-primary"><a href="/team/<%- team.id %>/profile" data-push-history><%- team.name %></a></h4>
+                        <h4 class="text-primary">
+                            <a href="/team/<%- team.id %>/profile" data-push-history><%- team.name %></a>
+                            <% if (team.disqualified) { %>&nbsp;<span class="label label-danger">disqualified</span><% } %>
+                        </h4>
                         <ul class="list-unstyled">
                             <% if ('email' in team && typeof team.email !== 'undefined' && team.email !== null) { %>
                             <li>
@@ -1651,7 +1661,10 @@
                         <% } %>
                     </div>
                     <div class="pull-left info">
-                        <h4 class="text-primary"><%- team.name %></h4>
+                        <h4 class="text-primary">
+                            <%- team.name %>
+                            <% if (team.disqualified) { %>&nbsp;<span class="label label-danger">disqualified</span><% } %>
+                        </h4>
                         <% if (identity.isExactTeam(team.id) || identity.isSupervisor()) { %>
                         <ul class="list-unstyled">
                             <% if ('email' in team && 'emailConfirmed' in team) { %>

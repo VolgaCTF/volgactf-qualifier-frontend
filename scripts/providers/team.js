@@ -14,6 +14,7 @@ class TeamProvider extends EventEmitter {
     this.onCreate = null
     this.onUpdateEmail = null
     this.onQualify = null
+    this.onDisqualify = null
     this.onUpdatePassword = null
     this.onUpdateLogo = null
     this.onLogin = null
@@ -57,6 +58,21 @@ class TeamProvider extends EventEmitter {
     }
 
     realtimeProvider.addEventListener('qualifyTeam', this.onQualify)
+
+    this.onDisqualify = (e) => {
+      let options = JSON.parse(e.data)
+      let team = new TeamModel(options)
+      let ndx = _.findIndex(this.teams, { id: options.id })
+      if (ndx > -1) {
+        this.teams.splice(ndx, 1)
+      }
+      if (identity.isSupervisor()) {
+        this.teams.push(team)
+      }
+      this.trigger('disqualifyTeam', [team, new Date(options.__metadataCreatedAt)])
+    }
+
+    realtimeProvider.addEventListener('disqualifyTeam', this.onDisqualify)
 
     if (identity.isSupervisor()) {
       this.onCreate = (e) => {
@@ -140,6 +156,11 @@ class TeamProvider extends EventEmitter {
     if (this.onQualify) {
       realtimeProvider.removeEventListener('qualifyTeam', this.onQualify)
       this.onQualify = null
+    }
+
+    if (this.onDisqualify) {
+      realtimeProvider.removeEventListener('disqualifyTeam', this.onDisqualify)
+      this.onDisqualify = null
     }
 
     if (this.onUpdatePassword) {
