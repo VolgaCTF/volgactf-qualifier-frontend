@@ -8,5 +8,6 @@ export default class TeamModel {
     this.createdAt = new Date(options.createdAt)
     this.email = (options.email) ? options.email : null
     this.emailConfirmed = (options.emailConfirmed) ? options.emailConfirmed : false
+    this.disqualified = options.disqualified
   }
 }

@@ -14,6 +14,11 @@ class TeamProvider extends EventEmitter {
     this.onCreate = null
     this.onUpdateEmail = null
     this.onQualify = null
+    this.onDisqualify = null
+    this.onUpdatePassword = null
+    this.onUpdateLogo = null
+    this.onLogin = null
+    this.onLogout = null
   }
 
   getTeams () {
@@ -35,7 +40,7 @@ class TeamProvider extends EventEmitter {
       if (ndx > -1) {
         this.teams.splice(ndx, 1)
         this.teams.push(team)
-        this.trigger('updateTeamProfile', [team])
+        this.trigger('updateTeamProfile', [team, new Date(options.__metadataCreatedAt)])
       }
     }
 
@@ -49,17 +54,32 @@ class TeamProvider extends EventEmitter {
         this.teams.splice(ndx, 1)
       }
       this.teams.push(team)
-      this.trigger('qualifyTeam', [team])
+      this.trigger('qualifyTeam', [team, new Date(options.__metadataCreatedAt)])
     }
 
     realtimeProvider.addEventListener('qualifyTeam', this.onQualify)
+
+    this.onDisqualify = (e) => {
+      let options = JSON.parse(e.data)
+      let team = new TeamModel(options)
+      let ndx = _.findIndex(this.teams, { id: options.id })
+      if (ndx > -1) {
+        this.teams.splice(ndx, 1)
+      }
+      if (identity.isSupervisor()) {
+        this.teams.push(team)
+      }
+      this.trigger('disqualifyTeam', [team, new Date(options.__metadataCreatedAt)])
+    }
+
+    realtimeProvider.addEventListener('disqualifyTeam', this.onDisqualify)
 
     if (identity.isSupervisor()) {
       this.onCreate = (e) => {
         let options = JSON.parse(e.data)
         let team = new TeamModel(options)
         this.teams.push(team)
-        this.trigger('createTeam', [team])
+        this.trigger('createTeam', [team, new Date(options.__metadataCreatedAt)])
       }
 
       realtimeProvider.addEventListener('createTeam', this.onCreate)
@@ -72,10 +92,42 @@ class TeamProvider extends EventEmitter {
           this.teams.splice(ndx, 1)
         }
         this.teams.push(team)
-        this.trigger('updateTeamEmail', [team])
+        this.trigger('updateTeamEmail', [team, new Date(options.__metadataCreatedAt)])
       }
 
       realtimeProvider.addEventListener('updateTeamEmail', this.onUpdateEmail)
+
+      this.onUpdatePassword = (e) => {
+        let options = JSON.parse(e.data)
+        let team = new TeamModel(options)
+        this.trigger('updateTeamPassword', [team, new Date(options.__metadataCreatedAt)])
+      }
+
+      realtimeProvider.addEventListener('updateTeamPassword', this.onUpdatePassword)
+
+      this.onUpdateLogo = (e) => {
+        let options = JSON.parse(e.data)
+        let team = new TeamModel(options)
+        this.trigger('updateTeamLogo', [team, new Date(options.__metadataCreatedAt)])
+      }
+
+      realtimeProvider.addEventListener('updateTeamLogo', this.onUpdateLogo)
+
+      this.onLogin = (e) => {
+        let options = JSON.parse(e.data)
+        let team = new TeamModel(options)
+        this.trigger('loginTeam', [team, new Date(options.__metadataCreatedAt)])
+      }
+
+      realtimeProvider.addEventListener('loginTeam', this.onLogin)
+
+      this.onLogout = (e) => {
+        let options = JSON.parse(e.data)
+        let team = new TeamModel(options)
+        this.trigger('logoutTeam', [team, new Date(options.__metadataCreatedAt)])
+      }
+
+      realtimeProvider.addEventListener('logoutTeam', this.onLogout)
     }
   }
 
@@ -105,6 +157,31 @@ class TeamProvider extends EventEmitter {
       realtimeProvider.removeEventListener('qualifyTeam', this.onQualify)
       this.onQualify = null
     }
+
+    if (this.onDisqualify) {
+      realtimeProvider.removeEventListener('disqualifyTeam', this.onDisqualify)
+      this.onDisqualify = null
+    }
+
+    if (this.onUpdatePassword) {
+      realtimeProvider.removeEventListener('updateTeamPassword', this.onUpdatePassword)
+      this.onUpdatePassword = null
+    }
+
+    if (this.onUpdateLogo) {
+      realtimeProvider.removeEventListener('updateTeamLogo', this.onUpdateLogo)
+      this.onUpdateLogo = null
+    }
+
+    if (this.onLogin) {
+      realtimeProvider.removeEventListener('loginTeam', this.onLogin)
+      this.onLogin = null
+    }
+
+    if (this.onLogout) {
+      realtimeProvider.removeEventListener('logoutTeam', this.onLogout)
+      this.onLogout = null
+    }
   }
 
   fetchTeamProfile (id) {
@@ -131,7 +208,7 @@ class TeamProvider extends EventEmitter {
 
   fetchTeams (callback) {
     let promise = $.Deferred()
-    let url = '/api/team/all'
+    let url = '/api/team/index'
 
     $.ajax({
       url: url,

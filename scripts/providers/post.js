@@ -11,7 +11,7 @@ class PostProvider extends EventEmitter {
 
     this.onCreate = null
     this.onUpdate = null
-    this.onRemove = null
+    this.onDelete = null
   }
 
   getPosts () {
@@ -29,7 +29,7 @@ class PostProvider extends EventEmitter {
       let options = JSON.parse(e.data)
       let post = new PostModel(options)
       this.posts.push(post)
-      this.trigger('createPost', [post])
+      this.trigger('createPost', [post, new Date(options.__metadataCreatedAt)])
     }
 
     realtimeProvider.addEventListener('createPost', this.onCreate)
@@ -42,21 +42,22 @@ class PostProvider extends EventEmitter {
         this.posts.splice(ndx, 1)
       }
       this.posts.push(post)
-      this.trigger('updatePost', [post])
+      this.trigger('updatePost', [post, new Date(options.__metadataCreatedAt)])
     }
 
     realtimeProvider.addEventListener('updatePost', this.onUpdate)
 
-    this.onRemove = (e) => {
+    this.onDelete = (e) => {
       let options = JSON.parse(e.data)
       let ndx = _.findIndex(this.posts, { id: options.id })
       if (ndx > -1) {
         this.posts.splice(ndx, 1)
-        this.trigger('removePost', [options.id])
+        let post = new PostModel(options)
+        this.trigger('deletePost', [post, new Date(options.__metadataCreatedAt)])
       }
     }
 
-    realtimeProvider.addEventListener('removePost', this.onRemove)
+    realtimeProvider.addEventListener('deletePost', this.onDelete)
   }
 
   unsubscribe () {
@@ -76,9 +77,9 @@ class PostProvider extends EventEmitter {
       this.onUpdate = null
     }
 
-    if (this.onRemove) {
-      realtimeProvider.removeEventListener('removePost', this.onRemove)
-      this.onRemove = null
+    if (this.onDelete) {
+      realtimeProvider.removeEventListener('deletePost', this.onDelete)
+      this.onDelete = null
     }
 
     this.posts = []
@@ -86,7 +87,7 @@ class PostProvider extends EventEmitter {
 
   fetchPosts () {
     let promise = $.Deferred()
-    let url = '/api/post/all'
+    let url = '/api/post/index'
 
     $.ajax({
       url: url,
@@ -110,9 +111,9 @@ class PostProvider extends EventEmitter {
     return promise
   }
 
-  removePost (id, token) {
+  deletePost (id, token) {
     let promise = $.Deferred()
-    let url = `/api/post/${id}/remove`
+    let url = `/api/post/${id}/delete`
 
     $.ajax({
       url: url,

@@ -33,7 +33,7 @@ class TaskProvider extends EventEmitter {
         let options = JSON.parse(e.data)
         let taskPreview = new TaskPreviewModel(options)
         this.taskPreviews.push(taskPreview)
-        this.trigger('createTask', [taskPreview])
+        this.trigger('createTask', [taskPreview, new Date(options.__metadataCreatedAt)])
       }
 
       realtimeProvider.addEventListener('createTask', this.onCreateTask)
@@ -47,7 +47,7 @@ class TaskProvider extends EventEmitter {
         this.taskPreviews.splice(ndx, 1)
       }
       this.taskPreviews.push(taskPreview)
-      this.trigger('openTask', [taskPreview])
+      this.trigger('openTask', [taskPreview, new Date(options.__metadataCreatedAt)])
     }
 
     realtimeProvider.addEventListener('openTask', this.onOpenTask)
@@ -60,7 +60,7 @@ class TaskProvider extends EventEmitter {
         this.taskPreviews.splice(ndx, 1)
       }
       this.taskPreviews.push(taskPreview)
-      this.trigger('closeTask', [taskPreview])
+      this.trigger('closeTask', [taskPreview, new Date(options.__metadataCreatedAt)])
     }
 
     realtimeProvider.addEventListener('closeTask', this.onCloseTask)
@@ -73,7 +73,7 @@ class TaskProvider extends EventEmitter {
         this.taskPreviews.splice(ndx, 1)
       }
       this.taskPreviews.push(taskPreview)
-      this.trigger('updateTask', [taskPreview])
+      this.trigger('updateTask', [taskPreview, new Date(options.__metadataCreatedAt)])
     }
 
     realtimeProvider.addEventListener('updateTask', this.onUpdateTask)
@@ -111,7 +111,7 @@ class TaskProvider extends EventEmitter {
 
   fetchTaskPreviews () {
     let promise = $.Deferred()
-    let url = '/api/task/all'
+    let url = '/api/task/index'
 
     $.ajax({
       url: url,

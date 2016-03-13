@@ -11,7 +11,7 @@ class TaskCategoryProvider extends EventEmitter {
     this.taskCategories = []
 
     this.onCreate = null
-    this.onRemove = null
+    this.onDelete = null
     this.onReveal = null
   }
 
@@ -30,7 +30,7 @@ class TaskCategoryProvider extends EventEmitter {
       let options = JSON.parse(e.data)
       let taskCategory = new TaskCategoryModel(options)
       this.taskCategories.push(taskCategory)
-      this.trigger('createTaskCategory', [taskCategory])
+      this.trigger('createTaskCategory', [taskCategory, new Date(options.__metadataCreatedAt)])
     }
 
     realtimeProvider.addEventListener('createTaskCategory', this.onCreate)
@@ -41,23 +41,24 @@ class TaskCategoryProvider extends EventEmitter {
         let options = JSON.parse(e.data)
         let taskCategory = new TaskCategoryModel(options)
         this.taskCategories.push(taskCategory)
-        this.trigger('revealTaskCategory', [taskCategory])
+        this.trigger('revealTaskCategory', [taskCategory, new Date(options.__metadataCreatedAt)])
       }
 
       realtimeProvider.addEventListener('revealTaskCategory', this.onReveal)
     }
 
-    this.onRemove = (e) => {
+    this.onDelete = (e) => {
       let options = JSON.parse(e.data)
       let ndx = _.findIndex(this.taskCategories, { id: options.id })
 
       if (ndx > -1) {
         this.taskCategories.splice(ndx, 1)
-        this.trigger('removeTaskCategory', [options.id])
+        let taskCategory = new TaskCategoryModel(options)
+        this.trigger('deleteTaskCategory', [taskCategory, new Date(options.__metadataCreatedAt)])
       }
     }
 
-    realtimeProvider.addEventListener('removeTaskCategory', this.onRemove)
+    realtimeProvider.addEventListener('deleteTaskCategory', this.onDelete)
   }
 
   unsubscribe () {
@@ -77,9 +78,9 @@ class TaskCategoryProvider extends EventEmitter {
       this.onReveal = null
     }
 
-    if (this.onRemove) {
-      realtimeProvider.removeEventListener('removeTaskCategory', this.onRemove)
-      this.onRemove = null
+    if (this.onDelete) {
+      realtimeProvider.removeEventListener('deleteTaskCategory', this.onDelete)
+      this.onDelete = null
     }
 
     this.taskCategories = []
@@ -87,7 +88,7 @@ class TaskCategoryProvider extends EventEmitter {
 
   fetchTaskCategories () {
     let promise = $.Deferred()
-    let url = '/api/task/category/all'
+    let url = '/api/task/category/index'
 
     $.ajax({
       url: url,
