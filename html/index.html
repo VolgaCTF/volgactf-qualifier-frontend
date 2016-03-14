@@ -200,84 +200,84 @@
             <script type="text/x-template" data-name="event-log-create-team">
                 <p>
                     <span><code><%- createdAt %></code>&nbsp;&nbsp;</span>
-                    <span class="text-success">Team <strong><%- team.name %></strong> has registered for the competition</span>
+                    <span class="text-success">Team <strong><u><a class="text-success" href="/team/<%- team.id %>/profile" target="_blank"><%- team.name %></a></u></strong> has registered for the competition</span>
                 </p>
             </script>
 
             <script type="text/x-template" data-name="event-log-update-team-email">
                 <p>
                     <span><code><%- createdAt %></code>&nbsp;&nbsp;</span>
-                    <span class="text-primary">Team <strong><%- team.name %></strong> has updated it's email</span>
+                    <span class="text-primary">Team <strong><u><a class="text-primary" href="/team/<%- team.id %>/profile" target="_blank"><%- team.name %></a></u></strong> has updated it's email</span>
                 </p>
             </script>
 
             <script type="text/x-template" data-name="event-log-update-team-profile">
                 <p>
                     <span><code><%- createdAt %></code>&nbsp;&nbsp;</span>
-                    <span class="text-primary">Team <strong><%- team.name %></strong> has updated it's profile</span>
+                    <span class="text-primary">Team <strong><u><a class="text-primary" href="/team/<%- team.id %>/profile" target="_blank"><%- team.name %></a></u></strong> has updated it's profile</span>
                 </p>
             </script>
 
             <script type="text/x-template" data-name="event-log-update-team-password">
                 <p>
                     <span><code><%- createdAt %></code>&nbsp;&nbsp;</span>
-                    <span class="text-primary">Team <strong><%- team.name %></strong> has changed it's password</span>
+                    <span class="text-primary">Team <strong><u><a class="text-primary" href="/team/<%- team.id %>/profile" target="_blank"><%- team.name %></a></u></strong> has changed it's password</span>
                 </p>
             </script>
 
             <script type="text/x-template" data-name="event-log-update-team-logo">
                 <p>
                     <span><code><%- createdAt %></code>&nbsp;&nbsp;</span>
-                    <span class="text-primary">Team <strong><%- team.name %></strong> has uploaded another logo</span>
+                    <span class="text-primary">Team <strong><u><a class="text-primary" href="/team/<%- team.id %>/profile" target="_blank"><%- team.name %></a></u></strong> has uploaded another logo</span>
                 </p>
             </script>
 
             <script type="text/x-template" data-name="event-log-qualify-team">
                 <p>
                     <span><code><%- createdAt %></code>&nbsp;&nbsp;</span>
-                    <span class="text-success">Team <strong><%- team.name %></strong> has qualified for the competition</span>
+                    <span class="text-success">Team <strong><u><a class="text-success" href="/team/<%- team.id %>/profile" target="_blank"><%- team.name %></a></u></strong> has qualified for the competition</span>
                 </p>
             </script>
 
             <script type="text/x-template" data-name="event-log-disqualify-team">
                 <p>
                     <span><code><%- createdAt %></code>&nbsp;&nbsp;</span>
-                    <span class="text-danger">Team <strong><%- team.name %></strong> has been disqualified</span>
+                    <span class="text-danger">Team <strong><u><a class="text-danger" href="/team/<%- team.id %>/profile" target="_blank"><%- team.name %></a></u></strong> has been disqualified</span>
                 </p>
             </script>
 
             <script type="text/x-template" data-name="event-log-login-team">
                 <p>
                     <span><code><%- createdAt %></code>&nbsp;&nbsp;</span>
-                    <span class="text-primary">Team <strong><%- team.name %></strong> has logged in</span>
+                    <span class="text-primary">Team <strong><u><a class="text-primary" href="/team/<%- team.id %>/profile" target="_blank"><%- team.name %></a></u></strong> has logged in</span>
                 </p>
             </script>
 
             <script type="text/x-template" data-name="event-log-logout-team">
                 <p>
                     <span><code><%- createdAt %></code>&nbsp;&nbsp;</span>
-                    <span class="text-primary">Team <strong><%- team.name %></strong> has logged out</span>
+                    <span class="text-primary">Team <strong><u><a class="text-primary" href="/team/<%- team.id %>/profile" target="_blank"><%- team.name %></a></u></strong> has logged out</span>
                 </p>
             </script>
 
             <script type="text/x-template" data-name="event-log-update-team-score">
                 <p>
                     <span><code><%- createdAt %></code>&nbsp;&nbsp;</span>
-                    <span class="text-primary">Team <strong><%- team.name %></strong> score has been adjusted to <strong><%- teamScore.score %></strong> points</span>
+                    <span class="text-primary">Team <strong><u><a class="text-primary" href="/team/<%- team.id %>/profile" target="_blank"><%- team.name %></a></u></strong> score has been adjusted to <strong><%- teamScore.score %></strong> points</span>
                 </p>
             </script>
 
             <script type="text/x-template" data-name="event-log-create-team-task-hit">
                 <p>
                     <span><code><%- createdAt %></code>&nbsp;&nbsp;</span>
-                    <span class="text-success">Team <strong><%- team.name %></strong> has just solved the task <strong><%- task.title %></strong> and has earned <strong><%- task.value %></strong> points</span>
+                    <span class="text-success">Team <strong><u><a class="text-success" href="/team/<%- team.id %>/profile" target="_blank"><%- team.name %></a></u></strong> has just solved the task <strong><%- task.title %></strong> and has earned <strong><%- task.value %></strong> points</span>
                 </p>
             </script>
 
             <script type="text/x-template" data-name="event-log-create-team-task-hit-attempt">
                 <p>
                     <span><code><%- createdAt %></code>&nbsp;&nbsp;</span>
-                    <span class="text-warning">Team <strong><%- team.name %></strong> has provided wrong answer <strong><%- teamTaskHitAttempt.wrongAnswer %></strong> for the task <strong><%- task.title %></strong></span>
+                    <span class="text-warning">Team <strong><u><a class="text-warning" href="/team/<%- team.id %>/profile" target="_blank"><%- team.name %></a></u></strong> has provided wrong answer <strong><%- teamTaskHitAttempt.wrongAnswer %></strong> for the task <strong><%- task.title %></strong></span>
                 </p>
             </script>
 
