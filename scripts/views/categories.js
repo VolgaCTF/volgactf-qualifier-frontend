@@ -13,6 +13,7 @@ import identityProvider from '../providers/identity'
 import 'bootstrap'
 import 'jquery.form'
 import 'parsley'
+import History from 'history.js'
 
 class CategoriesView extends View {
   constructor () {
@@ -228,6 +229,14 @@ class CategoriesView extends View {
               this.$categoriesList = $('#themis-categories-list')
 
               this.renderCategories()
+
+              let urlParams = History.getState().data.params
+              if (urlParams.action === 'scrollTo' && urlParams.categoryId) {
+                let $el = $(`div.themis-category[data-id="${urlParams.categoryId}"]`)
+                if ($el.length > 0) {
+                  $el.get(0).scrollIntoView()
+                }
+              }
 
               this.initCreateCategoryModal()
               this.initEditCategoryModal()

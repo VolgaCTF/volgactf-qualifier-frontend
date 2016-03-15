@@ -81,14 +81,14 @@
             <script type="text/x-template" data-name="event-log-create-category">
                 <p>
                     <span><code><%- createdAt %></code>&nbsp;&nbsp;</span>
-                    <span class="text-success">Category <strong><%- category.title %></strong> has been created</span>
+                    <span class="text-success">Category <strong><u><a class="text-success" href="/categories?action=scrollTo&categoryId=<%- category.id %>" target="_blank"><%- category.title %></a></u></strong> has been created</span>
                 </p>
             </script>
 
             <script type="text/x-template" data-name="event-log-update-category">
                 <p>
                     <span><code><%- createdAt %></code>&nbsp;&nbsp;</span>
-                    <span class="text-primary">Category <strong><%- category.title %></strong> has been updated</span>
+                    <span class="text-primary">Category <strong><u><a class="text-primary" href="/categories?action=scrollTo&categoryId=<%- category.id %>" target="_blank"><%- category.title %></a></u></strong> has been updated</span>
                 </p>
             </script>
 
@@ -391,7 +391,7 @@
             </script>
 
             <script type="text/x-template" data-name="category-supervisor-partial">
-                <div class="themis-category">
+                <div class="themis-category" data-id="<%- id %>">
                     <header>
                         <h4><%- title %></h4>
                     </header>
