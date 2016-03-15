@@ -279,6 +279,11 @@ class TeamProfileView extends View {
       let $submitSuccess = $modal.find('.submit-success > p')
       let $submitButton = $modal.find('button[data-action="complete-change-password"]')
       let $form = $modal.find('form')
+
+      let $currentPassword = $('#change-pwd-current')
+      let $newPassword = $('#change-pwd-new')
+      let $confirmNewPassword = $('#change-pwd-confirm-new')
+
       $form.parsley()
 
       $submitButton.on('click', (e) => {
@@ -286,9 +291,10 @@ class TeamProfileView extends View {
       })
 
       $modal.on('show.bs.modal', (e) => {
-        $('#change-pwd-current').val('')
-        $('#change-pwd-new').val('')
-        $('#change-pwd-confirm-new').val('')
+        $currentPassword.val('')
+        $newPassword.val('')
+        $confirmNewPassword.val('')
+        $form.find('div.form-group').show()
         $submitError.text('')
         $submitSuccess.text('')
         $submitButton.show()
@@ -296,7 +302,7 @@ class TeamProfileView extends View {
       })
 
       $modal.on('shown.bs.modal', (e) => {
-        $('#change-pwd-current').focus()
+        $currentPassword.focus()
       })
 
       $form.on('submit', (e) => {
@@ -314,6 +320,7 @@ class TeamProfileView extends View {
           },
           success: (responseText, textStatus, jqXHR) => {
             $submitButton.hide()
+            $form.find('div.form-group').hide()
             $submitSuccess.text('Password has been successfully changed!')
             let hideModal = () => {
               $modal.modal('hide')
