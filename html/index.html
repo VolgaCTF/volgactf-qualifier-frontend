@@ -796,7 +796,9 @@
                                     <div class="form-group" id="revise-task-answer-group">
                                         <label for="revise-task-answer" class="control-label">Answer</label>
                                         <input type="text" class="form-control" id="revise-task-answer" name="answer" required data-parsley-length="[2,256]">
-                                        <span class="help-block" id="revise-task-status"></span>
+                                    </div>
+                                    <div>
+                                        <p class="text-info" id="revise-task-status"></p>
                                     </div>
                                     <div class="submit-error">
                                         <p class="text-danger"></p>
@@ -1238,23 +1240,34 @@
             </script>
 
             <script type="text/x-template" data-name="revise-task-status-partial">
-                <% if (teamNames.length === 0) { %>
-                Nobody has solved this task.
+                <% if (teams.length === 0) { %>
+                No team has solved this task yet.
                 <% } else { %>
-                This task has been solved by the following teams:
-                <% for (var i=0; i<teamNames.length; ++i) { %>
-                    <i><%- teamNames[i] %></i><% if (i < teamNames.length - 1) { %>, <% } else { %>.<% } %>
+                This task has been solved by the following <% print((teams.length > 1) ? 'teams' : 'team'); %>:
+                <% for (var i=0; i<teams.length; ++i) { %>
+                    <strong><u><a class="text-info" href="/team/<%- teams[i].id %>/profile" target="_blank"><%- teams[i].name %></a></u></strong><% if (i < teams.length - 1) { %>, <% } else { %>.<% } %>
                 <% } %>
                 <% } %>
             </script>
 
             <script type="text/x-template" data-name="submit-task-status-partial">
                 <% if (solvedTeamCount === 0) { %>
-                Nobody has solved this task. Be the first!
+                No team has solved this task yet. Why don't you give it a try?
                 <% } else { %>
-                This task has been solved by <%- solvedTeamCount %> <% print((solvedTeamCount > 1) ? 'teams' : 'team'); %>.
+                    <% if (taskSolvedAt) { %>
+                        <% if (solvedTeamCount === 1) { %>
+                            Your team has solved this task on <strong><%- taskSolvedAt %></strong>.<br>
+                            No other team has managed to do the same.
+                        <% } else { %>
+                            Your team has solved this task on <strong><%- taskSolvedAt %></strong>.<br>
+                            <strong><% print(solvedTeamCount - 1) %></strong> other <% print((solvedTeamCount > 2) ? 'teams have' : 'team has'); %> managed to do the same.
+                        <% } %>
+                    <% } else { %>
+                    This task has been solved by <strong><%- solvedTeamCount %></strong> <% print((solvedTeamCount > 1) ? 'teams' : 'team'); %>. What are you waiting for?
+                    <% } %>
                 <% } %>
             </script>
+
 
             <script type="text/x-template" data-name="post-partial">
                 <div class="themis-post" data-id="<%- id %>">

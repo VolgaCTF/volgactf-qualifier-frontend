@@ -541,16 +541,16 @@ class TasksView extends View {
           let teamIds = _.map(sortedTeamTaskHits, (entry) => {
             return entry.teamId
           })
-          let teamNames = []
+          let teamList = []
           let teams = teamProvider.getTeams()
           for (let teamId of teamIds) {
             let team = _.findWhere(teams, { id: teamId })
             if (team) {
-              teamNames.push(team.name)
+              teamList.push(team)
             }
           }
 
-          $taskStatus.html(renderTemplate('revise-task-status-partial', { teamNames: teamNames }))
+          $taskStatus.html(renderTemplate('revise-task-status-partial', { teams: teamList }))
           $submitButton.prop('disabled', false)
         })
         .fail((err) => {
@@ -698,33 +698,29 @@ class TasksView extends View {
       let taskPreview = _.findWhere(taskProvider.getTaskPreviews(), { id: taskId })
       let identity = identityProvider.getIdentity()
       let contest = contestProvider.getContest()
+      let taskSolvedAt = null
 
       if (taskPreview && identity.isTeam()) {
-        let taskIsSolved = false
         let taskHit = _.findWhere(contestProvider.getTeamTaskHits(), {
           teamId: identity.id,
           taskId: taskId
         })
         if (taskHit) {
-          taskIsSolved = true
+          taskSolvedAt = taskHit.createdAt
         }
 
-        if (taskPreview.isOpened() && ((!taskIsSolved && contest.isStarted()) || contest.isFinished())) {
+        if (taskPreview.isOpened() && ((!taskSolvedAt && contest.isStarted()) || contest.isFinished())) {
           $taskAnswerGroup.show()
           $submitButton.show()
         } else {
           $taskAnswerGroup.hide()
           $submitButton.hide()
-          if (contest.isPaused() && !taskIsSolved) {
+          if (contest.isPaused() && !taskSolvedAt) {
             $submitError.text('Contest has been paused.')
           }
           if (taskPreview.isClosed()) {
             $submitError.text('Task has been closed by the event organizers.')
           }
-        }
-
-        if (taskIsSolved) {
-          $submitSuccess.text(`Your team has solved the task on ${moment(taskHit.createdAt).format('lll')}!`)
         }
       } else {
         $taskAnswerGroup.hide()
@@ -763,7 +759,10 @@ class TasksView extends View {
           }
           $taskContents.html(renderTemplate('task-content-partial', options))
 
-          $taskInfo.text(renderTemplate('submit-task-status-partial', { solvedTeamCount: solvedTeamCount }))
+          $taskInfo.html(renderTemplate('submit-task-status-partial', {
+            taskSolvedAt: taskSolvedAt ? moment(taskSolvedAt).format('lll') : null,
+            solvedTeamCount: solvedTeamCount
+          }))
 
           $submitButton.prop('disabled', false)
         })
