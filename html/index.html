@@ -718,7 +718,7 @@
                                 </div>
                             </div>
                             <div class="modal-body">
-                                <form method="POST">
+                                <form method="POST" data-target="submit">
                                     <div class="form-group" id="submit-task-answer-group">
                                         <label for="submit-task-answer" class="control-label">Answer</label>
                                         <input type="text" class="form-control" id="submit-task-answer" name="answer" required data-parsley-length="[2,256]">
@@ -733,10 +733,37 @@
                                         <p class="text-success"></p>
                                     </div>
                                 </form>
+                                <form method="POST" data-target="review">
+                                    <div class="form-group" id="review-task-field-group">
+                                        <hr>
+                                        <p><strong>We would greatly appreciate your feedback!</strong></p>
+                                        <label for="review-task-rating" class="control-label">Rating</label>
+                                        <select class="form-control" id="review-task-rating" name="rating" required>
+                                            <option value="5">5 &ndash; Excellent</option>
+                                            <option value="4">4 &ndash; Good</option>
+                                            <option value="3">3 &ndash; Average</option>
+                                            <option value="2">2 &ndash; Fair</option>
+                                            <option value="1">1 &ndash; Poor</option>
+                                        </select>
+                                        <label for="review-task-comment" class="control-label">Comment</label>
+                                        <textarea class="form-control" id="review-task-comment" name="comment" required data-parsley-length="[0,300]"></textarea>
+                                        <p class="text-muted"><small>Note that your comment may be posted publicly. Please avoid obscene language.</small></p>
+                                    </div>
+                                    <div class="review-error">
+                                        <p class="text-danger"></p>
+                                    </div>
+                                    <div class="review-info">
+                                        <p class="text-info"></p>
+                                    </div>
+                                    <div class="review-success">
+                                        <p class="text-success"></p>
+                                    </div>
+                                </form>
                             </div>
                             <div class="modal-footer">
                                 <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
                                 <button type="button" class="btn btn-primary" data-action="complete-submit-task">Submit</button>
+                                <button type="button" class="btn btn-primary" data-action="complete-review-task">Submit review</button>
                             </div>
                         </div>
                     </div>
@@ -1248,6 +1275,12 @@
                     <strong><u><a class="text-info" href="/team/<%- teams[i].id %>/profile" target="_blank"><%- teams[i].name %></a></u></strong><% if (i < teams.length - 1) { %>, <% } else { %>.<% } %>
                 <% } %>
                 <% } %>
+                <br>
+                <% if (ratedTeamCount > 0) { %>
+                This task has been rated <strong><%- averageRating.toFixed(2) %></strong> (on average) by <strong><%- ratedTeamCount %></strong> <% print((ratedTeamCount > 1) ? 'teams' : 'team'); %>.
+                <% } else { %>
+                This task hasn't been rated yet.
+                <% } %>
             </script>
 
             <script type="text/x-template" data-name="submit-task-status-partial">
@@ -1265,6 +1298,17 @@
                     <% } else { %>
                     This task has been solved by <strong><%- solvedTeamCount %></strong> <% print((solvedTeamCount > 1) ? 'teams' : 'team'); %>. What are you waiting for?
                     <% } %>
+                <% } %>
+                <br><br>
+                <% if (reviewCount > 0) { %>
+                This task has been rated <strong><%- reviewAverageRating.toFixed(2) %></strong> (on average) by <strong><%- reviewCount %></strong> <% print((reviewCount > 1) ? 'teams' : 'team'); %>.
+                <% } else { %>
+                This task hasn't been rated yet.
+                <% } %>
+                <% if (teamReview) { %>
+                <br>
+                Your team has rated this task <strong><%- teamReview.rating %></strong> on <strong><%- teamReview.createdAt %></strong> with the following comment:
+                <blockquote><%- teamReview.comment %></blockquote>
                 <% } %>
             </script>
 

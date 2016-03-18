@@ -16,6 +16,7 @@ import contestProvider from '../providers/contest'
 import identityProvider from '../providers/identity'
 import teamProvider from '../providers/team'
 import MarkdownRenderer from '../utils/markdown'
+import teamTaskReviewProvider from '../providers/team-task-review'
 import 'bootstrap'
 import 'jquery.form'
 import 'parsley'
@@ -519,9 +520,10 @@ class TasksView extends View {
       $
         .when(
           taskProvider.fetchTask(taskId),
-          taskHintProvider.fetchTaskHintsByTask(taskId)
+          taskHintProvider.fetchTaskHintsByTask(taskId),
+          teamTaskReviewProvider.fetchTeamTaskReviewsByTask(taskId)
         )
-        .done((task, taskHints) => {
+        .done((task, taskHints, teamTaskReviews) => {
           let md = new MarkdownRenderer()
           let hintsFormatted = []
           _.each(taskHints, (entry) => {
@@ -550,7 +552,18 @@ class TasksView extends View {
             }
           }
 
-          $taskStatus.html(renderTemplate('revise-task-status-partial', { teams: teamList }))
+          let ratingList = _.map(teamTaskReviews, (teamTaskReview) => {
+            return teamTaskReview.rating
+          })
+          let averageRating = _.reduce(ratingList, (memo, rating) => {
+            return memo + rating
+          }, 0) / (ratingList.length === 0 ? 1 : ratingList.length)
+
+          $taskStatus.html(renderTemplate('revise-task-status-partial', {
+            teams: teamList,
+            averageRating: averageRating,
+            ratedTeamCount: teamTaskReviews.length
+          }))
           $submitButton.prop('disabled', false)
         })
         .fail((err) => {
@@ -674,16 +687,31 @@ class TasksView extends View {
     let $taskInfo = $modal.find('.submit-info > p')
     let $submitSuccess = $modal.find('.submit-success > p')
     let $submitButton = $modal.find('button[data-action="complete-submit-task"]')
-    let $form = $modal.find('form')
-    $form.parsley()
+    let $submitForm = $modal.find('form[data-target="submit"]')
+    $submitForm.parsley()
 
     $submitButton.on('click', (e) => {
-      $form.trigger('submit')
+      $submitForm.trigger('submit')
     })
 
     let $taskAnswerGroup = $('#submit-task-answer-group')
     let $taskAnswer = $('#submit-task-answer')
     let $taskContents = $modal.find('.themis-task-contents')
+
+    let $reviewButton = $modal.find('button[data-action="complete-review-task"]')
+    let $reviewForm = $modal.find('form[data-target="review"]')
+    $reviewForm.parsley()
+    let $reviewError = $modal.find('.review-error > p')
+    let $reviewSuccess = $modal.find('.review-success > p')
+    let $reviewInfo = $modal.find('.review-info > p')
+
+    let $reviewFieldGroup = $modal.find('#review-task-field-group')
+    let $reviewRating = $modal.find('#review-task-rating')
+    let $reviewComment = $modal.find('#review-task-comment')
+
+    $reviewButton.on('click', (e) => {
+      $reviewForm.trigger('submit')
+    })
 
     $modal.on('show.bs.modal', (e) => {
       let taskId = parseInt($(e.relatedTarget).data('task-id'), 10)
@@ -695,10 +723,24 @@ class TasksView extends View {
       $submitSuccess.text('')
       $submitButton.prop('disabled', true)
 
+      $reviewFieldGroup.hide()
+      $reviewButton.hide()
+      $reviewButton.prop('disabled', true)
+      $reviewRating.val(5)
+      $reviewComment.val('')
+      $reviewError.text('')
+      $reviewSuccess.text('')
+      $reviewInfo.text('')
+
       let taskPreview = _.findWhere(taskProvider.getTaskPreviews(), { id: taskId })
       let identity = identityProvider.getIdentity()
       let contest = contestProvider.getContest()
       let taskSolvedAt = null
+      let teamTaskReview = null
+      let onlyReview = false
+
+      $reviewFieldGroup.hide()
+      $reviewButton.hide()
 
       if (taskPreview && identity.isTeam()) {
         let taskHit = _.findWhere(contestProvider.getTeamTaskHits(), {
@@ -709,18 +751,24 @@ class TasksView extends View {
           taskSolvedAt = taskHit.createdAt
         }
 
-        if (taskPreview.isOpened() && ((!taskSolvedAt && contest.isStarted()) || contest.isFinished())) {
-          $taskAnswerGroup.show()
-          $submitButton.show()
-        } else {
+        if (taskPreview.isOpened()) {
+          if (contest.isPaused()) {
+            $submitError.text('Contest has been paused.')
+            $taskAnswerGroup.hide()
+            $submitButton.hide()
+          } else {
+            if ((!taskSolvedAt && contest.isStarted()) || contest.isFinished()) {
+              $taskAnswerGroup.show()
+              $submitButton.show()
+            } else {
+              $taskAnswerGroup.hide()
+              $submitButton.hide()
+            }
+          }
+        } else if (taskPreview.isClosed()) {
+          $submitError.text('Task has been closed by the event organizers.')
           $taskAnswerGroup.hide()
           $submitButton.hide()
-          if (contest.isPaused() && !taskSolvedAt) {
-            $submitError.text('Contest has been paused.')
-          }
-          if (taskPreview.isClosed()) {
-            $submitError.text('Task has been closed by the event organizers.')
-          }
         }
       } else {
         $taskAnswerGroup.hide()
@@ -729,12 +777,15 @@ class TasksView extends View {
 
       $modal.data('task-id', taskId)
 
-      $form.parsley().reset()
+      $submitForm.parsley().reset()
       if (contest.isFinished()) {
-        $form.attr('action', `/api/task/${taskId}/check`)
+        $submitForm.attr('action', `/api/task/${taskId}/check`)
       } else {
-        $form.attr('action', `/api/task/${taskId}/submit`)
+        $submitForm.attr('action', `/api/task/${taskId}/submit`)
       }
+
+      $reviewForm.parsley().reset()
+      $reviewForm.attr('action', `/api/task/${taskId}/review`)
 
       if (taskPreview.isClosed()) {
         return
@@ -744,9 +795,11 @@ class TasksView extends View {
         .when(
           taskProvider.fetchTask(taskId),
           contestProvider.fetchSolvedTeamCountByTask(taskId),
-          taskHintProvider.fetchTaskHintsByTask(taskId)
+          taskHintProvider.fetchTaskHintsByTask(taskId),
+          teamTaskReviewProvider.fetchTeamTaskReviewsByTask(taskId),
+          teamTaskReviewProvider.fetchTaskReviewStatistics(taskId)
         )
-        .done((task, solvedTeamCount, taskHints) => {
+        .done((task, solvedTeamCount, taskHints, teamTaskReviews, taskReviewStatistics) => {
           let md = new MarkdownRenderer()
           let hintsFormatted = []
           _.each(taskHints, (entry) => {
@@ -759,12 +812,29 @@ class TasksView extends View {
           }
           $taskContents.html(renderTemplate('task-content-partial', options))
 
+          teamTaskReview = _.findWhere(teamTaskReviews, { taskId: taskId, teamId: identityProvider.getIdentity().id })
+
           $taskInfo.html(renderTemplate('submit-task-status-partial', {
             taskSolvedAt: taskSolvedAt ? moment(taskSolvedAt).format('lll') : null,
-            solvedTeamCount: solvedTeamCount
+            solvedTeamCount: solvedTeamCount,
+            reviewAverageRating: taskReviewStatistics.reviewAverageRating,
+            reviewCount: taskReviewStatistics.reviewCount,
+            teamReview: teamTaskReview ? {
+              rating: teamTaskReview.rating,
+              comment: teamTaskReview.comment,
+              createdAt: moment(teamTaskReview.createdAt).format('lll')
+            } : null
           }))
 
+          onlyReview = taskSolvedAt && contest.isStarted() && !teamTaskReview
+          if (onlyReview) {
+            $reviewFieldGroup.show()
+            $reviewButton.show()
+            $reviewRating.focus()
+          }
+
           $submitButton.prop('disabled', false)
+          $reviewButton.prop('disabled', false)
         })
         .fail((err) => {
           $submitError.text(err)
@@ -775,9 +845,9 @@ class TasksView extends View {
       $taskAnswer.focus()
     })
 
-    $form.on('submit', (e) => {
+    $submitForm.on('submit', (e) => {
       e.preventDefault()
-      $form.ajaxSubmit({
+      $submitForm.ajaxSubmit({
         beforeSubmit: () => {
           $submitError.text('')
           $submitSuccess.text('')
@@ -792,6 +862,45 @@ class TasksView extends View {
           $taskAnswerGroup.hide()
           $submitButton.hide()
           $submitSuccess.text('Answer is correct!')
+          let showReviewForm = () => {
+            $submitSuccess.text('')
+            $reviewFieldGroup.show()
+            $reviewButton.show()
+            $reviewRating.focus()
+          }
+
+          setTimeout(showReviewForm, 1000)
+        },
+        error: (jqXHR, textStatus, errorThrown) => {
+          if (jqXHR.responseJSON) {
+            $submitError.text(jqXHR.responseJSON)
+          } else {
+            $submitError.text('Unknown error. Please try again later.')
+          }
+        },
+        complete: () => {
+          $submitButton.prop('disabled', false)
+        }
+      })
+    })
+
+    $reviewForm.on('submit', (e) => {
+      e.preventDefault()
+      $reviewForm.ajaxSubmit({
+        beforeSubmit: () => {
+          $reviewError.text('')
+          $reviewSuccess.text('')
+          $reviewButton.prop('disabled', true)
+        },
+        clearForm: true,
+        dataType: 'json',
+        headers: {
+          'X-CSRF-Token': identityProvider.getIdentity().token
+        },
+        success: (responseText, textStatus, jqXHR) => {
+          $reviewFieldGroup.hide()
+          $reviewButton.hide()
+          $reviewSuccess.text('Review has been submitted!')
           let hideModal = () => {
             $modal.modal('hide')
             if (!dataStore.connectedRealtime()) {
@@ -803,13 +912,13 @@ class TasksView extends View {
         },
         error: (jqXHR, textStatus, errorThrown) => {
           if (jqXHR.responseJSON) {
-            $submitError.text(jqXHR.responseJSON)
+            $reviewError.text(jqXHR.responseJSON)
           } else {
-            $submitError.text('Unknown error. Please try again later.')
+            $reviewError.text('Unknown error. Please try again later.')
           }
         },
         complete: () => {
-          $submitButton.prop('disabled', false)
+          $reviewButton.prop('disabled', false)
         }
       })
     })
