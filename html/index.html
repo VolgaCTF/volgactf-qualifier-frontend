@@ -719,7 +719,7 @@
                             </div>
                             <div class="modal-body">
                                 <form method="POST" data-target="submit">
-                                    <div class="form-group" id="submit-task-answer-group">
+                                    <div class="form-group" id="submit-task-field-group">
                                         <label for="submit-task-answer" class="control-label">Answer</label>
                                         <input type="text" class="form-control" id="submit-task-answer" name="answer" required data-parsley-length="[2,256]">
                                     </div>
@@ -747,13 +747,16 @@
                                         </select>
                                         <label for="review-task-comment" class="control-label">Comment</label>
                                         <textarea class="form-control" id="review-task-comment" name="comment" required data-parsley-length="[0,300]"></textarea>
-                                        <p class="text-muted"><small>Note that your comment may be posted publicly. Please avoid obscene language.</small></p>
+                                        <p class="text-muted">
+                                            <small>
+                                                Note that your comment may be posted publicly. Please avoid obscene language.
+                                                <br>
+                                                You can submit only one review on your team's behalf. It can't be altered afterwards.
+                                            </small>
+                                        </p>
                                     </div>
                                     <div class="review-error">
                                         <p class="text-danger"></p>
-                                    </div>
-                                    <div class="review-info">
-                                        <p class="text-info"></p>
                                     </div>
                                     <div class="review-success">
                                         <p class="text-success"></p>
@@ -1275,9 +1278,9 @@
                     <strong><u><a class="text-info" href="/team/<%- teams[i].id %>/profile" target="_blank"><%- teams[i].name %></a></u></strong><% if (i < teams.length - 1) { %>, <% } else { %>.<% } %>
                 <% } %>
                 <% } %>
-                <br>
+                <br><br>
                 <% if (ratedTeamCount > 0) { %>
-                This task has been rated <strong><%- averageRating.toFixed(2) %></strong> (on average) by <strong><%- ratedTeamCount %></strong> <% print((ratedTeamCount > 1) ? 'teams' : 'team'); %>.
+                This task has been rated by <strong><%- ratedTeamCount %></strong> <% print((ratedTeamCount > 1) ? 'teams' : 'team'); %>. The average rating is <strong><%- averageRating.toFixed(2) %></strong> (5.00 max).
                 <% } else { %>
                 This task hasn't been rated yet.
                 <% } %>
@@ -1301,13 +1304,13 @@
                 <% } %>
                 <br><br>
                 <% if (reviewCount > 0) { %>
-                This task has been rated <strong><%- reviewAverageRating.toFixed(2) %></strong> (on average) by <strong><%- reviewCount %></strong> <% print((reviewCount > 1) ? 'teams' : 'team'); %>.
+                This task has been rated by <strong><%- reviewCount %></strong> <% print((reviewCount > 1) ? 'teams' : 'team'); %>. The average rating is <strong><%- reviewAverageRating.toFixed(2) %></strong> (5.00 max).
                 <% } else { %>
                 This task hasn't been rated yet.
                 <% } %>
                 <% if (teamReview) { %>
                 <br>
-                Your team has rated this task <strong><%- teamReview.rating %></strong> on <strong><%- teamReview.createdAt %></strong> with the following comment:
+                Your team has given this task <strong><%- teamReview.rating %></strong> rating <% print((teamReview.rating === 1) ? 'point' : 'points'); %> on <strong><%- teamReview.createdAt %></strong> and has made the following comment:
                 <blockquote><%- teamReview.comment %></blockquote>
                 <% } %>
             </script>

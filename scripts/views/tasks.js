@@ -694,7 +694,7 @@ class TasksView extends View {
       $submitForm.trigger('submit')
     })
 
-    let $taskAnswerGroup = $('#submit-task-answer-group')
+    let $submitFieldGroup = $('#submit-task-field-group')
     let $taskAnswer = $('#submit-task-answer')
     let $taskContents = $modal.find('.themis-task-contents')
 
@@ -703,7 +703,6 @@ class TasksView extends View {
     $reviewForm.parsley()
     let $reviewError = $modal.find('.review-error > p')
     let $reviewSuccess = $modal.find('.review-success > p')
-    let $reviewInfo = $modal.find('.review-info > p')
 
     let $reviewFieldGroup = $modal.find('#review-task-field-group')
     let $reviewRating = $modal.find('#review-task-rating')
@@ -730,7 +729,6 @@ class TasksView extends View {
       $reviewComment.val('')
       $reviewError.text('')
       $reviewSuccess.text('')
-      $reviewInfo.text('')
 
       let taskPreview = _.findWhere(taskProvider.getTaskPreviews(), { id: taskId })
       let identity = identityProvider.getIdentity()
@@ -754,24 +752,24 @@ class TasksView extends View {
         if (taskPreview.isOpened()) {
           if (contest.isPaused()) {
             $submitError.text('Contest has been paused.')
-            $taskAnswerGroup.hide()
+            $submitFieldGroup.hide()
             $submitButton.hide()
           } else {
             if ((!taskSolvedAt && contest.isStarted()) || contest.isFinished()) {
-              $taskAnswerGroup.show()
+              $submitFieldGroup.show()
               $submitButton.show()
             } else {
-              $taskAnswerGroup.hide()
+              $submitFieldGroup.hide()
               $submitButton.hide()
             }
           }
         } else if (taskPreview.isClosed()) {
           $submitError.text('Task has been closed by the event organizers.')
-          $taskAnswerGroup.hide()
+          $submitFieldGroup.hide()
           $submitButton.hide()
         }
       } else {
-        $taskAnswerGroup.hide()
+        $submitFieldGroup.hide()
         $submitButton.hide()
       }
 
@@ -814,7 +812,7 @@ class TasksView extends View {
 
           teamTaskReview = _.findWhere(teamTaskReviews, { taskId: taskId, teamId: identityProvider.getIdentity().id })
 
-          $taskInfo.html(renderTemplate('submit-task-status-partial', {
+          $taskInfo.show().html(renderTemplate('submit-task-status-partial', {
             taskSolvedAt: taskSolvedAt ? moment(taskSolvedAt).format('lll') : null,
             solvedTeamCount: solvedTeamCount,
             reviewAverageRating: taskReviewStatistics.reviewAverageRating,
@@ -859,8 +857,9 @@ class TasksView extends View {
           'X-CSRF-Token': identityProvider.getIdentity().token
         },
         success: (responseText, textStatus, jqXHR) => {
-          $taskAnswerGroup.hide()
+          $submitFieldGroup.hide()
           $submitButton.hide()
+          $taskInfo.hide()
           $submitSuccess.text('Answer is correct!')
           let showReviewForm = () => {
             $submitSuccess.text('')
