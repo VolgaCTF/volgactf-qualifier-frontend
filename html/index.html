@@ -495,7 +495,7 @@
             </script>
 
             <script type="text/x-template" data-name="check-task-guest-error">
-                To view the task, you must be authorized. Please <a href="/team/signin">sign in</a>. If you have not registered yet, please <a href="/team/signup">sign up</a>.
+                You must be authorized in order to view the task and submit answers. Please <u><a class="text-danger" href="/team/signin">sign in</a></u>. If you have not registered yet, please <u><a class="text-danger" href="/team/signup">sign up</a></u>.
             </script>
 
             <script type="text/x-template" data-name="task-content-partial">
@@ -524,7 +524,7 @@
                     <% if (task.isInitial()) { %>
                     <div class="panel panel-default">
                     <% } else if (task.isOpened() && !taskIsSolved) { %>
-                    <div class="panel panel-primary">
+                    <div class="panel panel-info">
                     <% } else if (task.isClosed() && !taskIsSolved) { %>
                     <div class="panel panel-danger">
                     <% } else if ((task.isOpened() || task.isClosed()) && taskIsSolved) { %>
@@ -536,15 +536,18 @@
                                 &nbsp;
                                 <% if (identity.isAdmin()) { %>
                                     <% if (!task.isClosed() && !contest.isFinished()) { %>
-                                    <a href="#" data-action="edit-task" data-toggle="modal" data-target="#edit-task-modal" data-task-id="<%- task.id %>"><span class="glyphicon glyphicon-pencil"></span></a>
+                                    <a href="#" data-action="edit-task" data-toggle="modal" data-target="#edit-task-modal" data-task-id="<%- task.id %>" title="Edit task"><span class="glyphicon glyphicon-edit"></span></a>
                                     <% } %>
                                     <% if (contest.isStarted()) { %>
                                         <% if (task.isInitial()) { %>
-                                        <a href="#" data-action="open-task" data-toggle="modal" data-target="#open-task-modal" data-task-id="<%- task.id %>"><span class="glyphicon glyphicon-share"></span></a>
+                                        <a href="#" data-action="open-task" data-toggle="modal" data-target="#open-task-modal" data-task-id="<%- task.id %>" title="Open task"><span class="glyphicon glyphicon-eye-open"></span></a>
                                         <% } else if (task.isOpened()) { %>
-                                        <a href="#" data-action="close-task" data-toggle="modal" data-target="#close-task-modal" data-task-id="<%- task.id %>"><span class="glyphicon glyphicon-lock"></span></a>
+                                        <a href="#" data-action="close-task" data-toggle="modal" data-target="#close-task-modal" data-task-id="<%- task.id %>" title="Close task"><span class="glyphicon glyphicon-eye-close"></span></a>
                                         <% } %>
                                     <% } %>
+                                <% } %>
+                                <% if (identity.isSupervisor()) { %>
+                                <a href="/task/<%- task.id %>/statistics" target="_blank" title="Task statistics"><span class="glyphicon glyphicon-dashboard"></span></a>
                                 <% } %>
                             </h4>
                         </div>
@@ -1251,6 +1254,16 @@
                 </div>
             </script>
 
+            <script type="text/x-template" data-name="task-statistics-view">
+                <div class="container">
+                    <header>
+                        <h1>Task statistics</h1>
+                    </header>
+                    <section>
+                    </section>
+                </div>
+            </script>
+
             <script type="text/x-template" data-name="post-simplified-partial">
                 <div class="themis-post">
                     <header>
@@ -1270,13 +1283,10 @@
             </script>
 
             <script type="text/x-template" data-name="revise-task-status-partial">
-                <% if (teams.length === 0) { %>
+                <% if (solvedTeamCount === 0) { %>
                 No team has solved this task yet.
                 <% } else { %>
-                This task has been solved by the following <% print((teams.length > 1) ? 'teams' : 'team'); %>:
-                <% for (var i=0; i<teams.length; ++i) { %>
-                    <strong><u><a class="text-info" href="/team/<%- teams[i].id %>/profile" target="_blank"><%- teams[i].name %></a></u></strong><% if (i < teams.length - 1) { %>, <% } else { %>.<% } %>
-                <% } %>
+                This task has been solved by <strong><%- solvedTeamCount %></strong> <% print((solvedTeamCount > 1) ? 'teams' : 'team'); %>.
                 <% } %>
                 <br><br>
                 <% if (ratedTeamCount > 0) { %>

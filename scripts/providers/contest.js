@@ -243,9 +243,9 @@ class ContestProvider extends EventEmitter {
     return promise
   }
 
-  fetchSolvedTeamCountByTask (taskId) {
+  fetchTaskHitStatistics (taskId) {
     let promise = $.Deferred()
-    let url = `/api/task/${taskId}/hits`
+    let url = `/api/task/${taskId}/hit/statistics`
 
     $.ajax({
       url: url,

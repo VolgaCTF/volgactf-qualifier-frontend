@@ -15,6 +15,7 @@ import eventsView from '../views/events'
 import restoreView from '../views/restore'
 import resetPasswordView from '../views/reset-password'
 import notFoundView from '../views/not-found'
+import taskStatisticsView from '../views/task/statistics'
 
 let viewController = new ViewControllerBase()
 
@@ -33,6 +34,7 @@ viewController.view(eventsView)
 viewController.view(scoreboardView)
 viewController.view(restoreView)
 viewController.view(resetPasswordView)
+viewController.view(taskStatisticsView)
 
 viewController.errorView('not-found', notFoundView)
 

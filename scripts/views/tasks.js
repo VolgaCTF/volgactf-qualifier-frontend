@@ -521,36 +521,19 @@ class TasksView extends View {
         .when(
           taskProvider.fetchTask(taskId),
           taskHintProvider.fetchTaskHintsByTask(taskId),
+          contestProvider.fetchTaskHitStatistics(taskId),
           teamTaskReviewProvider.fetchTeamTaskReviewsByTask(taskId)
         )
-        .done((task, taskHints, teamTaskReviews) => {
+        .done((task, taskHints, taskHitStatistics, teamTaskReviews) => {
           let md = new MarkdownRenderer()
-          let hintsFormatted = []
-          _.each(taskHints, (entry) => {
-            hintsFormatted.push(md.render(entry.hint))
-          })
 
-          let options = {
+          $taskContents.html(renderTemplate('task-content-partial', {
             title: task.title,
             description: md.render(task.description),
-            hints: hintsFormatted
-          }
-
-          $taskContents.html(renderTemplate('task-content-partial', options))
-
-          let teamTaskHits = _.where(contestProvider.getTeamTaskHits(), { taskId: task.id })
-          let sortedTeamTaskHits = _.sortBy(teamTaskHits, 'createdAt')
-          let teamIds = _.map(sortedTeamTaskHits, (entry) => {
-            return entry.teamId
-          })
-          let teamList = []
-          let teams = teamProvider.getTeams()
-          for (let teamId of teamIds) {
-            let team = _.findWhere(teams, { id: teamId })
-            if (team) {
-              teamList.push(team)
-            }
-          }
+            hints: _.map(taskHints, (taskHint) => {
+              return md.render(taskHint.hint)
+            })
+          }))
 
           let ratingList = _.map(teamTaskReviews, (teamTaskReview) => {
             return teamTaskReview.rating
@@ -560,7 +543,7 @@ class TasksView extends View {
           }, 0) / (ratingList.length === 0 ? 1 : ratingList.length)
 
           $taskStatus.html(renderTemplate('revise-task-status-partial', {
-            teams: teamList,
+            solvedTeamCount: taskHitStatistics.count,
             averageRating: averageRating,
             ratedTeamCount: teamTaskReviews.length
           }))
@@ -792,12 +775,12 @@ class TasksView extends View {
       $
         .when(
           taskProvider.fetchTask(taskId),
-          contestProvider.fetchSolvedTeamCountByTask(taskId),
+          contestProvider.fetchTaskHitStatistics(taskId),
           taskHintProvider.fetchTaskHintsByTask(taskId),
           teamTaskReviewProvider.fetchTeamTaskReviewsByTask(taskId),
           teamTaskReviewProvider.fetchTaskReviewStatistics(taskId)
         )
-        .done((task, solvedTeamCount, taskHints, teamTaskReviews, taskReviewStatistics) => {
+        .done((task, taskHitStatistics, taskHints, teamTaskReviews, taskReviewStatistics) => {
           let md = new MarkdownRenderer()
           let hintsFormatted = []
           _.each(taskHints, (entry) => {
@@ -814,7 +797,7 @@ class TasksView extends View {
 
           $taskInfo.show().html(renderTemplate('submit-task-status-partial', {
             taskSolvedAt: taskSolvedAt ? moment(taskSolvedAt).format('lll') : null,
-            solvedTeamCount: solvedTeamCount,
+            solvedTeamCount: taskHitStatistics.count,
             reviewAverageRating: taskReviewStatistics.reviewAverageRating,
             reviewCount: taskReviewStatistics.reviewCount,
             teamReview: teamTaskReview ? {
