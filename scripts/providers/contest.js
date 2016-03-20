@@ -265,6 +265,30 @@ class ContestProvider extends EventEmitter {
     return promise
   }
 
+  fetchTaskHits (taskId) {
+    let promise = $.Deferred()
+    let url = `/api/task/${taskId}/hit/index`
+
+    $.ajax({
+      url: url,
+      dataType: 'json',
+      success: (responseJSON, textStatus, jqXHR) => {
+        promise.resolve(_.map(responseJSON, (options) => {
+          return new TeamTaskHitModel(options)
+        }))
+      },
+      error: (jqXHR, textStatus, errorThrown) => {
+        if (jqXHR.responseJSON) {
+          promise.reject(jqXHR.responseJSON)
+        } else {
+          promise.reject('Unknown error. Please try again later.')
+        }
+      }
+    })
+
+    return promise
+  }
+
   fetchTeamTaskHit (teamId) {
     let promise = $.Deferred()
 

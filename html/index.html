@@ -518,7 +518,7 @@
                         <h5>Hints</h5>
                         <ol>
                             <% for (var i=0; i<hints.length; ++i) { %>
-                            <li><%= hints[i] %>
+                            <li><%= hints[i] %></li>
                             <% } %>
                         </ol>
                     </section>
@@ -1264,9 +1264,102 @@
             <script type="text/x-template" data-name="task-statistics-view">
                 <div class="container">
                     <header>
-                        <h1>Task statistics</h1>
+                        <h1><%- task.title %></h1>
+                        <span class="text-info">Created on <%- utils.moment(task.createdAt).format('lll') %></span>
                     </header>
                     <section>
+                        <h3>Description</h3>
+                        <div>
+                            <%= utils.md.render(task.description) %>
+                        </div>
+                    </section>
+                    <section>
+                        <h3>Hints</h3>
+                        <% if (taskHints.length > 0) { %>
+                        <table class="table table-condensed">
+                            <thead>
+                                <th>#</th>
+                                <th>Hint</th>
+                                <th>Created at</th>
+                            </thead>
+                            <tbody>
+                                <% var sortedTaskHints = utils.underscore.sortBy(taskHints, function(x) { return x.createdAt.getTime(); }); %>
+                                <% for (var i=0; i<sortedTaskHints.length; ++i) { %>
+                                <tr>
+                                    <td><% print(i + 1) %></td>
+                                    <td><%= utils.md.render(sortedTaskHints[i].hint) %></td>
+                                    <td><%- utils.moment(sortedTaskHints[i].createdAt).format('lll') %></td>
+                                </tr>
+                                <% } %>
+                            </tbody>
+                        </table>
+                        <% } else { %>
+                        <p>No hints have been provided for this task yet.</p>
+                        <% } %>
+                    </section>
+                    <section>
+                        <h3>Hits</h3>
+                        <% if (taskHits.length > 0) { %>
+                        <table class="table table-condensed">
+                            <thead>
+                                <th>#</th>
+                                <th>Team</th>
+                                <th>Solved at</th>
+                            </thead>
+                            <tbody>
+                                <% var sortedTaskHits = utils.underscore.sortBy(taskHits, function(x) { return x.createdAt.getTime(); }); %>
+                                <% var team = null; %>
+                                <% for (var i=0; i<sortedTaskHits.length; ++i) { %>
+                                    <% team = utils.underscore.findWhere(teams, { id: sortedTaskHits[i].teamId }); %>
+                                    <% if (team) { %>
+                                    <tr>
+                                        <td><% print(i + 1) %></td>
+                                        <td><a href="/team/<%- team.id %>/profile" target="_blank"><%- team.name %></a></td>
+                                        <td><%- utils.moment(sortedTaskHits[i].createdAt).format('lll') %></td>
+                                    </tr>
+                                    <% } %>
+                                <% } %>
+                            </tbody>
+                        </table>
+                        <% } else { %>
+                        <p>No team has solved this task yet.</p>
+                        <% } %>
+                    </section>
+                    <section>
+                        <h3>Reviews</h3>
+                        <% if (taskReviews.length > 0) { %>
+                        <% var averageRating = utils.underscore.reduce(taskReviews, function (memo, taskReview) {
+                            return memo + taskReview.rating;
+                        }, 0) / (taskReviews.length === 0 ? 1 : taskReviews.length); %>
+                        <p>Average rating is <strong><%- averageRating.toFixed(2) %></strong> (max 5.00).</p>
+                        <table class="table table-condensed">
+                            <thead>
+                                <th>#</th>
+                                <th>Team</th>
+                                <th>Rating</th>
+                                <th>Comment</th>
+                                <th>Created at</th>
+                            </thead>
+                            <tbody>
+                                <% var sortedTaskReviews = utils.underscore.sortBy(taskReviews, function(x) { return x.createdAt.getTime(); }); %>
+                                <% var team = null; %>
+                                <% for (var i=0; i<sortedTaskReviews.length; ++i) { %>
+                                    <% team = utils.underscore.findWhere(teams, { id: sortedTaskReviews[i].teamId }); %>
+                                    <% if (team) { %>
+                                    <tr>
+                                        <td><% print(i + 1) %></td>
+                                        <td><a href="/team/<%- team.id %>/profile" target="_blank"><%- team.name %></a></td>
+                                        <td><%- sortedTaskReviews[i].rating.toFixed(2) %></td>
+                                        <td><%- sortedTaskReviews[i].comment %></td>
+                                        <td><%- utils.moment(sortedTaskReviews[i].createdAt).format('lll') %></td>
+                                    </tr>
+                                    <% } %>
+                                <% } %>
+                            </tbody>
+                        </table>
+                        <% } else { %>
+                        <p>No team has rated this task yet.</p>
+                        <% } %>
                     </section>
                 </div>
             </script>

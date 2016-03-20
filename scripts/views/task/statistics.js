@@ -7,6 +7,14 @@ import statusBar from '../../status-bar'
 import metadataStore from '../../utils/metadata-store'
 import contestProvider from '../../providers/contest'
 import identityProvider from '../../providers/identity'
+import taskProvider from '../../providers/task'
+import taskHintProvider from '../../providers/task-hint'
+import teamTaskReviewProvider from '../../providers/team-task-review'
+import teamProvider from '../../providers/team'
+import History from 'history.js'
+import moment from 'moment'
+import MarkdownRenderer from '../../utils/markdown'
+import _ from 'underscore'
 
 class TaskStatisticsView extends View {
   constructor () {
@@ -16,6 +24,27 @@ class TaskStatisticsView extends View {
 
   getTitle () {
     return `${metadataStore.getMetadata('event-title')} :: Task statistics`
+  }
+
+  getTaskId () {
+    let url = History.getState().data.urlPath
+    let urlParts = url.split('/')
+    return parseInt(urlParts[urlParts.length - 2], 10)
+  }
+
+  renderPage (task, taskHints, taskHits, taskReviews, teams) {
+    this.$main.html(renderTemplate('task-statistics-view', {
+      task: task,
+      taskHints: taskHints,
+      taskHits: taskHits,
+      taskReviews: taskReviews,
+      teams: teams,
+      utils: {
+        underscore: _,
+        moment: moment,
+        md: new MarkdownRenderer()
+      }
+    }))
   }
 
   present () {
@@ -38,7 +67,23 @@ class TaskStatisticsView extends View {
           navigationBar.present()
           statusBar.present()
 
-          this.$main.html(renderTemplate('task-statistics-view'))
+          let taskId = this.getTaskId()
+
+          $
+            .when(
+              taskProvider.fetchTask(taskId),
+              taskHintProvider.fetchTaskHintsByTask(taskId),
+              contestProvider.fetchTaskHits(taskId),
+              teamTaskReviewProvider.fetchTeamTaskReviewsByTask(taskId),
+              teamProvider.fetchTeams()
+            )
+            .done((task, taskHints, taskHits, taskReviews, teams) => {
+              this.renderPage(task, taskHints, taskHits, taskReviews, teams)
+            })
+            .fail((err) => {
+              console.error(err)
+              this.$main.html(renderTemplate('internal-error-view'))
+            })
         } else {
           this.$main.html(renderTemplate('access-forbidden-view', {
             urlPath: window.location.pathname
