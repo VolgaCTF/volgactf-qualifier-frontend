@@ -281,6 +281,13 @@
                 </p>
             </script>
 
+            <script type="text/x-template" data-name="event-log-create-team-task-review">
+                <p>
+                    <span><code><%- createdAt %></code>&nbsp;&nbsp;</span>
+                    <span class="text-success">Team <strong><u><a class="text-success" href="/team/<%- team.id %>/profile" target="_blank"><%- team.name %></a></u></strong> has given <strong><%- teamTaskReview.rating.toFixed(2) %></strong> rating points to the task <strong><%- task.title %></strong></span>
+                </p>
+            </script>
+
             <script type="text/x-template" data-name="navbar-view">
                 <ul class="nav navbar-nav">
                     <li class="<% print((active === 'teams') ? 'active' : ''); %>">

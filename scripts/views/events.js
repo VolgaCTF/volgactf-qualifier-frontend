@@ -15,6 +15,7 @@ import supervisorProvider from '../providers/supervisor'
 import taskProvider from '../providers/task'
 import taskCategoryProvider from '../providers/task-category'
 import teamProvider from '../providers/team'
+import teamTaskReviewProvider from '../providers/team-task-review'
 
 class EventsView extends View {
   constructor () {
@@ -25,6 +26,8 @@ class EventsView extends View {
     this.onUpdateTeamScore = null
     this.onCreateTeamTaskHit = null
     this.onCreateTeamTaskHitAttempt = null
+
+    this.onCreateTeamTaskReview = null
 
     this.onCreateCategory = null
     this.onUpdateCategory = null
@@ -279,6 +282,18 @@ class EventsView extends View {
         }))
         break
       }
+      case 'createTeamTaskReview': {
+        let team = _.findWhere(teamProvider.getTeams(), { id: eventData.teamId })
+        let task = _.findWhere(taskProvider.getTaskPreviews(), { id: eventData.taskId })
+        $el = $(renderTemplate('event-log-create-team-task-review', {
+          createdAt: moment(createdAt).format(formatStr),
+          team: team,
+          task: task,
+          teamTaskReview: eventData
+        }))
+        break
+      }
+
       default:
         $el = $(renderTemplate('event-log-unknown', {
           eventName: moment(createdAt).format(formatStr),
@@ -296,6 +311,25 @@ class EventsView extends View {
       this.$eventsContainer.append($el)
       // $el.get(0).scrollIntoView()
     }
+  }
+
+  subscribeToTeamTaskReviewEvents () {
+    this.onCreateTeamTaskReview = (e, createdAt) => {
+      this.appendLog('createTeamTaskReview', e, createdAt)
+      return false
+    }
+
+    teamTaskReviewProvider.subscribe()
+    teamTaskReviewProvider.on('createTeamTaskReview', this.onCreateTeamTaskReview)
+  }
+
+  unsubscribeFromTeamTaskReviewEvents () {
+    if (this.onCreateTeamTaskReview) {
+      teamTaskReviewProvider.off('createTeamTaskReview', this.onCreateTeamTaskReview)
+      this.onCreateTeamTaskReview = null
+    }
+
+    teamTaskReviewProvider.unsubscribe()
   }
 
   subscribeToContestEvents () {
@@ -742,6 +776,7 @@ class EventsView extends View {
           this.subscribeToTaskEvents()
           this.subscribeToTaskCategoryEvents()
           this.subscribeToTeamEvents()
+          this.subscribeToTeamTaskReviewEvents()
 
           this.$main.html(renderTemplate('events-view'))
           this.$eventsContainer = $('#themis-events')
@@ -771,6 +806,7 @@ class EventsView extends View {
     this.unsubscribeFromTaskEvents()
     this.unsubscribeFromTaskCategoryEvents()
     this.unsubscribeFromTeamEvents()
+    this.unsubscribeFromTeamTaskReviewEvents()
 
     navigationBar.dismiss()
     statusBar.dismiss()
