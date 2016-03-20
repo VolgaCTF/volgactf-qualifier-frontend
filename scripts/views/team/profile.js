@@ -12,6 +12,7 @@ import countryProvider from '../../providers/country'
 import taskProvider from '../../providers/task'
 import History from 'history.js'
 import metadataStore from '../../utils/metadata-store'
+import teamTaskHitProvider from '../../providers/team-task-hit'
 import 'parsley'
 import 'jquery.form'
 import 'bootstrap-filestyle'
@@ -365,7 +366,7 @@ class TeamProfileView extends View {
             promise = $.when(
               teamProvider.fetchTeamProfile(teamId),
               countryProvider.fetchCountries(),
-              contestProvider.fetchTeamTaskHit(teamId),
+              teamTaskHitProvider.fetchTeamHits(teamId),
               taskProvider.fetchTaskPreviews()
             )
           }
@@ -379,7 +380,7 @@ class TeamProfileView extends View {
             promise = $.when(
               teamProvider.fetchTeamProfile(teamId),
               countryProvider.fetchCountries(),
-              contestProvider.fetchTeamTaskHit(teamId),
+              teamTaskHitProvider.fetchTeamHits(teamId),
               contestProvider.fetchTeamScores(),
               taskProvider.fetchTaskPreviews()
             )
@@ -394,7 +395,7 @@ class TeamProfileView extends View {
             promise = $.when(
               teamProvider.fetchTeamProfile(teamId),
               countryProvider.fetchCountries(),
-              contestProvider.fetchTeamTaskHit(teamId),
+              teamTaskHitProvider.fetchTeamHitStatistics(teamId),
               contestProvider.fetchTeamScores()
             )
           }
@@ -408,7 +409,7 @@ class TeamProfileView extends View {
             promise = $.when(
               teamProvider.fetchTeamProfile(teamId),
               countryProvider.fetchCountries(),
-              contestProvider.fetchTeamTaskHit(teamId)
+              teamTaskHitProvider.fetchTeamHitStatistics(teamId)
             )
           }
         }
@@ -456,7 +457,7 @@ class TeamProfileView extends View {
                 opts.teamHitsInfo = renderTemplate('team-hits-partial', {
                   identity: identity,
                   teamId: team.id,
-                  count: teamTaskHits
+                  count: teamTaskHits.count
                 })
               }
             } else {

@@ -17,6 +17,7 @@ import identityProvider from '../providers/identity'
 import teamProvider from '../providers/team'
 import MarkdownRenderer from '../utils/markdown'
 import teamTaskReviewProvider from '../providers/team-task-review'
+import teamTaskHitProvider from '../providers/team-task-hit'
 import 'bootstrap'
 import 'jquery.form'
 import 'parsley'
@@ -521,7 +522,7 @@ class TasksView extends View {
         .when(
           taskProvider.fetchTask(taskId),
           taskHintProvider.fetchTaskHintsByTask(taskId),
-          contestProvider.fetchTaskHitStatistics(taskId),
+          teamTaskHitProvider.fetchTaskHitStatistics(taskId),
           teamTaskReviewProvider.fetchTaskReviewStatistics(taskId)
         )
         .done((task, taskHints, taskHitStatistics, taskReviewStatistics) => {
@@ -717,7 +718,7 @@ class TasksView extends View {
       $reviewButton.hide()
 
       if (taskPreview && identity.isTeam()) {
-        let taskHit = _.findWhere(contestProvider.getTeamTaskHits(), {
+        let taskHit = _.findWhere(teamTaskHitProvider.getTeamTaskHits(), {
           teamId: identity.id,
           taskId: taskId
         })
@@ -768,7 +769,7 @@ class TasksView extends View {
       $
         .when(
           taskProvider.fetchTask(taskId),
-          contestProvider.fetchTaskHitStatistics(taskId),
+          teamTaskHitProvider.fetchTaskHitStatistics(taskId),
           taskHintProvider.fetchTaskHintsByTask(taskId),
           teamTaskReviewProvider.fetchTeamTaskReviewsByTask(taskId),
           teamTaskReviewProvider.fetchTaskReviewStatistics(taskId)
@@ -1055,7 +1056,7 @@ class TasksView extends View {
     } else {
       let solvedTaskIds = []
       if (identity.isTeam()) {
-        let taskHits = _.where(contestProvider.getTeamTaskHits(), { teamId: identity.id })
+        let taskHits = _.where(teamTaskHitProvider.getTeamTaskHits(), { teamId: identity.id })
         solvedTaskIds = _.map(taskHits, (taskHit) => {
           return taskHit.taskId
         })
@@ -1157,9 +1158,9 @@ class TasksView extends View {
 
         let promise = null
         if (identity.isTeam()) {
-          promise = $.when(taskProvider.fetchTaskPreviews(), categoryProvider.fetchCategories(), taskCategoryProvider.fetchTaskCategories(), contestProvider.fetchTeamTaskHits(), contestProvider.fetchTeamScores())
+          promise = $.when(taskProvider.fetchTaskPreviews(), categoryProvider.fetchCategories(), taskCategoryProvider.fetchTaskCategories(), teamTaskHitProvider.fetchTeamHits(identity.id), contestProvider.fetchTeamScores())
         } else if (identity.isSupervisor()) {
-          promise = $.when(taskProvider.fetchTaskPreviews(), categoryProvider.fetchCategories(), taskCategoryProvider.fetchTaskCategories(), contestProvider.fetchTeamTaskHits(), teamProvider.fetchTeams())
+          promise = $.when(taskProvider.fetchTaskPreviews(), categoryProvider.fetchCategories(), taskCategoryProvider.fetchTaskCategories())
         } else {
           promise = $.when(taskProvider.fetchTaskPreviews(), categoryProvider.fetchCategories(), taskCategoryProvider.fetchTaskCategories())
         }
@@ -1246,12 +1247,14 @@ class TasksView extends View {
             taskProvider.on('updateTask', this.onUpdateTask)
 
             if (identity.isTeam()) {
+              teamTaskHitProvider.subscribe()
+
               this.onCreateTeamTaskHit = (teamTaskHit) => {
                 this.requestRenderTasks()
                 return false
               }
 
-              contestProvider.on('createTeamTaskHit', this.onCreateTeamTaskHit)
+              teamTaskHitProvider.on('createTeamTaskHit', this.onCreateTeamTaskHit)
             }
 
             this.onUpdateContest = (contest) => {
@@ -1296,6 +1299,7 @@ class TasksView extends View {
     if (this.onCreateTeamTaskHit) {
       contestProvider.off('createTeamTaskHit', this.onCreateTeamTaskHit)
       this.onCreateTeamTaskHit = null
+      teamTaskHitProvider.unsubscribe()
     }
 
     if (this.onUpdateCategory) {

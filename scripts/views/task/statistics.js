@@ -10,6 +10,7 @@ import identityProvider from '../../providers/identity'
 import taskProvider from '../../providers/task'
 import taskHintProvider from '../../providers/task-hint'
 import teamTaskReviewProvider from '../../providers/team-task-review'
+import teamTaskHitProvider from '../../providers/team-task-hit'
 import teamProvider from '../../providers/team'
 import History from 'history.js'
 import moment from 'moment'
@@ -73,7 +74,7 @@ class TaskStatisticsView extends View {
             .when(
               taskProvider.fetchTask(taskId),
               taskHintProvider.fetchTaskHintsByTask(taskId),
-              contestProvider.fetchTaskHits(taskId),
+              teamTaskHitProvider.fetchTaskHits(taskId),
               teamTaskReviewProvider.fetchTeamTaskReviewsByTask(taskId),
               teamProvider.fetchTeams()
             )
