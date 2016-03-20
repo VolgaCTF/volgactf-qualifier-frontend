@@ -522,9 +522,9 @@ class TasksView extends View {
           taskProvider.fetchTask(taskId),
           taskHintProvider.fetchTaskHintsByTask(taskId),
           contestProvider.fetchTaskHitStatistics(taskId),
-          teamTaskReviewProvider.fetchTeamTaskReviewsByTask(taskId)
+          teamTaskReviewProvider.fetchTaskReviewStatistics(taskId)
         )
-        .done((task, taskHints, taskHitStatistics, teamTaskReviews) => {
+        .done((task, taskHints, taskHitStatistics, taskReviewStatistics) => {
           let md = new MarkdownRenderer()
 
           $taskContents.html(renderTemplate('task-content-partial', {
@@ -535,17 +535,10 @@ class TasksView extends View {
             })
           }))
 
-          let ratingList = _.map(teamTaskReviews, (teamTaskReview) => {
-            return teamTaskReview.rating
-          })
-          let averageRating = _.reduce(ratingList, (memo, rating) => {
-            return memo + rating
-          }, 0) / (ratingList.length === 0 ? 1 : ratingList.length)
-
           $taskStatus.html(renderTemplate('revise-task-status-partial', {
             solvedTeamCount: taskHitStatistics.count,
-            averageRating: averageRating,
-            ratedTeamCount: teamTaskReviews.length
+            averageRating: taskReviewStatistics.averageRating,
+            ratedTeamCount: taskReviewStatistics.count
           }))
           $submitButton.prop('disabled', false)
         })
@@ -798,8 +791,8 @@ class TasksView extends View {
           $taskInfo.show().html(renderTemplate('submit-task-status-partial', {
             taskSolvedAt: taskSolvedAt ? moment(taskSolvedAt).format('lll') : null,
             solvedTeamCount: taskHitStatistics.count,
-            reviewAverageRating: taskReviewStatistics.reviewAverageRating,
-            reviewCount: taskReviewStatistics.reviewCount,
+            reviewAverageRating: taskReviewStatistics.averageRating,
+            reviewCount: taskReviewStatistics.count,
             teamReview: teamTaskReview ? {
               rating: teamTaskReview.rating,
               comment: teamTaskReview.comment,
