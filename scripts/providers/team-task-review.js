@@ -58,6 +58,54 @@ class TeamTaskReviewProvider extends EventEmitter {
     return promise
   }
 
+  fetchTeamReviewStatistics (teamId) {
+    let promise = $.Deferred()
+    let url = `/api/team/${teamId}/review/statistics`
+
+    $.ajax({
+      url: url,
+      dataType: 'json',
+      success: (responseJSON, textStatus, jqXHR) => {
+        promise.resolve(responseJSON)
+      },
+      error: (jqXHR, textStatus, errorThrown) => {
+        if (jqXHR.responseJSON) {
+          promise.reject(jqXHR.responseJSON)
+        } else {
+          promise.reject('Unknown error. Please try again later.')
+        }
+      }
+    })
+
+    return promise
+  }
+
+  fetchTeamReviews (teamId) {
+    let promise = $.Deferred()
+    let url = `/api/team/${teamId}/review/index`
+
+    $.ajax({
+      url: url,
+      dataType: 'json',
+      success: (responseJSON, textStatus, jqXHR) => {
+        this.teamTaskReviews = _.map(responseJSON, (options) => {
+          return new TeamTaskReviewModel(options)
+        })
+
+        promise.resolve(this.teamTaskReviews)
+      },
+      error: (jqXHR, textStatus, errorThrown) => {
+        if (jqXHR.responseJSON) {
+          promise.reject(jqXHR.responseJSON)
+        } else {
+          promise.reject('Unknown error. Please try again later.')
+        }
+      }
+    })
+
+    return promise
+  }
+
   subscribe () {
     if (!dataStore.supportsRealtime()) {
       return

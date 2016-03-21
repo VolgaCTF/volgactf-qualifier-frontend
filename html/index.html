@@ -1331,7 +1331,7 @@
                         <% var averageRating = utils.underscore.reduce(taskReviews, function (memo, taskReview) {
                             return memo + taskReview.rating;
                         }, 0) / (taskReviews.length === 0 ? 1 : taskReviews.length); %>
-                        <p>Average rating is <strong><%- averageRating.toFixed(2) %></strong> (max 5.00).</p>
+                        <p class="text-muted">Average rating is <strong><%- averageRating.toFixed(2) %></strong> (max 5.00)</p>
                         <table class="table table-condensed">
                             <thead>
                                 <th>#</th>
@@ -1800,27 +1800,8 @@
                 </div>
             </script>
 
-            <script type="text/x-template" data-name="team-hits-partial">
-                <% if (identity.isSupervisor() || identity.isExactTeam(teamId)) { %>
-                    <% if (taskNames.length > 0) { %>
-                    Team has solved the following <% print((taskNames.length === 1) ? 'task' : 'tasks') %>:
-                    <% for (var i=0; i<taskNames.length; ++i) { %>
-                        <strong><%- taskNames[i] %></strong><% if (i < taskNames.length - 1) { %>, <% } else { %>.<% } %>
-                    <% } %>
-                    <% } else { %>
-                    Team hasn't solved any tasks
-                    <% } %>
-                <% } else { %>
-                    <% if (count > 0) { %>
-                    Team has solved <strong><%- count %></strong> <% print((count === 1) ? 'task' : 'tasks') %>
-                    <% } else { %>
-                    Team hasn't solved any tasks
-                    <% } %>
-                <% } %>
-            </script>
-
             <script type="text/x-template" data-name="team-profile-partial">
-                <div class="clearfix themis-profile">
+                <header class="clearfix themis-profile">
                     <div class="pull-left logo">
                         <% if (identity.isExactTeam(team.id)) { %>
                         <a href="#" title="Click to upload new logo" data-action="upload-logo" data-toggle="modal" data-target="#upload-logo-modal">
@@ -1831,57 +1812,158 @@
                         <% } %>
                     </div>
                     <div class="pull-left info">
-                        <h4 class="text-primary">
-                            <%- team.name %>
-                            <% if (team.disqualified) { %>&nbsp;<span class="label label-danger">disqualified</span><% } %>
-                        </h4>
-                        <% if (identity.isExactTeam(team.id) || identity.isSupervisor()) { %>
-                        <ul class="list-unstyled">
-                            <% if ('email' in team && 'emailConfirmed' in team) { %>
-                            <li>
-                                <span class="glyphicon glyphicon-envelope"></span>
-                                <% if (team.emailConfirmed) { %>
-                                <span class="text-success" title="Email verified"><%- team.email %></span>
-                                <% } else { %>
-                                <span class="text-danger" title="Email not verified"><%- team.email %></span>
-                                <% if (identity.isExactTeam(team.id)) { %>
-                                <br>
-                                <button type="button" class="btn btn-default btn-sm" data-action="resend-confirmation" data-toggle="modal" data-target="#resend-confirmation-modal">Resend confirmation email</button>
-                                <button type="button" class="btn btn-warning btn-sm" data-action="change-email" data-toggle="modal" data-target="#change-email-modal">Change email</button>
-                                <% } %>
-                                <% } %>
-                            </li>
-                            <% } %>
-                        </ul>
-                        <% } %>
-                        <ul class="list-unstyled">
-                            <% if (country !== '' || identity.isExactTeam(team.id)) { %>
-                            <li><strong>Country:</strong> <%- country %></li>
-                            <% } %>
-                            <% if (team.locality !== '' || identity.isExactTeam(team.id)) { %>
-                            <li><strong>Locality:</strong> <%- team.locality %></li>
-                            <% } %>
-                            <% if (team.institution !== '' || identity.isExactTeam(team.id)) { %>
-                            <li><strong>Institution:</strong> <%- team.institution %></li>
-                            <% } %>
-                            <% if (identity.isExactTeam(team.id)) { %>
-                            <li>
-                                <button type="button" class="btn btn-default btn-sm" data-action="edit-profile" data-toggle="modal" data-target="#edit-profile-modal">
-                                    Edit
-                                </button>
-                                <button type="button" class="btn btn-default btn-sm" data-action="change-password" data-toggle="modal" data-target="#change-password-modal">
-                                    Change password
-                                </button>
-                            </li>
-                            <% } %>
-                        </ul>
-                        <% if (teamHitsInfo) { %>
-                        <p class="text-muted">
-                            <%= teamHitsInfo %>
-                        </p>
-                        <% } %>
+                        <h1><%- team.name %></h1>
+                        <% if (team.disqualified) { %><p><span class="label label-danger">disqualified</span></p><% } %>
                     </div>
-                </div>
+                </header>
+
+                <section>
+                    <h3>General information</h3>
+                    <p class="text-info">Signed up on <%- utils.moment(team.createdAt).format('lll') %></p>
+                    <% if (identity.isExactTeam(team.id) || identity.isSupervisor()) { %>
+                    <ul class="list-unstyled">
+                        <% if ('email' in team && 'emailConfirmed' in team) { %>
+                        <li>
+                            <span class="glyphicon glyphicon-envelope"></span>
+                            <% if (team.emailConfirmed) { %>
+                            <span class="text-success" title="Email verified"><%- team.email %></span>
+                            <% } else { %>
+                            <span class="text-danger" title="Email not verified"><%- team.email %></span>
+                            <% if (identity.isExactTeam(team.id)) { %>
+                            <br>
+                            <button type="button" class="btn btn-default btn-sm" data-action="resend-confirmation" data-toggle="modal" data-target="#resend-confirmation-modal">Resend confirmation email</button>
+                            <button type="button" class="btn btn-warning btn-sm" data-action="change-email" data-toggle="modal" data-target="#change-email-modal">Change email</button>
+                            <% } %>
+                            <% } %>
+                        </li>
+                        <% } %>
+                    </ul>
+                    <% } %>
+                    <ul class="list-unstyled">
+                        <% if (country !== '' || identity.isExactTeam(team.id)) { %>
+                        <li><strong>Country:</strong> <%- country %></li>
+                        <% } %>
+                        <% if (team.locality !== '' || identity.isExactTeam(team.id)) { %>
+                        <li><strong>Locality:</strong> <%- team.locality %></li>
+                        <% } %>
+                        <% if (team.institution !== '' || identity.isExactTeam(team.id)) { %>
+                        <li><strong>Institution:</strong> <%- team.institution %></li>
+                        <% } %>
+                        <% if (identity.isExactTeam(team.id)) { %>
+                        <li>
+                            <button type="button" class="btn btn-default btn-sm" data-action="edit-profile" data-toggle="modal" data-target="#edit-profile-modal">
+                                Edit
+                            </button>
+                            <button type="button" class="btn btn-default btn-sm" data-action="change-password" data-toggle="modal" data-target="#change-password-modal">
+                                Change password
+                            </button>
+                        </li>
+                        <% } %>
+                    </ul>
+                </section>
+
+                <% if (identity.isGuest() || !identity.isExactTeam(team.id)) { %>
+                    <% if (teamHitStatistics) { %>
+                    <section>
+                        <h3>Task hits</h3>
+                        <p class="text-muted">
+                            <% if (teamHitStatistics.count > 0) { %>
+                            Team has solved <strong><%- teamHitStatistics.count %></strong> <% print((teamHitStatistics.count === 1) ? 'task' : 'tasks') %>
+                            <% } else { %>
+                            Team hasn't solved any tasks
+                            <% } %>
+                        </p>
+                    </section>
+                    <% } %>
+                    <% if (teamReviewStatistics) { %>
+                    <section>
+                        <h3>Task reviews</h3>
+                        <p class="text-muted">
+                            <% if (teamReviewStatistics.count > 0) { %>
+                            Team has reviewed <strong><%- teamReviewStatistics.count %></strong> <% print((teamReviewStatistics.count === 1) ? 'task' : 'tasks') %> and has given <strong><%- teamReviewStatistics.averageRating.toFixed(2) %></strong> rating points on average
+                            <% } else { %>
+                            Team hasn't reviewed any tasks
+                            <% } %>
+                        </p>
+                    </section>
+                    <% } %>
+                <% } %>
+
+                <% if (identity.isExactTeam(team.id) || identity.isSupervisor()) { %>
+                    <% if (taskHits) { %>
+                    <section>
+                        <h3>Task hits</h3>
+                        <% if (taskHits.length > 0) { %>
+                        <table class="table table-condensed">
+                            <thead>
+                                <th>#</th>
+                                <th>Task</th>
+                                <th>Value</th>
+                                <th>Solved at</th>
+                            </thead>
+                            <tbody>
+                                <% var sortedTaskHits = utils.underscore.sortBy(taskHits, function(x) { return x.createdAt.getTime(); }); %>
+                                <% var task = null; %>
+                                <% for (var i=0; i<sortedTaskHits.length; ++i) { %>
+                                    <% task = utils.underscore.findWhere(tasks, { id: sortedTaskHits[i].taskId }); %>
+                                    <% if (task) { %>
+                                    <tr>
+                                        <td><% print(i + 1) %></td>
+                                        <td><%- task.title %></td>
+                                        <td><%- task.value %></td>
+                                        <td><%- utils.moment(sortedTaskHits[i].createdAt).format('lll') %></td>
+                                    </tr>
+                                    <% } %>
+                                <% } %>
+                            </tbody>
+                        </table>
+                        <% } else { %>
+                        <p>Team hasn't solved any tasks yet.</p>
+                        <% } %>
+                    </section>
+                    <% } %>
+                    <% if (taskReviews) { %>
+                    <section>
+                        <h3>Task reviews</h3>
+                        <% if (taskReviews.length > 0) { %>
+                        <% var averageRating = utils.underscore.reduce(taskReviews, function (memo, taskReview) {
+                            return memo + taskReview.rating;
+                        }, 0) / (taskReviews.length === 0 ? 1 : taskReviews.length); %>
+                        <p class="text-muted">Average rating is <strong><%- averageRating.toFixed(2) %></strong> (max 5.00)</p>
+                        <table class="table table-condensed">
+                            <thead>
+                                <th>#</th>
+                                <th>Task</th>
+                                <th>Value</th>
+                                <th>Rating</th>
+                                <th>Comment</th>
+                                <th>Created at</th>
+                            </thead>
+                            <tbody>
+                                <% var sortedTaskReviews = utils.underscore.sortBy(taskReviews, function(x) { return x.createdAt.getTime(); }); %>
+                                <% var task = null; %>
+                                <% for (var i=0; i<sortedTaskReviews.length; ++i) { %>
+                                    <% task = utils.underscore.findWhere(tasks, { id: sortedTaskReviews[i].taskId }); %>
+                                    <% if (task) { %>
+                                    <tr>
+                                        <td><% print(i + 1) %></td>
+                                        <td><%- task.title %></td>
+                                        <td><%- task.value %></td>
+                                        <td><%- sortedTaskReviews[i].rating.toFixed(2) %></td>
+                                        <td><%- sortedTaskReviews[i].comment %></td>
+                                        <td><%- utils.moment(sortedTaskReviews[i].createdAt).format('lll') %></td>
+                                    </tr>
+                                    <% } %>
+                                <% } %>
+                            </tbody>
+                        </table>
+                        <% } else { %>
+                        <p>Team hasn't reviewed any tasks yet.</p>
+                        <% } %>
+
+                    </section>
+                    <% } %>
+                <% } %>
             </script>
 
             <script type="text/x-template" data-name="profile-view">
@@ -1889,9 +1971,6 @@
                     <% if (identity.isTeam() && !identity.emailConfirmed) { %>
                     <!--=include ../partials/alert_email_verification.html -->
                     <% } %>
-                    <header>
-                        <h1>Team profile</h1>
-                    </header>
                     <section>
                     </section>
                 </div>

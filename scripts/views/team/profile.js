@@ -13,6 +13,8 @@ import taskProvider from '../../providers/task'
 import History from 'history.js'
 import metadataStore from '../../utils/metadata-store'
 import teamTaskHitProvider from '../../providers/team-task-hit'
+import teamTaskReviewProvider from '../../providers/team-task-review'
+import moment from 'moment'
 import 'parsley'
 import 'jquery.form'
 import 'bootstrap-filestyle'
@@ -367,6 +369,7 @@ class TeamProfileView extends View {
               teamProvider.fetchTeamProfile(teamId),
               countryProvider.fetchCountries(),
               teamTaskHitProvider.fetchTeamHits(teamId),
+              teamTaskReviewProvider.fetchTeamReviews(teamId),
               taskProvider.fetchTaskPreviews()
             )
           }
@@ -381,6 +384,7 @@ class TeamProfileView extends View {
               teamProvider.fetchTeamProfile(teamId),
               countryProvider.fetchCountries(),
               teamTaskHitProvider.fetchTeamHits(teamId),
+              teamTaskReviewProvider.fetchTeamReviews(teamId),
               contestProvider.fetchTeamScores(),
               taskProvider.fetchTaskPreviews()
             )
@@ -396,6 +400,7 @@ class TeamProfileView extends View {
               teamProvider.fetchTeamProfile(teamId),
               countryProvider.fetchCountries(),
               teamTaskHitProvider.fetchTeamHitStatistics(teamId),
+              teamTaskReviewProvider.fetchTeamReviewStatistics(teamId),
               contestProvider.fetchTeamScores()
             )
           }
@@ -409,13 +414,14 @@ class TeamProfileView extends View {
             promise = $.when(
               teamProvider.fetchTeamProfile(teamId),
               countryProvider.fetchCountries(),
-              teamTaskHitProvider.fetchTeamHitStatistics(teamId)
+              teamTaskHitProvider.fetchTeamHitStatistics(teamId),
+              teamTaskReviewProvider.fetchTeamReviewStatistics(teamId)
             )
           }
         }
 
         promise
-          .done((team, countries, teamTaskHits) => {
+          .done((team, countries, teamTaskHits, teamTaskReviews) => {
             identityProvider.subscribe()
 
             if (dataStore.supportsRealtime()) {
@@ -425,12 +431,24 @@ class TeamProfileView extends View {
             navigationBar.present()
             statusBar.present()
 
-            this.$main.html(renderTemplate('profile-view', { identity: identity }))
+            this.$main.html(renderTemplate('profile-view', {
+              identity: identity,
+              team: team
+            }))
 
             this.team = team
             let opts = {
               identity: identity,
-              team: team
+              team: team,
+              tasks: null,
+              taskHits: null,
+              taskReviews: null,
+              teamHitStatistics: null,
+              teamReviewStatistics: null,
+              utils: {
+                underscore: _,
+                moment: moment
+              }
             }
 
             let country = _.findWhere(countries, { id: team.countryId })
@@ -438,30 +456,13 @@ class TeamProfileView extends View {
 
             if (!contest.isInitial()) {
               if (identity.isSupervisor() || identity.isExactTeam(teamId)) {
-                let tasks = taskProvider.getTaskPreviews()
-                let taskNames = []
-
-                for (let entry of teamTaskHits) {
-                  let task = _.findWhere(tasks, { id: entry.taskId })
-                  if (task && !_.contains(taskNames, task.title)) {
-                    taskNames.push(task.title)
-                  }
-                }
-
-                opts.teamHitsInfo = renderTemplate('team-hits-partial', {
-                  identity: identity,
-                  teamId: team.id,
-                  taskNames: taskNames
-                })
+                opts.tasks = taskProvider.getTaskPreviews()
+                opts.taskHits = teamTaskHits
+                opts.taskReviews = teamTaskReviews
               } else {
-                opts.teamHitsInfo = renderTemplate('team-hits-partial', {
-                  identity: identity,
-                  teamId: team.id,
-                  count: teamTaskHits.count
-                })
+                opts.teamHitStatistics = teamTaskHits
+                opts.teamReviewStatistics = teamTaskReviews
               }
-            } else {
-              opts.teamHitsInfo = null
             }
 
             this.$main.find('section').html(renderTemplate('team-profile-partial', opts))
