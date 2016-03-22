@@ -3,6 +3,9 @@ import $ from 'jquery'
 class DataStore {
   constructor () {
     this.eventSource = null
+
+    this.onEventSourceOpenHandlers = []
+    this.onEventSourceError = null
   }
 
   verifyEmail (data, token, callback) {
@@ -32,8 +35,8 @@ class DataStore {
   }
 
   getRealtimeConnectionState () {
-    if (this.supportsRealtime() && this.eventSource) {
-      return this.eventSource.readyState
+    if (this.supportsRealtime()) {
+      return this.eventSource ? this.eventSource.readyState : 999
     } else {
       return -1
     }
@@ -43,12 +46,33 @@ class DataStore {
     return (this.supportsRealtime() && this.eventSource && this.eventSource.readyState === 1)
   }
 
+  onConnectedRealtime (func) {
+    this.onEventSourceOpenHandlers.push(func)
+  }
+
   connectRealtime () {
+    if (!this.onEventSourceError) {
+      this.onEventSourceError = (e) => {
+        this.disconnectRealtime()
+      }
+    }
+
     this.eventSource = new window.EventSource('/api/stream')
+    for (let func of this.onEventSourceOpenHandlers) {
+      this.eventSource.addEventListener('open', func)
+    }
+    this.eventSource.addEventListener('error', this.onEventSourceError)
   }
 
   disconnectRealtime () {
     if (this.eventSource) {
+      for (let func of this.onEventSourceOpenHandlers) {
+        this.eventSource.removeEventListener('open', func)
+      }
+      if (this.onEventSourceError) {
+        this.eventSource.removeEventListener('error', this.onEventSourceError)
+        this.onEventSourceError = null
+      }
       this.eventSource.close()
       this.eventSource = null
     }
