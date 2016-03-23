@@ -845,7 +845,18 @@ class TasksView extends View {
             $reviewRating.focus()
           }
 
-          setTimeout(showReviewForm, 1000)
+          let hideModal = () => {
+            $modal.modal('hide')
+            if (!dataStore.connectedRealtime()) {
+              window.location.reload()
+            }
+          }
+
+          if (contestProvider.getContest().isFinished()) {
+            setTimeout(hideModal, 1000)
+          } else {
+            setTimeout(showReviewForm, 1000)
+          }
         },
         error: (jqXHR, textStatus, errorThrown) => {
           if (jqXHR.responseJSON) {
