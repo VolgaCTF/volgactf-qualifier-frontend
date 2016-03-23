@@ -1628,41 +1628,38 @@
                     <% if (!identity.emailConfirmed) { %>
                     <!--=include ../partials/alert_email_verification.html -->
                     <% } %>
-                    <h1>Welcome back!</h1>
+                    <h1>Welcome!</h1>
                     <% if (contest.isInitial()) { %>
                     <p class="lead">
                         {{#event}}{{ title }}{{/event}} hasn't started yet.
-                        Now, you can check out the <a href="/news" data-push-history>news</a> or <a href="/team/<%- identity.id %>/profile" data-push-history>edit your profile</a>.
                     </p>
                     <% } else if (contest.isStarted() || contest.isPaused()) { %>
                     <p class="lead">
-                        {{#event}}{{ title }}{{/event}} has begun!
+                        {{#event}}{{ title }}{{/event}} has started!
                     </p>
-                    <ul class="lead list-unstyled">
-                        <li><a href="/news" data-push-history>Check out the news</a></li>
-                        <li><a href="/scoreboard" data-push-history>View current scoreboard</a></li>
-                        <li><a href="/tasks" data-push-history>Get to the tasks!</a></li>
-                    </ul>
                     <% } else if (contest.isFinished()) { %>
                     <p class="lead">
                         {{#event}}{{ title }}{{/event}} has finished!
                     </p>
-                    <ul class="lead list-unstyled">
-                        <li><a href="/scoreboard" data-push-history>View result scoreboard</a></li>
-                    </ul>
-                    <p class="lead">
-                        We hope you've enjoyed the <a href="/tasks" data-push-history>tasks</a>! See you the next year!
-                    </p>
                     <% } %>
-                    <% } else if (identity.isSupervisor()) { %>
-                    <h1>Welcome back!</h1>
                     <ul class="lead list-unstyled">
+                        <li><a href="/team/<%- identity.id %>/profile" data-push-history>Team profile</a></li>
+                        <li><a href="/news" data-push-history>News</a></li>
+                        <% if (contest.isStarted() || contest.isPaused() || contest.isFinished()) { %>
+                        <li><a href="/scoreboard" data-push-history>Scoreboard</a></li>
+                        <li><a href="/tasks" data-push-history>Tasks</a></li>
+                        <% } %>
+                    </ul>
+                    <% } else if (identity.isSupervisor()) { %>
+                    <h1>Welcome!</h1>
+                    <ul class="lead list-unstyled">
+                        <li><a href="/scoreboard" data-push-history>Scoreboard</a></li>
                         <li><a href="/news" data-push-history>News management</a></li>
-                        <li><a href="/scoreboard" data-push-history>View scoreboard</a></li>
                         <% if (identity.isAdmin()) { %>
+                        <li><a href="/categories" data-push-history>Category management</a></li>
                         <li><a href="/tasks" data-push-history>Task management</a></li>
                         <% } %>
-                        <li><a href="/events" data-push-history>Realtime event log</a></li>
+                        <li><a href="/events" data-push-history>Event log</a></li>
                     </ul>
                     <% } %>
                 </div>
