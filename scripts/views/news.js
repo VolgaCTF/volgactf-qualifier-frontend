@@ -11,6 +11,7 @@ import moment from 'moment'
 import postProvider from '../providers/post'
 import contestProvider from '../providers/contest'
 import identityProvider from '../providers/identity'
+import History from 'history.js'
 import 'jquery.form'
 import 'parsley'
 
@@ -283,6 +284,14 @@ class NewsView extends View {
             }
 
             this.renderPosts()
+
+            let urlParams = History.getState().data.params
+            if (urlParams.action === 'scrollTo' && urlParams.postId) {
+              let $el = $(`div.themis-post[data-id="${urlParams.postId}"]`)
+              if ($el.length > 0) {
+                $el.get(0).scrollIntoView()
+              }
+            }
 
             this.onCreatePost = () => {
               this.renderPosts()

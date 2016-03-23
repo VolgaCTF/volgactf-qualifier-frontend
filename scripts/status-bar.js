@@ -28,6 +28,10 @@ class StatusBar {
 
     this.realtimeControlInterval = null
     this.onRealtimeControl = null
+
+    dataStore.onConnectedRealtime(() => {
+      this.renderRealtimeState()
+    })
   }
 
   initUpdateContestModal () {
@@ -194,6 +198,10 @@ class StatusBar {
   }
 
   renderRealtimeState () {
+    if (!this.$realtimeContainer) {
+      return
+    }
+
     this.$realtimeContainer.empty()
     let state = null
     switch (dataStore.getRealtimeConnectionState()) {
@@ -282,7 +290,7 @@ class StatusBar {
       this.renderRealtimeState()
     }
 
-    this.realtimeControlInterval = setInterval(this.onRealtimeControl, 10000)
+    this.realtimeControlInterval = setInterval(this.onRealtimeControl, 1000)
   }
 
   dismiss () {

@@ -16,6 +16,8 @@ import contestProvider from '../providers/contest'
 import identityProvider from '../providers/identity'
 import teamProvider from '../providers/team'
 import MarkdownRenderer from '../utils/markdown'
+import teamTaskReviewProvider from '../providers/team-task-review'
+import teamTaskHitProvider from '../providers/team-task-hit'
 import 'bootstrap'
 import 'jquery.form'
 import 'parsley'
@@ -519,38 +521,26 @@ class TasksView extends View {
       $
         .when(
           taskProvider.fetchTask(taskId),
-          taskHintProvider.fetchTaskHintsByTask(taskId)
+          taskHintProvider.fetchTaskHintsByTask(taskId),
+          teamTaskHitProvider.fetchTaskHitStatistics(taskId),
+          teamTaskReviewProvider.fetchTaskReviewStatistics(taskId)
         )
-        .done((task, taskHints) => {
+        .done((task, taskHints, taskHitStatistics, taskReviewStatistics) => {
           let md = new MarkdownRenderer()
-          let hintsFormatted = []
-          _.each(taskHints, (entry) => {
-            hintsFormatted.push(md.render(entry.hint))
-          })
 
-          let options = {
+          $taskContents.html(renderTemplate('task-content-partial', {
             title: task.title,
             description: md.render(task.description),
-            hints: hintsFormatted
-          }
+            hints: _.map(taskHints, (taskHint) => {
+              return md.render(taskHint.hint)
+            })
+          }))
 
-          $taskContents.html(renderTemplate('task-content-partial', options))
-
-          let teamTaskHits = _.where(contestProvider.getTeamTaskHits(), { taskId: task.id })
-          let sortedTeamTaskHits = _.sortBy(teamTaskHits, 'createdAt')
-          let teamIds = _.map(sortedTeamTaskHits, (entry) => {
-            return entry.teamId
-          })
-          let teamNames = []
-          let teams = teamProvider.getTeams()
-          for (let teamId of teamIds) {
-            let team = _.findWhere(teams, { id: teamId })
-            if (team) {
-              teamNames.push(team.name)
-            }
-          }
-
-          $taskStatus.html(renderTemplate('revise-task-status-partial', { teamNames: teamNames }))
+          $taskStatus.html(renderTemplate('revise-task-status-partial', {
+            solvedTeamCount: taskHitStatistics.count,
+            averageRating: taskReviewStatistics.averageRating,
+            ratedTeamCount: taskReviewStatistics.count
+          }))
           $submitButton.prop('disabled', false)
         })
         .fail((err) => {
@@ -674,16 +664,30 @@ class TasksView extends View {
     let $taskInfo = $modal.find('.submit-info > p')
     let $submitSuccess = $modal.find('.submit-success > p')
     let $submitButton = $modal.find('button[data-action="complete-submit-task"]')
-    let $form = $modal.find('form')
-    $form.parsley()
+    let $submitForm = $modal.find('form[data-target="submit"]')
+    $submitForm.parsley()
 
     $submitButton.on('click', (e) => {
-      $form.trigger('submit')
+      $submitForm.trigger('submit')
     })
 
-    let $taskAnswerGroup = $('#submit-task-answer-group')
+    let $submitFieldGroup = $('#submit-task-field-group')
     let $taskAnswer = $('#submit-task-answer')
     let $taskContents = $modal.find('.themis-task-contents')
+
+    let $reviewButton = $modal.find('button[data-action="complete-review-task"]')
+    let $reviewForm = $modal.find('form[data-target="review"]')
+    $reviewForm.parsley()
+    let $reviewError = $modal.find('.review-error > p')
+    let $reviewSuccess = $modal.find('.review-success > p')
+
+    let $reviewFieldGroup = $modal.find('#review-task-field-group')
+    let $reviewRating = $modal.find('#review-task-rating')
+    let $reviewComment = $modal.find('#review-task-comment')
+
+    $reviewButton.on('click', (e) => {
+      $reviewForm.trigger('submit')
+    })
 
     $modal.on('show.bs.modal', (e) => {
       let taskId = parseInt($(e.relatedTarget).data('task-id'), 10)
@@ -695,50 +699,68 @@ class TasksView extends View {
       $submitSuccess.text('')
       $submitButton.prop('disabled', true)
 
+      $reviewFieldGroup.hide()
+      $reviewButton.hide()
+      $reviewButton.prop('disabled', true)
+      $reviewRating.val(5)
+      $reviewComment.val('')
+      $reviewError.text('')
+      $reviewSuccess.text('')
+
       let taskPreview = _.findWhere(taskProvider.getTaskPreviews(), { id: taskId })
       let identity = identityProvider.getIdentity()
       let contest = contestProvider.getContest()
+      let taskSolvedAt = null
+      let teamTaskReview = null
+      let onlyReview = false
+
+      $reviewFieldGroup.hide()
+      $reviewButton.hide()
 
       if (taskPreview && identity.isTeam()) {
-        let taskIsSolved = false
-        let taskHit = _.findWhere(contestProvider.getTeamTaskHits(), {
+        let taskHit = _.findWhere(teamTaskHitProvider.getTeamTaskHits(), {
           teamId: identity.id,
           taskId: taskId
         })
         if (taskHit) {
-          taskIsSolved = true
+          taskSolvedAt = taskHit.createdAt
         }
 
-        if (taskPreview.isOpened() && ((!taskIsSolved && contest.isStarted()) || contest.isFinished())) {
-          $taskAnswerGroup.show()
-          $submitButton.show()
-        } else {
-          $taskAnswerGroup.hide()
-          $submitButton.hide()
-          if (contest.isPaused() && !taskIsSolved) {
+        if (taskPreview.isOpened()) {
+          if (contest.isPaused()) {
             $submitError.text('Contest has been paused.')
+            $submitFieldGroup.hide()
+            $submitButton.hide()
+          } else {
+            if ((!taskSolvedAt && contest.isStarted()) || contest.isFinished()) {
+              $submitFieldGroup.show()
+              $submitButton.show()
+            } else {
+              $submitFieldGroup.hide()
+              $submitButton.hide()
+            }
           }
-          if (taskPreview.isClosed()) {
-            $submitError.text('Task has been closed by the event organizers.')
-          }
-        }
-
-        if (taskIsSolved) {
-          $submitSuccess.text(`Your team has solved the task on ${moment(taskHit.createdAt).format('lll')}!`)
+        } else if (taskPreview.isClosed()) {
+          $submitError.text('Task has been closed by the event organizers.')
+          $submitFieldGroup.hide()
+          $submitButton.hide()
         }
       } else {
-        $taskAnswerGroup.hide()
+        $submitFieldGroup.hide()
         $submitButton.hide()
       }
 
       $modal.data('task-id', taskId)
 
-      $form.parsley().reset()
+      $submitForm.parsley().reset()
       if (contest.isFinished()) {
-        $form.attr('action', `/api/task/${taskId}/check`)
+        $submitForm.attr('action', `/api/task/${taskId}/check`)
       } else {
-        $form.attr('action', `/api/task/${taskId}/submit`)
+        $submitForm.attr('action', `/api/task/${taskId}/submit`)
       }
+
+      $reviewForm.parsley().reset()
+      $reviewForm.attr('action', `/api/task/${taskId}/review`)
 
       if (taskPreview.isClosed()) {
         return
@@ -747,10 +769,12 @@ class TasksView extends View {
       $
         .when(
           taskProvider.fetchTask(taskId),
-          contestProvider.fetchSolvedTeamCountByTask(taskId),
-          taskHintProvider.fetchTaskHintsByTask(taskId)
+          teamTaskHitProvider.fetchTaskHitStatistics(taskId),
+          taskHintProvider.fetchTaskHintsByTask(taskId),
+          teamTaskReviewProvider.fetchTeamTaskReviewsByTask(taskId),
+          teamTaskReviewProvider.fetchTaskReviewStatistics(taskId)
         )
-        .done((task, solvedTeamCount, taskHints) => {
+        .done((task, taskHitStatistics, taskHints, teamTaskReviews, taskReviewStatistics) => {
           let md = new MarkdownRenderer()
           let hintsFormatted = []
           _.each(taskHints, (entry) => {
@@ -763,9 +787,29 @@ class TasksView extends View {
           }
           $taskContents.html(renderTemplate('task-content-partial', options))
 
-          $taskInfo.text(renderTemplate('submit-task-status-partial', { solvedTeamCount: solvedTeamCount }))
+          teamTaskReview = _.findWhere(teamTaskReviews, { taskId: taskId, teamId: identityProvider.getIdentity().id })
+
+          $taskInfo.show().html(renderTemplate('submit-task-status-partial', {
+            taskSolvedAt: taskSolvedAt ? moment(taskSolvedAt).format('lll') : null,
+            solvedTeamCount: taskHitStatistics.count,
+            reviewAverageRating: taskReviewStatistics.averageRating,
+            reviewCount: taskReviewStatistics.count,
+            teamReview: teamTaskReview ? {
+              rating: teamTaskReview.rating,
+              comment: teamTaskReview.comment,
+              createdAt: moment(teamTaskReview.createdAt).format('lll')
+            } : null
+          }))
+
+          onlyReview = taskSolvedAt && contest.isStarted() && !teamTaskReview
+          if (onlyReview) {
+            $reviewFieldGroup.show()
+            $reviewButton.show()
+            $reviewRating.focus()
+          }
 
           $submitButton.prop('disabled', false)
+          $reviewButton.prop('disabled', false)
         })
         .fail((err) => {
           $submitError.text(err)
@@ -776,9 +820,9 @@ class TasksView extends View {
       $taskAnswer.focus()
     })
 
-    $form.on('submit', (e) => {
+    $submitForm.on('submit', (e) => {
       e.preventDefault()
-      $form.ajaxSubmit({
+      $submitForm.ajaxSubmit({
         beforeSubmit: () => {
           $submitError.text('')
           $submitSuccess.text('')
@@ -790,9 +834,60 @@ class TasksView extends View {
           'X-CSRF-Token': identityProvider.getIdentity().token
         },
         success: (responseText, textStatus, jqXHR) => {
-          $taskAnswerGroup.hide()
+          $submitFieldGroup.hide()
           $submitButton.hide()
+          $taskInfo.hide()
           $submitSuccess.text('Answer is correct!')
+          let showReviewForm = () => {
+            $submitSuccess.text('')
+            $reviewFieldGroup.show()
+            $reviewButton.show()
+            $reviewRating.focus()
+          }
+
+          let hideModal = () => {
+            $modal.modal('hide')
+            if (!dataStore.connectedRealtime()) {
+              window.location.reload()
+            }
+          }
+
+          if (contestProvider.getContest().isFinished()) {
+            setTimeout(hideModal, 1000)
+          } else {
+            setTimeout(showReviewForm, 1000)
+          }
+        },
+        error: (jqXHR, textStatus, errorThrown) => {
+          if (jqXHR.responseJSON) {
+            $submitError.text(jqXHR.responseJSON)
+          } else {
+            $submitError.text('Unknown error. Please try again later.')
+          }
+        },
+        complete: () => {
+          $submitButton.prop('disabled', false)
+        }
+      })
+    })
+
+    $reviewForm.on('submit', (e) => {
+      e.preventDefault()
+      $reviewForm.ajaxSubmit({
+        beforeSubmit: () => {
+          $reviewError.text('')
+          $reviewSuccess.text('')
+          $reviewButton.prop('disabled', true)
+        },
+        clearForm: true,
+        dataType: 'json',
+        headers: {
+          'X-CSRF-Token': identityProvider.getIdentity().token
+        },
+        success: (responseText, textStatus, jqXHR) => {
+          $reviewFieldGroup.hide()
+          $reviewButton.hide()
+          $reviewSuccess.text('Review has been submitted!')
           let hideModal = () => {
             $modal.modal('hide')
             if (!dataStore.connectedRealtime()) {
@@ -804,13 +899,13 @@ class TasksView extends View {
         },
         error: (jqXHR, textStatus, errorThrown) => {
           if (jqXHR.responseJSON) {
-            $submitError.text(jqXHR.responseJSON)
+            $reviewError.text(jqXHR.responseJSON)
           } else {
-            $submitError.text('Unknown error. Please try again later.')
+            $reviewError.text('Unknown error. Please try again later.')
           }
         },
         complete: () => {
-          $submitButton.prop('disabled', false)
+          $reviewButton.prop('disabled', false)
         }
       })
     })
@@ -972,7 +1067,7 @@ class TasksView extends View {
     } else {
       let solvedTaskIds = []
       if (identity.isTeam()) {
-        let taskHits = _.where(contestProvider.getTeamTaskHits(), { teamId: identity.id })
+        let taskHits = _.where(teamTaskHitProvider.getTeamTaskHits(), { teamId: identity.id })
         solvedTaskIds = _.map(taskHits, (taskHit) => {
           return taskHit.taskId
         })
@@ -1074,9 +1169,9 @@ class TasksView extends View {
 
         let promise = null
         if (identity.isTeam()) {
-          promise = $.when(taskProvider.fetchTaskPreviews(), categoryProvider.fetchCategories(), taskCategoryProvider.fetchTaskCategories(), contestProvider.fetchTeamTaskHits(), contestProvider.fetchTeamScores())
+          promise = $.when(taskProvider.fetchTaskPreviews(), categoryProvider.fetchCategories(), taskCategoryProvider.fetchTaskCategories(), teamTaskHitProvider.fetchTeamHits(identity.id), contestProvider.fetchTeamScores())
         } else if (identity.isSupervisor()) {
-          promise = $.when(taskProvider.fetchTaskPreviews(), categoryProvider.fetchCategories(), taskCategoryProvider.fetchTaskCategories(), contestProvider.fetchTeamTaskHits(), teamProvider.fetchTeams())
+          promise = $.when(taskProvider.fetchTaskPreviews(), categoryProvider.fetchCategories(), taskCategoryProvider.fetchTaskCategories())
         } else {
           promise = $.when(taskProvider.fetchTaskPreviews(), categoryProvider.fetchCategories(), taskCategoryProvider.fetchTaskCategories())
         }
@@ -1163,12 +1258,14 @@ class TasksView extends View {
             taskProvider.on('updateTask', this.onUpdateTask)
 
             if (identity.isTeam()) {
+              teamTaskHitProvider.subscribe()
+
               this.onCreateTeamTaskHit = (teamTaskHit) => {
                 this.requestRenderTasks()
                 return false
               }
 
-              contestProvider.on('createTeamTaskHit', this.onCreateTeamTaskHit)
+              teamTaskHitProvider.on('createTeamTaskHit', this.onCreateTeamTaskHit)
             }
 
             this.onUpdateContest = (contest) => {
@@ -1213,6 +1310,7 @@ class TasksView extends View {
     if (this.onCreateTeamTaskHit) {
       contestProvider.off('createTeamTaskHit', this.onCreateTeamTaskHit)
       this.onCreateTeamTaskHit = null
+      teamTaskHitProvider.unsubscribe()
     }
 
     if (this.onUpdateCategory) {

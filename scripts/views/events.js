@@ -15,6 +15,8 @@ import supervisorProvider from '../providers/supervisor'
 import taskProvider from '../providers/task'
 import taskCategoryProvider from '../providers/task-category'
 import teamProvider from '../providers/team'
+import teamTaskReviewProvider from '../providers/team-task-review'
+import teamTaskHitProvider from '../providers/team-task-hit'
 
 class EventsView extends View {
   constructor () {
@@ -24,7 +26,10 @@ class EventsView extends View {
     this.onUpdateContest = null
     this.onUpdateTeamScore = null
     this.onCreateTeamTaskHit = null
+
     this.onCreateTeamTaskHitAttempt = null
+
+    this.onCreateTeamTaskReview = null
 
     this.onCreateCategory = null
     this.onUpdateCategory = null
@@ -279,6 +284,18 @@ class EventsView extends View {
         }))
         break
       }
+      case 'createTeamTaskReview': {
+        let team = _.findWhere(teamProvider.getTeams(), { id: eventData.teamId })
+        let task = _.findWhere(taskProvider.getTaskPreviews(), { id: eventData.taskId })
+        $el = $(renderTemplate('event-log-create-team-task-review', {
+          createdAt: moment(createdAt).format(formatStr),
+          team: team,
+          task: task,
+          teamTaskReview: eventData
+        }))
+        break
+      }
+
       default:
         $el = $(renderTemplate('event-log-unknown', {
           eventName: moment(createdAt).format(formatStr),
@@ -298,6 +315,57 @@ class EventsView extends View {
     }
   }
 
+  subscribeToTeamTaskReviewEvents () {
+    this.onCreateTeamTaskReview = (e, createdAt) => {
+      this.appendLog('createTeamTaskReview', e, createdAt)
+      return false
+    }
+
+    teamTaskReviewProvider.subscribe()
+    teamTaskReviewProvider.on('createTeamTaskReview', this.onCreateTeamTaskReview)
+  }
+
+  unsubscribeFromTeamTaskReviewEvents () {
+    if (this.onCreateTeamTaskReview) {
+      teamTaskReviewProvider.off('createTeamTaskReview', this.onCreateTeamTaskReview)
+      this.onCreateTeamTaskReview = null
+    }
+
+    teamTaskReviewProvider.unsubscribe()
+  }
+
+  subscribeToTeamTaskHitEvents () {
+    teamTaskHitProvider.subscribe()
+
+    this.onCreateTeamTaskHit = (e, createdAt) => {
+      this.appendLog('createTeamTaskHit', e, createdAt)
+      return false
+    }
+
+    teamTaskHitProvider.on('createTeamTaskHit', this.onCreateTeamTaskHit)
+
+    this.onCreateTeamTaskHitAttempt = (e, createdAt) => {
+      this.appendLog('createTeamTaskHitAttempt', e, createdAt)
+      return false
+    }
+
+    teamTaskHitProvider.on('createTeamTaskHitAttempt', this.onCreateTeamTaskHitAttempt)
+  }
+
+  unsubscribeFromTeamTaskHitEvents () {
+    if (this.onCreateTeamTaskHit) {
+      contestProvider.off('createTeamTaskHit', this.onCreateTeamTaskHit)
+      this.onCreateTeamTaskHit = null
+    }
+
+    if (this.onCreateTeamTaskHitAttempt) {
+      teamTaskHitProvider.off('createTeamTaskHitAttempt', this.onCreateTeamTaskHitAttempt)
+      this.onCreateTeamTaskHitAttempt = null
+    }
+
+    teamTaskHitProvider.unsubscribe()
+  }
+
   subscribeToContestEvents () {
     this.onUpdateContest = (e, createdAt) => {
       this.appendLog('updateContest', e, createdAt)
@@ -312,20 +380,6 @@ class EventsView extends View {
     }
 
     contestProvider.on('updateTeamScore', this.onUpdateTeamScore)
-
-    this.onCreateTeamTaskHit = (e, createdAt) => {
-      this.appendLog('createTeamTaskHit', e, createdAt)
-      return false
-    }
-
-    contestProvider.on('createTeamTaskHit', this.onCreateTeamTaskHit)
-
-    this.onCreateTeamTaskHitAttempt = (e, createdAt) => {
-      this.appendLog('createTeamTaskHitAttempt', e, createdAt)
-      return false
-    }
-
-    contestProvider.on('createTeamTaskHitAttempt', this.onCreateTeamTaskHitAttempt)
   }
 
   unsubscribeFromContestEvents () {
@@ -337,16 +391,6 @@ class EventsView extends View {
     if (this.onUpdateTeamScore) {
       contestProvider.off('updateTeamScore', this.onUpdateTeamScore)
       this.onUpdateTeamScore = null
-    }
-
-    if (this.onCreateTeamTaskHit) {
-      contestProvider.off('createTeamTaskHit', this.onCreateTeamTaskHit)
-      this.onCreateTeamTaskHit = null
-    }
-
-    if (this.onCreateTeamTaskHitAttempt) {
-      contestProvider.off('createTeamTaskHitAttempt', this.onCreateTeamTaskHitAttempt)
-      this.onCreateTeamTaskHitAttempt = null
     }
   }
 
@@ -742,6 +786,8 @@ class EventsView extends View {
           this.subscribeToTaskEvents()
           this.subscribeToTaskCategoryEvents()
           this.subscribeToTeamEvents()
+          this.subscribeToTeamTaskReviewEvents()
+          this.subscribeToTeamTaskHitEvents()
 
           this.$main.html(renderTemplate('events-view'))
           this.$eventsContainer = $('#themis-events')
@@ -771,6 +817,8 @@ class EventsView extends View {
     this.unsubscribeFromTaskEvents()
     this.unsubscribeFromTaskCategoryEvents()
     this.unsubscribeFromTeamEvents()
+    this.unsubscribeFromTeamTaskReviewEvents()
+    this.unsubscribeFromTeamTaskHitEvents()
 
     navigationBar.dismiss()
     statusBar.dismiss()

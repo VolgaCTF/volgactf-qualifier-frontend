@@ -5,24 +5,17 @@ import dataStore from '../data-store'
 import ContestModel from '../models/contest'
 import TeamModel from '../models/team'
 import TeamScoreModel from '../models/team-score'
-import TeamTaskHitModel from '../models/team-task-hit'
-import TeamTaskHitAttemptModel from '../models/team-task-hit-attempt'
-import identityProvider from './identity'
 
 class ContestProvider extends EventEmitter {
   constructor () {
     super()
     this.contest = null
     this.teamScores = []
-    this.teamTaskHits = []
 
     this.onUpdate = null
     this.onUpdateTeamScore = null
     this.onQualifyTeam = null
     this.onDisqualifyTeam = null
-
-    this.onCreateTeamTaskHit = null
-    this.onCreateTeamTaskHitAttempt = null
   }
 
   getContest () {
@@ -55,10 +48,6 @@ class ContestProvider extends EventEmitter {
         return 0
       }
     }
-  }
-
-  getTeamTaskHits () {
-    return this.teamTaskHits
   }
 
   subscribe () {
@@ -122,34 +111,6 @@ class ContestProvider extends EventEmitter {
     }
 
     realtimeProvider.addEventListener('disqualifyTeam', this.onDisqualifyTeam)
-
-    let identity = identityProvider.getIdentity()
-    if (identity.isSupervisor() || identity.isTeam()) {
-      this.onCreateTeamTaskHit = (e) => {
-        let options = JSON.parse(e.data)
-        let teamTaskHit = new TeamTaskHitModel(options)
-        let ndx = _.findIndex(this.teamTaskHits, { teamId: options.teamId, taskId: options.taskId })
-        if (ndx === -1) {
-          if (identity.isTeam() && !identity.isExactTeam(options.teamId)) {
-            return
-          }
-          this.teamTaskHits.push(teamTaskHit)
-          this.trigger('createTeamTaskHit', [teamTaskHit, new Date(options.__metadataCreatedAt)])
-        }
-      }
-
-      realtimeProvider.addEventListener('createTeamTaskHit', this.onCreateTeamTaskHit)
-    }
-
-    if (identity.isSupervisor()) {
-      this.onCreateTeamTaskHitAttempt = (e) => {
-        let options = JSON.parse(e.data)
-        let teamTaskHitAttempt = new TeamTaskHitAttemptModel(options)
-        this.trigger('createTeamTaskHitAttempt', [teamTaskHitAttempt, new Date(options.__metadataCreatedAt)])
-      }
-
-      realtimeProvider.addEventListener('createTeamTaskHitAttempt', this.onCreateTeamTaskHitAttempt)
-    }
   }
 
   unsubscribe () {
@@ -179,19 +140,8 @@ class ContestProvider extends EventEmitter {
       this.onDisqualifyTeam = null
     }
 
-    if (this.onCreateTeamTaskHit) {
-      realtimeProvider.removeEventListener('createTeamTaskHit', this.onCreateTeamTaskHit)
-      this.onCreateTeamTaskHit = null
-    }
-
-    if (this.onCreateTeamTaskHitAttempt) {
-      realtimeProvider.removeEventListener('createTeamTaskHitAttempt', this.onCreateTeamTaskHitAttempt)
-      this.onCreateTeamTaskHitAttempt = null
-    }
-
     this.contest = null
     this.teamScores = []
-    this.teamTaskHits = []
   }
 
   fetchContest () {
@@ -239,97 +189,6 @@ class ContestProvider extends EventEmitter {
         }
       }
     })
-
-    return promise
-  }
-
-  fetchSolvedTeamCountByTask (taskId) {
-    let promise = $.Deferred()
-    let url = `/api/task/${taskId}/hits`
-
-    $.ajax({
-      url: url,
-      dataType: 'json',
-      success: (responseJSON, textStatus, jqXHR) => {
-        promise.resolve(responseJSON)
-      },
-      error: (jqXHR, textStatus, errorThrown) => {
-        if (jqXHR.responseJSON) {
-          promise.reject(jqXHR.responseJSON)
-        } else {
-          promise.reject('Unknown error. Please try again later.')
-        }
-      }
-    })
-
-    return promise
-  }
-
-  fetchTeamTaskHit (teamId) {
-    let promise = $.Deferred()
-
-    let identity = identityProvider.getIdentity()
-    let url = `/api/team/${teamId}/hits`
-
-    $.ajax({
-      url: url,
-      dataType: 'json',
-      success: (responseJSON, textStatus, jqXHR) => {
-        if (identity.isSupervisor() || identity.isExactTeam(teamId)) {
-          let teamTaskHits = _.map(responseJSON, (options) => {
-            return new TeamTaskHitModel(options)
-          })
-
-          promise.resolve(teamTaskHits)
-        } else {
-          promise.resolve(responseJSON)
-        }
-      },
-      error: (jqXHR, textStatus, errorThrown) => {
-        if (jqXHR.responseJSON) {
-          promise.reject(jqXHR.responseJSON)
-        } else {
-          promise.reject('Unknown error. Please try again later.')
-        }
-      }
-    })
-
-    return promise
-  }
-
-  fetchTeamTaskHits () {
-    let promise = $.Deferred()
-    let identity = identityProvider.getIdentity()
-    let url = null
-
-    if (identity.isSupervisor()) {
-      url = '/api/task/hit/index'
-    } else if (identity.isTeam()) {
-      url = `/api/team/${identity.id}/hits`
-    } else {
-      promise.reject('Unknown error. Please try again later.')
-    }
-
-    if (identity.isSupervisor() || identity.isTeam()) {
-      $.ajax({
-        url: url,
-        dataType: 'json',
-        success: (responseJSON, textStatus, jqXHR) => {
-          this.teamTaskHits = _.map(responseJSON, (options) => {
-            return new TeamTaskHitModel(options)
-          })
-
-          promise.resolve(this.teamTaskHits)
-        },
-        error: (jqXHR, textStatus, errorThrown) => {
-          if (jqXHR.responseJSON) {
-            promise.reject(jqXHR.responseJSON)
-          } else {
-            promise.reject('Unknown error. Please try again later.')
-          }
-        }
-      })
-    }
 
     return promise
   }

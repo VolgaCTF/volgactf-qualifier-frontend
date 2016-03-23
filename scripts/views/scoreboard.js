@@ -19,6 +19,8 @@ class ScoreboardView extends View {
     this.$main = null
 
     this.onUpdateTeamScore = null
+    this.onUpdateTeamLogo = null
+    this.onUpdateTeamProfile = null
 
     this.onReloadScoreboard = null
     this.reloadScoreboard = false
@@ -110,6 +112,26 @@ class ScoreboardView extends View {
 
         contestProvider.on('updateTeamScore', this.onUpdateTeamScore)
 
+        this.onUpdateTeamLogo = (team) => {
+          const teamId = team.id
+          setTimeout(() => {
+            let el = document.getElementById(`team-${teamId}-logo`)
+            if (el) {
+              el.setAttribute('src', `/api/team/${teamId}/logo?timestamp=${(new Date()).getTime()}`)
+            }
+          }, 500)
+          return false
+        }
+
+        teamProvider.on('updateTeamLogo', this.onUpdateTeamLogo)
+
+        this.onUpdateTeamProfile = () => {
+          this.reloadScoreboard = true
+          return false
+        }
+
+        teamProvider.on('updateTeamProfile', this.onUpdateTeamProfile)
+
         this.onReloadScoreboard = () => {
           if (!this.reloadScoreboard || this.renderingScoreboard) {
             return
@@ -121,7 +143,7 @@ class ScoreboardView extends View {
           this.renderingScoreboard = false
         }
 
-        this.reloadScoreboardInterval = setInterval(this.onReloadScoreboard, 1000)
+        this.reloadScoreboardInterval = setInterval(this.onReloadScoreboard, 1500)
       })
       .fail(() => {
         navigationBar.present()
@@ -136,6 +158,16 @@ class ScoreboardView extends View {
     if (this.onUpdateTeamScore) {
       contestProvider.off('updateTeamScore', this.onUpdateTeamScore)
       this.onUpdateTeamScore = null
+    }
+
+    if (this.onUpdateTeamLogo) {
+      teamProvider.off('updateTeamLogo', this.onUpdateTeamLogo)
+      this.onUpdateTeamLogo = null
+    }
+
+    if (this.onUpdateTeamProfile) {
+      teamProvider.off('updateTeamProfile', this.onUpdateTeamProfile)
+      this.onUpdateTeamProfile = null
     }
 
     if (this.reloadScoreboardInterval) {

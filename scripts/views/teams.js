@@ -17,6 +17,7 @@ class TeamsView extends View {
     this.$main = null
 
     this.onUpdateTeamProfile = null
+    this.onUpdateTeamLogo = null
     this.onCreateTeam = null
     this.onUpdateTeamEmail = null
     this.onQualifyTeam = null
@@ -94,6 +95,19 @@ class TeamsView extends View {
 
             teamProvider.on('updateTeamProfile', this.onUpdateTeamProfile)
 
+            this.onUpdateTeamLogo = (team) => {
+              const teamId = team.id
+              setTimeout(() => {
+                let el = document.getElementById(`team-${teamId}-logo`)
+                if (el) {
+                  el.setAttribute('src', `/api/team/${teamId}/logo?timestamp=${(new Date()).getTime()}`)
+                }
+              }, 500)
+              return false
+            }
+
+            teamProvider.on('updateTeamLogo', this.onUpdateTeamLogo)
+
             this.onQualifyTeam = (team) => {
               this.renderTeams()
               return false
@@ -143,6 +157,11 @@ class TeamsView extends View {
     if (this.onUpdateTeamProfile) {
       teamProvider.off('updateTeamProfile', this.onUpdateTeamProfile)
       this.onUpdateTeamProfile = null
+    }
+
+    if (this.onUpdateTeamLogo) {
+      teamProvider.off('updateTeamLogo', this.onUpdateTeamLogo)
+      this.onUpdateTeamLogo = null
     }
 
     if (this.onCreateTeam) {

@@ -81,14 +81,14 @@
             <script type="text/x-template" data-name="event-log-create-category">
                 <p>
                     <span><code><%- createdAt %></code>&nbsp;&nbsp;</span>
-                    <span class="text-success">Category <strong><%- category.title %></strong> has been created</span>
+                    <span class="text-success">Category <strong><u><a class="text-success" href="/categories?action=scrollTo&categoryId=<%- category.id %>" target="_blank"><%- category.title %></a></u></strong> has been created</span>
                 </p>
             </script>
 
             <script type="text/x-template" data-name="event-log-update-category">
                 <p>
                     <span><code><%- createdAt %></code>&nbsp;&nbsp;</span>
-                    <span class="text-primary">Category <strong><%- category.title %></strong> has been updated</span>
+                    <span class="text-primary">Category <strong><u><a class="text-primary" href="/categories?action=scrollTo&categoryId=<%- category.id %>" target="_blank"><%- category.title %></a></u></strong> has been updated</span>
                 </p>
             </script>
 
@@ -102,14 +102,14 @@
             <script type="text/x-template" data-name="event-log-create-post">
                 <p>
                     <span><code><%- createdAt %></code>&nbsp;&nbsp;</span>
-                    <span class="text-success">Post <strong><%- post.title %></strong> has been created</span>
+                    <span class="text-success">Post <strong><u><a class="text-success" href="/news?action=scrollTo&amp;postId=<%- post.id %>" target="_blank"><%- post.title %></a></u></strong> has been created</span>
                 </p>
             </script>
 
             <script type="text/x-template" data-name="event-log-update-post">
                 <p>
                     <span><code><%- createdAt %></code>&nbsp;&nbsp;</span>
-                    <span class="text-primary">Post <strong><%- post.title %></strong> has been updated</span>
+                    <span class="text-primary">Post <strong><u><a class="text-primary" href="/news?action=scrollTo&amp;postId=<%- post.id %>" target="_blank"><%- post.title %></a></u></strong> has been updated</span>
                 </p>
             </script>
 
@@ -137,7 +137,7 @@
             <script type="text/x-template" data-name="event-log-update-supervisor-password">
                 <p>
                     <span><code><%- createdAt %></code>&nbsp;&nbsp;</span>
-                    <span class="text-primary">Supervisor <strong><%- supervisor.username %></strong> has updated it's password</span>
+                    <span class="text-primary">Supervisor <strong><%- supervisor.username %></strong> has updated its password</span>
                 </p>
             </script>
 
@@ -200,84 +200,91 @@
             <script type="text/x-template" data-name="event-log-create-team">
                 <p>
                     <span><code><%- createdAt %></code>&nbsp;&nbsp;</span>
-                    <span class="text-success">Team <strong><%- team.name %></strong> has registered for the competition</span>
+                    <span class="text-success">Team <strong><u><a class="text-success" href="/team/<%- team.id %>/profile" target="_blank"><%- team.name %></a></u></strong> has registered for the competition</span>
                 </p>
             </script>
 
             <script type="text/x-template" data-name="event-log-update-team-email">
                 <p>
                     <span><code><%- createdAt %></code>&nbsp;&nbsp;</span>
-                    <span class="text-primary">Team <strong><%- team.name %></strong> has updated it's email</span>
+                    <span class="text-primary">Team <strong><u><a class="text-primary" href="/team/<%- team.id %>/profile" target="_blank"><%- team.name %></a></u></strong> has updated its email</span>
                 </p>
             </script>
 
             <script type="text/x-template" data-name="event-log-update-team-profile">
                 <p>
                     <span><code><%- createdAt %></code>&nbsp;&nbsp;</span>
-                    <span class="text-primary">Team <strong><%- team.name %></strong> has updated it's profile</span>
+                    <span class="text-primary">Team <strong><u><a class="text-primary" href="/team/<%- team.id %>/profile" target="_blank"><%- team.name %></a></u></strong> has updated its profile</span>
                 </p>
             </script>
 
             <script type="text/x-template" data-name="event-log-update-team-password">
                 <p>
                     <span><code><%- createdAt %></code>&nbsp;&nbsp;</span>
-                    <span class="text-primary">Team <strong><%- team.name %></strong> has changed it's password</span>
+                    <span class="text-primary">Team <strong><u><a class="text-primary" href="/team/<%- team.id %>/profile" target="_blank"><%- team.name %></a></u></strong> has changed its password</span>
                 </p>
             </script>
 
             <script type="text/x-template" data-name="event-log-update-team-logo">
                 <p>
                     <span><code><%- createdAt %></code>&nbsp;&nbsp;</span>
-                    <span class="text-primary">Team <strong><%- team.name %></strong> has uploaded another logo</span>
+                    <span class="text-primary">Team <strong><u><a class="text-primary" href="/team/<%- team.id %>/profile" target="_blank"><%- team.name %></a></u></strong> has uploaded another logo</span>
                 </p>
             </script>
 
             <script type="text/x-template" data-name="event-log-qualify-team">
                 <p>
                     <span><code><%- createdAt %></code>&nbsp;&nbsp;</span>
-                    <span class="text-success">Team <strong><%- team.name %></strong> has qualified for the competition</span>
+                    <span class="text-success">Team <strong><u><a class="text-success" href="/team/<%- team.id %>/profile" target="_blank"><%- team.name %></a></u></strong> has qualified for the competition</span>
                 </p>
             </script>
 
             <script type="text/x-template" data-name="event-log-disqualify-team">
                 <p>
                     <span><code><%- createdAt %></code>&nbsp;&nbsp;</span>
-                    <span class="text-danger">Team <strong><%- team.name %></strong> has been disqualified</span>
+                    <span class="text-danger">Team <strong><u><a class="text-danger" href="/team/<%- team.id %>/profile" target="_blank"><%- team.name %></a></u></strong> has been disqualified</span>
                 </p>
             </script>
 
             <script type="text/x-template" data-name="event-log-login-team">
                 <p>
                     <span><code><%- createdAt %></code>&nbsp;&nbsp;</span>
-                    <span class="text-primary">Team <strong><%- team.name %></strong> has logged in</span>
+                    <span class="text-primary">Team <strong><u><a class="text-primary" href="/team/<%- team.id %>/profile" target="_blank"><%- team.name %></a></u></strong> has logged in</span>
                 </p>
             </script>
 
             <script type="text/x-template" data-name="event-log-logout-team">
                 <p>
                     <span><code><%- createdAt %></code>&nbsp;&nbsp;</span>
-                    <span class="text-primary">Team <strong><%- team.name %></strong> has logged out</span>
+                    <span class="text-primary">Team <strong><u><a class="text-primary" href="/team/<%- team.id %>/profile" target="_blank"><%- team.name %></a></u></strong> has logged out</span>
                 </p>
             </script>
 
             <script type="text/x-template" data-name="event-log-update-team-score">
                 <p>
                     <span><code><%- createdAt %></code>&nbsp;&nbsp;</span>
-                    <span class="text-primary">Team <strong><%- team.name %></strong> score has been adjusted to <strong><%- teamScore.score %></strong> points</span>
+                    <span class="text-primary">Team <strong><u><a class="text-primary" href="/team/<%- team.id %>/profile" target="_blank"><%- team.name %></a></u></strong> score has been adjusted to <strong><%- teamScore.score %></strong> points</span>
                 </p>
             </script>
 
             <script type="text/x-template" data-name="event-log-create-team-task-hit">
                 <p>
                     <span><code><%- createdAt %></code>&nbsp;&nbsp;</span>
-                    <span class="text-success">Team <strong><%- team.name %></strong> has just solved the task <strong><%- task.title %></strong> and has earned <strong><%- task.value %></strong> points</span>
+                    <span class="text-success">Team <strong><u><a class="text-success" href="/team/<%- team.id %>/profile" target="_blank"><%- team.name %></a></u></strong> has just solved the task <strong><%- task.title %></strong> and has earned <strong><%- task.value %></strong> points</span>
                 </p>
             </script>
 
             <script type="text/x-template" data-name="event-log-create-team-task-hit-attempt">
                 <p>
                     <span><code><%- createdAt %></code>&nbsp;&nbsp;</span>
-                    <span class="text-warning">Team <strong><%- team.name %></strong> has provided wrong answer <strong><%- teamTaskHitAttempt.wrongAnswer %></strong> for the task <strong><%- task.title %></strong></span>
+                    <span class="text-warning">Team <strong><u><a class="text-warning" href="/team/<%- team.id %>/profile" target="_blank"><%- team.name %></a></u></strong> has provided wrong answer <strong><%- teamTaskHitAttempt.wrongAnswer %></strong> for the task <strong><%- task.title %></strong></span>
+                </p>
+            </script>
+
+            <script type="text/x-template" data-name="event-log-create-team-task-review">
+                <p>
+                    <span><code><%- createdAt %></code>&nbsp;&nbsp;</span>
+                    <span class="text-success">Team <strong><u><a class="text-success" href="/team/<%- team.id %>/profile" target="_blank"><%- team.name %></a></u></strong> has given <strong><%- teamTaskReview.rating.toFixed(2) %></strong> rating points to the task <strong><%- task.title %></strong></span>
                 </p>
             </script>
 
@@ -339,7 +346,7 @@
             <script type="text/x-template" data-name="team-profile-simplified-partial">
                 <div class="clearfix themis-profile">
                     <div class="pull-left logo">
-                        <img class="img-thumbnail" src="/api/team/<%- team.id %>/logo">
+                        <img id="team-<%- team.id %>-logo" class="img-thumbnail" src="/api/team/<%- team.id %>/logo">
                     </div>
                     <div class="pull-left info">
                         <h4 class="text-primary">
@@ -391,7 +398,7 @@
             </script>
 
             <script type="text/x-template" data-name="category-supervisor-partial">
-                <div class="themis-category">
+                <div class="themis-category" data-id="<%- id %>">
                     <header>
                         <h4><%- title %></h4>
                     </header>
@@ -495,7 +502,7 @@
             </script>
 
             <script type="text/x-template" data-name="check-task-guest-error">
-                To view the task, you must be authorized. Please <a href="/team/signin">sign in</a>. If you have not registered yet, please <a href="/team/signup">sign up</a>.
+                You must be authorized in order to view the task and submit answers. Please <u><a class="text-danger" href="/team/signin">sign in</a></u>. If you have not registered yet, please <u><a class="text-danger" href="/team/signup">sign up</a></u>.
             </script>
 
             <script type="text/x-template" data-name="task-content-partial">
@@ -511,7 +518,7 @@
                         <h5>Hints</h5>
                         <ol>
                             <% for (var i=0; i<hints.length; ++i) { %>
-                            <li><%= hints[i] %>
+                            <li><%= hints[i] %></li>
                             <% } %>
                         </ol>
                     </section>
@@ -524,7 +531,7 @@
                     <% if (task.isInitial()) { %>
                     <div class="panel panel-default">
                     <% } else if (task.isOpened() && !taskIsSolved) { %>
-                    <div class="panel panel-primary">
+                    <div class="panel panel-info">
                     <% } else if (task.isClosed() && !taskIsSolved) { %>
                     <div class="panel panel-danger">
                     <% } else if ((task.isOpened() || task.isClosed()) && taskIsSolved) { %>
@@ -536,15 +543,18 @@
                                 &nbsp;
                                 <% if (identity.isAdmin()) { %>
                                     <% if (!task.isClosed() && !contest.isFinished()) { %>
-                                    <a href="#" data-action="edit-task" data-toggle="modal" data-target="#edit-task-modal" data-task-id="<%- task.id %>"><span class="glyphicon glyphicon-pencil"></span></a>
+                                    <a href="#" data-action="edit-task" data-toggle="modal" data-target="#edit-task-modal" data-task-id="<%- task.id %>" title="Edit task"><span class="glyphicon glyphicon-edit"></span></a>
                                     <% } %>
                                     <% if (contest.isStarted()) { %>
                                         <% if (task.isInitial()) { %>
-                                        <a href="#" data-action="open-task" data-toggle="modal" data-target="#open-task-modal" data-task-id="<%- task.id %>"><span class="glyphicon glyphicon-share"></span></a>
+                                        <a href="#" data-action="open-task" data-toggle="modal" data-target="#open-task-modal" data-task-id="<%- task.id %>" title="Open task"><span class="glyphicon glyphicon-eye-open"></span></a>
                                         <% } else if (task.isOpened()) { %>
-                                        <a href="#" data-action="close-task" data-toggle="modal" data-target="#close-task-modal" data-task-id="<%- task.id %>"><span class="glyphicon glyphicon-lock"></span></a>
+                                        <a href="#" data-action="close-task" data-toggle="modal" data-target="#close-task-modal" data-task-id="<%- task.id %>" title="Close task"><span class="glyphicon glyphicon-eye-close"></span></a>
                                         <% } %>
                                     <% } %>
+                                <% } %>
+                                <% if (identity.isSupervisor()) { %>
+                                <a href="/task/<%- task.id %>/statistics" target="_blank" title="Task statistics"><span class="glyphicon glyphicon-dashboard"></span></a>
                                 <% } %>
                             </h4>
                         </div>
@@ -718,8 +728,8 @@
                                 </div>
                             </div>
                             <div class="modal-body">
-                                <form method="POST">
-                                    <div class="form-group" id="submit-task-answer-group">
+                                <form method="POST" data-target="submit">
+                                    <div class="form-group" id="submit-task-field-group">
                                         <label for="submit-task-answer" class="control-label">Answer</label>
                                         <input type="text" class="form-control" id="submit-task-answer" name="answer" required data-parsley-length="[2,256]">
                                     </div>
@@ -733,10 +743,40 @@
                                         <p class="text-success"></p>
                                     </div>
                                 </form>
+                                <form method="POST" data-target="review">
+                                    <div class="form-group" id="review-task-field-group">
+                                        <hr>
+                                        <p><strong>We would greatly appreciate your feedback!</strong></p>
+                                        <label for="review-task-rating" class="control-label">Rating</label>
+                                        <select class="form-control" id="review-task-rating" name="rating" required>
+                                            <option value="5">5 &ndash; Excellent</option>
+                                            <option value="4">4 &ndash; Good</option>
+                                            <option value="3">3 &ndash; Average</option>
+                                            <option value="2">2 &ndash; Fair</option>
+                                            <option value="1">1 &ndash; Poor</option>
+                                        </select>
+                                        <label for="review-task-comment" class="control-label">Comment</label>
+                                        <textarea class="form-control" id="review-task-comment" name="comment" required data-parsley-length="[0,300]"></textarea>
+                                        <p class="text-muted">
+                                            <small>
+                                                Note that your comment may be posted publicly. Please avoid obscene language.
+                                                <br>
+                                                You can submit only one review on your team's behalf. It can't be altered afterwards.
+                                            </small>
+                                        </p>
+                                    </div>
+                                    <div class="review-error">
+                                        <p class="text-danger"></p>
+                                    </div>
+                                    <div class="review-success">
+                                        <p class="text-success"></p>
+                                    </div>
+                                </form>
                             </div>
                             <div class="modal-footer">
                                 <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
                                 <button type="button" class="btn btn-primary" data-action="complete-submit-task">Submit</button>
+                                <button type="button" class="btn btn-primary" data-action="complete-review-task">Submit review</button>
                             </div>
                         </div>
                     </div>
@@ -796,7 +836,9 @@
                                     <div class="form-group" id="revise-task-answer-group">
                                         <label for="revise-task-answer" class="control-label">Answer</label>
                                         <input type="text" class="form-control" id="revise-task-answer" name="answer" required data-parsley-length="[2,256]">
-                                        <span class="help-block" id="revise-task-status"></span>
+                                    </div>
+                                    <div>
+                                        <p class="text-info" id="revise-task-status"></p>
                                     </div>
                                     <div class="submit-error">
                                         <p class="text-danger"></p>
@@ -1028,7 +1070,7 @@
                 <tr class="themis-scoreboard-row<% print(highlight ? ' info': ''); %>">
                     <td><%- rank %></td>
                     <td>
-                        <img class="themis-scoreboard-logo" src="/api/team/<%- id %>/logo">
+                        <img id="team-<%- id %>-logo" class="themis-scoreboard-logo" src="/api/team/<%- id %>/logo">
                         <a href="/team/<%- id %>/profile" class="themis-team-link" data-push-history><%- name %></a>
                     </td>
                     <td><%- country %></td>
@@ -1219,6 +1261,109 @@
                 </div>
             </script>
 
+            <script type="text/x-template" data-name="task-statistics-view">
+                <div class="container">
+                    <header>
+                        <h1><%- task.title %></h1>
+                        <span class="text-info">Created on <%- utils.moment(task.createdAt).format('lll') %></span>
+                    </header>
+                    <section>
+                        <h3>Description</h3>
+                        <div>
+                            <%= utils.md.render(task.description) %>
+                        </div>
+                    </section>
+                    <section>
+                        <h3>Hints</h3>
+                        <% if (taskHints.length > 0) { %>
+                        <table class="table table-condensed">
+                            <thead>
+                                <th>#</th>
+                                <th>Hint</th>
+                                <th>Created at</th>
+                            </thead>
+                            <tbody>
+                                <% var sortedTaskHints = utils.underscore.sortBy(taskHints, function(x) { return x.createdAt.getTime(); }); %>
+                                <% for (var i=0; i<sortedTaskHints.length; ++i) { %>
+                                <tr>
+                                    <td><% print(i + 1) %></td>
+                                    <td><%= utils.md.render(sortedTaskHints[i].hint) %></td>
+                                    <td><%- utils.moment(sortedTaskHints[i].createdAt).format('lll') %></td>
+                                </tr>
+                                <% } %>
+                            </tbody>
+                        </table>
+                        <% } else { %>
+                        <p>No hints have been provided for this task yet.</p>
+                        <% } %>
+                    </section>
+                    <section>
+                        <h3>Hits</h3>
+                        <% if (taskHits.length > 0) { %>
+                        <table class="table table-condensed">
+                            <thead>
+                                <th>#</th>
+                                <th>Team</th>
+                                <th>Solved at</th>
+                            </thead>
+                            <tbody>
+                                <% var sortedTaskHits = utils.underscore.sortBy(taskHits, function(x) { return x.createdAt.getTime(); }); %>
+                                <% var team = null; %>
+                                <% for (var i=0; i<sortedTaskHits.length; ++i) { %>
+                                    <% team = utils.underscore.findWhere(teams, { id: sortedTaskHits[i].teamId }); %>
+                                    <% if (team) { %>
+                                    <tr>
+                                        <td><% print(i + 1) %></td>
+                                        <td><a href="/team/<%- team.id %>/profile" target="_blank"><%- team.name %></a></td>
+                                        <td><%- utils.moment(sortedTaskHits[i].createdAt).format('lll') %></td>
+                                    </tr>
+                                    <% } %>
+                                <% } %>
+                            </tbody>
+                        </table>
+                        <% } else { %>
+                        <p>No team has solved this task yet.</p>
+                        <% } %>
+                    </section>
+                    <section>
+                        <h3>Reviews</h3>
+                        <% if (taskReviews.length > 0) { %>
+                        <% var averageRating = utils.underscore.reduce(taskReviews, function (memo, taskReview) {
+                            return memo + taskReview.rating;
+                        }, 0) / (taskReviews.length === 0 ? 1 : taskReviews.length); %>
+                        <p class="text-muted">Average rating is <strong><%- averageRating.toFixed(2) %></strong> (max 5.00)</p>
+                        <table class="table table-condensed">
+                            <thead>
+                                <th>#</th>
+                                <th>Team</th>
+                                <th>Rating</th>
+                                <th>Comment</th>
+                                <th>Created at</th>
+                            </thead>
+                            <tbody>
+                                <% var sortedTaskReviews = utils.underscore.sortBy(taskReviews, function(x) { return x.createdAt.getTime(); }); %>
+                                <% var team = null; %>
+                                <% for (var i=0; i<sortedTaskReviews.length; ++i) { %>
+                                    <% team = utils.underscore.findWhere(teams, { id: sortedTaskReviews[i].teamId }); %>
+                                    <% if (team) { %>
+                                    <tr>
+                                        <td><% print(i + 1) %></td>
+                                        <td><a href="/team/<%- team.id %>/profile" target="_blank"><%- team.name %></a></td>
+                                        <td><%- sortedTaskReviews[i].rating.toFixed(2) %></td>
+                                        <td><%- sortedTaskReviews[i].comment %></td>
+                                        <td><%- utils.moment(sortedTaskReviews[i].createdAt).format('lll') %></td>
+                                    </tr>
+                                    <% } %>
+                                <% } %>
+                            </tbody>
+                        </table>
+                        <% } else { %>
+                        <p>No team has rated this task yet.</p>
+                        <% } %>
+                    </section>
+                </div>
+            </script>
+
             <script type="text/x-template" data-name="post-simplified-partial">
                 <div class="themis-post">
                     <header>
@@ -1238,23 +1383,48 @@
             </script>
 
             <script type="text/x-template" data-name="revise-task-status-partial">
-                <% if (teamNames.length === 0) { %>
-                Nobody has solved this task.
+                <% if (solvedTeamCount === 0) { %>
+                No team has solved this task yet.
                 <% } else { %>
-                This task has been solved by the following teams:
-                <% for (var i=0; i<teamNames.length; ++i) { %>
-                    <i><%- teamNames[i] %></i><% if (i < teamNames.length - 1) { %>, <% } else { %>.<% } %>
+                This task has been solved by <strong><%- solvedTeamCount %></strong> <% print((solvedTeamCount > 1) ? 'teams' : 'team'); %>.
                 <% } %>
+                <br><br>
+                <% if (ratedTeamCount > 0) { %>
+                This task has been rated by <strong><%- ratedTeamCount %></strong> <% print((ratedTeamCount > 1) ? 'teams' : 'team'); %>. The average rating is <strong><%- averageRating.toFixed(2) %></strong> (5.00 max).
+                <% } else { %>
+                This task hasn't been rated yet.
                 <% } %>
             </script>
 
             <script type="text/x-template" data-name="submit-task-status-partial">
                 <% if (solvedTeamCount === 0) { %>
-                Nobody has solved this task. Be the first!
+                No team has solved this task yet. Why don't you give it a try?
                 <% } else { %>
-                This task has been solved by <%- solvedTeamCount %> <% print((solvedTeamCount > 1) ? 'teams' : 'team'); %>.
+                    <% if (taskSolvedAt) { %>
+                        <% if (solvedTeamCount === 1) { %>
+                            Your team has solved this task on <strong><%- taskSolvedAt %></strong>.<br>
+                            No other team has managed to do the same.
+                        <% } else { %>
+                            Your team has solved this task on <strong><%- taskSolvedAt %></strong>.<br>
+                            <strong><% print(solvedTeamCount - 1) %></strong> other <% print((solvedTeamCount > 2) ? 'teams have' : 'team has'); %> managed to do the same.
+                        <% } %>
+                    <% } else { %>
+                    This task has been solved by <strong><%- solvedTeamCount %></strong> <% print((solvedTeamCount > 1) ? 'teams' : 'team'); %>. What are you waiting for?
+                    <% } %>
+                <% } %>
+                <br><br>
+                <% if (reviewCount > 0) { %>
+                This task has been rated by <strong><%- reviewCount %></strong> <% print((reviewCount > 1) ? 'teams' : 'team'); %>. The average rating is <strong><%- reviewAverageRating.toFixed(2) %></strong> (5.00 max).
+                <% } else { %>
+                This task hasn't been rated yet.
+                <% } %>
+                <% if (teamReview) { %>
+                <br>
+                Your team has given this task <strong><%- teamReview.rating %></strong> rating <% print((teamReview.rating === 1) ? 'point' : 'points'); %> on <strong><%- teamReview.createdAt %></strong> and has made the following comment:
+                <blockquote><%- teamReview.comment %></blockquote>
                 <% } %>
             </script>
+
 
             <script type="text/x-template" data-name="post-partial">
                 <div class="themis-post" data-id="<%- id %>">
@@ -1458,41 +1628,38 @@
                     <% if (!identity.emailConfirmed) { %>
                     <!--=include ../partials/alert_email_verification.html -->
                     <% } %>
-                    <h1>Welcome back!</h1>
+                    <h1>Welcome!</h1>
                     <% if (contest.isInitial()) { %>
                     <p class="lead">
                         {{#event}}{{ title }}{{/event}} hasn't started yet.
-                        Now, you can check out the <a href="/news" data-push-history>news</a> or <a href="/team/<%- identity.id %>/profile" data-push-history>edit your profile</a>.
                     </p>
                     <% } else if (contest.isStarted() || contest.isPaused()) { %>
                     <p class="lead">
-                        {{#event}}{{ title }}{{/event}} has begun!
+                        {{#event}}{{ title }}{{/event}} has started!
                     </p>
-                    <ul class="lead list-unstyled">
-                        <li><a href="/news" data-push-history>Check out the news</a></li>
-                        <li><a href="/scoreboard" data-push-history>View current scoreboard</a></li>
-                        <li><a href="/tasks" data-push-history>Get to the tasks!</a></li>
-                    </ul>
                     <% } else if (contest.isFinished()) { %>
                     <p class="lead">
                         {{#event}}{{ title }}{{/event}} has finished!
                     </p>
-                    <ul class="lead list-unstyled">
-                        <li><a href="/scoreboard" data-push-history>View result scoreboard</a></li>
-                    </ul>
-                    <p class="lead">
-                        We hope you've enjoyed the <a href="/tasks" data-push-history>tasks</a>! See you the next year!
-                    </p>
                     <% } %>
-                    <% } else if (identity.isSupervisor()) { %>
-                    <h1>Welcome back!</h1>
                     <ul class="lead list-unstyled">
+                        <li><a href="/team/<%- identity.id %>/profile" data-push-history>Team profile</a></li>
+                        <li><a href="/news" data-push-history>News</a></li>
+                        <% if (contest.isStarted() || contest.isPaused() || contest.isFinished()) { %>
+                        <li><a href="/scoreboard" data-push-history>Scoreboard</a></li>
+                        <li><a href="/tasks" data-push-history>Tasks</a></li>
+                        <% } %>
+                    </ul>
+                    <% } else if (identity.isSupervisor()) { %>
+                    <h1>Welcome!</h1>
+                    <ul class="lead list-unstyled">
+                        <li><a href="/scoreboard" data-push-history>Scoreboard</a></li>
                         <li><a href="/news" data-push-history>News management</a></li>
-                        <li><a href="/scoreboard" data-push-history>View scoreboard</a></li>
                         <% if (identity.isAdmin()) { %>
+                        <li><a href="/categories" data-push-history>Category management</a></li>
                         <li><a href="/tasks" data-push-history>Task management</a></li>
                         <% } %>
-                        <li><a href="/events" data-push-history>Realtime event log</a></li>
+                        <li><a href="/events" data-push-history>Event log</a></li>
                     </ul>
                     <% } %>
                 </div>
@@ -1630,27 +1797,8 @@
                 </div>
             </script>
 
-            <script type="text/x-template" data-name="team-hits-partial">
-                <% if (identity.isSupervisor() || identity.isExactTeam(teamId)) { %>
-                    <% if (taskNames.length > 0) { %>
-                    Team has solved the following <% print((taskNames.length === 1) ? 'task' : 'tasks') %>:
-                    <% for (var i=0; i<taskNames.length; ++i) { %>
-                        <strong><%- taskNames[i] %></strong><% if (i < taskNames.length - 1) { %>, <% } else { %>.<% } %>
-                    <% } %>
-                    <% } else { %>
-                    Team hasn't solved any tasks
-                    <% } %>
-                <% } else { %>
-                    <% if (count > 0) { %>
-                    Team has solved <strong><%- count %></strong> <% print((count === 1) ? 'task' : 'tasks') %>
-                    <% } else { %>
-                    Team hasn't solved any tasks
-                    <% } %>
-                <% } %>
-            </script>
-
             <script type="text/x-template" data-name="team-profile-partial">
-                <div class="clearfix themis-profile">
+                <header class="clearfix themis-profile">
                     <div class="pull-left logo">
                         <% if (identity.isExactTeam(team.id)) { %>
                         <a href="#" title="Click to upload new logo" data-action="upload-logo" data-toggle="modal" data-target="#upload-logo-modal">
@@ -1661,57 +1809,158 @@
                         <% } %>
                     </div>
                     <div class="pull-left info">
-                        <h4 class="text-primary">
-                            <%- team.name %>
-                            <% if (team.disqualified) { %>&nbsp;<span class="label label-danger">disqualified</span><% } %>
-                        </h4>
-                        <% if (identity.isExactTeam(team.id) || identity.isSupervisor()) { %>
-                        <ul class="list-unstyled">
-                            <% if ('email' in team && 'emailConfirmed' in team) { %>
-                            <li>
-                                <span class="glyphicon glyphicon-envelope"></span>
-                                <% if (team.emailConfirmed) { %>
-                                <span class="text-success" title="Email verified"><%- team.email %></span>
-                                <% } else { %>
-                                <span class="text-danger" title="Email not verified"><%- team.email %></span>
-                                <% if (identity.isExactTeam(team.id)) { %>
-                                <br>
-                                <button type="button" class="btn btn-default btn-sm" data-action="resend-confirmation" data-toggle="modal" data-target="#resend-confirmation-modal">Resend confirmation email</button>
-                                <button type="button" class="btn btn-warning btn-sm" data-action="change-email" data-toggle="modal" data-target="#change-email-modal">Change email</button>
-                                <% } %>
-                                <% } %>
-                            </li>
-                            <% } %>
-                        </ul>
-                        <% } %>
-                        <ul class="list-unstyled">
-                            <% if (country !== '' || identity.isExactTeam(team.id)) { %>
-                            <li><strong>Country:</strong> <%- country %></li>
-                            <% } %>
-                            <% if (team.locality !== '' || identity.isExactTeam(team.id)) { %>
-                            <li><strong>Locality:</strong> <%- team.locality %></li>
-                            <% } %>
-                            <% if (team.institution !== '' || identity.isExactTeam(team.id)) { %>
-                            <li><strong>Institution:</strong> <%- team.institution %></li>
-                            <% } %>
-                            <% if (identity.isExactTeam(team.id)) { %>
-                            <li>
-                                <button type="button" class="btn btn-default btn-sm" data-action="edit-profile" data-toggle="modal" data-target="#edit-profile-modal">
-                                    Edit
-                                </button>
-                                <button type="button" class="btn btn-default btn-sm" data-action="change-password" data-toggle="modal" data-target="#change-password-modal">
-                                    Change password
-                                </button>
-                            </li>
-                            <% } %>
-                        </ul>
-                        <% if (teamHitsInfo) { %>
-                        <p class="text-muted">
-                            <%= teamHitsInfo %>
-                        </p>
-                        <% } %>
+                        <h1><%- team.name %></h1>
+                        <% if (team.disqualified) { %><p><span class="label label-danger">disqualified</span></p><% } %>
                     </div>
-                </div>
+                </header>
+
+                <section>
+                    <h3>General information</h3>
+                    <p class="text-info">Signed up on <%- utils.moment(team.createdAt).format('lll') %></p>
+                    <% if (identity.isExactTeam(team.id) || identity.isSupervisor()) { %>
+                    <ul class="list-unstyled">
+                        <% if ('email' in team && 'emailConfirmed' in team) { %>
+                        <li>
+                            <span class="glyphicon glyphicon-envelope"></span>
+                            <% if (team.emailConfirmed) { %>
+                            <span class="text-success" title="Email verified"><%- team.email %></span>
+                            <% } else { %>
+                            <span class="text-danger" title="Email not verified"><%- team.email %></span>
+                            <% if (identity.isExactTeam(team.id)) { %>
+                            <br>
+                            <button type="button" class="btn btn-default btn-sm" data-action="resend-confirmation" data-toggle="modal" data-target="#resend-confirmation-modal">Resend confirmation email</button>
+                            <button type="button" class="btn btn-warning btn-sm" data-action="change-email" data-toggle="modal" data-target="#change-email-modal">Change email</button>
+                            <% } %>
+                            <% } %>
+                        </li>
+                        <% } %>
+                    </ul>
+                    <% } %>
+                    <ul class="list-unstyled">
+                        <% if (country !== '' || identity.isExactTeam(team.id)) { %>
+                        <li><strong>Country:</strong> <%- country %></li>
+                        <% } %>
+                        <% if (team.locality !== '' || identity.isExactTeam(team.id)) { %>
+                        <li><strong>Locality:</strong> <%- team.locality %></li>
+                        <% } %>
+                        <% if (team.institution !== '' || identity.isExactTeam(team.id)) { %>
+                        <li><strong>Institution:</strong> <%- team.institution %></li>
+                        <% } %>
+                        <% if (identity.isExactTeam(team.id)) { %>
+                        <li>
+                            <button type="button" class="btn btn-default btn-sm" data-action="edit-profile" data-toggle="modal" data-target="#edit-profile-modal">
+                                Edit
+                            </button>
+                            <button type="button" class="btn btn-default btn-sm" data-action="change-password" data-toggle="modal" data-target="#change-password-modal">
+                                Change password
+                            </button>
+                        </li>
+                        <% } %>
+                    </ul>
+                </section>
+
+                <% if (identity.isGuest() || !identity.isExactTeam(team.id)) { %>
+                    <% if (teamHitStatistics) { %>
+                    <section>
+                        <h3>Task hits</h3>
+                        <p class="text-muted">
+                            <% if (teamHitStatistics.count > 0) { %>
+                            Team has solved <strong><%- teamHitStatistics.count %></strong> <% print((teamHitStatistics.count === 1) ? 'task' : 'tasks') %>
+                            <% } else { %>
+                            Team hasn't solved any tasks
+                            <% } %>
+                        </p>
+                    </section>
+                    <% } %>
+                    <% if (teamReviewStatistics) { %>
+                    <section>
+                        <h3>Task reviews</h3>
+                        <p class="text-muted">
+                            <% if (teamReviewStatistics.count > 0) { %>
+                            Team has reviewed <strong><%- teamReviewStatistics.count %></strong> <% print((teamReviewStatistics.count === 1) ? 'task' : 'tasks') %> and has given <strong><%- teamReviewStatistics.averageRating.toFixed(2) %></strong> rating points on average
+                            <% } else { %>
+                            Team hasn't reviewed any tasks
+                            <% } %>
+                        </p>
+                    </section>
+                    <% } %>
+                <% } %>
+
+                <% if (identity.isExactTeam(team.id) || identity.isSupervisor()) { %>
+                    <% if (taskHits) { %>
+                    <section>
+                        <h3>Task hits</h3>
+                        <% if (taskHits.length > 0) { %>
+                        <table class="table table-condensed">
+                            <thead>
+                                <th>#</th>
+                                <th>Task</th>
+                                <th>Value</th>
+                                <th>Solved at</th>
+                            </thead>
+                            <tbody>
+                                <% var sortedTaskHits = utils.underscore.sortBy(taskHits, function(x) { return x.createdAt.getTime(); }); %>
+                                <% var task = null; %>
+                                <% for (var i=0; i<sortedTaskHits.length; ++i) { %>
+                                    <% task = utils.underscore.findWhere(tasks, { id: sortedTaskHits[i].taskId }); %>
+                                    <% if (task) { %>
+                                    <tr>
+                                        <td><% print(i + 1) %></td>
+                                        <td><%- task.title %></td>
+                                        <td><%- task.value %></td>
+                                        <td><%- utils.moment(sortedTaskHits[i].createdAt).format('lll') %></td>
+                                    </tr>
+                                    <% } %>
+                                <% } %>
+                            </tbody>
+                        </table>
+                        <% } else { %>
+                        <p>Team hasn't solved any tasks yet.</p>
+                        <% } %>
+                    </section>
+                    <% } %>
+                    <% if (taskReviews) { %>
+                    <section>
+                        <h3>Task reviews</h3>
+                        <% if (taskReviews.length > 0) { %>
+                        <% var averageRating = utils.underscore.reduce(taskReviews, function (memo, taskReview) {
+                            return memo + taskReview.rating;
+                        }, 0) / (taskReviews.length === 0 ? 1 : taskReviews.length); %>
+                        <p class="text-muted">Average rating is <strong><%- averageRating.toFixed(2) %></strong> (max 5.00)</p>
+                        <table class="table table-condensed">
+                            <thead>
+                                <th>#</th>
+                                <th>Task</th>
+                                <th>Value</th>
+                                <th>Rating</th>
+                                <th>Comment</th>
+                                <th>Created at</th>
+                            </thead>
+                            <tbody>
+                                <% var sortedTaskReviews = utils.underscore.sortBy(taskReviews, function(x) { return x.createdAt.getTime(); }); %>
+                                <% var task = null; %>
+                                <% for (var i=0; i<sortedTaskReviews.length; ++i) { %>
+                                    <% task = utils.underscore.findWhere(tasks, { id: sortedTaskReviews[i].taskId }); %>
+                                    <% if (task) { %>
+                                    <tr>
+                                        <td><% print(i + 1) %></td>
+                                        <td><%- task.title %></td>
+                                        <td><%- task.value %></td>
+                                        <td><%- sortedTaskReviews[i].rating.toFixed(2) %></td>
+                                        <td><%- sortedTaskReviews[i].comment %></td>
+                                        <td><%- utils.moment(sortedTaskReviews[i].createdAt).format('lll') %></td>
+                                    </tr>
+                                    <% } %>
+                                <% } %>
+                            </tbody>
+                        </table>
+                        <% } else { %>
+                        <p>Team hasn't reviewed any tasks yet.</p>
+                        <% } %>
+
+                    </section>
+                    <% } %>
+                <% } %>
             </script>
 
             <script type="text/x-template" data-name="profile-view">
@@ -1719,9 +1968,6 @@
                     <% if (identity.isTeam() && !identity.emailConfirmed) { %>
                     <!--=include ../partials/alert_email_verification.html -->
                     <% } %>
-                    <header>
-                        <h1>Team profile</h1>
-                    </header>
                     <section>
                     </section>
                 </div>

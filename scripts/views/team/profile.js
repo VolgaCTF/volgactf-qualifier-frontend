@@ -12,6 +12,9 @@ import countryProvider from '../../providers/country'
 import taskProvider from '../../providers/task'
 import History from 'history.js'
 import metadataStore from '../../utils/metadata-store'
+import teamTaskHitProvider from '../../providers/team-task-hit'
+import teamTaskReviewProvider from '../../providers/team-task-review'
+import moment from 'moment'
 import 'parsley'
 import 'jquery.form'
 import 'bootstrap-filestyle'
@@ -279,6 +282,11 @@ class TeamProfileView extends View {
       let $submitSuccess = $modal.find('.submit-success > p')
       let $submitButton = $modal.find('button[data-action="complete-change-password"]')
       let $form = $modal.find('form')
+
+      let $currentPassword = $('#change-pwd-current')
+      let $newPassword = $('#change-pwd-new')
+      let $confirmNewPassword = $('#change-pwd-confirm-new')
+
       $form.parsley()
 
       $submitButton.on('click', (e) => {
@@ -286,9 +294,10 @@ class TeamProfileView extends View {
       })
 
       $modal.on('show.bs.modal', (e) => {
-        $('#change-pwd-current').val('')
-        $('#change-pwd-new').val('')
-        $('#change-pwd-confirm-new').val('')
+        $currentPassword.val('')
+        $newPassword.val('')
+        $confirmNewPassword.val('')
+        $form.find('div.form-group').show()
         $submitError.text('')
         $submitSuccess.text('')
         $submitButton.show()
@@ -296,7 +305,7 @@ class TeamProfileView extends View {
       })
 
       $modal.on('shown.bs.modal', (e) => {
-        $('#change-pwd-current').focus()
+        $currentPassword.focus()
       })
 
       $form.on('submit', (e) => {
@@ -314,6 +323,7 @@ class TeamProfileView extends View {
           },
           success: (responseText, textStatus, jqXHR) => {
             $submitButton.hide()
+            $form.find('div.form-group').hide()
             $submitSuccess.text('Password has been successfully changed!')
             let hideModal = () => {
               $modal.modal('hide')
@@ -358,7 +368,8 @@ class TeamProfileView extends View {
             promise = $.when(
               teamProvider.fetchTeamProfile(teamId),
               countryProvider.fetchCountries(),
-              contestProvider.fetchTeamTaskHit(teamId),
+              teamTaskHitProvider.fetchTeamHits(teamId),
+              teamTaskReviewProvider.fetchTeamReviews(teamId),
               taskProvider.fetchTaskPreviews()
             )
           }
@@ -372,7 +383,8 @@ class TeamProfileView extends View {
             promise = $.when(
               teamProvider.fetchTeamProfile(teamId),
               countryProvider.fetchCountries(),
-              contestProvider.fetchTeamTaskHit(teamId),
+              teamTaskHitProvider.fetchTeamHits(teamId),
+              teamTaskReviewProvider.fetchTeamReviews(teamId),
               contestProvider.fetchTeamScores(),
               taskProvider.fetchTaskPreviews()
             )
@@ -387,7 +399,8 @@ class TeamProfileView extends View {
             promise = $.when(
               teamProvider.fetchTeamProfile(teamId),
               countryProvider.fetchCountries(),
-              contestProvider.fetchTeamTaskHit(teamId),
+              teamTaskHitProvider.fetchTeamHitStatistics(teamId),
+              teamTaskReviewProvider.fetchTeamReviewStatistics(teamId),
               contestProvider.fetchTeamScores()
             )
           }
@@ -401,13 +414,14 @@ class TeamProfileView extends View {
             promise = $.when(
               teamProvider.fetchTeamProfile(teamId),
               countryProvider.fetchCountries(),
-              contestProvider.fetchTeamTaskHit(teamId)
+              teamTaskHitProvider.fetchTeamHitStatistics(teamId),
+              teamTaskReviewProvider.fetchTeamReviewStatistics(teamId)
             )
           }
         }
 
         promise
-          .done((team, countries, teamTaskHits) => {
+          .done((team, countries, teamTaskHits, teamTaskReviews) => {
             identityProvider.subscribe()
 
             if (dataStore.supportsRealtime()) {
@@ -417,12 +431,24 @@ class TeamProfileView extends View {
             navigationBar.present()
             statusBar.present()
 
-            this.$main.html(renderTemplate('profile-view', { identity: identity }))
+            this.$main.html(renderTemplate('profile-view', {
+              identity: identity,
+              team: team
+            }))
 
             this.team = team
             let opts = {
               identity: identity,
-              team: team
+              team: team,
+              tasks: null,
+              taskHits: null,
+              taskReviews: null,
+              teamHitStatistics: null,
+              teamReviewStatistics: null,
+              utils: {
+                underscore: _,
+                moment: moment
+              }
             }
 
             let country = _.findWhere(countries, { id: team.countryId })
@@ -430,30 +456,13 @@ class TeamProfileView extends View {
 
             if (!contest.isInitial()) {
               if (identity.isSupervisor() || identity.isExactTeam(teamId)) {
-                let tasks = taskProvider.getTaskPreviews()
-                let taskNames = []
-
-                for (let entry of teamTaskHits) {
-                  let task = _.findWhere(tasks, { id: entry.taskId })
-                  if (task && !_.contains(taskNames, task.title)) {
-                    taskNames.push(task.title)
-                  }
-                }
-
-                opts.teamHitsInfo = renderTemplate('team-hits-partial', {
-                  identity: identity,
-                  teamId: team.id,
-                  taskNames: taskNames
-                })
+                opts.tasks = taskProvider.getTaskPreviews()
+                opts.taskHits = teamTaskHits
+                opts.taskReviews = teamTaskReviews
               } else {
-                opts.teamHitsInfo = renderTemplate('team-hits-partial', {
-                  identity: identity,
-                  teamId: team.id,
-                  count: teamTaskHits
-                })
+                opts.teamHitStatistics = teamTaskHits
+                opts.teamReviewStatistics = teamTaskReviews
               }
-            } else {
-              opts.teamHitsInfo = null
             }
 
             this.$main.find('section').html(renderTemplate('team-profile-partial', opts))
