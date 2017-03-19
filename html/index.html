@@ -1437,7 +1437,9 @@
                     <footer>
                         <p class="text-muted">
                             <small>Updated on <%- updatedAt %></small>
+                            &nbsp;
                             <% if (manageable) { %>
+                            <a href="<% print(window.location.href); %>?action=scrollTo&postId=<%- id %>" target="_blank">Permalink</a>
                             &nbsp;
                             <button type="button" class="btn btn-default btn-xs" data-action="edit-post" data-toggle="modal" data-target="#edit-post-modal" data-post-id="<%- id %>">
                                 Edit
