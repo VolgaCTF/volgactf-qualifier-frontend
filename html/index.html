@@ -555,6 +555,7 @@
                                 <% } %>
                                 <% if (identity.isSupervisor()) { %>
                                 <a href="/task/<%- task.id %>/statistics" target="_blank" title="Task statistics"><span class="glyphicon glyphicon-dashboard"></span></a>
+                                <a href="/tasks?action=show&taskId=<%- task.id %>" target="_blank" title="Task permalink"><span class="glyphicon glyphicon-link"></span></a>
                                 <% } %>
                             </h4>
                         </div>

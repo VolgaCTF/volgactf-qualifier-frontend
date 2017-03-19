@@ -1050,6 +1050,26 @@ class TasksView extends View {
     this.flagRenderTasks = true
   }
 
+  showTaskModal (identity, taskId) {
+    let taskPreview = _.findWhere(taskProvider.getTaskPreviews(), { id: taskId })
+    if (taskPreview) {
+      let $modal = null
+      let $button = $(`<button data-task-id="${taskId}"></button>`)
+      if (identity.isSupervisor()) {
+        $modal = $('#revise-task-modal')
+      } else if (identity.isTeam()) {
+        $modal = $('#submit-task-modal')
+      } else {
+        $modal = $('#check-task-modal')
+      }
+      if ($modal) {
+        $modal.modal('show', $button)
+      }
+    } else {
+      console.log('Task does not exist!')
+    }
+  }
+
   renderTaskPreviews () {
     let taskPreviews = taskProvider.getTaskPreviews()
     let identity = identityProvider.getIdentity()
@@ -1280,12 +1300,21 @@ class TasksView extends View {
             taskCategoryProvider.on('createTaskCategory', this.onCreateTaskCategory)
             taskCategoryProvider.on('deleteTaskCategory', this.onDeleteTaskCategory)
 
+            let firstRender = true
+
             this.onRenderTasks = (force = false) => {
               if ((this.flagRenderTasks || force) && !this.flagRenderingTasks) {
                 this.flagRenderingTasks = true
                 this.renderTaskPreviews()
                 this.flagRenderingTasks = false
                 this.flagRenderTasks = false
+                if (firstRender) {
+                  firstRender = false
+                  const urlParams = History.getState().data.params
+                  if (urlParams.action === 'show' && urlParams.taskId) {
+                    this.showTaskModal(identity, parseInt(urlParams.taskId, 10))
+                  }
+                }
               }
             }
 
