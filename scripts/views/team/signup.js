@@ -52,7 +52,11 @@ class TeamSignupView extends View {
           if (jqXHR.responseJSON) {
             $submitError.text(jqXHR.responseJSON)
           } else {
-            $submitError.text('Unknown error. Please try again later.')
+            if (jqXHR.status === 413) {
+              $submitError.text('Image size must not exceed 1 Mb. Please try again with another image.')
+            } else {
+              $submitError.text('Unknown error. Please try again later.')
+            }
           }
         },
         complete: () => {
