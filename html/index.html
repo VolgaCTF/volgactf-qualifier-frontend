@@ -1841,13 +1841,13 @@
                     <% } %>
                     <ul class="list-unstyled">
                         <% if (country !== '' || identity.isExactTeam(team.id)) { %>
-                        <li><strong>Country:</strong> <%- country %></li>
+                        <li><strong data-field="team-country">Country:</strong> <%- country %></li>
                         <% } %>
                         <% if (team.locality !== '' || identity.isExactTeam(team.id)) { %>
-                        <li><strong>Locality:</strong> <%- team.locality %></li>
+                        <li><strong data-field="team-locality">Locality:</strong> <%- team.locality %></li>
                         <% } %>
                         <% if (team.institution !== '' || identity.isExactTeam(team.id)) { %>
-                        <li><strong>Institution:</strong> <%- team.institution %></li>
+                        <li><strong data-field="team-institution">Institution:</strong> <%- team.institution %></li>
                         <% } %>
                         <% if (identity.isExactTeam(team.id)) { %>
                         <li>
