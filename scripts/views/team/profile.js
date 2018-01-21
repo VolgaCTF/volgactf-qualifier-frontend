@@ -222,7 +222,7 @@ class TeamProfileView extends View {
 
       let $countrySelect = $('#edit-profile-country')
       for (let country of countryProvider.getCountries()) {
-        $countrySelect.append($('<option></option>').attr('value', country.id).text(country.getFullName()))
+        $countrySelect.append($('<option></option>').attr('value', country.id).text(country.getName()))
       }
 
       $submitButton.on('click', (e) => {
