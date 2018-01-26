@@ -107,8 +107,8 @@ class StatusBar {
         },
         clearForm: true,
         data: {
-          startsAt: (valStartsAt) ? valStartsAt.valueOf() : null,
-          finishesAt: (valFinishesAt) ? valFinishesAt.valueOf() : null
+          startsAt: (valStartsAt) ? valStartsAt.seconds(0).milliseconds(0).valueOf() : null,
+          finishesAt: (valFinishesAt) ? valFinishesAt.seconds(0).milliseconds(0).valueOf() : null
         },
         dataType: 'json',
         headers: {
