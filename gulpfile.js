@@ -28,7 +28,7 @@ const tmp = require('tmp')
 const customizerHost = process.env.THEMIS_QUALS_CUSTOMIZER_HOST || '127.0.0.1'
 const customizerPort = parseInt(process.env.THEMIS_QUALS_CUSTOMIZER_PORT || '7037', 10)
 
-const distDir = path.join(__dirname, 'dist')
+const buildDir = path.join(__dirname, 'build')
 
 const paths = {
   scripts: [
@@ -46,8 +46,7 @@ const paths = {
   ],
   images: [
   ],
-  html: 'src/html/index.html',
-  partials: 'src/partials'
+  html: 'src/html/index.html'
 }
 
 function isProduction () {
@@ -61,7 +60,7 @@ function isSass (file) {
 gulp.task('scripts', function (cb) {
   async.series([
     function (callback) {
-      del([path.join(distDir, 'assets', 'js', '*')], callback)
+      del([path.join(buildDir, 'assets', 'js', '*')], callback)
     },
     function (callback) {
       browserify({
@@ -75,16 +74,16 @@ gulp.task('scripts', function (cb) {
         .pipe(buffer())
         .pipe(plumber())
         .pipe(gulpIf(isProduction, uglify()))
-        .pipe(gulp.dest(path.join(distDir, 'assets', 'js')))
+        .pipe(gulp.dest(path.join(buildDir, 'assets', 'js')))
         .pipe(rev())
-        .pipe(gulp.dest(path.join(distDir, 'assets', 'js')))
+        .pipe(gulp.dest(path.join(buildDir, 'assets', 'js')))
         .pipe(rev.manifest('manifest.json'))
-        .pipe(gulp.dest(path.join(distDir, 'assets', 'js')))
+        .pipe(gulp.dest(path.join(buildDir, 'assets', 'js')))
         .on('end', callback)
     },
     function (callback) {
       del([
-        path.join(distDir, 'assets', 'js', 'themis.js')
+        path.join(buildDir, 'assets', 'js', 'themis.js')
       ], callback)
     }
   ], function (err, values) {
@@ -112,7 +111,7 @@ gulp.task('stylesheets', function (cb) {
     },
     function (callback) {
       del([
-        path.join(distDir, 'assets', 'css', '*')
+        path.join(buildDir, 'assets', 'css', '*')
       ], callback)
     },
     function (callback) {
@@ -145,16 +144,16 @@ gulp.task('stylesheets', function (cb) {
           rebaseUrls: false
         }))
         .pipe(gulpIf(isProduction, minifyCSS()))
-        .pipe(gulp.dest(path.join(distDir, 'assets', 'css')))
+        .pipe(gulp.dest(path.join(buildDir, 'assets', 'css')))
         .pipe(rev())
-        .pipe(gulp.dest(path.join(distDir, 'assets', 'css')))
+        .pipe(gulp.dest(path.join(buildDir, 'assets', 'css')))
         .pipe(rev.manifest('manifest.json'))
-        .pipe(gulp.dest(path.join(distDir, 'assets', 'css')))
+        .pipe(gulp.dest(path.join(buildDir, 'assets', 'css')))
         .on('end', callback)
     },
     function (callback) {
       del([
-        path.join(distDir, 'assets', 'css', 'themis.css'),
+        path.join(buildDir, 'assets', 'css', 'themis.css'),
         tmpDir
       ], {
         force: true
@@ -185,7 +184,7 @@ gulp.task('fonts', function (cb) {
     },
     function (callback) {
       del([
-        path.join(distDir, 'assets', 'fonts', '*')
+        path.join(buildDir, 'assets', 'fonts', '*')
       ], callback)
     },
     function (callback) {
@@ -210,7 +209,7 @@ gulp.task('fonts', function (cb) {
         .src(paths.fonts.concat(customizerIndex.map(function (filename) {
           return path.join(tmpDir, filename)
         })))
-        .pipe(gulp.dest(path.join(distDir, 'assets', 'fonts')))
+        .pipe(gulp.dest(path.join(buildDir, 'assets', 'fonts')))
         .on('end', callback)
     },
     function (callback) {
@@ -241,7 +240,7 @@ gulp.task('images', function (cb) {
     },
     function (callback) {
       del([
-        path.join(distDir, 'assets', 'images', '*')
+        path.join(buildDir, 'assets', 'images', '*')
       ], callback)
     },
     function (callback) {
@@ -266,7 +265,7 @@ gulp.task('images', function (cb) {
         .src(paths.images.concat(customizerIndex.map(function (filename) {
           return path.join(tmpDir, filename)
         })))
-        .pipe(gulp.dest(path.join(distDir, 'assets', 'images')))
+        .pipe(gulp.dest(path.join(buildDir, 'assets', 'images')))
         .on('end', callback)
     },
     function (callback) {
@@ -300,13 +299,13 @@ gulp.task('default', ['fonts', 'images', 'scripts', 'stylesheets'], function (cb
     },
     function (callback) {
       del([
-        path.join(distDir, 'html', '*')
+        path.join(buildDir, 'html', '*')
       ], callback)
     },
     function (callback) {
       try {
-        const cachebusting_js = JSON.parse(fs.readFileSync(path.join(distDir, 'assets', 'js', 'manifest.json'), 'utf8'))
-        const cachebusting_css = JSON.parse(fs.readFileSync(path.join(distDir, 'assets', 'css', 'manifest.json'), 'utf8'))
+        const cachebusting_js = JSON.parse(fs.readFileSync(path.join(buildDir, 'assets', 'js', 'manifest.json'), 'utf8'))
+        const cachebusting_css = JSON.parse(fs.readFileSync(path.join(buildDir, 'assets', 'css', 'manifest.json'), 'utf8'))
         opts.cachebusting = {
           themis: {
             js: cachebusting_js['themis.js'],
@@ -371,13 +370,13 @@ gulp.task('default', ['fonts', 'images', 'scripts', 'stylesheets'], function (cb
         }))
         .on('error', console.log)
         .pipe(gulpIf(isProduction, minifyHTML()))
-        .pipe(gulp.dest(path.join(distDir, 'html')))
+        .pipe(gulp.dest(path.join(buildDir, 'html')))
         .on('end', callback)
     },
     function (callback) {
       del([
-        path.join(distDir, 'assets', 'js', 'manifest.json'),
-        path.join(distDir, 'assets', 'css', 'manifest.json'),
+        path.join(buildDir, 'assets', 'js', 'manifest.json'),
+        path.join(buildDir, 'assets', 'css', 'manifest.json'),
         tmpDir
       ], {
         force: true
