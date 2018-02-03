@@ -8,7 +8,7 @@ Themis Quals platform web interface. Part of [Themis Quals](https://github.com/a
 ### Build assets
 
 ```sh
-$ npm run gulp
+$ npm run build
 ```
 
 ### Bower package manager CLI

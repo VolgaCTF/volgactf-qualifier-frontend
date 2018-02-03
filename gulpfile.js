@@ -1,3 +1,5 @@
+require('dotenv').config()
+
 const gulp = require('gulp')
 const gulpIf = require('gulp-if')
 const plumber = require('gulp-plumber')
@@ -21,13 +23,16 @@ const path = require('path')
 const async = require('async')
 const axios = require('axios')
 const remoteSrc = require('gulp-remote-src')
+const tmp = require('tmp')
 
 const customizerHost = process.env.THEMIS_QUALS_CUSTOMIZER_HOST || '127.0.0.1'
 const customizerPort = parseInt(process.env.THEMIS_QUALS_CUSTOMIZER_PORT || '7037', 10)
 
+const distDir = path.join(__dirname, 'dist')
+
 const paths = {
   scripts: [
-    'scripts/themis.js'
+    'src/scripts/themis.js'
   ],
   fonts: [
     'node_modules/bootstrap/dist/fonts/*.eot',
@@ -37,11 +42,12 @@ const paths = {
     'node_modules/bootstrap/dist/fonts/*.woff2'
   ],
   stylesheets: [
-    'stylesheets/themis.sass'
+    'src/stylesheets/themis.sass'
   ],
   images: [
   ],
-  html: 'html/index.html'
+  html: 'src/html/index.html',
+  partials: 'src/partials'
 }
 
 function isProduction () {
@@ -55,7 +61,7 @@ function isSass (file) {
 gulp.task('scripts', function (cb) {
   async.series([
     function (callback) {
-      del(['public/assets/js/*'], callback)
+      del([path.join(distDir, 'assets', 'js', '*')], callback)
     },
     function (callback) {
       browserify({
@@ -69,12 +75,17 @@ gulp.task('scripts', function (cb) {
         .pipe(buffer())
         .pipe(plumber())
         .pipe(gulpIf(isProduction, uglify()))
-        .pipe(gulp.dest('public/assets/js'))
+        .pipe(gulp.dest(path.join(distDir, 'assets', 'js')))
         .pipe(rev())
-        .pipe(gulp.dest('public/assets/js'))
+        .pipe(gulp.dest(path.join(distDir, 'assets', 'js')))
         .pipe(rev.manifest('manifest.json'))
-        .pipe(gulp.dest('public/assets/js'))
+        .pipe(gulp.dest(path.join(distDir, 'assets', 'js')))
         .on('end', callback)
+    },
+    function (callback) {
+      del([
+        path.join(distDir, 'assets', 'js', 'themis.js')
+      ], callback)
     }
   ], function (err, values) {
     if (err) {
@@ -87,11 +98,21 @@ gulp.task('scripts', function (cb) {
 
 gulp.task('stylesheets', function (cb) {
   let customizerIndex = null
+  let tmpDir = null
   async.series([
     function (callback) {
+      tmp.dir({}, function (err, tmpPath, cleanupCallback) {
+        if (err) {
+          callback(err)
+        } else {
+          tmpDir = tmpPath
+          callback()
+        }
+      })
+    },
+    function (callback) {
       del([
-        'public/assets/css/*',
-        'customizer/assets/stylesheets/*'
+        path.join(distDir, 'assets', 'css', '*')
       ], callback)
     },
     function (callback) {
@@ -108,13 +129,13 @@ gulp.task('stylesheets', function (cb) {
       remoteSrc(customizerIndex, {
         base: `http://${customizerHost}:${customizerPort}/assets/stylesheets/`
       })
-        .pipe(gulp.dest('customizer/assets/stylesheets'))
+        .pipe(gulp.dest(tmpDir))
         .on('end', callback)
     },
     function (callback) {
       gulp
         .src(paths.stylesheets.concat(customizerIndex.map(function (filename) {
-          return path.join('customizer/assets/stylesheets', filename)
+          return path.join(tmpDir, filename)
         })))
         .pipe(gulpIf(isSass, sass({
           indentedSyntax: true,
@@ -124,12 +145,20 @@ gulp.task('stylesheets', function (cb) {
           rebaseUrls: false
         }))
         .pipe(gulpIf(isProduction, minifyCSS()))
-        .pipe(gulp.dest('public/assets/css'))
+        .pipe(gulp.dest(path.join(distDir, 'assets', 'css')))
         .pipe(rev())
-        .pipe(gulp.dest('public/assets/css'))
+        .pipe(gulp.dest(path.join(distDir, 'assets', 'css')))
         .pipe(rev.manifest('manifest.json'))
-        .pipe(gulp.dest('public/assets/css'))
+        .pipe(gulp.dest(path.join(distDir, 'assets', 'css')))
         .on('end', callback)
+    },
+    function (callback) {
+      del([
+        path.join(distDir, 'assets', 'css', 'themis.css'),
+        tmpDir
+      ], {
+        force: true
+      }, callback)
     }
   ], function (err, values) {
     if (err) {
@@ -142,11 +171,21 @@ gulp.task('stylesheets', function (cb) {
 
 gulp.task('fonts', function (cb) {
   let customizerIndex = null
+  let tmpDir = null
   async.series([
     function (callback) {
+      tmp.dir({}, function (err, tmpPath, cleanupCallback) {
+        if (err) {
+          callback(err)
+        } else {
+          tmpDir = tmpPath
+          callback()
+        }
+      })
+    },
+    function (callback) {
       del([
-        'public/assets/fonts/*',
-        'customizer/assets/fonts/*'
+        path.join(distDir, 'assets', 'fonts', '*')
       ], callback)
     },
     function (callback) {
@@ -163,16 +202,19 @@ gulp.task('fonts', function (cb) {
       remoteSrc(customizerIndex, {
         base: `http://${customizerHost}:${customizerPort}/assets/fonts/`
       })
-        .pipe(gulp.dest('customizer/assets/fonts'))
+        .pipe(gulp.dest(tmpDir))
         .on('end', callback)
     },
     function (callback) {
       gulp
         .src(paths.fonts.concat(customizerIndex.map(function (filename) {
-          return path.join('customizer/assets/fonts', filename)
+          return path.join(tmpDir, filename)
         })))
-        .pipe(gulp.dest('public/assets/fonts'))
+        .pipe(gulp.dest(path.join(distDir, 'assets', 'fonts')))
         .on('end', callback)
+    },
+    function (callback) {
+      del([tmpDir], { force: true }, callback)
     }
   ], function (err, values) {
     if (err) {
@@ -185,11 +227,21 @@ gulp.task('fonts', function (cb) {
 
 gulp.task('images', function (cb) {
   let customizerIndex = null
+  let tmpDir = null
   async.series([
     function (callback) {
+      tmp.dir({}, function (err, tmpPath, cleanupCallback) {
+        if (err) {
+          callback(err)
+        } else {
+          tmpDir = tmpPath
+          callback()
+        }
+      })
+    },
+    function (callback) {
       del([
-        'public/assets/images/*',
-        'customizer/assets/images/*'
+        path.join(distDir, 'assets', 'images', '*')
       ], callback)
     },
     function (callback) {
@@ -206,16 +258,19 @@ gulp.task('images', function (cb) {
       remoteSrc(customizerIndex, {
         base: `http://${customizerHost}:${customizerPort}/assets/images/`
       })
-        .pipe(gulp.dest('customizer/assets/images'))
+        .pipe(gulp.dest(tmpDir))
         .on('end', callback)
     },
     function (callback) {
       gulp
         .src(paths.images.concat(customizerIndex.map(function (filename) {
-          return path.join('customizer/assets/images', filename)
+          return path.join(tmpDir, filename)
         })))
-        .pipe(gulp.dest('public/assets/images'))
+        .pipe(gulp.dest(path.join(distDir, 'assets', 'images')))
         .on('end', callback)
+    },
+    function (callback) {
+      del([tmpDir], { force: true }, callback)
     }
   ], function (err, values) {
     if (err) {
@@ -231,18 +286,27 @@ gulp.task('default', ['fonts', 'images', 'scripts', 'stylesheets'], function (cb
     partials: {}
   }
   let customizerIndex = null
-
+  let tmpDir = null
   async.series([
     function (callback) {
+      tmp.dir({}, function (err, tmpPath, cleanupCallback) {
+        if (err) {
+          callback(err)
+        } else {
+          tmpDir = tmpPath
+          callback()
+        }
+      })
+    },
+    function (callback) {
       del([
-        'public/html/*',
-        'customizer/assets/partials/*'
+        path.join(distDir, 'html', '*')
       ], callback)
     },
     function (callback) {
       try {
-        const cachebusting_js = JSON.parse(fs.readFileSync('./public/assets/js/manifest.json', 'utf8'))
-        const cachebusting_css = JSON.parse(fs.readFileSync('./public/assets/css/manifest.json', 'utf8'))
+        const cachebusting_js = JSON.parse(fs.readFileSync(path.join(distDir, 'assets', 'js', 'manifest.json'), 'utf8'))
+        const cachebusting_css = JSON.parse(fs.readFileSync(path.join(distDir, 'assets', 'css', 'manifest.json'), 'utf8'))
         opts.cachebusting = {
           themis: {
             js: cachebusting_js['themis.js'],
@@ -280,13 +344,13 @@ gulp.task('default', ['fonts', 'images', 'scripts', 'stylesheets'], function (cb
       remoteSrc(customizerIndex, {
         base: `http://${customizerHost}:${customizerPort}/assets/partials/`
       })
-        .pipe(gulp.dest('customizer/assets/partials'))
+        .pipe(gulp.dest(tmpDir))
         .on('end', callback)
     },
     function (callback) {
-      const basedir = path.dirname(path.join(process.cwd(), paths.html))
-      fs.readdirSync('customizer/assets/partials').forEach(function(filename) {
-        const fullPath = path.join(__dirname, 'customizer', 'assets', 'partials', filename)
+      const basedir = path.dirname(path.join(__dirname, paths.html))
+      fs.readdirSync(tmpDir).forEach(function(filename) {
+        const fullPath = path.join(tmpDir, filename)
         if (fs.statSync(fullPath).isFile() && path.extname(fullPath) === '.html') {
           const key = path.basename(fullPath, '.html')
           opts.partials[key] = {
@@ -300,10 +364,24 @@ gulp.task('default', ['fonts', 'images', 'scripts', 'stylesheets'], function (cb
       gulp
         .src(paths.html)
         .pipe(mustache(opts))
-        .pipe(include())
+        .pipe(include({
+          includePaths: [
+            path.dirname(path.join(__dirname, paths.html))
+          ]
+        }))
+        .on('error', console.log)
         .pipe(gulpIf(isProduction, minifyHTML()))
-        .pipe(gulp.dest('public/html'))
+        .pipe(gulp.dest(path.join(distDir, 'html')))
         .on('end', callback)
+    },
+    function (callback) {
+      del([
+        path.join(distDir, 'assets', 'js', 'manifest.json'),
+        path.join(distDir, 'assets', 'css', 'manifest.json'),
+        tmpDir
+      ], {
+        force: true
+      }, callback)
     }
   ], function (err, values) {
     if (err) {
