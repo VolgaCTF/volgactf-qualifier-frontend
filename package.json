@@ -18,6 +18,7 @@
     "url": "https://github.com/aspyatkin/themis-quals-frontend/issues"
   },
   "dependencies": {
+    "animate.css": "^3.6.1",
     "async": "^2.6.0",
     "axios": "^0.17.1",
     "bootstrap": "^3.3.4",

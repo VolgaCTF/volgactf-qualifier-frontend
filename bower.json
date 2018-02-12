@@ -12,7 +12,6 @@
     "bootstrap-filestyle": "~1.1.2",
     "jquery-form": "~3.46.0",
     "parsleyjs": "~2.3.0",
-    "eonasdan-bootstrap-datetimepicker": "~4.7.14",
-    "animate.css": "~3.2.6"
+    "eonasdan-bootstrap-datetimepicker": "~4.7.14"
   }
 }
