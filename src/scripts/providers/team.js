@@ -184,6 +184,13 @@ class TeamProvider extends EventEmitter {
     }
   }
 
+  initTeamProfile () {
+    const promise = $.Deferred()
+    promise.resolve(new TeamModel(window.themis.quals.data.team))
+
+    return promise
+  }
+
   fetchTeamProfile (id) {
     let promise = $.Deferred()
     let url = `/api/team/${id}/profile`

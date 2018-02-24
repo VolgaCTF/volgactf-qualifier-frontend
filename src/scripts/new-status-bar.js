@@ -51,13 +51,13 @@ class NewStatusBar {
     $contestStartsAt.datetimepicker({
       showClose: true,
       sideBySide: true,
-      // format: pickerFormat
+      format: pickerFormat
     })
 
     $contestFinishesAt.datetimepicker({
       showClose: true,
       sideBySide: true,
-      // format: pickerFormat
+      format: pickerFormat
     })
 
     $submitButton.on('click', (e) => {

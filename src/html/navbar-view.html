@@ -37,13 +37,14 @@
     </li>
     <% } else { %>
     <li class="nav-item dropdown">
-        <a href="#" class="nav-link dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+        <% if (identity.role === 'team') { %>
+        <img class="profile-image d-inline-block" src="/api/team/<%- identity.id %>/logo">
+        <% } %>
+        <a href="#" class="nav-link dropdown-toggle d-inline-block" data-toggle="dropdown" role="button" aria-expanded="false">
             <% if (identity.role === 'admin') { %>
             <span class="badge badge-success">A</span>
             <% } else if (identity.role === 'manager') { %>
             <span class="badge badge-primary">M</span>
-            <% } else if (identity.role === 'team') { %>
-            <img class="profile-image" src="/api/team/<%- identity.id %>/logo">
             <% } %>
             <%- identity.name %>&nbsp;<span class="caret"></span>
         </a>

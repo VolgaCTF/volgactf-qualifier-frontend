@@ -1,13 +1,11 @@
 import $ from 'jquery'
 import View from './base'
-import renderTemplate from '../utils/render-template'
 import dataStore from '../data-store'
 import newNavigationBar from '../new-navigation-bar'
 import newStatusBar from '../new-status-bar'
 import metadataStore from '../utils/metadata-store'
 import contestProvider from '../providers/contest'
 import identityProvider from '../providers/identity'
-import _ from 'underscore'
 
 class IndexView extends View {
   constructor () {
@@ -21,8 +19,6 @@ class IndexView extends View {
   }
 
   render () {
-    let identity = identityProvider.getIdentity()
-    let contest = contestProvider.getContest()
   }
 
   present () {
@@ -48,8 +44,6 @@ class IndexView extends View {
             newNavigationBar.present()
             newStatusBar.present()
 
-            this.render()
-
             this.onUpdateContest = (e) => {
               this.render()
               return false
@@ -57,16 +51,6 @@ class IndexView extends View {
 
             contestProvider.on('updateContest', this.onUpdateContest)
           })
-          .fail((err) => {
-            console.error(err)
-            newNavigationBar.present()
-            this.$main.html(renderTemplate('internal-error-view'))
-          })
-      })
-      .fail((err) => {
-        console.error(err)
-        newNavigationBar.present()
-        this.$main.html(renderTemplate('internal-error-view'))
       })
   }
 

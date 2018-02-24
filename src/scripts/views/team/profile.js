@@ -2,8 +2,8 @@ import $ from 'jquery'
 import _ from 'underscore'
 import View from '../base'
 import renderTemplate from '../../utils/render-template'
-import navigationBar from '../../navigation-bar'
-import statusBar from '../../status-bar'
+import newNavigationBar from '../../new-navigation-bar'
+import newStatusBar from '../../new-status-bar'
 import dataStore from '../../data-store'
 import identityProvider from '../../providers/identity'
 import teamProvider from '../../providers/team'
@@ -38,7 +38,33 @@ class TeamProfileView extends View {
       let $submitError = $modal.find('.submit-error > p')
       let $submitButton = $modal.find('button[data-action="complete-upload-logo"]')
       let $form = $modal.find('form')
-      $form.parsley()
+      $form.parsley({
+        errorClass: 'is-invalid',
+        successClass: 'is-valid',
+        classHandler: function (ParsleyField) {
+          return ParsleyField.$element;
+        },
+        errorsContainer: function (ParsleyField) {
+          return ParsleyField.$element.parents('form-group')
+        },
+        errorsWrapper: '<div class="invalid-feedback">',
+        errorTemplate: '<span></span>'
+      })
+
+      $('input[type=file]').change(function () {
+        var fieldVal = $(this).val()
+
+        // Change the node's value by removing the fake path (Chrome)
+        fieldVal = fieldVal.replace('C:\\fakepath\\', '')
+
+        if (fieldVal != undefined || fieldVal != '') {
+          $(this).next('.custom-file-label').attr('data-content', fieldVal)
+          $(this).next('.custom-file-label').text(fieldVal)
+        } else {
+          $(this).next('.custom-file-label').attr('data-content', '')
+          $(this).next('.custom-file-label').text('Choose file')
+        }
+      })
 
       $submitButton.on('click', (e) => {
         $form.trigger('submit')
@@ -93,7 +119,18 @@ class TeamProfileView extends View {
       let $submitError = $modal.find('.submit-error > p')
       let $submitButton = $modal.find('button[data-action="complete-change-email"]')
       let $form = $modal.find('form')
-      $form.parsley()
+      $form.parsley({
+        errorClass: 'is-invalid',
+        successClass: 'is-valid',
+        classHandler: function (ParsleyField) {
+          return ParsleyField.$element;
+        },
+        errorsContainer: function (ParsleyField) {
+          return ParsleyField.$element.parents('form-group')
+        },
+        errorsWrapper: '<div class="invalid-feedback">',
+        errorTemplate: '<span></span>'
+      })
 
       $submitButton.on('click', (e) => {
         $form.trigger('submit')
@@ -214,7 +251,18 @@ class TeamProfileView extends View {
       let $submitError = $modal.find('.submit-error > p')
       let $submitButton = $modal.find('button[data-action="complete-edit-profile"]')
       let $form = $modal.find('form')
-      $form.parsley()
+      $form.parsley({
+        errorClass: 'is-invalid',
+        successClass: 'is-valid',
+        classHandler: function (ParsleyField) {
+          return ParsleyField.$element;
+        },
+        errorsContainer: function (ParsleyField) {
+          return ParsleyField.$element.parents('form-group')
+        },
+        errorsWrapper: '<div class="invalid-feedback">',
+        errorTemplate: '<span></span>'
+      })
 
       let $countrySelect = $('#edit-profile-country')
       for (let country of countryProvider.getCountries()) {
@@ -283,7 +331,18 @@ class TeamProfileView extends View {
       let $newPassword = $('#change-pwd-new')
       let $confirmNewPassword = $('#change-pwd-confirm-new')
 
-      $form.parsley()
+      $form.parsley({
+        errorClass: 'is-invalid',
+        successClass: 'is-valid',
+        classHandler: function (ParsleyField) {
+          return ParsleyField.$element;
+        },
+        errorsContainer: function (ParsleyField) {
+          return ParsleyField.$element.parents('form-group')
+        },
+        errorsWrapper: '<div class="invalid-feedback">',
+        errorTemplate: '<span></span>'
+      })
 
       $submitButton.on('click', (e) => {
         $form.trigger('submit')
@@ -344,10 +403,9 @@ class TeamProfileView extends View {
 
   present () {
     this.$main = $('#main')
-    this.$main.html(renderTemplate('loading-view'))
 
     $
-      .when(identityProvider.fetchIdentity(), contestProvider.fetchContest())
+      .when(identityProvider.initIdentity(), contestProvider.initContest())
       .done((identity, contest) => {
         let urlParts = window.location.pathname.split('/')
         let teamId = parseInt(urlParts[urlParts.length - 2], 10)
@@ -356,13 +414,13 @@ class TeamProfileView extends View {
         if (identity.isSupervisor()) {
           if (contest.isInitial()) {
             promise = $.when(
-              teamProvider.fetchTeamProfile(teamId),
-              countryProvider.fetchCountries()
+              teamProvider.initTeamProfile(),
+              countryProvider.initCountries()
             )
           } else {
             promise = $.when(
-              teamProvider.fetchTeamProfile(teamId),
-              countryProvider.fetchCountries(),
+              teamProvider.initTeamProfile(),
+              countryProvider.initCountries(),
               teamTaskHitProvider.fetchTeamHits(teamId),
               teamTaskReviewProvider.fetchTeamReviews(teamId),
               taskProvider.fetchTaskPreviews()
@@ -371,13 +429,13 @@ class TeamProfileView extends View {
         } else if (identity.isExactTeam(teamId)) {
           if (contest.isInitial()) {
             promise = $.when(
-              teamProvider.fetchTeamProfile(teamId),
-              countryProvider.fetchCountries()
+              teamProvider.initTeamProfile(),
+              countryProvider.initCountries()
             )
           } else {
             promise = $.when(
-              teamProvider.fetchTeamProfile(teamId),
-              countryProvider.fetchCountries(),
+              teamProvider.initTeamProfile(),
+              countryProvider.initCountries(),
               teamTaskHitProvider.fetchTeamHits(teamId),
               teamTaskReviewProvider.fetchTeamReviews(teamId),
               contestProvider.fetchTeamScores(),
@@ -387,13 +445,13 @@ class TeamProfileView extends View {
         } else if (identity.isTeam()) {
           if (contest.isInitial()) {
             promise = $.when(
-              teamProvider.fetchTeamProfile(teamId),
-              countryProvider.fetchCountries()
+              teamProvider.initTeamProfile(),
+              countryProvider.initCountries()
             )
           } else {
             promise = $.when(
-              teamProvider.fetchTeamProfile(teamId),
-              countryProvider.fetchCountries(),
+              teamProvider.initTeamProfile(),
+              countryProvider.initCountries(),
               teamTaskHitProvider.fetchTeamHitStatistics(teamId),
               teamTaskReviewProvider.fetchTeamReviewStatistics(teamId),
               contestProvider.fetchTeamScores()
@@ -402,13 +460,13 @@ class TeamProfileView extends View {
         } else {
           if (contest.isInitial()) {
             promise = $.when(
-              teamProvider.fetchTeamProfile(teamId),
-              countryProvider.fetchCountries()
+              teamProvider.initTeamProfile(),
+              countryProvider.initCountries()
             )
           } else {
             promise = $.when(
-              teamProvider.fetchTeamProfile(teamId),
-              countryProvider.fetchCountries(),
+              teamProvider.initTeamProfile(),
+              countryProvider.initCountries(),
               teamTaskHitProvider.fetchTeamHitStatistics(teamId),
               teamTaskReviewProvider.fetchTeamReviewStatistics(teamId)
             )
@@ -423,13 +481,8 @@ class TeamProfileView extends View {
               dataStore.connectRealtime()
             }
 
-            navigationBar.present()
-            statusBar.present()
-
-            this.$main.html(renderTemplate('profile-view', {
-              identity: identity,
-              team: team
-            }))
+            newNavigationBar.present()
+            newStatusBar.present()
 
             this.team = team
             let opts = {
@@ -460,7 +513,7 @@ class TeamProfileView extends View {
               }
             }
 
-            this.$main.find('section').html(renderTemplate('team-profile-partial', opts))
+            // this.$main.find('section').html(renderTemplate('team-profile-partial', opts))
             if (identity.isExactTeam(team.id)) {
               this.initUploadLogoModal()
 
@@ -473,15 +526,6 @@ class TeamProfileView extends View {
               this.initChangePasswordModal()
             }
           })
-          .fail((err) => {
-            console.error(err)
-            this.$main.html(renderTemplate('internal-error-view'))
-          })
-      })
-      .fail((err) => {
-        console.error(err)
-        navigationBar.present()
-        this.$main.html(renderTemplate('internal-error-view'))
       })
   }
 
@@ -490,8 +534,8 @@ class TeamProfileView extends View {
     this.$main.empty()
     this.$main = null
     this.team = null
-    navigationBar.dismiss()
-    statusBar.dismiss()
+    newNavigationBar.dismiss()
+    newStatusBar.dismiss()
 
     if (dataStore.supportsRealtime()) {
       dataStore.disconnectRealtime()

@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <title>{{#event}}{{ title }}{{/event}} :: Team :: <%- team.name %></title>
+
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link rel="stylesheet" href="/assets/css/{{#cachebusting}}{{#themis_quals}}{{ css }}{{/themis_quals}}{{/cachebusting}}">
+        {{#partials}}
+        {{#head}}
+        <!--=include {{{path}}} -->
+        {{/head}}
+        {{/partials}}
+        <script type="text/x-metadata" data-name="event-title" data-value="{{#event}}{{ title }}{{/event}}"></script>
+    </head>
+    <body>
+        <nav class="navbar navbar-expand-md navbar-dark bg-dark themis-navbar">
+            <a href="/" class="navbar-brand">{{#event}}{{ title }}{{/event}}</a>
+
+            <button class="navbar-toggler collapsed" type="button" data-toggle="collapse" data-target="#themis-navbar" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <div id="themis-navbar" class="collapse navbar-collapse">
+                <%= templates.navbar({ _: _, active: null, identity: identity }) %>
+            </div>
+        </nav>
+        <div id="themis-statusbar">
+            <%= templates.statusbar({ _: _, identity: identity, contest: contest, templates: templates, moment: moment }) %>
+        </div>
+
+        <div id="main">
+            <div class="container">
+                <% if (identity.role === 'team' && !identity.emailConfirmed) { %>
+                <!--=include ../partials/alert_email_verification.html -->
+                <% } %>
+                <section>
+                    <% var country = _.findWhere(countries, { id: team.countryId }) %>
+                    <%= templates.teamProfilePartial({ _: _, identity: identity, team: team, country: country, contest: contest, moment: moment, taskHits: null, taskReviews: null, teamHitStatistics: null, teamReviewStatistics: null }) %>
+                </section>
+            </div>
+
+            <% if (identity.role === 'team') { %>
+            <div class="modal fade" id="upload-logo-modal" tabindex="-1" role="dialog">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title">Upload logo</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <form method="POST" action="/api/team/update-logo" novalidate>
+                                <div class="form-group">
+                                    <label for="upload-logo-logo" class="control-label">Logo</label>
+                                    <div class="custom-file">
+                                      <input type="file" id="upload-logo-logo" name="logo" class="custom-file-input" accept="image/jpeg,image/png,image/gif" required>
+                                      <label class="custom-file-label" for="signup-logo">Choose file</label>
+                                    </div>
+                                    <div id="upload-logo-errors">
+                                    </div>
+                                </div>
+                                <div class="submit-error">
+                                    <p class="text-danger"></p>
+                                </div>
+                            </form>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                            <button type="button" class="btn btn-primary" data-action="complete-upload-logo">Upload</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <% if (identity.id === team.id) { %>
+            <div class="modal fade" id="resend-confirmation-modal" tabindex="-1" role="dialog">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title">Resend confirmation email</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <form method="POST" action="/api/team/resend-confirmation-email" novalidate>
+                                <div class="form-group">
+                                    <label for="resend-confirmation-email" class="control-label">Email</label>
+                                    <input type="email" class="form-control" id="resend-confirmation-email" disabled readonly>
+                                </div>
+                                <div class="submit-error">
+                                    <p class="text-danger"></p>
+                                </div>
+                                <div class="submit-success">
+                                    <p class="text-success"></p>
+                                </div>
+                            </form>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                            <button type="button" class="btn btn-primary" data-action="complete-resend-confirmation">Resend</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal fade" id="change-email-modal" tabindex="-1" role="dialog">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title">Change email</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <form method="POST" action="/api/team/update-email" novalidate>
+                                <div class="form-group">
+                                    <label for="change-email-new" class="control-label">New email</label>
+                                    <input type="email" class="form-control" id="change-email-new" name="email" placeholder="Enter a new email" required autofocus>
+                                </div>
+                                <div class="submit-error">
+                                    <p class="text-danger"></p>
+                                </div>
+                            </form>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                            <button type="button" class="btn btn-primary" data-action="complete-change-email">Change</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <% } %>
+
+            <div class="modal fade" id="edit-profile-modal" tabindex="-1" role="dialog">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title">Edit profile</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <form method="POST" action="/api/team/update-profile" novalidate>
+                                <div class="form-group">
+                                    <label for="edit-profile-country" class="control-label">Country</label>
+                                    <select required class="form-control" id="edit-profile-country" name="countryId" autofocus></select>
+                                </div>
+                                <div class="form-group">
+                                    <label for="edit-profile-locality" class="control-label">Locality</label>
+                                    <input type="text" class="form-control" id="edit-profile-locality" name="locality">
+                                </div>
+                                <div class="form-group">
+                                    <label for="edit-profile-institution" class="control-label">Institution</label>
+                                    <input type="text" class="form-control" id="edit-profile-institution" name="institution">
+                                </div>
+                                <div class="submit-error">
+                                    <p class="text-danger"></p>
+                                </div>
+                            </form>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                            <button type="button" class="btn btn-primary" data-action="complete-edit-profile">Change</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal fade" id="change-password-modal" tabindex="-1" role="dialog">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title">Change password</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <form method="POST" action="/api/team/update-password">
+                                <div class="form-group">
+                                    <label for="change-pwd-current" class="control-label">Current password</label>
+                                    <input type="password" class="form-control" id="change-pwd-current" name="currentPassword" required autofocus minlength="6" maxlength="40" pattern="^[A-Za-z0-9\x5b\x5d\x28\x29\x7b\x7d\x7e\x60\x21\x40\x23\x24\x25\x5e\x26\x2a\x2d\x5f\x3d\x2b\x27\x22\x3a\x3b\x7c\x2f\x5c\x2e\x2c\x3f\x3c\x3e]+$">
+                                </div>
+                                <div class="form-group">
+                                    <label for="change-pwd-new" class="control-label">New password</label>
+                                    <input type="password" class="form-control" id="change-pwd-new" name="newPassword" required minlength="6" maxlength="40" pattern="^[A-Za-z0-9\x5b\x5d\x28\x29\x7b\x7d\x7e\x60\x21\x40\x23\x24\x25\x5e\x26\x2a\x2d\x5f\x3d\x2b\x27\x22\x3a\x3b\x7c\x2f\x5c\x2e\x2c\x3f\x3c\x3e]+$">
+                                </div>
+                                <div class="form-group">
+                                    <label for="change-pwd-confirm-new" class="control-label">Confirm new password</label>
+                                    <input type="password" class="form-control" id="change-pwd-confirm-new" required minlength="6" maxlength="40" pattern="^[A-Za-z0-9\x5b\x5d\x28\x29\x7b\x7d\x7e\x60\x21\x40\x23\x24\x25\x5e\x26\x2a\x2d\x5f\x3d\x2b\x27\x22\x3a\x3b\x7c\x2f\x5c\x2e\x2c\x3f\x3c\x3e]+$" data-parsley-equalto="#change-pwd-new">
+                                </div>
+                                <div class="submit-error">
+                                    <p class="text-danger"></p>
+                                </div>
+                                <div class="submit-success">
+                                    <p class="text-success"></p>
+                                </div>
+                            </form>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                            <button type="button" class="btn btn-primary" data-action="complete-change-password">Change</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <% } %>
+        </div>
+
+        <footer class="footer">
+            {{#partials}}
+            {{#footer}}
+            <!--=include {{{path}}} -->
+            {{/footer}}
+            {{^footer}}
+            <!--=include ../partials/footer.html -->
+            {{/footer}}
+            {{/partials}}
+        </footer>
+
+        <script>
+            window.themis = {
+                quals: {
+                    data: {
+                        identity: <%= JSON.stringify(identity) %>,
+                        contest: <%= JSON.stringify(contest) %>,
+                        team: <%= JSON.stringify(team) %>,
+                        countries: <%= JSON.stringify(countries) %>,
+                        teamScores: <%= JSON.stringify(teamScores) %>
+                    },
+                    templates: {
+                        contestStatePartial: <%= templates.contestStatePartial.source %>,
+                        contestTimer: <%= templates.contestTimer.source %>,
+                        contestRealtimeState: <%= templates.contestRealtimeState.source %>,
+                        contestScore: <%= templates.contestScore.source %>,
+                        teamProfilePartial: <%= templates.teamProfilePartial.source %>
+                    }
+                }
+            }
+        </script>
+        <script src="/assets/js/{{#cachebusting}}{{#themis_quals}}{{ js }}{{/themis_quals}}{{/cachebusting}}"></script>
+    </body>
+</html>

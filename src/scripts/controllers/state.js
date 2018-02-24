@@ -1,5 +1,3 @@
-import $ from 'jquery'
-
 class StateController {
   constructor () {
     this.viewController = null

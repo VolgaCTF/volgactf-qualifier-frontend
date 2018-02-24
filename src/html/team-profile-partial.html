@@ -1,0 +1,164 @@
+<% var sameTeam = identity.role === 'team' && identity.id === team.id %>
+<header class="clearfix themis-profile">
+    <div class="float-left logo">
+        <% if (sameTeam) { %>
+        <a href="#" title="Click to upload new logo" data-action="upload-logo" data-toggle="modal" data-target="#upload-logo-modal">
+            <img class="img-thumbnail" src="/api/team/<%- team.id %>/logo">
+        </a>
+        <% } else { %>
+            <img class="img-thumbnail" src="/api/team/<%- team.id %>/logo">
+        <% } %>
+    </div>
+    <div class="float-left info">
+        <h1><%- team.name %></h1>
+        <% if (team.disqualified) { %><p><span class="badge badge-danger">DQL</span></p><% } %>
+    </div>
+</header>
+
+<section>
+    <h3>General information</h3>
+    <% var createdAt = (team.createdAt instanceof Date) ? team.createdAt : new Date(team.createdAt) %>
+    <p class="text-secondary">Signed up on <%- moment(createdAt).format('lll') %></p>
+    <% if (sameTeam || identity.role === 'manager' || identity.role === 'admin') { %>
+    <ul class="list-unstyled">
+        <% if ('email' in team && 'emailConfirmed' in team) { %>
+        <li>
+            <span class="oi oi-envelope-closed"></span>
+            <% if (team.emailConfirmed) { %>
+            <span class="text-success" title="Email verified"><%- team.email %></span>
+            <% } else { %>
+            <span class="text-danger" title="Email not verified"><%- team.email %></span>
+            <% if (sameTeam) { %>
+            <br>
+            <button type="button" class="btn btn-primary btn-sm" data-action="resend-confirmation" data-toggle="modal" data-target="#resend-confirmation-modal">Resend confirmation email</button>
+            <button type="button" class="btn btn-warning btn-sm" data-action="change-email" data-toggle="modal" data-target="#change-email-modal">Change email</button>
+            <% } %>
+            <% } %>
+        </li>
+        <% } %>
+    </ul>
+    <% } %>
+    <ul class="list-unstyled">
+        <% if (country !== '' || sameTeam) { %>
+        <li><strong data-field="team-country">Country:</strong> <%- country.name %></li>
+        <% } %>
+        <% if (team.locality !== '' || sameTeam) { %>
+        <li><strong data-field="team-locality">Locality:</strong> <%- team.locality %></li>
+        <% } %>
+        <% if (team.institution !== '' || sameTeam) { %>
+        <li><strong data-field="team-institution">Institution:</strong> <%- team.institution %></li>
+        <% } %>
+        <% if (sameTeam) { %>
+        <li>
+            <button type="button" class="btn btn-primary btn-sm" data-action="edit-profile" data-toggle="modal" data-target="#edit-profile-modal">
+                Edit
+            </button>
+            <button type="button" class="btn btn-primary btn-sm" data-action="change-password" data-toggle="modal" data-target="#change-password-modal">
+                Change password
+            </button>
+        </li>
+        <% } %>
+    </ul>
+</section>
+
+<% if (identity.role === 'guest' || !sameTeam) { %>
+    <% if (teamHitStatistics) { %>
+    <section>
+        <h3>Task hits</h3>
+        <p class="text-muted">
+            <% if (teamHitStatistics.count > 0) { %>
+            Team has solved <strong><%- teamHitStatistics.count %></strong> <% print((teamHitStatistics.count === 1) ? 'task' : 'tasks') %>
+            <% } else { %>
+            Team has not solved a single task
+            <% } %>
+        </p>
+    </section>
+    <% } %>
+    <% if (teamReviewStatistics) { %>
+    <section>
+        <h3>Task reviews</h3>
+        <p class="text-muted">
+            <% if (teamReviewStatistics.count > 0) { %>
+            Team has reviewed <strong><%- teamReviewStatistics.count %></strong> <% print((teamReviewStatistics.count === 1) ? 'task' : 'tasks') %> and has given <strong><%- teamReviewStatistics.averageRating.toFixed(2) %></strong> rating points on average
+            <% } else { %>
+            Team has not reviewed a single task
+            <% } %>
+        </p>
+    </section>
+    <% } %>
+<% } %>
+
+<% if (sameTeam || identity.role === 'manager' || identity.role === 'admin') { %>
+    <% if (taskHits) { %>
+    <section>
+        <h3>Task hits</h3>
+        <% if (taskHits.length > 0) { %>
+        <table class="table table-condensed">
+            <thead>
+                <th>#</th>
+                <th>Task</th>
+                <th>Value</th>
+                <th>Solved at</th>
+            </thead>
+            <tbody>
+                <% var sortedTaskHits = _.sortBy(taskHits, 'createdAt') %>
+                <% var task = null %>
+                <% for (var i=0; i<sortedTaskHits.length; ++i) { %>
+                    <% task = _.findWhere(tasks, { id: sortedTaskHits[i].taskId }); %>
+                    <% if (task) { %>
+                    <tr>
+                        <td><% print(i + 1) %></td>
+                        <td><%- task.title %></td>
+                        <td><%- task.value %></td>
+                        <td><%- moment(sortedTaskHits[i].createdAt).format('lll') %></td>
+                    </tr>
+                    <% } %>
+                <% } %>
+            </tbody>
+        </table>
+        <% } else { %>
+        <p>Team has not solved a single task</p>
+        <% } %>
+    </section>
+    <% } %>
+    <% if (taskReviews) { %>
+    <section>
+        <h3>Task reviews</h3>
+        <% if (taskReviews.length > 0) { %>
+        <% var averageRating = _.reduce(taskReviews, function (memo, taskReview) {
+            return memo + taskReview.rating;
+        }, 0) / (taskReviews.length === 0 ? 1 : taskReviews.length); %>
+        <p class="text-muted">Average rating is <strong><%- averageRating.toFixed(2) %></strong> (max 5.00)</p>
+        <table class="table table-condensed">
+            <thead>
+                <th>#</th>
+                <th>Task</th>
+                <th>Value</th>
+                <th>Rating</th>
+                <th>Comment</th>
+                <th>Created at</th>
+            </thead>
+            <tbody>
+                <% var sortedTaskReviews = _.sortBy(taskReviews, 'createdAt') %>
+                <% var task = null %>
+                <% for (var i=0; i<sortedTaskReviews.length; ++i) { %>
+                    <% task = _.findWhere(tasks, { id: sortedTaskReviews[i].taskId }) %>
+                    <% if (task) { %>
+                    <tr>
+                        <td><% print(i + 1) %></td>
+                        <td><%- task.title %></td>
+                        <td><%- task.value %></td>
+                        <td><%- sortedTaskReviews[i].rating.toFixed(2) %></td>
+                        <td><%- sortedTaskReviews[i].comment %></td>
+                        <td><%- moment(sortedTaskReviews[i].createdAt).format('lll') %></td>
+                    </tr>
+                    <% } %>
+                <% } %>
+            </tbody>
+        </table>
+        <% } else { %>
+        <p>Team has not reviewed a single task</p>
+        <% } %>
+    </section>
+    <% } %>
+<% } %>

@@ -1,5 +1,3 @@
-import $ from 'jquery'
-
 class DataStore {
   constructor () {
     this.eventSource = null
