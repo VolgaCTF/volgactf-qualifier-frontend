@@ -1,0 +1,9 @@
+<% if (posts.length === 0) { %>
+	<p class="lead">No posts have been published yet.</p>
+<% } else { %>
+	<% var sortedPosts = _.sortBy(posts, 'createdAt').reverse() %>
+	<% for (var i=0; i<sortedPosts.length; ++i) { %>
+		<% var post = sortedPosts[i] %>
+		<%= templates.postPartial({ _: _, post: post, identity: identity, moment: moment, md: md }) %>
+	<% } %>
+<% } %>

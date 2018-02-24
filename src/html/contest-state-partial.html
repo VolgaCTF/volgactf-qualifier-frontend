@@ -1,0 +1,22 @@
+<% if (contest.state === 1) { %>
+    <span class="themis-contest-not-started">
+        &#9679;&nbsp;Not started
+    </span>
+<% } else if (contest.state === 2) { %>
+    <span class="themis-contest-started">
+        &#9679;&nbsp;Started
+    </span>
+<% } else if (contest.state === 3) { %>
+    <span class="themis-contest-paused">
+        &#9679;&nbsp;Paused
+    </span>
+<% } else if (contest.state === 4) { %>
+    <span class="themis-contest-finished">
+        &#9679;&nbsp;Finished
+    </span>
+<% } %>
+<% if (identity.role === 'admin') { %>
+<a href="#" class="text-info" data-action="update-contest" data-toggle="modal" data-target="#update-contest-modal">
+    <span class="oi oi-cog"></span>&nbsp;Edit
+</a>
+<% } %>

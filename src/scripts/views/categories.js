@@ -11,9 +11,9 @@ import categoryProvider from '../providers/category'
 import contestProvider from '../providers/contest'
 import identityProvider from '../providers/identity'
 import 'bootstrap'
-import 'jquery.form'
+import 'jquery-form'
 import 'parsley'
-import History from 'history.js'
+import URLSearchParams from 'url-search-params'
 
 class CategoriesView extends View {
   constructor () {
@@ -230,9 +230,9 @@ class CategoriesView extends View {
 
               this.renderCategories()
 
-              let urlParams = History.getState().data.params
-              if (urlParams.action === 'scrollTo' && urlParams.categoryId) {
-                let $el = $(`div.themis-category[data-id="${urlParams.categoryId}"]`)
+              let urlParams = new URLSearchParams(window.location.search)
+              if (urlParams.get('action') === 'scrollTo' && urlParams.has('categoryId')) {
+                let $el = $(`div.themis-category[data-id="${urlParams.get('categoryId')}"]`)
                 if ($el.length > 0) {
                   $el.get(0).scrollIntoView()
                 }

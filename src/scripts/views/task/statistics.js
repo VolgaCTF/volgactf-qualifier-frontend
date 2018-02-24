@@ -12,7 +12,6 @@ import taskHintProvider from '../../providers/task-hint'
 import teamTaskReviewProvider from '../../providers/team-task-review'
 import teamTaskHitProvider from '../../providers/team-task-hit'
 import teamProvider from '../../providers/team'
-import History from 'history.js'
 import moment from 'moment'
 import MarkdownRenderer from '../../utils/markdown'
 import _ from 'underscore'
@@ -28,8 +27,7 @@ class TaskStatisticsView extends View {
   }
 
   getTaskId () {
-    let url = History.getState().data.urlPath
-    let urlParts = url.split('/')
+    let urlParts = window.location.pathname.split('/')
     return parseInt(urlParts[urlParts.length - 2], 10)
   }
 

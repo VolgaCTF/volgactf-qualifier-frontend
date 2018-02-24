@@ -144,6 +144,14 @@ class ContestProvider extends EventEmitter {
     this.teamScores = []
   }
 
+  initContest () {
+    const promise = $.Deferred()
+    this.contest = new ContestModel(window.themis.quals.data.contest)
+    promise.resolve(this.contest)
+
+    return promise
+  }
+
   fetchContest () {
     let promise = $.Deferred()
     let url = '/api/contest'
@@ -163,6 +171,16 @@ class ContestProvider extends EventEmitter {
         }
       }
     })
+
+    return promise
+  }
+
+  initTeamScores () {
+    const promise = $.Deferred()
+    this.teamScores = _.map(window.themis.quals.data.teamScores, function (options) {
+      return new TeamScoreModel(options)
+    })
+    promise.resolve(this.teamScores)
 
     return promise
   }

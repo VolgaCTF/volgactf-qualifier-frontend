@@ -1,15 +1,14 @@
 import $ from 'jquery'
 import _ from 'underscore'
-import renderTemplate from './utils/render-template'
 import dataStore from './data-store'
 import moment from 'moment'
 import contestProvider from './providers/contest'
 import identityProvider from './providers/identity'
 import 'bootstrap'
 import 'parsley'
-// import 'bootstrap-datetimepicker'
+import 'tempusdominius-bootstrap-4'
 
-class StatusBar {
+class NewStatusBar {
   constructor () {
     this.$container = null
     this.$stateContainer = null
@@ -52,13 +51,13 @@ class StatusBar {
     $contestStartsAt.datetimepicker({
       showClose: true,
       sideBySide: true,
-      format: pickerFormat
+      // format: pickerFormat
     })
 
     $contestFinishesAt.datetimepicker({
       showClose: true,
       sideBySide: true,
-      format: pickerFormat
+      // format: pickerFormat
     })
 
     $submitButton.on('click', (e) => {
@@ -86,8 +85,8 @@ class StatusBar {
         updateOptions(false, false, false, true)
       }
 
-      $contestStartsAt.data('DateTimePicker').date(contest.startsAt)
-      $contestFinishesAt.data('DateTimePicker').date(contest.finishesAt)
+      $contestStartsAt.datetimepicker('date', contest.startsAt)
+      $contestFinishesAt.datetimepicker('date', contest.finishesAt)
       $submitError.text('')
     })
 
@@ -96,8 +95,8 @@ class StatusBar {
     })
 
     $form.on('submit', (e) => {
-      let valStartsAt = $contestStartsAt.data('DateTimePicker').date()
-      let valFinishesAt = $contestFinishesAt.data('DateTimePicker').date()
+      let valStartsAt = $contestStartsAt.datetimepicker('date')
+      let valFinishesAt = $contestFinishesAt.datetimepicker('date')
 
       e.preventDefault()
       $form.ajaxSubmit({
@@ -137,40 +136,21 @@ class StatusBar {
   renderContestState () {
     let contest = contestProvider.getContest()
 
-    this.$stateContainer.html(renderTemplate('contest-state-partial', {
+    this.$stateContainer.html(window.themis.quals.templates.contestStatePartial({
+      _: _,
       contest: contest,
       identity: identityProvider.getIdentity()
     }))
   }
 
   renderContestTimer () {
-    this.$timerContainer.empty()
     let contest = contestProvider.getContest()
 
-    if (contest.isInitial() && contest.startsAt) {
-      this.$timerContainer.html(renderTemplate('contest-timer-initial', {
-        startsAt: moment(contest.startsAt).format('lll'),
-        interval: moment(contest.startsAt).fromNow()
-      }))
-    }
-
-    if (contest.isStarted()) {
-      this.$timerContainer.html(renderTemplate('contest-timer-started', {
-        finishesAt: moment(contest.finishesAt).format('lll'),
-        interval: moment(contest.finishesAt).fromNow()
-      }))
-    }
-
-    if (contest.isPaused()) {
-      this.$timerContainer.html(renderTemplate('contest-timer-paused'))
-    }
-
-    if (contest.isFinished()) {
-      this.$timerContainer.html(renderTemplate('contest-timer-finished', {
-        finishesAt: moment(contest.finishesAt).format('lll'),
-        interval: moment(contest.finishesAt).fromNow()
-      }))
-    }
+    this.$timerContainer.html(window.themis.quals.templates.contestTimer({
+      _: _,
+      contest: contest,
+      moment: moment
+    }))
   }
 
   renderTeamScore () {
@@ -190,7 +170,8 @@ class StatusBar {
         return teamScore.teamId === identity.id
       })
 
-      this.$scoreContainer.html(renderTemplate('contest-score', {
+      this.$scoreContainer.html(window.themis.quals.templates.contestScore({
+        _: _,
         teamRank: teamNdx + 1,
         teamScore: teamScore.score
       }))
@@ -222,19 +203,19 @@ class StatusBar {
         break
     }
 
-    this.$realtimeContainer.html(renderTemplate('contest-realtime-state', { state: state }))
+    this.$realtimeContainer.html(window.themis.quals.templates.contestRealtimeState({
+      _: _,
+      state: state
+    }))
     let $state = this.$realtimeContainer.find('span')
     $state.tooltip()
   }
 
   present () {
     this.$container = $('#themis-statusbar')
-    this.$container.html(renderTemplate('statusbar-view'))
     this.$stateContainer = $('#themis-contest-state')
-    this.renderContestState()
 
     this.$timerContainer = $('#themis-contest-timer')
-    this.renderContestTimer()
 
     let identity = identityProvider.getIdentity()
 
@@ -334,4 +315,4 @@ class StatusBar {
   }
 }
 
-export default new StatusBar()
+export default new NewStatusBar()

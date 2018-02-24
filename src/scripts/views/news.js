@@ -1,18 +1,17 @@
 import $ from 'jquery'
 import _ from 'underscore'
 import View from './base'
-import renderTemplate from '../utils/render-template'
 import dataStore from '../data-store'
-import navigationBar from '../navigation-bar'
-import statusBar from '../status-bar'
+import newNavigationBar from '../new-navigation-bar'
+import newStatusBar from '../new-status-bar'
 import metadataStore from '../utils/metadata-store'
 import MarkdownRenderer from '../utils/markdown'
 import moment from 'moment'
 import postProvider from '../providers/post'
 import contestProvider from '../providers/contest'
 import identityProvider from '../providers/identity'
-import History from 'history.js'
-import 'jquery.form'
+import URLSearchParams from 'url-search-params'
+import 'jquery-form'
 import 'parsley'
 
 class NewsView extends View {
@@ -30,29 +29,16 @@ class NewsView extends View {
   }
 
   renderPosts () {
-    let posts = postProvider.getPosts()
-    let $section = this.$main.find('section')
-
-    if (posts.length === 0) {
-      $section.empty()
-      $section.html($('<p></p>').addClass('lead').text('No posts have been published yet.'))
-    } else {
-      $section.empty()
-      let md = new MarkdownRenderer()
-      let sortedPosts = _.sortBy(posts, 'createdAt').reverse()
-      let manageable = identityProvider.getIdentity().isSupervisor()
-      for (let post of sortedPosts) {
-        let options = {
-          id: post.id,
-          title: post.title,
-          description: md.render(post.description),
-          updatedAt: moment(post.updatedAt).format('lll'),
-          manageable: manageable
-        }
-
-        $section.append($(renderTemplate('post-partial', options)))
-      }
-    }
+    const identity = identityProvider.getIdentity()
+    const posts = postProvider.getPosts()
+    this.$main.find('section').html(window.themis.quals.templates.postList({
+      _: _,
+      identity: identity,
+      posts: posts,
+      templates: window.themis.quals.templates,
+      moment: moment,
+      md: new MarkdownRenderer()
+    }))
   }
 
   initDeletePostModal () {
@@ -67,7 +53,8 @@ class NewsView extends View {
       let postId = parseInt($(e.relatedTarget).data('post-id'), 10)
       $modal.data('post-id', postId)
       let post = _.findWhere(postProvider.getPosts(), { id: postId })
-      $modalBody.html(renderTemplate('delete-post-confirmation', { title: post.title }))
+      const template = _.template('You are about to delete the post <mark><%- title %></mark>. Continue?')
+      $modalBody.html(template({ title: post.title }))
       $submitError.text('')
     })
 
@@ -113,14 +100,14 @@ class NewsView extends View {
     $tabPreview.tab()
 
     $tabPreview.on('show.bs.tab', (e) => {
-      let md = new MarkdownRenderer()
-      let options = {
+      $postPreview.html(window.themis.quals.templates.postSimplifiedPartial({
+        _: _,
+        moment: moment,
+        md: new MarkdownRenderer(),
         title: $postTitle.val(),
-        description: md.render($postDescription.val()),
-        updatedAt: moment(new Date()).format('lll')
-      }
-
-      $postPreview.html(renderTemplate('post-simplified-partial', options))
+        description: $postDescription.val(),
+        updatedAt: new Date()
+      }))
     })
 
     $modal.on('show.bs.modal', (e) => {
@@ -193,14 +180,14 @@ class NewsView extends View {
     $tabPreview.tab()
 
     $tabPreview.on('show.bs.tab', (e) => {
-      let md = new MarkdownRenderer()
-      let options = {
+      $postPreview.html(window.themis.quals.templates.postSimplifiedPartial({
+        _: _,
+        moment: moment,
+        md: new MarkdownRenderer(),
         title: $postTitle.val(),
-        description: md.render($postDescription.val()),
-        updatedAt: moment(new Date()).format('lll')
-      }
-
-      $postPreview.html(renderTemplate('post-simplified-partial', options))
+        description: $postDescription.val(),
+        updatedAt: new Date()
+      }))
     })
 
     $modal.on('show.bs.modal', (e) => {
@@ -253,16 +240,15 @@ class NewsView extends View {
 
   present () {
     this.$main = $('#main')
-    this.$main.html(renderTemplate('loading-view'))
 
     $
-      .when(identityProvider.fetchIdentity())
+      .when(identityProvider.initIdentity())
       .done((identity) => {
         let promise = null
         if (identity.isTeam()) {
-          promise = $.when(contestProvider.fetchContest(), postProvider.fetchPosts(), contestProvider.fetchTeamScores())
+          promise = $.when(contestProvider.initContest(), postProvider.initPosts(), contestProvider.initTeamScores())
         } else {
-          promise = $.when(contestProvider.fetchContest(), postProvider.fetchPosts())
+          promise = $.when(contestProvider.initContest(), postProvider.initPosts())
         }
 
         promise
@@ -272,10 +258,8 @@ class NewsView extends View {
               dataStore.connectRealtime()
             }
 
-            navigationBar.present({ active: 'news' })
-            statusBar.present()
-
-            this.$main.html(renderTemplate('news-view', { identity: identity }))
+            newNavigationBar.present()
+            newStatusBar.present()
 
             if (identity.isSupervisor()) {
               this.initCreatePostModal()
@@ -283,11 +267,9 @@ class NewsView extends View {
               this.initEditPostModal()
             }
 
-            this.renderPosts()
-
-            let urlParams = History.getState().data.params
-            if (urlParams.action === 'scrollTo' && urlParams.postId) {
-              let $el = $(`div.themis-post[data-id="${urlParams.postId}"]`)
+            let urlParams = new URLSearchParams(window.location.search)
+            if (urlParams.get('action') === 'scrollTo' && urlParams.has('postId')) {
+              let $el = $(`div.themis-post[data-id="${urlParams.get('postId')}"]`)
               if ($el.length > 0) {
                 $el.get(0).scrollIntoView()
               }
@@ -313,16 +295,6 @@ class NewsView extends View {
             postProvider.on('updatePost', this.onUpdatePost)
             postProvider.on('deletePost', this.onDeletePost)
           })
-          .fail((err) => {
-            console.error(err)
-            navigationBar.present()
-            this.$main.html(renderTemplate('internal-error-view'))
-          })
-      })
-      .fail((err) => {
-        console.error(err)
-        navigationBar.present()
-        this.$main.html(renderTemplate('internal-error-view'))
       })
   }
 
@@ -348,8 +320,8 @@ class NewsView extends View {
 
     this.$main.empty()
     this.$main = null
-    navigationBar.dismiss()
-    statusBar.dismiss()
+    newNavigationBar.dismiss()
+    newStatusBar.dismiss()
 
     if (dataStore.supportsRealtime()) {
       dataStore.disconnectRealtime()

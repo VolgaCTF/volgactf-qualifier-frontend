@@ -32,21 +32,21 @@ const buildDir = path.join(__dirname, 'build')
 
 const paths = {
   scripts: [
-    'src/scripts/themis.js'
+    'src/scripts/themis-quals.js'
   ],
   fonts: [
-    'node_modules/bootstrap/dist/fonts/*.eot',
-    'node_modules/bootstrap/dist/fonts/*.svg',
-    'node_modules/bootstrap/dist/fonts/*.ttf',
-    'node_modules/bootstrap/dist/fonts/*.woff',
-    'node_modules/bootstrap/dist/fonts/*.woff2'
+    'node_modules/open-iconic/font/fonts/*.eot',
+    'node_modules/open-iconic/font/fonts/*.otf',
+    'node_modules/open-iconic/font/fonts/*.svg',
+    'node_modules/open-iconic/font/fonts/*.ttf',
+    'node_modules/open-iconic/font/fonts/*.woff'
   ],
   stylesheets: [
-    'src/stylesheets/themis.sass'
+    'src/stylesheets/themis-quals.sass'
   ],
   images: [
   ],
-  html: 'src/html/index.html'
+  html: 'src/html'
 }
 
 function isProduction () {
@@ -70,7 +70,7 @@ gulp.task('scripts', function (cb) {
       })
         .transform(babelify)
         .bundle()
-        .pipe(source('themis.js'))
+        .pipe(source('themis-quals.js'))
         .pipe(buffer())
         .pipe(plumber())
         .pipe(gulpIf(isProduction, uglify()))
@@ -83,7 +83,7 @@ gulp.task('scripts', function (cb) {
     },
     function (callback) {
       del([
-        path.join(buildDir, 'assets', 'js', 'themis.js')
+        path.join(buildDir, 'assets', 'js', 'themis-quals.js')
       ], callback)
     }
   ], function (err, values) {
@@ -140,7 +140,7 @@ gulp.task('stylesheets', function (cb) {
           indentedSyntax: true,
           errLogToConsole: true
         })))
-        .pipe(concatCss('themis.css', {
+        .pipe(concatCss('themis-quals.css', {
           rebaseUrls: false
         }))
         .pipe(gulpIf(isProduction, minifyCSS()))
@@ -153,7 +153,7 @@ gulp.task('stylesheets', function (cb) {
     },
     function (callback) {
       del([
-        path.join(buildDir, 'assets', 'css', 'themis.css'),
+        path.join(buildDir, 'assets', 'css', 'themis-quals.css'),
         tmpDir
       ], {
         force: true
@@ -307,9 +307,9 @@ gulp.task('default', ['fonts', 'images', 'scripts', 'stylesheets'], function (cb
         const cachebusting_js = JSON.parse(fs.readFileSync(path.join(buildDir, 'assets', 'js', 'manifest.json'), 'utf8'))
         const cachebusting_css = JSON.parse(fs.readFileSync(path.join(buildDir, 'assets', 'css', 'manifest.json'), 'utf8'))
         opts.cachebusting = {
-          themis: {
-            js: cachebusting_js['themis.js'],
-            css: cachebusting_css['themis.css']
+          themis_quals: {
+            js: cachebusting_js['themis-quals.js'],
+            css: cachebusting_css['themis-quals.css']
           }
         }
         callback()
@@ -347,7 +347,7 @@ gulp.task('default', ['fonts', 'images', 'scripts', 'stylesheets'], function (cb
         .on('end', callback)
     },
     function (callback) {
-      const basedir = path.dirname(path.join(__dirname, paths.html))
+      const basedir = path.join(__dirname, paths.html)
       fs.readdirSync(tmpDir).forEach(function(filename) {
         const fullPath = path.join(tmpDir, filename)
         if (fs.statSync(fullPath).isFile() && path.extname(fullPath) === '.html') {
@@ -361,11 +361,11 @@ gulp.task('default', ['fonts', 'images', 'scripts', 'stylesheets'], function (cb
     },
     function (callback) {
       gulp
-        .src(paths.html)
+        .src(`${paths.html}/**/*.html`)
         .pipe(mustache(opts))
         .pipe(include({
           includePaths: [
-            path.dirname(path.join(__dirname, paths.html))
+            path.join(__dirname, paths.html)
           ]
         }))
         .on('error', console.log)

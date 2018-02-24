@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <title>{{#event}}{{ title }}{{/event}} :: Restore password</title>
+
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link rel="stylesheet" href="/assets/css/{{#cachebusting}}{{#themis_quals}}{{ css }}{{/themis_quals}}{{/cachebusting}}">
+        {{#partials}}
+        {{#head}}
+        <!--=include {{{path}}} -->
+        {{/head}}
+        {{/partials}}
+        <script type="text/x-metadata" data-name="event-title" data-value="{{#event}}{{ title }}{{/event}}"></script>
+    </head>
+    <body>
+        <nav class="navbar navbar-expand-md navbar-dark bg-dark themis-navbar">
+            <a href="/" class="navbar-brand">{{#event}}{{ title }}{{/event}}</a>
+
+            <button class="navbar-toggler collapsed" type="button" data-toggle="collapse" data-target="#themis-navbar" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <div id="themis-navbar" class="collapse navbar-collapse">
+                <%= templates.navbar({ _: _, active: null, identity: identity }) %>
+            </div>
+        </nav>
+        <div id="themis-statusbar">
+        </div>
+
+        <div id="main">
+            <div class="container">
+            <% if (identity.role === 'guest') { %>
+                <form class="themis-form-restore" method="POST" action="/api/team/restore" novalidate>
+                    <h2>Restore password</h2>
+                    <div class="alert alert-warning">
+                        <span class="oi oi-warning"></span>&nbsp;If you have recently made a request to reset your account password, you may have to wait some time for an email to be delivered.
+                    </div>
+                    <div class="form-group">
+                        <label for="restore-email" class="sr-only">Email</label>
+                        <input type="email" id="restore-email" name="email" class="form-control" placeholder="Email" required autofocus>
+                    </div>
+                    <div class="submit-error">
+                        <p class="text-danger"></p>
+                    </div>
+                    <button class="btn btn-lg btn-primary btn-block" type="submit">Restore</button>
+                </form>
+                <div class="themis-alert-restore">
+                    <div class="col-sm-offset-3 col-sm-9">
+                        <h2>Restore password</h2>
+                    </div>
+                    <div class="col-sm-12 alert alert-success">
+                        You will receive an email with further instructions.
+                    </div>
+                </div>
+            <% } else { %>
+                <header>
+                    <h1>Already authenticated</h1>
+                </header>
+                <section>
+                    <p class="lead">You have already authenticated. Please navigate to another page.</p>
+                </section>
+            <% } %>
+            </div>
+        </div>
+
+        <footer class="footer">
+            {{#partials}}
+            {{#footer}}
+            <!--=include {{{path}}} -->
+            {{/footer}}
+            {{^footer}}
+            <!--=include ../partials/footer.html -->
+            {{/footer}}
+            {{/partials}}
+        </footer>
+
+        <script>
+            window.themis = {
+                quals: {
+                    data: {
+                        identity: <%= JSON.stringify(identity) %>
+                    },
+                    templates: {
+                    }
+                }
+            }
+        </script>
+        <script src="/assets/js/{{#cachebusting}}{{#themis_quals}}{{ js }}{{/themis_quals}}{{/cachebusting}}"></script>
+    </body>
+</html>

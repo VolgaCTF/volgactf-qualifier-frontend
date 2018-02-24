@@ -1,15 +1,14 @@
 import $ from 'jquery'
-import View from './base'
-import renderTemplate from '../utils/render-template'
-import navigationBar from '../navigation-bar'
-import metadataStore from '../utils/metadata-store'
-import identityProvider from '../providers/identity'
+import View from '../base'
+import newNavigationBar from '../../new-navigation-bar'
+import metadataStore from '../../utils/metadata-store'
+import identityProvider from '../../providers/identity'
 import 'parsley'
-import 'jquery.form'
+import 'jquery-form'
 
 class RestoreView extends View {
   constructor () {
-    super(/^\/restore$/)
+    super(/^\/team\/restore$/)
     this.$main = null
   }
 
@@ -19,7 +18,18 @@ class RestoreView extends View {
 
   initRestoreForm () {
     let $form = this.$main.find('form.themis-form-restore')
-    $form.parsley()
+    $form.parsley({
+      errorClass: 'is-invalid',
+      successClass: 'is-valid',
+      classHandler: function(ParsleyField) {
+        return ParsleyField.$element;
+      },
+      errorsContainer: function(ParsleyField) {
+        return ParsleyField.$element.parents('form-group');
+      },
+      errorsWrapper: '<div class="invalid-feedback">',
+      errorTemplate: '<span></span>'
+    })
 
     $form.find('input[name="email"]').focus()
 
@@ -62,23 +72,14 @@ class RestoreView extends View {
     this.$main = $('#main')
 
     $
-      .when(identityProvider.fetchIdentity())
+      .when(identityProvider.initIdentity())
       .done((identity) => {
         identityProvider.subscribe()
-
-        navigationBar.present()
+        newNavigationBar.present()
 
         if (identity.isGuest()) {
-          this.$main.html(renderTemplate('restore-view'))
           this.initRestoreForm()
-        } else {
-          this.$main.html(renderTemplate('already-authenticated-view'))
         }
-      })
-      .fail((err) => {
-        console.error(err)
-        navigationBar.present()
-        this.$main.html(renderTemplate('internal-error-view'))
       })
   }
 
@@ -86,7 +87,7 @@ class RestoreView extends View {
     identityProvider.unsubscribe()
     this.$main.empty()
     this.$main = null
-    navigationBar.dismiss()
+    newNavigationBar.dismiss()
   }
 }
 

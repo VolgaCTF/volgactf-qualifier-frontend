@@ -13,6 +13,16 @@ class CountryProvider extends EventEmitter {
     return this.countries
   }
 
+  initCountries () {
+    const promise = $.Deferred()
+    this.countries = _.map(window.themis.quals.data.countries, (options) => {
+      return new CountryModel(options)
+    })
+    promise.resolve(this.countries)
+
+    return promise
+  }
+
   fetchCountries () {
     let promise = $.Deferred()
     let url = '/api/country/index'

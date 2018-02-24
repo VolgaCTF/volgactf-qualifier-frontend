@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <title>{{#event}}{{ title }}{{/event}} :: Login</title>
+
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link rel="stylesheet" href="/assets/css/{{#cachebusting}}{{#themis_quals}}{{ css }}{{/themis_quals}}{{/cachebusting}}">
+        {{#partials}}
+        {{#head}}
+        <!--=include {{{path}}} -->
+        {{/head}}
+        {{/partials}}
+        <script type="text/x-metadata" data-name="event-title" data-value="{{#event}}{{ title }}{{/event}}"></script>
+    </head>
+    <body>
+        <nav class="navbar navbar-expand-md navbar-dark bg-dark themis-navbar">
+            <a href="/" class="navbar-brand">{{#event}}{{ title }}{{/event}}</a>
+
+            <button class="navbar-toggler collapsed" type="button" data-toggle="collapse" data-target="#themis-navbar" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <div id="themis-navbar" class="collapse navbar-collapse">
+                <%= templates.navbar({ _: _, active: null, identity: identity }) %>
+            </div>
+        </nav>
+        <div id="themis-statusbar">
+        </div>
+
+        <div id="main">
+            <div class="container">
+            <% if (identity.role === 'guest') { %>
+                <form class="themis-form-login" method="POST" action="/api/supervisor/signin" novalidate>
+                    <h1>Please log in</h1>
+                    <div class="form-group">
+                        <label for="login-team" class="sr-only">Username</label>
+                        <input type="text" id="login-username" name="username" class="form-control" placeholder="Username" required autofocus minlength="2" maxlength="100">
+                    </div>
+                    <div class="form-group">
+                        <label for="login-password" class="sr-only">Password</label>
+                        <input type="password" id="login-password" name="password" class="form-control" placeholder="Password" required minlength="6" maxlength="40" pattern="^[A-Za-z0-9\x5b\x5d\x28\x29\x7b\x7d\x7e\x60\x21\x40\x23\x24\x25\x5e\x26\x2a\x2d\x5f\x3d\x2b\x27\x22\x3a\x3b\x7c\x2f\x5c\x2e\x2c\x3f\x3c\x3e]+$">
+                    </div>
+                    <div class="submit-error">
+                        <p class="text-danger"></p>
+                    </div>
+                    <button class="btn btn-lg btn-primary btn-block" type="submit">Log in</button>
+                </form>
+            <% } else { %>
+                <header>
+                    <h1>Already authenticated</h1>
+                </header>
+                <section>
+                    <p class="lead">You have already authenticated. Please navigate to another page.</p>
+                </section>
+            <% } %>
+            </div>
+        </div>
+
+        <footer class="footer">
+            {{#partials}}
+            {{#footer}}
+            <!--=include {{{path}}} -->
+            {{/footer}}
+            {{^footer}}
+            <!--=include ../partials/footer.html -->
+            {{/footer}}
+            {{/partials}}
+        </footer>
+
+        <script>
+            window.themis = {
+                quals: {
+                    data: {
+                        identity: <%= JSON.stringify(identity) %>
+                    },
+                    templates: {
+                    }
+                }
+            }
+        </script>
+        <script src="/assets/js/{{#cachebusting}}{{#themis_quals}}{{ js }}{{/themis_quals}}{{/cachebusting}}"></script>
+    </body>
+</html>

@@ -17,6 +17,14 @@ class IdentityProvider {
     return this.identity
   }
 
+  initIdentity () {
+    const promise = $.Deferred()
+    this.identity = new IdentityModel(window.themis.quals.data.identity)
+    promise.resolve(this.identity)
+
+    return promise
+  }
+
   fetchIdentity () {
     let promise = $.Deferred()
     let url = '/api/identity'

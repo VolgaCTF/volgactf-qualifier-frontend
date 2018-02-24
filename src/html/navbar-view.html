@@ -1,0 +1,58 @@
+<ul class="navbar-nav mr-auto">
+    <li class="nav-item <% print((active === 'teams') ? 'active' : ''); %>">
+        <a class="nav-link" href="/teams">Teams</a>
+    </li>
+    <li class="nav-item <% print((active === 'news') ? 'active' : ''); %>">
+        <a class="nav-link" href="/news">News</a>
+    </li>
+<!-- 
+    <li class="nav-item <% print((active === 'scoreboard') ? 'active' : ''); %>">
+        <a class="nav-link" href="/scoreboard">Scoreboard</a>
+    </li>
+ -->
+    <% if (identity.role === 'admin' || identity.role === 'manager') { %>
+    <li class="nav-item <% print((active === 'categories') ? 'active' : ''); %>">
+        <a class="nav-link" href="/categories">Categories</a>
+    </li>
+    <% } %>
+<!-- 
+    <li class="nav-item <% print((active === 'tasks') ? 'active' : ''); %>">
+        <a class="nav-link" href="/tasks">Tasks</a>
+    </li>
+
+ -->    <li class="nav-item <% print((active === 'about') ? 'active' : ''); %>">
+        <a class="nav-link" href="/about">About</a>
+    </li>
+    <% if (identity.role === 'admin' || identity.role === 'manager') { %>
+    <li class="nav-item <% print((active === 'events') ? 'active' : ''); %>">
+        <a class="nav-link" href="/events">Events</a>
+    </li>
+    <% } %>
+</ul>
+
+<ul class="navbar-nav ml-auto">
+    <% if (identity.role === 'guest') { %>
+    <li class="nav-item <% print((active === 'signin') ? 'active' : ''); %>">
+        <a class="nav-link" href="/team/signin"><span class="oi oi-account-login"></span>&nbsp;Sign in</a>
+    </li>
+    <% } else { %>
+    <li class="nav-item dropdown">
+        <a href="#" class="nav-link dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+            <% if (identity.role === 'admin') { %>
+            <span class="badge badge-success">A</span>
+            <% } else if (identity.role === 'manager') { %>
+            <span class="badge badge-primary">M</span>
+            <% } else if (identity.role === 'team') { %>
+            <img class="profile-image" src="/api/team/<%- identity.id %>/logo">
+            <% } %>
+            <%- identity.name %>&nbsp;<span class="caret"></span>
+        </a>
+        <div class="dropdown-menu themis-quals-dropdown-menu" role="menu">
+            <% if (identity.role === 'team') { %>
+            <a class="dropdown-item" href="/team/<%- identity.id %>/profile"><span class="oi oi-cog"></span>&nbsp;Edit profile</a>
+            <% } %>
+            <a class="dropdown-item" href="#" data-action="signout"><span class="oi oi-account-logout"></span>&nbsp;Sign out</a>
+        </div>
+    </li>
+    <% } %>
+</ul>

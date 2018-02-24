@@ -10,14 +10,12 @@ import teamProvider from '../../providers/team'
 import contestProvider from '../../providers/contest'
 import countryProvider from '../../providers/country'
 import taskProvider from '../../providers/task'
-import History from 'history.js'
 import metadataStore from '../../utils/metadata-store'
 import teamTaskHitProvider from '../../providers/team-task-hit'
 import teamTaskReviewProvider from '../../providers/team-task-review'
 import moment from 'moment'
 import 'parsley'
-import 'jquery.form'
-import 'bootstrap-filestyle'
+import 'jquery-form'
 
 class TeamProfileView extends View {
   constructor () {
@@ -40,7 +38,6 @@ class TeamProfileView extends View {
       let $submitError = $modal.find('.submit-error > p')
       let $submitButton = $modal.find('button[data-action="complete-upload-logo"]')
       let $form = $modal.find('form')
-      $form.find('input:file').filestyle()
       $form.parsley()
 
       $submitButton.on('click', (e) => {
@@ -48,7 +45,6 @@ class TeamProfileView extends View {
       })
 
       $modal.on('show.bs.modal', (e) => {
-        $form.find('input:file').filestyle('clear')
         $form.parsley().reset()
       })
 
@@ -353,8 +349,7 @@ class TeamProfileView extends View {
     $
       .when(identityProvider.fetchIdentity(), contestProvider.fetchContest())
       .done((identity, contest) => {
-        let url = History.getState().data.urlPath
-        let urlParts = url.split('/')
+        let urlParts = window.location.pathname.split('/')
         let teamId = parseInt(urlParts[urlParts.length - 2], 10)
         let promise = null
 

@@ -1,0 +1,11 @@
+<div class="themis-post">
+    <header>
+        <h3><%- title %></h3>
+    </header>
+    <section>
+        <%= md.render(description) %>
+    </section>
+    <footer>
+        <p class="text-muted"><small>Updated on <%- moment(updatedAt).format('lll') %></small></p>
+    </footer>
+</div>

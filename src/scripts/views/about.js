@@ -2,8 +2,8 @@ import $ from 'jquery'
 import View from './base'
 import renderTemplate from '../utils/render-template'
 import dataStore from '../data-store'
-import navigationBar from '../navigation-bar'
-import statusBar from '../status-bar'
+import newNavigationBar from '../new-navigation-bar'
+import newStatusBar from '../new-status-bar'
 import metadataStore from '../utils/metadata-store'
 import contestProvider from '../providers/contest'
 import identityProvider from '../providers/identity'
@@ -20,40 +20,28 @@ class AboutView extends View {
 
   present () {
     this.$main = $('#main')
-    this.$main.html(renderTemplate('loading-view'))
 
     $
-      .when(identityProvider.fetchIdentity())
+      .when(identityProvider.initIdentity())
       .done((identity) => {
         let promise = null
         if (identity.isTeam()) {
-          promise = $.when(contestProvider.fetchContest(), contestProvider.fetchTeamScores())
+          promise = $.when(contestProvider.initContest(), contestProvider.initTeamScores())
         } else {
-          promise = $.when(contestProvider.fetchContest())
+          promise = $.when(contestProvider.initContest())
         }
 
         promise
           .done((contest) => {
-            this.$main.html(renderTemplate('about-view', { identity: identity }))
             identityProvider.subscribe()
 
             if (dataStore.supportsRealtime()) {
               dataStore.connectRealtime()
             }
 
-            navigationBar.present({ active: 'about' })
-            statusBar.present()
+            newNavigationBar.present()
+            newStatusBar.present()
           })
-          .fail((err) => {
-            console.error(err)
-            navigationBar.present()
-            this.$main.html(renderTemplate('internal-error-view'))
-          })
-      })
-      .fail((err) => {
-        console.error(err)
-        navigationBar.present()
-        this.$main.html(renderTemplate('internal-error-view'))
       })
   }
 
@@ -61,8 +49,8 @@ class AboutView extends View {
     identityProvider.unsubscribe()
 
     this.$main.empty()
-    navigationBar.dismiss()
-    statusBar.dismiss()
+    newNavigationBar.dismiss()
+    newStatusBar.dismiss()
 
     if (dataStore.supportsRealtime()) {
       dataStore.disconnectRealtime()

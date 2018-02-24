@@ -2,11 +2,12 @@ import $ from 'jquery'
 import View from './base'
 import renderTemplate from '../utils/render-template'
 import dataStore from '../data-store'
-import navigationBar from '../navigation-bar'
-import statusBar from '../status-bar'
+import newNavigationBar from '../new-navigation-bar'
+import newStatusBar from '../new-status-bar'
 import metadataStore from '../utils/metadata-store'
 import contestProvider from '../providers/contest'
 import identityProvider from '../providers/identity'
+import _ from 'underscore'
 
 class IndexView extends View {
   constructor () {
@@ -22,25 +23,19 @@ class IndexView extends View {
   render () {
     let identity = identityProvider.getIdentity()
     let contest = contestProvider.getContest()
-    this.$main.empty()
-    this.$main.html(renderTemplate('index-view', {
-      identity: identity,
-      contest: contest
-    }))
   }
 
   present () {
     this.$main = $('#main')
-    this.$main.html(renderTemplate('loading-view'))
 
     $
-      .when(identityProvider.fetchIdentity())
+      .when(identityProvider.initIdentity())
       .done((identity) => {
         let promise = null
         if (identity.isTeam()) {
-          promise = $.when(contestProvider.fetchContest(), contestProvider.fetchTeamScores())
+          promise = $.when(contestProvider.initContest(), contestProvider.initTeamScores())
         } else {
-          promise = $.when(contestProvider.fetchContest())
+          promise = $.when(contestProvider.initContest())
         }
 
         promise
@@ -50,8 +45,8 @@ class IndexView extends View {
               dataStore.connectRealtime()
             }
 
-            navigationBar.present()
-            statusBar.present()
+            newNavigationBar.present()
+            newStatusBar.present()
 
             this.render()
 
@@ -64,13 +59,13 @@ class IndexView extends View {
           })
           .fail((err) => {
             console.error(err)
-            navigationBar.present()
+            newNavigationBar.present()
             this.$main.html(renderTemplate('internal-error-view'))
           })
       })
       .fail((err) => {
         console.error(err)
-        navigationBar.present()
+        newNavigationBar.present()
         this.$main.html(renderTemplate('internal-error-view'))
       })
   }
@@ -85,8 +80,8 @@ class IndexView extends View {
 
     this.$main.empty()
     this.$main = null
-    navigationBar.dismiss()
-    statusBar.dismiss()
+    newNavigationBar.dismiss()
+    newStatusBar.dismiss()
 
     if (dataStore.supportsRealtime()) {
       dataStore.disconnectRealtime()

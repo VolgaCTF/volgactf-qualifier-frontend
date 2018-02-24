@@ -1,0 +1,10 @@
+<% var sortedTeams = _.sortBy(teams, 'createdAt') %>
+<div class="row">
+	<% for (var i=0; i<sortedTeams.length; ++i) { %>
+	<div class="col-lg-4 col-sm-6">
+		<% var team = sortedTeams[i] %>
+		<% var country = _.findWhere(countries, { id: team.countryId }) %>
+		<%= templates.teamProfileSimplifiedPartial({ _: _, team: team, country: country, moment: moment }) %>
+	</div>
+	<% } %>
+</div>

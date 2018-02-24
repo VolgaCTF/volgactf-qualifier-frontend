@@ -1,12 +1,12 @@
 import $ from 'jquery'
 import View from '../base'
-import renderTemplate from '../../utils/render-template'
-import navigationBar from '../../navigation-bar'
+import newNavigationBar from '../../new-navigation-bar'
 import stateController from '../../controllers/state'
 import metadataStore from '../../utils/metadata-store'
 import identityProvider from '../../providers/identity'
 import 'parsley'
-import 'jquery.form'
+import 'jquery-form'
+import parsleyBootstrapOptions from '../../utils/parsley-bootstrap'
 
 class TeamSigninView extends View {
   constructor () {
@@ -20,7 +20,18 @@ class TeamSigninView extends View {
 
   initSigninForm () {
     let $form = this.$main.find('form.themis-form-signin')
-    $form.parsley()
+    $form.parsley({
+      errorClass: 'is-invalid',
+      successClass: 'is-valid',
+      classHandler: function(ParsleyField) {
+        return ParsleyField.$element;
+      },
+      errorsContainer: function(ParsleyField) {
+        return ParsleyField.$element.parents('form-group');
+      },
+      errorsWrapper: '<div class="invalid-feedback">',
+      errorTemplate: '<span></span>'
+    })
 
     $form.find('input[name="team"]').focus()
 
@@ -60,23 +71,14 @@ class TeamSigninView extends View {
     this.$main = $('#main')
 
     $
-      .when(identityProvider.fetchIdentity())
+      .when(identityProvider.initIdentity())
       .done((identity) => {
         identityProvider.subscribe()
-
-        navigationBar.present({ active: 'signin' })
+        newNavigationBar.present({ active: 'signin' })
 
         if (identity.isGuest()) {
-          this.$main.html(renderTemplate('signin-view'))
           this.initSigninForm()
-        } else {
-          this.$main.html(renderTemplate('already-authenticated-view'))
         }
-      })
-      .fail((err) => {
-        console.error(err)
-        navigationBar.present()
-        this.$main.html(renderTemplate('internal-error-view'))
       })
   }
 
@@ -84,7 +86,7 @@ class TeamSigninView extends View {
     identityProvider.unsubscribe()
     this.$main.empty()
     this.$main = null
-    navigationBar.dismiss()
+    newNavigationBar.dismiss()
   }
 }
 

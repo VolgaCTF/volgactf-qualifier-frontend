@@ -10,7 +10,7 @@ import moment from 'moment'
 import contestProvider from '../providers/contest'
 import identityProvider from '../providers/identity'
 import teamProvider from '../providers/team'
-import History from 'history.js'
+import URLSearchParams from 'url-search-params'
 import countryProvider from '../providers/country'
 
 class ScoreboardView extends View {
@@ -90,8 +90,8 @@ class ScoreboardView extends View {
 
         identityProvider.subscribe()
 
-        let params = History.getState().data.params
-        this.detailed = (params.full)
+        let urlParams = new URLSearchParams(window.location.search)
+        this.detailed = urlParams.has('full')
 
         this.$main.html(renderTemplate('scoreboard-view', {
           identity: identity,

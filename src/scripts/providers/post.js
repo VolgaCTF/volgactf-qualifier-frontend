@@ -85,6 +85,15 @@ class PostProvider extends EventEmitter {
     this.posts = []
   }
 
+  initPosts () {
+    const promise = $.Deferred()
+    this.posts = _.map(window.themis.quals.data.posts, function (options) {
+      return new PostModel(options)
+    })
+    promise.resolve(this.posts)
+    return promise
+  }
+
   fetchPosts () {
     let promise = $.Deferred()
     let url = '/api/post/index'

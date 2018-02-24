@@ -1,14 +1,14 @@
 import $ from 'jquery'
 import View from '../base'
-import renderTemplate from '../../utils/render-template'
-import navigationBar from '../../navigation-bar'
+import newNavigationBar from '../../new-navigation-bar'
 import metadataStore from '../../utils/metadata-store'
 import contestProvider from '../../providers/contest'
 import identityProvider from '../../providers/identity'
 import countryProvider from '../../providers/country'
 import 'parsley'
-import 'jquery.form'
-import 'bootstrap-filestyle'
+import 'jquery-form'
+import parsleyBootstrapOptions from '../../utils/parsley-bootstrap'
+
 
 class TeamSignupView extends View {
   constructor () {
@@ -22,7 +22,18 @@ class TeamSignupView extends View {
 
   initSignupForm () {
     let $form = this.$main.find('form.themis-form-signup')
-    $form.parsley()
+    $form.parsley({
+      errorClass: 'is-invalid',
+      successClass: 'is-valid',
+      classHandler: function(ParsleyField) {
+        return ParsleyField.$element;
+      },
+      errorsContainer: function(ParsleyField) {
+        return ParsleyField.$element.parents('.col-sm-8');
+      },
+      errorsWrapper: '<div class="invalid-feedback">',
+      errorTemplate: '<span></span>'
+    })
 
     $form.find('input[name="team"]').focus()
 
@@ -31,7 +42,21 @@ class TeamSignupView extends View {
     let $submitError = $form.find('.submit-error > p')
     let $submitButton = $form.find('button')
 
-    $form.find('input:file').filestyle()
+    $("input[type=file]").change(function () {
+      var fieldVal = $(this).val();
+
+      // Change the node's value by removing the fake path (Chrome)
+      fieldVal = fieldVal.replace("C:\\fakepath\\", "");
+
+      if (fieldVal != undefined || fieldVal != "") {
+        $(this).next(".custom-file-label").attr('data-content', fieldVal);
+        $(this).next(".custom-file-label").text(fieldVal);
+      } else {
+        $(this).next('.custom-file-label').attr('data-content', '');
+        $(this).next('.custom-file-label').text('Choose file');
+      }
+    })
+
     $form.on('submit', (e) => {
       e.preventDefault()
       $form.ajaxSubmit({
@@ -71,31 +96,17 @@ class TeamSignupView extends View {
 
     $
       .when(
-        identityProvider.fetchIdentity(),
-        contestProvider.fetchContest(),
-        countryProvider.fetchCountries()
+        identityProvider.initIdentity(),
+        contestProvider.initContest(),
+        countryProvider.initCountries()
       )
       .done((identity, contest, countries) => {
         identityProvider.subscribe()
-        navigationBar.present()
+        newNavigationBar.present()
 
-        if (identity.isGuest()) {
-          if (contest.isFinished()) {
-            this.$main.html(renderTemplate('signup-not-available-view'))
-          } else {
-            this.$main.html(renderTemplate('signup-view', {
-              countries: countries
-            }))
-            this.initSignupForm()
-          }
-        } else {
-          this.$main.html(renderTemplate('already-authenticated-view'))
+        if (identity.isGuest() && !contest.isFinished()) {
+          this.initSignupForm()
         }
-      })
-      .fail((err) => {
-        console.error(err)
-        navigationBar.present()
-        this.$main.html(renderTemplate('internal-error-view'))
       })
   }
 
@@ -103,7 +114,7 @@ class TeamSignupView extends View {
     identityProvider.unsubscribe()
     this.$main.empty()
     this.$main = null
-    navigationBar.dismiss()
+    newNavigationBar.dismiss()
   }
 }
 

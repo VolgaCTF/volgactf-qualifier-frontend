@@ -1,16 +1,15 @@
 import $ from 'jquery'
-import View from './base'
-import renderTemplate from '../utils/render-template'
-import navigationBar from '../navigation-bar'
-import metadataStore from '../utils/metadata-store'
-import identityProvider from '../providers/identity'
-import History from 'history.js'
+import View from '../base'
+import newNavigationBar from '../../new-navigation-bar'
+import metadataStore from '../../utils/metadata-store'
+import identityProvider from '../../providers/identity'
+import URLSearchParams from 'url-search-params'
 import 'parsley'
-import 'jquery.form'
+import 'jquery-form'
 
 class ResetPasswordView extends View {
   constructor () {
-    super(/^\/reset-password$/)
+    super(/^\/team\/reset-password$/)
     this.$main = null
   }
 
@@ -22,23 +21,32 @@ class ResetPasswordView extends View {
     this.$main = $('#main')
 
     $
-      .when(identityProvider.fetchIdentity())
+      .when(identityProvider.initIdentity())
       .done((identity) => {
         identityProvider.subscribe()
-        navigationBar.present()
-
-        this.$main.html(renderTemplate('reset-password-view', { identity: identity }))
+        newNavigationBar.present()
 
         let $form = this.$main.find('form.themis-form-reset')
-        $form.parsley()
+        $form.parsley({
+          errorClass: 'is-invalid',
+          successClass: 'is-valid',
+          classHandler: function(ParsleyField) {
+            return ParsleyField.$element;
+          },
+          errorsContainer: function(ParsleyField) {
+            return ParsleyField.$element.parents('form-group');
+          },
+          errorsWrapper: '<div class="invalid-feedback">',
+          errorTemplate: '<span></span>'
+        })
         let $submitError = $form.find('.submit-error > p')
         let $submitButton = $form.find('button')
 
         let $successAlert = this.$main.find('div.themis-reset-success')
         let $errorAlert = this.$main.find('div.themis-reset-error')
 
-        let urlParams = History.getState().data.params
-        if (urlParams.team && urlParams.code) {
+        let urlParams = new URLSearchParams(window.location.search)
+        if (urlParams.has('team') && urlParams.has('code')) {
           $form.show()
 
           $form.on('submit', (e) => {
@@ -51,8 +59,8 @@ class ResetPasswordView extends View {
               clearForm: true,
               dataType: 'json',
               data: {
-                team: urlParams.team,
-                code: urlParams.code
+                team: urlParams.get('team'),
+                code: urlParams.get('code')
               },
               headers: {
                 'X-CSRF-Token': identityProvider.getIdentity().token
@@ -77,18 +85,13 @@ class ResetPasswordView extends View {
           $errorAlert.show()
         }
       })
-      .fail((err) => {
-        console.error(err)
-        navigationBar.present()
-        this.$main.html(renderTemplate('internal-error-view'))
-      })
   }
 
   dismiss () {
     identityProvider.unsubscribe()
     this.$main.empty()
     this.$main = null
-    navigationBar.dismiss()
+    newNavigationBar.dismiss()
   }
 }
 

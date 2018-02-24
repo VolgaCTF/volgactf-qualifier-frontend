@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <title>{{#event}}{{ title }}{{/event}} :: Sign up</title>
+
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link rel="stylesheet" href="/assets/css/{{#cachebusting}}{{#themis_quals}}{{ css }}{{/themis_quals}}{{/cachebusting}}">
+        {{#partials}}
+        {{#head}}
+        <!--=include {{{path}}} -->
+        {{/head}}
+        {{/partials}}
+        <script type="text/x-metadata" data-name="event-title" data-value="{{#event}}{{ title }}{{/event}}"></script>
+    </head>
+    <body>
+        <nav class="navbar navbar-expand-md navbar-dark bg-dark themis-navbar">
+            <a href="/" class="navbar-brand">{{#event}}{{ title }}{{/event}}</a>
+
+            <button class="navbar-toggler collapsed" type="button" data-toggle="collapse" data-target="#themis-navbar" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <div id="themis-navbar" class="collapse navbar-collapse">
+                <%= templates.navbar({ _: _, active: null, identity: identity }) %>
+            </div>
+        </nav>
+        <div id="themis-statusbar">
+        </div>
+
+        <div id="main">
+            <div class="container">
+            <% if (identity.role === 'guest') { %>
+                <% if (contest.state === 4) { %>
+                    <header>
+                        <h1>Signup not available</h1>
+                    </header>
+                    <section>
+                        <p class="lead">We are really sorry, but the contest has finished.</p>
+                    </section>
+                <% } else { %>
+                    <form class="themis-form-signup" method="POST" enctype="multipart/form-data" action="/api/team/signup" novalidate>
+                        <div class="form-group">
+                            <div class="offset-sm-4 col-sm-8">
+                                <h1>Sign up</h1>
+                            </div>
+                        </div>
+
+                        <div class="form-group row">
+                            <label for="signup-team" class="col-sm-4 col-form-label text-right">
+                                Team&nbsp;<sup>*</sup>
+                            </label>
+                            <div class="col-sm-8">
+                                <input type="text" class="form-control" id="signup-team" name="team" placeholder="Team" required autofocus minlength="2" maxlength="100">
+                            </div>
+                        </div>
+
+                        <div class="form-group row">
+                            <label for="signup-email" class="col-sm-4 col-form-label text-right">
+                                Email&nbsp;<sup>*</sup>
+                            </label>
+                            <div class="col-sm-8">
+                                <input type="email" class="form-control" id="signup-email" name="email" placeholder="Email" required>
+                            </div>
+                        </div>
+
+                        <div class="form-group row">
+                            <label for="signup-password" class="col-sm-4 col-form-label text-right">
+                                Password&nbsp;<sup>*</sup>
+                            </label>
+                            <div class="col-sm-8">
+                                <input type="password" class="form-control" id="signup-password" name="password" placeholder="Password" required minlength="6" maxlength="40" pattern="^[A-Za-z0-9\x5b\x5d\x28\x29\x7b\x7d\x7e\x60\x21\x40\x23\x24\x25\x5e\x26\x2a\x2d\x5f\x3d\x2b\x27\x22\x3a\x3b\x7c\x2f\x5c\x2e\x2c\x3f\x3c\x3e]+$">
+                            </div>
+                        </div>
+
+                        <div class="form-group row">
+                            <label for="signup-password-confirm" class="col-sm-4 col-form-label text-right">
+                                Confirm password&nbsp;<sup>*</sup>
+                            </label>
+                            <div class="col-sm-8">
+                                <input type="password" class="form-control" id="signup-password-confirm" placeholder="Confirm password" required minlength="6" maxlength="40" pattern="^[A-Za-z0-9\x5b\x5d\x28\x29\x7b\x7d\x7e\x60\x21\x40\x23\x24\x25\x5e\x26\x2a\x2d\x5f\x3d\x2b\x27\x22\x3a\x3b\x7c\x2f\x5c\x2e\x2c\x3f\x3c\x3e]+$" data-parsley-equalto="#signup-password">
+                            </div>
+                        </div>
+
+                        <div class="form-group row">
+                            <label for="signup-logo" class="col-sm-4 col-form-label text-right">
+                                Logo&nbsp;<sup>*</sup>
+                            </label>
+
+                            <div class="col-sm-8">
+                                <div class="custom-file">
+                                  <input type="file" id="signup-logo" name="logo" class="custom-file-input" accept="image/jpeg,image/png,image/gif" required>
+                                  <label class="custom-file-label" for="signup-logo">Choose file</label>
+                                </div>
+                            </div>
+                            <div class="col-sm-8 offset-sm-4">
+                                <p class="text-info">Image must be square and its size must not exceed 1 Mb</p>
+                            </div>
+                        </div>
+
+                        <div class="form-group row">
+                            <label for="signup-country" class="col-sm-4 col-form-label text-right">
+                                Country&nbsp;<sup>*</sup>
+                            </label>
+                            <div class="col-sm-8">
+                                <select required class="form-control" id="signup-country" name="countryId">
+                                    <% for (var i=0; i<countries.length; ++i) { %>
+                                    <% var country = countries[i] %>
+                                    <option value="<%- country.id %>" <% if (country.code === geoIPData.countryCode) { %>selected<% } %>>
+                                        <%- country.name %>
+                                    </option>
+                                    <% } %>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="form-group row">
+                            <label for="signup-locality" class="col-sm-4 col-form-label text-right">
+                                Locality
+                            </label>
+                            <div class="col-sm-8">
+                                <input type="text" class="form-control" id="signup-locality" name="locality" placeholder="Locality" value="<%- geoIPData.cityName %>">
+                            </div>
+                        </div>
+
+                        <div class="offset-sm-4 col-sm-8 submit-error">
+                            <p class="text-danger"></p>
+                        </div>
+
+                        <div class="form-group row">
+                            <div class="offset-sm-4 col-sm-8">
+                                <button type="submit" class="btn btn-primary btn-lg">Sign up</button>
+                            </div>
+                        </div>
+                    </form>
+
+                    <div class="themis-alert-signup">
+                        <div class="offset-sm-4 col-sm-8">
+                            <h1>Sign up</h1>
+                        </div>
+                        <div class="col-sm-12 alert alert-success">
+                            You have successfully signed up for the contest!
+                            Now, you can <a href="/team/signin">sign in</a> to your account.
+                        </div>
+                    </div>
+                <% } %>
+            <% } else { %>
+                <header>
+                    <h1>Already authenticated</h1>
+                </header>
+                <section>
+                    <p class="lead">You have already authenticated. Please navigate to another page.</p>
+                </section>
+            <% } %>
+            </div>
+        </div>
+
+        <footer class="footer">
+            {{#partials}}
+            {{#footer}}
+            <!--=include {{{path}}} -->
+            {{/footer}}
+            {{^footer}}
+            <!--=include ../partials/footer.html -->
+            {{/footer}}
+            {{/partials}}
+        </footer>
+
+        <script>
+            window.themis = {
+                quals: {
+                    data: {
+                        identity: <%= JSON.stringify(identity) %>,
+                        contest: <%= JSON.stringify(contest) %>,
+                        countries: <%= JSON.stringify(countries) %>
+                    },
+                    templates: {
+                    }
+                }
+            }
+        </script>
+        <script src="/assets/js/{{#cachebusting}}{{#themis_quals}}{{ js }}{{/themis_quals}}{{/cachebusting}}"></script>
+    </body>
+</html>

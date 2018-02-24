@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <title>{{#event}}{{ title }}{{/event}} :: Email verification</title>
+
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link rel="stylesheet" href="/assets/css/{{#cachebusting}}{{#themis_quals}}{{ css }}{{/themis_quals}}{{/cachebusting}}">
+        {{#partials}}
+        {{#head}}
+        <!--=include {{{path}}} -->
+        {{/head}}
+        {{/partials}}
+        <script type="text/x-metadata" data-name="event-title" data-value="{{#event}}{{ title }}{{/event}}"></script>
+    </head>
+    <body>
+        <nav class="navbar navbar-expand-md navbar-dark bg-dark themis-navbar">
+            <a href="/" class="navbar-brand">{{#event}}{{ title }}{{/event}}</a>
+
+            <button class="navbar-toggler collapsed" type="button" data-toggle="collapse" data-target="#themis-navbar" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <div id="themis-navbar" class="collapse navbar-collapse">
+                <%= templates.navbar({ _: _, active: null, identity: identity }) %>
+            </div>
+        </nav>
+        <div id="themis-statusbar">
+        </div>
+
+        <div id="main">
+            <div class="container">
+                <header>
+                    <h1>Email verification</h1>
+                </header>
+                <section>
+                    <p class="lead <% print(success ? 'text-success' : 'text-danger') %>" data-role="result"><%- text %></p>
+                </section>
+            </div>
+        </div>
+
+        <footer class="footer">
+            {{#partials}}
+            {{#footer}}
+            <!--=include {{{path}}} -->
+            {{/footer}}
+            {{^footer}}
+            <!--=include ../partials/footer.html -->
+            {{/footer}}
+            {{/partials}}
+        </footer>
+
+        <script>
+            window.themis = {
+                quals: {
+                    data: {
+                        identity: <%= JSON.stringify(identity) %>
+                    },
+                    templates: {
+                    }
+                }
+            }
+        </script>
+        <script src="/assets/js/{{#cachebusting}}{{#themis_quals}}{{ js }}{{/themis_quals}}{{/cachebusting}}"></script>
+    </body>
+</html>

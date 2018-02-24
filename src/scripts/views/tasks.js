@@ -18,8 +18,9 @@ import teamProvider from '../providers/team'
 import MarkdownRenderer from '../utils/markdown'
 import teamTaskReviewProvider from '../providers/team-task-review'
 import teamTaskHitProvider from '../providers/team-task-hit'
+import URLSearchParams from 'url-search-params'
 import 'bootstrap'
-import 'jquery.form'
+import 'jquery-form'
 import 'parsley'
 
 class TasksView extends View {
@@ -1310,9 +1311,9 @@ class TasksView extends View {
                 this.flagRenderTasks = false
                 if (firstRender) {
                   firstRender = false
-                  const urlParams = History.getState().data.params
-                  if (urlParams.action === 'show' && urlParams.taskId) {
-                    this.showTaskModal(identity, parseInt(urlParams.taskId, 10))
+                  const urlParams = new URLSearchParams(window.location.search)
+                  if (urlParams.get('action') === 'show' && urlParams.has('taskId')) {
+                    this.showTaskModal(identity, parseInt(urlParams.get('taskId'), 10))
                   }
                 }
               }

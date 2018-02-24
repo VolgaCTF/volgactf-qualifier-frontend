@@ -1,12 +1,12 @@
 import $ from 'jquery'
 import View from '../base'
 import renderTemplate from '../../utils/render-template'
-import navigationBar from '../../navigation-bar'
+import newNavigationBar from '../../new-navigation-bar'
 import stateController from '../../controllers/state'
 import metadataStore from '../../utils/metadata-store'
 import identityProvider from '../../providers/identity'
 import 'parsley'
-import 'jquery.form'
+import 'jquery-form'
 
 class SupervisorSigninView extends View {
   constructor () {
@@ -20,7 +20,18 @@ class SupervisorSigninView extends View {
 
   initLoginForm () {
     let $form = this.$main.find('form.themis-form-login')
-    $form.parsley()
+    $form.parsley({
+      errorClass: 'is-invalid',
+      successClass: 'is-valid',
+      classHandler: function(ParsleyField) {
+        return ParsleyField.$element;
+      },
+      errorsContainer: function(ParsleyField) {
+        return ParsleyField.$element.parents('form-group');
+      },
+      errorsWrapper: '<div class="invalid-feedback">',
+      errorTemplate: '<span></span>'
+    })
 
     let $submitError = $form.find('.submit-error > p')
     let $submitButton = $form.find('button')
@@ -58,21 +69,13 @@ class SupervisorSigninView extends View {
     this.$main = $('#main')
 
     $
-      .when(identityProvider.fetchIdentity())
+      .when(identityProvider.initIdentity())
       .done((identity) => {
         identityProvider.subscribe()
-        navigationBar.present()
+        newNavigationBar.present()
         if (identity.isGuest()) {
-          this.$main.html(renderTemplate('login-view'))
           this.initLoginForm()
-        } else {
-          this.$main.html(renderTemplate('already-authenticated-view'))
         }
-      })
-      .fail((err) => {
-        console.error(err)
-        navigationBar.present()
-        this.$main.html(renderTemplate('internal-error-view'))
       })
   }
 
@@ -80,7 +83,7 @@ class SupervisorSigninView extends View {
     identityProvider.unsubscribe()
     this.$main.empty()
     this.$main = null
-    navigationBar.dismiss()
+    newNavigationBar.dismiss()
   }
 }
 

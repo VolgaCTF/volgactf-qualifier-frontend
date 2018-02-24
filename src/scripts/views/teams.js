@@ -1,10 +1,9 @@
 import $ from 'jquery'
 import _ from 'underscore'
 import View from './base'
-import renderTemplate from '../utils/render-template'
 import dataStore from '../data-store'
-import navigationBar from '../navigation-bar'
-import statusBar from '../status-bar'
+import newNavigationBar from '../new-navigation-bar'
+import newStatusBar from '../new-status-bar'
 import metadataStore from '../utils/metadata-store'
 import contestProvider from '../providers/contest'
 import identityProvider from '../providers/identity'
@@ -30,45 +29,35 @@ class TeamsView extends View {
 
   renderTeams () {
     let countries = countryProvider.getCountries()
-    let sortedTeams = _.sortBy(teamProvider.getTeams(), 'createdAt')
-    this.$main.find('.themis-team-count').show().html(renderTemplate('team-count-partial', { count: sortedTeams.length }))
-
-    let $section = this.$main.find('section')
-    $section.empty()
-
-    let $content = $('<ul></ul>').addClass('themis-teams list-unstyled')
-    let identity = identityProvider.getIdentity()
-    for (let team of sortedTeams) {
-      let country = _.findWhere(countries, { id: team.countryId })
-      $content.append($('<li></li>').html(renderTemplate('team-profile-simplified-partial', {
-        identity: identity,
-        team: team,
-        country: country.name
-      })))
-    }
-    $section.html($content)
+    let teams = teamProvider.getTeams()
+    this.$main.find('.themis-team-count').text(`(${teams.length})`)
+    this.$main.find('section').html(window.themis.quals.templates.teamList({
+      _: _,
+      teams: teams,
+      countries: countries,
+      templates: window.themis.quals.templates
+    }))
   }
 
   present () {
     this.$main = $('#main')
-    this.$main.html(renderTemplate('loading-view'))
 
     $
-      .when(identityProvider.fetchIdentity())
+      .when(identityProvider.initIdentity())
       .done((identity) => {
         let promise = null
         if (identity.isTeam()) {
           promise = $.when(
-            contestProvider.fetchContest(),
-            teamProvider.fetchTeams(),
-            countryProvider.fetchCountries(),
-            contestProvider.fetchTeamScores()
+            contestProvider.initContest(),
+            teamProvider.initTeams(),
+            countryProvider.initCountries(),
+            contestProvider.initTeamScores()
           )
         } else {
           promise = $.when(
-            contestProvider.fetchContest(),
-            teamProvider.fetchTeams(),
-            countryProvider.fetchCountries()
+            contestProvider.initContest(),
+            teamProvider.initTeams(),
+            countryProvider.initCountries()
           )
         }
 
@@ -79,12 +68,10 @@ class TeamsView extends View {
               dataStore.connectRealtime()
             }
 
-            navigationBar.present({ active: 'teams' })
-            statusBar.present()
+            newNavigationBar.present()
+            newStatusBar.present()
 
-            this.$main.html(renderTemplate('teams-view', { identity: identity }))
-
-            this.renderTeams()
+            // this.renderTeams()
 
             teamProvider.subscribe()
 
@@ -138,16 +125,6 @@ class TeamsView extends View {
               teamProvider.on('updateTeamEmail', this.onUpdateTeamEmail)
             }
           })
-          .fail((err) => {
-            console.error(err)
-            navigationBar.present()
-            this.$main.html(renderTemplate('internal-error-view'))
-          })
-      })
-      .fail((err) => {
-        console.error(err)
-        navigationBar.present()
-        this.$main.html(renderTemplate('internal-error-view'))
       })
   }
 
@@ -188,8 +165,8 @@ class TeamsView extends View {
 
     this.$main.empty()
     this.$main = null
-    navigationBar.dismiss()
-    statusBar.dismiss()
+    newNavigationBar.dismiss()
+    newStatusBar.dismiss()
 
     if (dataStore.supportsRealtime()) {
       dataStore.disconnectRealtime()

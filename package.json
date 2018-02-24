@@ -1,10 +1,9 @@
 {
   "name": "themis-quals-frontend",
-  "version": "2.2.4",
+  "version": "2.9.9",
   "description": "",
   "main": "index.js",
   "scripts": {
-    "bower": "bower",
     "build": "gulp",
     "lint": "standard --verbose scripts/**/*.js | snazzy"
   },
@@ -18,31 +17,34 @@
     "url": "https://github.com/aspyatkin/themis-quals-frontend/issues"
   },
   "dependencies": {
-    "animate.css": "^3.6.1",
     "async": "^2.6.0",
     "axios": "^0.17.1",
-    "bootstrap": "^3.3.4",
+    "bootstrap": "^4.0.0",
     "dotenv": "^5.0.0",
     "gulp-remote-src": "^0.4.3",
-    "jquery": "^2.1.3",
-    "markdown-it": "^6.0.0",
-    "markdown-it-emoji": "^1.1.0",
+    "jquery": "^3.3.1",
+    "jquery-form": "^3.50.0",
+    "markdown-it": "^8.4.1",
+    "markdown-it-emoji": "^1.4.0",
     "markdown-it-ins": "^2.0.0",
     "markdown-it-mark": "^2.0.0",
     "markdown-it-sub": "^1.0.0",
     "markdown-it-sup": "^1.0.0",
-    "moment": "^2.9.0",
-    "query-string": "^3.0.0",
+    "moment": "^2.20.1",
+    "open-iconic": "^1.1.1",
+    "parsleyjs": "^2.8.1",
+    "popper.js": "^1.12.9",
+    "tempusdominus-bootstrap-4": "^5.0.0-alpha15",
     "tmp": "0.0.33",
-    "twemoji": "^1.4.1",
+    "twemoji": "^2.5.0",
     "underscore": "^1.8.3",
+    "url-search-params": "^0.10.0",
     "wolfy87-eventemitter": "^4.2.11"
   },
   "devDependencies": {
     "babel-eslint": "^4.1.8",
     "babel-preset-es2015": "^6.5.0",
     "babelify": "^7.2.0",
-    "bower": "~1.7.2",
     "browserify": "^13.0.0",
     "browserify-shim": "^3.8.12",
     "del": "^1.2.1",
@@ -50,7 +52,6 @@
     "gulp": "^3.9.1",
     "gulp-babel": "^6.1.2",
     "gulp-buster": "~1.0.0",
-    "gulp-coffee": "^2.3.1",
     "gulp-concat-css": "^2.2.0",
     "gulp-if": "^2.0.0",
     "gulp-include": "^2.3.1",
@@ -75,20 +76,20 @@
     ]
   },
   "browser": {
-    "history.js": "./bower_components/history.js/scripts/bundled-uncompressed/html5/jquery.history.js",
-    "parsley": "./bower_components/parsleyjs/dist/parsley.js",
-    "jquery.form": "./bower_components/jquery-form/jquery.form.js",
-    "bootstrap-filestyle": "./bower_components/bootstrap-filestyle/src/bootstrap-filestyle.js",
-    "bootstrap-datetimepicker": "./bower_components/eonasdan-bootstrap-datetimepicker/src/js/bootstrap-datetimepicker.js"
+    "bootstrap": "./node_modules/bootstrap/dist/js/bootstrap.js",
+    "popper": "./node_modules/popper.js/dist/umd/popper.js",
+    "parsley": "./node_modules/parsleyjs/dist/parsley.js",
+    "jquery-form": "./node_modules/jquery-form/jquery.form.js",
+    "tempusdominius-bootstrap-4": "./node_modules/tempusdominus-bootstrap-4/build/js/tempusdominus-bootstrap-4.js"
   },
   "browserify-shim": {
     "jquery": {
       "exports": "$"
     },
-    "history.js": {
-      "exports": "History",
+    "bootstrap": {
       "depends": [
-        "jquery:jQuery"
+        "jquery:jQuery",
+        "popper.js:popper"
       ]
     },
     "parsley": {
@@ -96,22 +97,16 @@
         "jquery"
       ]
     },
-    "jquery.form": {
+    "jquery-form": {
       "depends": [
         "jquery"
       ]
     },
-    "bootstrap-filestyle": {
-      "depends": [
-        "jquery",
-        "bootstrap"
-      ]
-    },
-    "bootstrap-datetimepicker": {
+    "tempusdominius-bootstrap-4": {
       "depends": [
         "jquery",
         "bootstrap",
-        "moment"
+        "moment:moment"
       ]
     }
   },

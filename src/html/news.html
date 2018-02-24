@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <title>{{#event}}{{ title }}{{/event}} :: News</title>
+
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link rel="stylesheet" href="/assets/css/{{#cachebusting}}{{#themis_quals}}{{ css }}{{/themis_quals}}{{/cachebusting}}">
+        {{#partials}}
+        {{#head}}
+        <!--=include {{{path}}} -->
+        {{/head}}
+        {{/partials}}
+        <script type="text/x-metadata" data-name="event-title" data-value="{{#event}}{{ title }}{{/event}}"></script>
+    </head>
+    <body>
+        <nav class="navbar navbar-expand-md navbar-dark bg-dark themis-navbar">
+            <a href="/" class="navbar-brand">{{#event}}{{ title }}{{/event}}</a>
+
+            <button class="navbar-toggler collapsed" type="button" data-toggle="collapse" data-target="#themis-navbar" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <div id="themis-navbar" class="collapse navbar-collapse">
+                <%= templates.navbar({ _: _, active: 'news', identity: identity }) %>
+            </div>
+        </nav>
+        <div id="themis-statusbar">
+            <%= templates.statusbar({ _: _, identity: identity, contest: contest, templates: templates, moment: moment }) %>
+        </div>
+
+        <div id="main">
+            <div class="container">
+                <% if (identity.role === 'team' && !identity.emailConfirmed) { %>
+                <!--=include ../partials/alert_email_verification.html -->
+                <% } %>
+                <header>
+                    <h1>News</h1>
+                    <% if (identity.role === 'manager' || identity.role === 'admin') { %>
+                    <button type="button" class="btn btn-success" data-action="create-post" data-toggle="modal" data-target="#create-post-modal">
+                        Create
+                    </button>
+                    <% } %>
+                </header>
+                <section id="#news">
+                    <%= templates.postList({ _: _, identity: identity, posts: posts, templates: templates, moment: moment, md: md }) %>
+                </section>
+            </div>
+
+            <% if (identity.role === 'manager' || identity.role === 'admin') { %>
+            <div class="modal fade" id="create-post-modal" tabindex="-1" role="dialog">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title">Create post</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <div>
+                                <ul class="nav nav-tabs" id="create-post-tablist">
+                                    <li class="nav-item"><a class="nav-link" href="#create-post-data" role="tab" data-toggle="tab">Data</a></li>
+                                    <li class="nav-item"><a class="nav-link" href="#create-post-preview" role="tab" data-toggle="tab">Preview</a></li>
+                                </ul>
+
+                                <div class="tab-content">
+                                    <div role="tabpanel" class="tab-pane" id="create-post-data">
+                                        <form method="POST" action="/api/post/create">
+                                            <div class="form-group">
+                                                <label for="create-post-title" class="control-label">Title</label>
+                                                <input type="text" class="form-control" id="create-post-title" required minlength="2" maxlength="250" name="title">
+                                                <label for="create-post-description" class="control-label">Description</label>
+                                                <textarea class="form-control themis-post-description" id="create-post-description" required minlength="1" maxlength="4096" name="description"></textarea>
+                                            </div>
+                                            <div class="submit-error">
+                                                <p class="text-danger"></p>
+                                            </div>
+                                        </form>
+                                    </div>
+                                    <div role="tabpanel" class="tab-pane" id="create-post-preview">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                            <button type="button" class="btn btn-primary" data-action="complete-create-post">Create</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal fade" id="delete-post-modal" tabindex="-1" role="dialog">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title">Delete post</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <p class="confirmation"></p>
+                            <div class="submit-error">
+                                <p class="text-danger"></p>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                            <button type="button" class="btn btn-danger" data-action="complete-delete-post">Delete</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal fade" id="edit-post-modal" tabindex="-1" role="dialog">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title">Edit post</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <div>
+                                <ul class="nav nav-tabs" id="edit-post-tablist">
+                                    <li class="nav-item"><a class="nav-link" href="#edit-post-data" role="tab" data-toggle="tab">Data</a></li>
+                                    <li class="nav-item"><a class="nav-link" href="#edit-post-preview" role="tab" data-toggle="tab">Preview</a></li>
+                                </ul>
+
+                                <div class="tab-content">
+                                    <div role="tabpanel" class="tab-pane" id="edit-post-data">
+                                        <form method="POST">
+                                            <div class="form-group">
+                                                <label for="edit-post-title" class="control-label">Title</label>
+                                                <input type="text" class="form-control" id="edit-post-title" required minlength="2" maxlength="250" name="title">
+                                                <label for="edit-post-description" class="control-label">Description</label>
+                                                <textarea class="form-control themis-post-description" id="edit-post-description" required minlength="1" maxlength="4096" name="description"></textarea>
+                                            </div>
+                                            <div class="submit-error">
+                                                <p class="text-danger"></p>
+                                            </div>
+                                        </form>
+                                    </div>
+                                    <div role="tabpanel" class="tab-pane" id="edit-post-preview">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                            <button type="button" class="btn btn-primary" data-action="complete-edit-post">Save</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <% } %>
+        </div>
+
+        <footer class="footer">
+            {{#partials}}
+            {{#footer}}
+            <!--=include {{{path}}} -->
+            {{/footer}}
+            {{^footer}}
+            <!--=include ../partials/footer.html -->
+            {{/footer}}
+            {{/partials}}
+        </footer>
+
+        <script>
+            window.themis = {
+                quals: {
+                    data: {
+                        identity: <%= JSON.stringify(identity) %>,
+                        contest: <%= JSON.stringify(contest) %>,
+                        teamScores: <%= JSON.stringify(teamScores) %>,
+                        posts: <%= JSON.stringify(posts) %>
+                    },
+                    templates: {
+                        contestStatePartial: <%= templates.contestStatePartial.source %>,
+                        contestTimer: <%= templates.contestTimer.source %>,
+                        contestRealtimeState: <%= templates.contestRealtimeState.source %>,
+                        contestScore: <%= templates.contestScore.source %>,
+                        postList: <%= templates.postList.source %>,
+                        postPartial: <%= templates.postPartial.source %>,
+                        postSimplifiedPartial: <%= templates.postSimplifiedPartial.source %>
+                    }
+                }
+            }
+        </script>
+        <script src="/assets/js/{{#cachebusting}}{{#themis_quals}}{{ js }}{{/themis_quals}}{{/cachebusting}}"></script>
+    </body>
+</html>

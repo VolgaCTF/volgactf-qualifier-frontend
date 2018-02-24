@@ -1,9 +1,8 @@
 import $ from 'jquery'
 import View from './base'
-import renderTemplate from '../utils/render-template'
 import metadataStore from '../utils/metadata-store'
 import identityProvider from '../providers/identity'
-import navigationBar from '../navigation-bar'
+import newNavigationBar from '../new-navigation-bar'
 
 class NotFoundView extends View {
   constructor () {
@@ -19,18 +18,10 @@ class NotFoundView extends View {
     this.$main = $('#main')
 
     $
-      .when(identityProvider.fetchIdentity())
+      .when(identityProvider.initIdentity())
       .done((identity) => {
         identityProvider.subscribe()
-        navigationBar.present()
-        this.$main.html(renderTemplate('not-found-view', {
-          urlPath: window.location.pathname
-        }))
-      })
-      .fail((err) => {
-        console.error(err)
-        navigationBar.present()
-        this.$main.html(renderTemplate('internal-error-view'))
+        newNavigationBar.present()
       })
   }
 
@@ -38,7 +29,7 @@ class NotFoundView extends View {
     identityProvider.unsubscribe()
     this.$main.empty()
     this.$main = null
-    navigationBar.dismiss()
+    newNavigationBar.dismiss()
   }
 }
 
