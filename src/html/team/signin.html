@@ -18,17 +18,7 @@
         <% } %>
     </head>
     <body>
-        <nav class="navbar navbar-expand-md navbar-dark bg-dark themis-navbar">
-            <a href="/" class="navbar-brand">{{#event}}{{ title }}{{/event}}</a>
-
-            <button class="navbar-toggler collapsed" type="button" data-toggle="collapse" data-target="#themis-navbar" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-
-            <div id="themis-navbar" class="collapse navbar-collapse">
-                <%= templates.navbar({ _: _, active: null, identity: identity }) %>
-            </div>
-        </nav>
+        <%= templates.navbar({ _: _, active: null, identity: identity }) %>
         <div id="themis-statusbar">
         </div>
 
