@@ -6,6 +6,6 @@
         <%= md.render(description) %>
     </section>
     <footer>
-        <p class="text-muted"><small>Updated on <%- moment(updatedAt).format('lll') %></small></p>
+        <p class="text-muted"><small>Updated on <%- moment(updatedAt).utc().format('MMM D [at] HH:mm [UTC]') %></small></p>
     </footer>
 </div>

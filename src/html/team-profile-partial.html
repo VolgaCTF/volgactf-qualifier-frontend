@@ -18,7 +18,7 @@
 <section>
     <h3>General information</h3>
     <% var createdAt = (team.createdAt instanceof Date) ? team.createdAt : new Date(team.createdAt) %>
-    <p class="text-secondary">Signed up on <%- moment(createdAt).format('lll') %></p>
+    <p class="text-secondary">Signed up on <%- moment(createdAt).utc().format('MMM D [at] HH:mm [UTC]') %></p>
     <% if (sameTeam || identity.role === 'manager' || identity.role === 'admin') { %>
     <ul class="list-unstyled">
         <% if ('email' in team && 'emailConfirmed' in team) { %>
@@ -110,7 +110,7 @@
                         <td><% print(i + 1) %></td>
                         <td><%- task.title %></td>
                         <td><%- task.value %></td>
-                        <td><%- moment(sortedTaskHits[i].createdAt).format('lll') %></td>
+                        <td><%- moment(sortedTaskHits[i].createdAt).utc().format('MMM D [at] HH:mm [UTC]') %></td>
                     </tr>
                     <% } %>
                 <% } %>
@@ -150,7 +150,7 @@
                         <td><%- task.value %></td>
                         <td><%- sortedTaskReviews[i].rating.toFixed(2) %></td>
                         <td><%- sortedTaskReviews[i].comment %></td>
-                        <td><%- moment(sortedTaskReviews[i].createdAt).format('lll') %></td>
+                        <td><%- moment(sortedTaskReviews[i].createdAt).utc().format('MMM D [at] HH:mm [UTC]') %></td>
                     </tr>
                     <% } %>
                 <% } %>

@@ -1,12 +1,12 @@
 <% if (contest.state === 1 && contest.startsAt) { %>
 <% var startsAt = (contest.startsAt instanceof Date) ? contest.startsAt : new Date(contest.startsAt) %>
-<span class="text-info">Contest starts on <%- moment(startsAt).format('lll') %> (<%- moment(startsAt).fromNow() %>)</span>
+<span class="text-info">Contest starts on <%- moment(startsAt).utc().format('MMM D [at] HH:mm [UTC]') %> (<%- moment(startsAt).fromNow() %>)</span>
 <% } else if (contest.state === 2 && contest.finishesAt) { %>
 <% var finishesAt = (contest.finishesAt instanceof Date) ? contest.finishesAt : new Date(contest.finishesAt) %>
-<span class="text-info">Contest finishes on <%- moment(finishesAt).format('lll') %> (<%- moment(finishesAt).fromNow() %>)</span>
+<span class="text-info">Contest finishes on <%- moment(finishesAt).utc().format('MMM D [at] HH:mm [UTC]') %> (<%- moment(finishesAt).fromNow() %>)</span>
 <% } else if (contest.state === 3) { %>
 <span class="text-info">Contest is paused</span>
 <% } else if (contest.state === 4 && contest.finishesAt) { %>
 <% var finishesAt = (contest.finishesAt instanceof Date) ? contest.finishesAt : new Date(contest.finishesAt) %>
-<span class="text-info">Contest has finished on <%- moment(finishesAt).format('lll') %> (<%- moment(finishesAt).fromNow() %>)</span>
+<span class="text-info">Contest has finished on <%- moment(finishesAt).utc().format('MMM D [at] HH:mm [UTC]') %> (<%- moment(finishesAt).fromNow() %>)</span>
 <% } %>

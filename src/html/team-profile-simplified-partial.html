@@ -11,7 +11,7 @@
     </p>
     <p class="card-text text-secondary">
         <% var createdAt = (team.createdAt instanceof Date) ? team.createdAt : new Date(team.createdAt) %>
-        Signed up on <%- moment(team.createdAt).format('lll') %>
+        Signed up on <%- moment(team.createdAt).utc().format('MMM D [at] HH:mm [UTC]') %>
     </p>
     <p class="card-text">
         <% if (typeof team.email !== 'undefined' && team.email !== null) { %>

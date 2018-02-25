@@ -8,7 +8,7 @@
     <footer>
         <p class="text-muted">
             <% var updatedAt = (post.updatedAt instanceof Date) ? post.updatedAt : new Date(post.updatedAt) %>
-            <small>Updated on <%- moment(updatedAt).format('lll') %></small>
+            <small>Updated on <%- moment(updatedAt).utc().format('MMM D [at] HH:mm [UTC]') %></small>
             &nbsp;
             <% if (identity.role === 'manager' || identity.role === 'admin') { %>
             <a href="/news?action=scrollTo&postId=<%- post.id %>" target="_blank">Permalink</a>
