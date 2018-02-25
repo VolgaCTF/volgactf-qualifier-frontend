@@ -221,11 +221,11 @@
             window.themis = {
                 quals: {
                     data: {
-                        identity: <%= JSON.stringify(identity) %>,
-                        contest: <%= JSON.stringify(contest) %>,
-                        team: <%= JSON.stringify(team) %>,
-                        countries: <%= JSON.stringify(countries) %>,
-                        teamScores: <%= JSON.stringify(teamScores) %>
+                        identity: <%= jsesc(identity, { json: true, isScriptContext: true }) %>,
+                        contest: <%= jsesc(contest, { json: true, isScriptContext: true }) %>,
+                        team: <%= jsesc(team, { json: true, isScriptContext: true }) %>,
+                        countries: <%= jsesc(countries, { json: true, isScriptContext: true }) %>,
+                        teamScores: <%= jsesc(teamScores, { json: true, isScriptContext: true }) %>
                     },
                     templates: {
                         contestStatePartial: <%= templates.contestStatePartial.source %>,

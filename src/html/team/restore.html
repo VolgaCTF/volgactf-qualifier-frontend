@@ -73,7 +73,7 @@
             window.themis = {
                 quals: {
                     data: {
-                        identity: <%= JSON.stringify(identity) %>
+                        identity: <%= jsesc(identity, { json: true, isScriptContext: true }) %>
                     },
                     templates: {
                     }

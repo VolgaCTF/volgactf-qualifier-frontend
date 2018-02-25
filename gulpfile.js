@@ -7,7 +7,7 @@ const mustache = require('gulp-mustache')
 const sass = require('gulp-sass')
 const uglify = require('gulp-uglify')
 const minifyCSS = require('gulp-minify-css')
-const minifyHTML = require('gulp-minify-html')
+// const minifyHTML = require('gulp-minify-html')
 const rev = require('gulp-rev')
 const concatCss = require('gulp-concat-css')
 
@@ -369,7 +369,7 @@ gulp.task('default', ['fonts', 'images', 'scripts', 'stylesheets'], function (cb
           ]
         }))
         .on('error', console.log)
-        .pipe(gulpIf(isProduction, minifyHTML()))
+        // .pipe(gulpIf(isProduction, minifyHTML()))
         .pipe(gulp.dest(path.join(buildDir, 'html')))
         .on('end', callback)
     },

@@ -164,9 +164,9 @@
             window.themis = {
                 quals: {
                     data: {
-                        identity: <%= JSON.stringify(identity) %>,
-                        contest: <%= JSON.stringify(contest) %>,
-                        countries: <%= JSON.stringify(countries) %>
+                        identity: <%= jsesc(identity, { json: true, isScriptContext: true }) %>,
+                        contest: <%= jsesc(contest, { json: true, isScriptContext: true }) %>,
+                        countries: <%= jsesc(countries, { json: true, isScriptContext: true }) %>
                     },
                     templates: {
                     }
