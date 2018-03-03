@@ -12,7 +12,7 @@ import aboutView from './views/about'
 import teamsView from './views/teams'
 import categoriesView from './views/categories'
 // import tasksView from './views/tasks'
-// import scoreboardView from './views/scoreboard'
+import scoreboardView from './views/scoreboard'
 // import eventsView from './views/events'
 import teamRestoreView from './views/team/restore'
 import teamResetPasswordView from './views/team/reset-password'
@@ -31,6 +31,7 @@ $(document).ready(function () {
     index: indexView,
     teams: teamsView,
     news: newsView,
+    scoreboard: scoreboardView,
     about: aboutView,
     categories: categoriesView,
 

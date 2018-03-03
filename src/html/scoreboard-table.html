@@ -1,0 +1,75 @@
+<table class="table table-sm">
+    <thead>
+        <tr>
+            <th scope="col">#</th>
+            <th scope="col">Team</th>
+            <th scope="col">Country</th>
+            <% if (detailed) { %>
+            <th scope="col">Locality</th>
+            <th scope="col">Institution</th>
+            <% } %>
+            <th scope="col">Score</th>
+            <th scope="col">Last updated</th>
+        </tr>
+    </thead>
+    <tbody id="themis-scoreboard-table-body">
+        <% var entries = _.map(teamScores, function (teamScore) {
+            var team = _.findWhere(teams, { id: teamScore.teamId })
+            return {
+                team: team,
+                teamScore: teamScore,
+                country: _.findWhere(countries, { id: team.countryId })
+            }
+        }) %>
+
+        <% function rank (a, b) {
+            if (a.teamScore.score > b.teamScore.score) {
+                return -1
+            } else if (a.teamScore.score < b.teamScore.score) {
+                return 1
+            } else {
+                if (a.teamScore.updatedAt && b.teamScore.updatedAt) {
+                    var aUpdatedAt = (a.teamScore.updatedAt instanceof Date) ? a.teamScore.updatedAt : new Date(a.teamScore.updatedAt)
+                    var bUpdatedAt = (b.teamScore.updatedAt instanceof Date) ? b.teamScore.updatedAt : new Date(b.teamScore.updatedAt)
+
+                    if (aUpdatedAt.getTime() < bUpdatedAt.getTime()) {
+                        return -1
+                    } else if (aUpdatedAt.getTime() > bUpdatedAt.getTime()) {
+                        return 1
+                    } else {
+                        var aCreatedAt = (a.team.createdAt instanceof Date) ? a.team.createdAt : new Date(a.team.createdAt)
+                        var bCreatedAt = (b.team.createdAt instanceof Date) ? b.team.createdAt : new Date(b.team.createdAt)
+                        if (aCreatedAt.getTime() < bCreatedAt.getTime()) {
+                            return -1
+                        } else if (aCreatedAt.getTime() > bCreatedAt.getTime()) {
+                            return 1
+                        } else {
+                            return 0
+                        }
+                    }
+                } else if (a.teamScore.updatedAt && !b.teamScore.updatedAt) {
+                    return -1
+                } else if (!a.teamScore.updatedAt && b.teamScore.updatedAt) {
+                    return 1
+                } else {
+                    var aCreatedAt = (a.team.createdAt instanceof Date) ? a.team.createdAt : new Date(a.team.createdAt)
+                    var bCreatedAt = (b.team.createdAt instanceof Date) ? b.team.createdAt : new Date(b.team.createdAt)
+                    if (aCreatedAt.getTime() < bCreatedAt.getTime()) {
+                        return -1
+                    } else if (aCreatedAt.getTime() > bCreatedAt.getTime()) {
+                        return 1
+                    } else {
+                        return 0
+                    }
+                }
+            }
+        } %>
+
+        <% entries.sort(rank) %>
+
+        <% for (var i=0; i<entries.length; ++i) { %>
+            <% var entry = entries[i] %>
+            <%= templates.scoreboardTableRowPartial({ _: _, identity: identity, detailed: detailed, rank: i + 1, teamScore: entry.teamScore, team: entry.team, country: entry.country, moment: moment }) %>
+        <% } %>
+    </tbody>
+</table>

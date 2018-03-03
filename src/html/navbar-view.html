@@ -22,11 +22,9 @@
             <li class="nav-item <% print((active === 'news') ? 'active' : ''); %>">
                 <a class="nav-link" href="/news">News</a>
             </li>
-        <!-- 
             <li class="nav-item <% print((active === 'scoreboard') ? 'active' : ''); %>">
                 <a class="nav-link" href="/scoreboard">Scoreboard</a>
             </li>
-         -->
             <% if (identity.role === 'admin' || identity.role === 'manager') { %>
             <li class="nav-item <% print((active === 'categories') ? 'active' : ''); %>">
                 <a class="nav-link" href="/categories">Categories</a>

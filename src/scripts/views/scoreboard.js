@@ -1,10 +1,9 @@
 import $ from 'jquery'
 import _ from 'underscore'
 import View from './base'
-import renderTemplate from '../utils/render-template'
 import dataStore from '../data-store'
-import navigationBar from '../navigation-bar'
-import statusBar from '../status-bar'
+import newNavigationBar from '../new-navigation-bar'
+import newStatusBar from '../new-status-bar'
 import moment from 'moment'
 import contestProvider from '../providers/contest'
 import identityProvider from '../providers/identity'
@@ -29,76 +28,40 @@ class ScoreboardView extends View {
     this.detailed = false
   }
 
-  getTitle () {
-    return ` :: Scoreboard`
-  }
-
   renderScoreboard () {
-    let $tableBody = $('#themis-scoreboard-table-body')
-    $tableBody.empty()
-
-    let teamScores = contestProvider.getTeamScores()
-    let teams = teamProvider.getTeams()
-    let countries = countryProvider.getCountries()
-
-    let identity = identityProvider.getIdentity()
-
-    teamScores.sort(contestProvider.teamRankFunc)
-    _.each(teamScores, (teamScore, ndx) => {
-      let team = _.findWhere(teams, { id: teamScore.teamId })
-      if (team) {
-        let country = _.findWhere(countries, { id: team.countryId })
-
-        let obj = {
-          rank: ndx + 1,
-          id: team.id,
-          name: team.name,
-          country: country.name,
-          score: teamScore.score,
-          updatedAt: (teamScore.updatedAt) ? moment(teamScore.updatedAt).format('lll') : 'never',
-          highlight: identity.isExactTeam(team.id),
-          detailed: this.detailed
-        }
-
-        if (this.detailed) {
-          obj.locality = team.locality
-          obj.institution = team.institution
-        }
-
-        $tableBody.append($(renderTemplate('scoreboard-table-row-partial', obj)))
-      }
-    })
+    this.$main.find('section').html(window.themis.quals.templates.scoreboardTable({
+      _: _,
+      moment: moment,
+      detailed: this.detailed,
+      templates: window.themis.quals.templates,
+      teams: teamProvider.getTeams(),
+      teamScores: contestProvider.getTeamScores(),
+      countries: countryProvider.getCountries(),
+      identity: identityProvider.getIdentity()
+    }))
   }
 
   present () {
     this.$main = $('#main')
-    this.$main.html(renderTemplate('loading-view'))
 
     $
       .when(
-        identityProvider.fetchIdentity(),
-        contestProvider.fetchContest(),
-        teamProvider.fetchTeams(),
-        contestProvider.fetchTeamScores(),
-        countryProvider.fetchCountries()
+        identityProvider.initIdentity(),
+        contestProvider.initContest(),
+        teamProvider.initTeams(),
+        contestProvider.initTeamScores(),
+        countryProvider.initCountries()
       )
       .done((identity, contest, teams, teamScores, countries) => {
         identityProvider.subscribe()
 
         let urlParams = new URLSearchParams(window.location.search)
-        this.detailed = urlParams.has('full')
-
-        this.$main.html(renderTemplate('scoreboard-view', {
-          identity: identity,
-          detailed: this.detailed
-        }))
+        this.detailed = urlParams.has('detailed')
 
         teamProvider.subscribe()
 
-        navigationBar.present({ active: 'scoreboard' })
-        statusBar.present()
-
-        this.renderScoreboard()
+        newNavigationBar.present()
+        newStatusBar.present()
 
         this.onUpdateTeamScore = (teamScore) => {
           this.reloadScoreboard = true
@@ -140,46 +103,6 @@ class ScoreboardView extends View {
 
         this.reloadScoreboardInterval = setInterval(this.onReloadScoreboard, 1500)
       })
-      .fail(() => {
-        navigationBar.present()
-        this.$main.html(renderTemplate('internal-error-view'))
-      })
-  }
-
-  dismiss () {
-    identityProvider.unsubscribe()
-    teamProvider.unsubscribe()
-
-    if (this.onUpdateTeamScore) {
-      contestProvider.off('updateTeamScore', this.onUpdateTeamScore)
-      this.onUpdateTeamScore = null
-    }
-
-    if (this.onUpdateTeamLogo) {
-      teamProvider.off('updateTeamLogo', this.onUpdateTeamLogo)
-      this.onUpdateTeamLogo = null
-    }
-
-    if (this.onUpdateTeamProfile) {
-      teamProvider.off('updateTeamProfile', this.onUpdateTeamProfile)
-      this.onUpdateTeamProfile = null
-    }
-
-    if (this.reloadScoreboardInterval) {
-      clearInterval(this.reloadScoreboardInterval)
-      this.reloadScoreboardInterval = null
-      this.renderingScoreboard = false
-      this.reloadScoreboard = false
-    }
-
-    this.$main.empty()
-    this.$main = null
-    navigationBar.dismiss()
-    statusBar.dismiss()
-
-    if (dataStore.supportsRealtime()) {
-      dataStore.disconnectRealtime()
-    }
   }
 }
 

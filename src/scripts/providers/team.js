@@ -46,6 +46,14 @@ class TeamProvider extends EventEmitter {
 
     realtimeProvider.addEventListener('updateTeamProfile', this.onUpdateProfile)
 
+    this.onUpdateLogo = (e) => {
+      let options = JSON.parse(e.data)
+      let team = new TeamModel(options)
+      this.trigger('updateTeamLogo', [team, new Date(options.__metadataCreatedAt)])
+    }
+
+    realtimeProvider.addEventListener('updateTeamLogo', this.onUpdateLogo)
+
     this.onQualify = (e) => {
       let options = JSON.parse(e.data)
       let team = new TeamModel(options)
@@ -104,14 +112,6 @@ class TeamProvider extends EventEmitter {
       }
 
       realtimeProvider.addEventListener('updateTeamPassword', this.onUpdatePassword)
-
-      this.onUpdateLogo = (e) => {
-        let options = JSON.parse(e.data)
-        let team = new TeamModel(options)
-        this.trigger('updateTeamLogo', [team, new Date(options.__metadataCreatedAt)])
-      }
-
-      realtimeProvider.addEventListener('updateTeamLogo', this.onUpdateLogo)
 
       this.onLogin = (e) => {
         let options = JSON.parse(e.data)
