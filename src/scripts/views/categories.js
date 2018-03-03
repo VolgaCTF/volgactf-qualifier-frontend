@@ -5,7 +5,6 @@ import renderTemplate from '../utils/render-template'
 import dataStore from '../data-store'
 import navigationBar from '../navigation-bar'
 import statusBar from '../status-bar'
-import metadataStore from '../utils/metadata-store'
 import moment from 'moment'
 import categoryProvider from '../providers/category'
 import contestProvider from '../providers/contest'
@@ -17,7 +16,7 @@ import URLSearchParams from 'url-search-params'
 
 class CategoriesView extends View {
   constructor () {
-    super(/^\/categories$/)
+    super()
     this.$main = null
     this.$categoriesList = null
 
@@ -26,10 +25,6 @@ class CategoriesView extends View {
     this.onDeleteCategory = null
 
     this.onUpdateContest = null
-  }
-
-  getTitle () {
-    return `${metadataStore.getMetadata('event-title')} :: Categories`
   }
 
   initCreateCategoryModal () {
@@ -214,10 +209,6 @@ class CategoriesView extends View {
         if (identity.isSupervisor()) {
           identityProvider.subscribe()
 
-          if (dataStore.supportsRealtime()) {
-            dataStore.connectRealtime()
-          }
-
           navigationBar.present({ active: 'categories' })
 
           $
@@ -284,42 +275,6 @@ class CategoriesView extends View {
         navigationBar.present()
         this.$main.html(renderTemplate('internal-error-view'))
       })
-  }
-
-  dismiss () {
-    identityProvider.unsubscribe()
-
-    if (this.onCreateCategory) {
-      categoryProvider.off('createCategory', this.onCreateCategory)
-      this.onCreateCategory = null
-    }
-
-    if (this.onUpdateCategory) {
-      categoryProvider.off('updateCategory', this.onUpdateCategory)
-      this.onUpdateCategory = null
-    }
-
-    if (this.onDeleteCategory) {
-      categoryProvider.off('deleteCategory', this.onDeleteCategory)
-      this.onDeleteCategory = null
-    }
-
-    categoryProvider.unsubscribe()
-
-    if (this.onUpdateContest) {
-      contestProvider.off('updateContest', this.onUpdateContest)
-      this.onUpdateContest = null
-    }
-
-    this.$main.empty()
-    this.$main = null
-    this.$categoriesList = null
-    navigationBar.dismiss()
-    statusBar.dismiss()
-
-    if (dataStore.supportsRealtime()) {
-      dataStore.disconnectRealtime()
-    }
   }
 }
 

@@ -25,7 +25,7 @@ import 'parsley'
 
 class TasksView extends View {
   constructor () {
-    super(/^\/tasks$/)
+    super()
     this.$main = null
     this.$taskPreviewsList = null
 
@@ -1181,10 +1181,6 @@ class TasksView extends View {
       .done((identity, contest) => {
         identityProvider.subscribe()
         this.$main.html(renderTemplate('tasks-view', { identity: identity, contest: contest }))
-
-        if (dataStore.supportsRealtime()) {
-          dataStore.connectRealtime()
-        }
 
         navigationBar.present({ active: 'tasks' })
 

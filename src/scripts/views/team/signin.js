@@ -1,8 +1,6 @@
 import $ from 'jquery'
 import View from '../base'
 import newNavigationBar from '../../new-navigation-bar'
-import stateController from '../../controllers/state'
-import metadataStore from '../../utils/metadata-store'
 import identityProvider from '../../providers/identity'
 import 'parsley'
 import 'jquery-form'
@@ -10,12 +8,8 @@ import parsleyBootstrapOptions from '../../utils/parsley-bootstrap'
 
 class TeamSigninView extends View {
   constructor () {
-    super(/^\/team\/signin$/)
+    super()
     this.$main = null
-  }
-
-  getTitle () {
-    return `${metadataStore.getMetadata('event-title')} :: Sign in`
   }
 
   initSigninForm () {
@@ -51,7 +45,7 @@ class TeamSigninView extends View {
           'X-CSRF-Token': identityProvider.getIdentity().token
         },
         success: (responseText, textStatus, jqXHR) => {
-          stateController.navigateTo('/')
+          window.location = '/'
         },
         error: (jqXHR, textStatus, errorThrown) => {
           if (jqXHR.responseJSON) {
@@ -80,13 +74,6 @@ class TeamSigninView extends View {
           this.initSigninForm()
         }
       })
-  }
-
-  dismiss () {
-    identityProvider.unsubscribe()
-    this.$main.empty()
-    this.$main = null
-    newNavigationBar.dismiss()
   }
 }
 

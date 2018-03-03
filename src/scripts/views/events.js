@@ -20,7 +20,7 @@ import teamTaskHitProvider from '../providers/team-task-hit'
 
 class EventsView extends View {
   constructor () {
-    super(/^\/events$/)
+    super()
     this.$main = null
 
     this.onUpdateContest = null
@@ -770,10 +770,6 @@ class EventsView extends View {
       )
       .done((identity, contest) => {
         if (identity.isSupervisor()) {
-          if (dataStore.supportsRealtime()) {
-            dataStore.connectRealtime()
-          }
-
           identityProvider.subscribe()
 
           navigationBar.present({ active: 'events' })

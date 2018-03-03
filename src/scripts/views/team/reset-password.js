@@ -1,7 +1,6 @@
 import $ from 'jquery'
 import View from '../base'
 import newNavigationBar from '../../new-navigation-bar'
-import metadataStore from '../../utils/metadata-store'
 import identityProvider from '../../providers/identity'
 import URLSearchParams from 'url-search-params'
 import 'parsley'
@@ -9,12 +8,8 @@ import 'jquery-form'
 
 class ResetPasswordView extends View {
   constructor () {
-    super(/^\/team\/reset-password$/)
+    super()
     this.$main = null
-  }
-
-  getTitle () {
-    return `${metadataStore.getMetadata('event-title')} :: Reset password`
   }
 
   present () {
@@ -85,13 +80,6 @@ class ResetPasswordView extends View {
           $errorAlert.show()
         }
       })
-  }
-
-  dismiss () {
-    identityProvider.unsubscribe()
-    this.$main.empty()
-    this.$main = null
-    newNavigationBar.dismiss()
   }
 }
 

@@ -18,7 +18,7 @@
         <% } %>
     </head>
     <body>
-        <%= templates.navbar({ _: _, active: null, identity: identity }) %>
+        <%= templates.navbar({ _: _, active: null, identity: identity, templates: templates }) %>
         <div id="themis-statusbar">
             <%= templates.statusbar({ _: _, identity: identity, contest: contest, templates: templates, moment: moment }) %>
         </div>
@@ -220,6 +220,7 @@
         <script>
             window.themis = {
                 quals: {
+                    view: 'teamProfile',
                     data: {
                         identity: <%= jsesc(identity, { json: true, isScriptContext: true }) %>,
                         contest: <%= jsesc(contest, { json: true, isScriptContext: true }) %>,
@@ -230,9 +231,9 @@
                     templates: {
                         contestStatePartial: <%= templates.contestStatePartial.source %>,
                         contestTimer: <%= templates.contestTimer.source %>,
-                        contestRealtimeState: <%= templates.contestRealtimeState.source %>,
                         contestScore: <%= templates.contestScore.source %>,
-                        teamProfilePartial: <%= templates.teamProfilePartial.source %>
+                        teamProfilePartial: <%= templates.teamProfilePartial.source %>,
+                        streamStatePartial: <%= templates.streamStatePartial.source %>
                     }
                 }
             }

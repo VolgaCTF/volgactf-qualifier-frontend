@@ -4,7 +4,6 @@ import View from './base'
 import dataStore from '../data-store'
 import newNavigationBar from '../new-navigation-bar'
 import newStatusBar from '../new-status-bar'
-import metadataStore from '../utils/metadata-store'
 import MarkdownRenderer from '../utils/markdown'
 import moment from 'moment'
 import postProvider from '../providers/post'
@@ -16,16 +15,12 @@ import 'parsley'
 
 class NewsView extends View {
   constructor () {
-    super(/^\/news$/)
+    super()
     this.$main = null
 
     this.onCreatePost = null
     this.onUpdatePost = null
     this.onDeletePost = null
-  }
-
-  getTitle () {
-    return `${metadataStore.getMetadata('event-title')} :: News`
   }
 
   renderPosts () {
@@ -254,9 +249,6 @@ class NewsView extends View {
         promise
           .done((contest) => {
             identityProvider.subscribe()
-            if (dataStore.supportsRealtime()) {
-              dataStore.connectRealtime()
-            }
 
             newNavigationBar.present()
             newStatusBar.present()
@@ -296,36 +288,6 @@ class NewsView extends View {
             postProvider.on('deletePost', this.onDeletePost)
           })
       })
-  }
-
-  dismiss () {
-    identityProvider.unsubscribe()
-
-    if (this.onCreatePost) {
-      postProvider.off('createPost', this.onCreatePost)
-      this.onCreatePost = null
-    }
-
-    if (this.onDeletePost) {
-      postProvider.off('deletePost', this.onDeletePost)
-      this.onDeletePost = null
-    }
-
-    if (this.onUpdatePost) {
-      postProvider.off('updatePost', this.onUpdatePost)
-      this.onUpdatePost = null
-    }
-
-    postProvider.unsubscribe()
-
-    this.$main.empty()
-    this.$main = null
-    newNavigationBar.dismiss()
-    newStatusBar.dismiss()
-
-    if (dataStore.supportsRealtime()) {
-      dataStore.disconnectRealtime()
-    }
   }
 }
 

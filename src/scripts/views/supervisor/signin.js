@@ -2,20 +2,14 @@ import $ from 'jquery'
 import View from '../base'
 import renderTemplate from '../../utils/render-template'
 import newNavigationBar from '../../new-navigation-bar'
-import stateController from '../../controllers/state'
-import metadataStore from '../../utils/metadata-store'
 import identityProvider from '../../providers/identity'
 import 'parsley'
 import 'jquery-form'
 
 class SupervisorSigninView extends View {
   constructor () {
-    super(/^\/supervisor\/signin$/)
+    super()
     this.$main = null
-  }
-
-  getTitle () {
-    return `${metadataStore.getMetadata('event-title')} :: Login`
   }
 
   initLoginForm () {
@@ -49,7 +43,7 @@ class SupervisorSigninView extends View {
           'X-CSRF-Token': identityProvider.getIdentity().token
         },
         success: (responseText, textStatus, jqXHR) => {
-          stateController.navigateTo('/')
+          window.location = '/'
         },
         error: (jqXHR, textStatus, errorThrown) => {
           if (jqXHR.responseJSON) {
@@ -77,13 +71,6 @@ class SupervisorSigninView extends View {
           this.initLoginForm()
         }
       })
-  }
-
-  dismiss () {
-    identityProvider.unsubscribe()
-    this.$main.empty()
-    this.$main = null
-    newNavigationBar.dismiss()
   }
 }
 

@@ -47,7 +47,17 @@
             <% } %>
         </ul>
 
+        <div id="themis-quals-stream-state">
+            <%= templates.streamStatePartial({ state: 'connecting' }) %>
+        </div>
+
         <ul class="navbar-nav ml-auto">
+<!--             <li class="nav-item">
+                <a href="#" class="nav-link text-success">
+                    <span class="oi oi-timer"></span>&nbsp;Started
+                </a>
+            </li>
+ -->
             <% if (identity.role === 'guest') { %>
             <li class="nav-item <% print((active === 'signin') ? 'active' : ''); %>">
                 <a class="nav-link" href="/team/signin"><span class="oi oi-account-login"></span>&nbsp;Sign in</a>

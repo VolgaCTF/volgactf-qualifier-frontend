@@ -1,7 +1,6 @@
 import $ from 'jquery'
 import View from '../base'
 import newNavigationBar from '../../new-navigation-bar'
-import metadataStore from '../../utils/metadata-store'
 import contestProvider from '../../providers/contest'
 import identityProvider from '../../providers/identity'
 import countryProvider from '../../providers/country'
@@ -12,12 +11,8 @@ import parsleyBootstrapOptions from '../../utils/parsley-bootstrap'
 
 class TeamSignupView extends View {
   constructor () {
-    super(/^\/team\/signup$/)
+    super()
     this.$main = null
-  }
-
-  getTitle () {
-    return `${metadataStore.getMetadata('event-title')} :: Sign up`
   }
 
   initSignupForm () {
@@ -108,13 +103,6 @@ class TeamSignupView extends View {
           this.initSignupForm()
         }
       })
-  }
-
-  dismiss () {
-    identityProvider.unsubscribe()
-    this.$main.empty()
-    this.$main = null
-    newNavigationBar.dismiss()
   }
 }
 

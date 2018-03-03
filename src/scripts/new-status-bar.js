@@ -13,7 +13,6 @@ class NewStatusBar {
     this.$container = null
     this.$stateContainer = null
     this.$timerContainer = null
-    this.$realtimeContainer = null
 
     this.onUpdateContest = null
     this.onUpdateTeamScore = null
@@ -24,13 +23,6 @@ class NewStatusBar {
     this.reloadTeamScore = false
     this.reloadTeamScoreInterval = null
     this.renderingTeamScore = false
-
-    this.realtimeControlInterval = null
-    this.onRealtimeControl = null
-
-    dataStore.onConnectedRealtime(() => {
-      this.renderRealtimeState()
-    })
   }
 
   initUpdateContestModal () {
@@ -178,39 +170,6 @@ class NewStatusBar {
     }
   }
 
-  renderRealtimeState () {
-    if (!this.$realtimeContainer) {
-      return
-    }
-
-    this.$realtimeContainer.empty()
-    let state = null
-    switch (dataStore.getRealtimeConnectionState()) {
-      case -1:
-        state = 'not-supported'
-        break
-      case 0:
-        state = 'connecting'
-        break
-      case 1:
-        state = 'connected'
-        break
-      case 2:
-        state = 'closed'
-        break
-      default:
-        state = 'n/a'
-        break
-    }
-
-    this.$realtimeContainer.html(window.themis.quals.templates.contestRealtimeState({
-      _: _,
-      state: state
-    }))
-    let $state = this.$realtimeContainer.find('span')
-    $state.tooltip()
-  }
-
   present () {
     this.$container = $('#themis-statusbar')
     this.$stateContainer = $('#themis-contest-state')
@@ -263,55 +222,6 @@ class NewStatusBar {
 
       this.reloadTeamScoreInterval = setInterval(this.onReloadTeamScore, 1000)
     }
-
-    this.$realtimeContainer = $('#themis-realtime-state')
-    this.renderRealtimeState()
-
-    this.onRealtimeControl = () => {
-      this.renderRealtimeState()
-    }
-
-    this.realtimeControlInterval = setInterval(this.onRealtimeControl, 1000)
-  }
-
-  dismiss () {
-    if (this.onUpdateContest) {
-      contestProvider.off('updateContest', this.onUpdateContest)
-      this.onUpdateContest = null
-    }
-
-    if (this.onUpdateTeamScore) {
-      contestProvider.off('updateTeamScore', this.onUpdateTeamScore)
-      this.onUpdateTeamScore = null
-    }
-
-    if (this.onReloadTeamScore) {
-      clearInterval(this.reloadTeamScoreInterval)
-      this.onReloadTeamScore = null
-      this.renderingTeamScore = false
-      this.reloadTeamScore = false
-    }
-
-    contestProvider.unsubscribe()
-
-    if (this.timerInterval) {
-      clearInterval(this.timerInterval)
-      this.timerInterval = null
-    }
-
-    if (this.onRealtimeControl) {
-      clearInterval(this.realtimeControlInterval)
-      this.onRealtimeControl = null
-    }
-
-    if (this.$container && this.$container.length) {
-      this.$container.empty()
-      this.$container = null
-    }
-
-    this.$stateContainer = null
-    this.$timerContainer = null
-    this.$scoreContainer = null
   }
 }
 

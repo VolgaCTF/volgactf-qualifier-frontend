@@ -5,6 +5,7 @@
         <% if (team.disqualified) { %>
         &nbsp;<span class="badge label-danger">DQL</span>
         <% } %>
+        &nbsp;<a href="/team/<%- team.id %>/profile" class="themis-quals-team-profile-link" title="More information"><small><span class="oi oi-external-link"></span></small></a>
     </h5>
     <p class="card-text">
         <img id="team-<%- team.id %>-logo" class="img-thumbnail" src="/api/team/<%- team.id %>/logo">

@@ -1,7 +1,6 @@
 import $ from 'jquery'
 import _ from 'underscore'
 import renderTemplate from './utils/render-template'
-import stateController from './controllers/state'
 import identityProvider from './providers/identity'
 
 class NavigationBar {
@@ -40,7 +39,7 @@ class NavigationBar {
             'X-CSRF-Token': identityProvider.getIdentity().token
           },
           success: (responseText, textStatus, jqXHR) => {
-            stateController.navigateTo('/')
+            window.location = '/'
           },
           error: (jqXHR, textStatus, errorThrown) => {
             console.log(errorThrown)

@@ -1,19 +1,14 @@
 import $ from 'jquery'
 import View from '../base'
 import newNavigationBar from '../../new-navigation-bar'
-import metadataStore from '../../utils/metadata-store'
 import identityProvider from '../../providers/identity'
 import 'parsley'
 import 'jquery-form'
 
 class RestoreView extends View {
   constructor () {
-    super(/^\/team\/restore$/)
+    super()
     this.$main = null
-  }
-
-  getTitle () {
-    return `${metadataStore.getMetadata('event-title')} :: Restore password`
   }
 
   initRestoreForm () {
@@ -81,13 +76,6 @@ class RestoreView extends View {
           this.initRestoreForm()
         }
       })
-  }
-
-  dismiss () {
-    identityProvider.unsubscribe()
-    this.$main.empty()
-    this.$main = null
-    newNavigationBar.dismiss()
   }
 }
 

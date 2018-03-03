@@ -15,7 +15,7 @@ import countryProvider from '../providers/country'
 
 class ScoreboardView extends View {
   constructor () {
-    super(/^\/scoreboard$/)
+    super()
     this.$main = null
 
     this.onUpdateTeamScore = null
@@ -84,10 +84,6 @@ class ScoreboardView extends View {
         countryProvider.fetchCountries()
       )
       .done((identity, contest, teams, teamScores, countries) => {
-        if (dataStore.supportsRealtime()) {
-          dataStore.connectRealtime()
-        }
-
         identityProvider.subscribe()
 
         let urlParams = new URLSearchParams(window.location.search)

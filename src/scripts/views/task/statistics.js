@@ -18,7 +18,7 @@ import _ from 'underscore'
 
 class TaskStatisticsView extends View {
   constructor () {
-    super(/^\/task\/[0-9]{1,5}\/statistics$/)
+    super()
     this.$main = null
   }
 
@@ -57,10 +57,6 @@ class TaskStatisticsView extends View {
       )
       .done((identity, contest) => {
         if (identity.isSupervisor()) {
-          if (dataStore.supportsRealtime()) {
-            dataStore.connectRealtime()
-          }
-
           identityProvider.subscribe()
 
           navigationBar.present()

@@ -11,11 +11,7 @@ class DataStore {
   }
 
   getRealtimeConnectionState () {
-    if (this.supportsRealtime()) {
-      return this.eventSource ? this.eventSource.readyState : 999
-    } else {
-      return -1
-    }
+    return (this.supportsRealtime() && this.eventSource) ? this.eventSource.readyState : 2
   }
 
   connectedRealtime () {

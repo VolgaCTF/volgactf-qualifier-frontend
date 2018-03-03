@@ -4,13 +4,11 @@ import View from '../base'
 import renderTemplate from '../../utils/render-template'
 import newNavigationBar from '../../new-navigation-bar'
 import newStatusBar from '../../new-status-bar'
-import dataStore from '../../data-store'
 import identityProvider from '../../providers/identity'
 import teamProvider from '../../providers/team'
 import contestProvider from '../../providers/contest'
 import countryProvider from '../../providers/country'
 import taskProvider from '../../providers/task'
-import metadataStore from '../../utils/metadata-store'
 import teamTaskHitProvider from '../../providers/team-task-hit'
 import teamTaskReviewProvider from '../../providers/team-task-review'
 import moment from 'moment'
@@ -19,13 +17,9 @@ import 'jquery-form'
 
 class TeamProfileView extends View {
   constructor () {
-    super(/^\/team\/[0-9]{1,5}\/profile$/)
+    super()
     this.$main = null
     this.team = null
-  }
-
-  getTitle () {
-    return `${metadataStore.getMetadata('event-title')} :: Team profile`
   }
 
   initUploadLogoModal () {
@@ -477,10 +471,6 @@ class TeamProfileView extends View {
           .done((team, countries, teamTaskHits, teamTaskReviews) => {
             identityProvider.subscribe()
 
-            if (dataStore.supportsRealtime()) {
-              dataStore.connectRealtime()
-            }
-
             newNavigationBar.present()
             newStatusBar.present()
 
@@ -527,19 +517,6 @@ class TeamProfileView extends View {
             }
           })
       })
-  }
-
-  dismiss () {
-    identityProvider.unsubscribe()
-    this.$main.empty()
-    this.$main = null
-    this.team = null
-    newNavigationBar.dismiss()
-    newStatusBar.dismiss()
-
-    if (dataStore.supportsRealtime()) {
-      dataStore.disconnectRealtime()
-    }
   }
 }
 

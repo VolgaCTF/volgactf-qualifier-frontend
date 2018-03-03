@@ -1,0 +1,13 @@
+<% if (state === 'connecting') { %>
+    <span class="navbar-text text-warning" title="Connecting to the realtime update channel">
+        <span class="oi oi-pulse"></span>&nbsp;Connecting
+    </span>
+<% } else if (state === 'open') { %>
+    <span class="navbar-text text-success" title="Connected to the realtime update channel">
+        <span class="oi oi-pulse"></span>&nbsp;Online
+    </span>
+<% } else if (state === 'closed') { %>
+    <span class="navbar-text text-danger" title="Connection to the realtime update channel has failed. Please reload the page">
+        <span class="oi oi-pulse"></span>&nbsp;Offline
+    </span>
+<% } %>

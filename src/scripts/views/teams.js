@@ -1,10 +1,8 @@
 import $ from 'jquery'
 import _ from 'underscore'
 import View from './base'
-import dataStore from '../data-store'
 import newNavigationBar from '../new-navigation-bar'
 import newStatusBar from '../new-status-bar'
-import metadataStore from '../utils/metadata-store'
 import contestProvider from '../providers/contest'
 import identityProvider from '../providers/identity'
 import teamProvider from '../providers/team'
@@ -12,7 +10,7 @@ import countryProvider from '../providers/country'
 
 class TeamsView extends View {
   constructor () {
-    super(/^\/teams$/)
+    super()
     this.$main = null
 
     this.onUpdateTeamProfile = null
@@ -21,10 +19,6 @@ class TeamsView extends View {
     this.onUpdateTeamEmail = null
     this.onQualifyTeam = null
     this.onDisqualifyTeam = null
-  }
-
-  getTitle () {
-    return `${metadataStore.getMetadata('event-title')} :: Teams`
   }
 
   renderTeams () {
@@ -64,9 +58,6 @@ class TeamsView extends View {
         promise
           .done(() => {
             identityProvider.subscribe()
-            if (dataStore.supportsRealtime()) {
-              dataStore.connectRealtime()
-            }
 
             newNavigationBar.present()
             newStatusBar.present()
@@ -126,51 +117,6 @@ class TeamsView extends View {
             }
           })
       })
-  }
-
-  dismiss () {
-    identityProvider.unsubscribe()
-
-    if (this.onUpdateTeamProfile) {
-      teamProvider.off('updateTeamProfile', this.onUpdateTeamProfile)
-      this.onUpdateTeamProfile = null
-    }
-
-    if (this.onUpdateTeamLogo) {
-      teamProvider.off('updateTeamLogo', this.onUpdateTeamLogo)
-      this.onUpdateTeamLogo = null
-    }
-
-    if (this.onCreateTeam) {
-      teamProvider.off('createTeam', this.onCreateTeam)
-      this.onCreateTeam = null
-    }
-
-    if (this.onUpdateTeamEmail) {
-      teamProvider.off('updateTeamEmail', this.onUpdateTeamEmail)
-      this.onUpdateTeamEmail = null
-    }
-
-    if (this.onQualifyTeam) {
-      teamProvider.off('qualifyTeam', this.onQualifyTeam)
-      this.onQualifyTeam = null
-    }
-
-    if (this.onDisqualifyTeam) {
-      teamProvider.off('disqualifyTeam', this.onDisqualifyTeam)
-      this.onDisqualifyTeam = null
-    }
-
-    teamProvider.unsubscribe()
-
-    this.$main.empty()
-    this.$main = null
-    newNavigationBar.dismiss()
-    newStatusBar.dismiss()
-
-    if (dataStore.supportsRealtime()) {
-      dataStore.disconnectRealtime()
-    }
   }
 }
 
