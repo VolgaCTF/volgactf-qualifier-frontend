@@ -1,0 +1,22 @@
+<div class="themis-category" data-id="<%- category.id %>">
+    <header>
+        <h4><%- category.title %></h4>
+    </header>
+    <section>
+        <p><%- category.description %></p>
+    </section>
+    <footer>
+        <% var updatedAt = (category.updatedAt instanceof Date) ? category.updatedAt : new Date(category.updatedAt) %>
+        <p class="text-muted"><small>Updated on <%- moment(updatedAt).utc().format('MMM D [at] HH:mm [UTC]') %></small>
+            <% if (identity.role === 'admin' && contest.state !== 4) { %>
+            &nbsp;
+            <button type="button" class="btn btn-secondary btn-sm" data-action="edit-category" data-toggle="modal" data-target="#edit-category-modal" data-category-id="<%- category.id %>">
+                Edit
+            </button>
+            <button type="button" class="btn btn-danger btn-sm" data-action="delete-category" data-toggle="modal" data-target="#delete-category-modal" data-category-id="<%- category.id %>">
+                Delete
+            </button>
+            <% } %>
+        </p>
+    </footer>
+</div>

@@ -3,8 +3,8 @@ import _ from 'underscore'
 import View from './base'
 import renderTemplate from '../utils/render-template'
 import dataStore from '../data-store'
-import navigationBar from '../navigation-bar'
-import statusBar from '../status-bar'
+import newNavigationBar from '../new-navigation-bar'
+import newStatusBar from '../new-status-bar'
 import moment from 'moment'
 import categoryProvider from '../providers/category'
 import contestProvider from '../providers/contest'
@@ -18,7 +18,6 @@ class CategoriesView extends View {
   constructor () {
     super()
     this.$main = null
-    this.$categoriesList = null
 
     this.onCreateCategory = null
     this.onUpdateCategory = null
@@ -34,7 +33,18 @@ class CategoriesView extends View {
     let $submitError = $modal.find('.submit-error > p')
     let $submitButton = $modal.find('button[data-action="complete-create-category"]')
     let $form = $modal.find('form')
-    $form.parsley()
+    $form.parsley({
+      errorClass: 'is-invalid',
+      successClass: 'is-valid',
+      classHandler: function (ParsleyField) {
+        return ParsleyField.$element;
+      },
+      errorsContainer: function (ParsleyField) {
+        return ParsleyField.$element.parents('form-group')
+      },
+      errorsWrapper: '<div class="invalid-feedback">',
+      errorTemplate: '<span></span>'
+    })
 
     $submitButton.on('click', (e) => {
       $form.trigger('submit')
@@ -88,7 +98,18 @@ class CategoriesView extends View {
     let $submitError = $modal.find('.submit-error > p')
     let $submitButton = $modal.find('button[data-action="complete-edit-category"]')
     let $form = $modal.find('form')
-    $form.parsley()
+    $form.parsley({
+      errorClass: 'is-invalid',
+      successClass: 'is-valid',
+      classHandler: function (ParsleyField) {
+        return ParsleyField.$element;
+      },
+      errorsContainer: function (ParsleyField) {
+        return ParsleyField.$element.parents('form-group')
+      },
+      errorsWrapper: '<div class="invalid-feedback">',
+      errorTemplate: '<span></span>'
+    })
 
     $submitButton.on('click', (e) => {
       $form.trigger('submit')
@@ -156,7 +177,8 @@ class CategoriesView extends View {
       let categoryId = parseInt($(e.relatedTarget).data('category-id'), 10)
       $modal.data('category-id', categoryId)
       let category = _.findWhere(categoryProvider.getCategories(), { id: categoryId })
-      $modalBody.html(renderTemplate('delete-category-confirmation', { title: category.title }))
+      const msgTemplate = _.template('You are about to delete the category <mark><%- title %></mark>. Continue?')
+      $modalBody.html(msgTemplate({ title: category.title }))
       $submitError.text('')
     })
 
@@ -177,103 +199,68 @@ class CategoriesView extends View {
   }
 
   renderCategories () {
-    let categories = categoryProvider.getCategories()
-    if (categories.length === 0) {
-      this.$categoriesList.empty()
-      this.$categoriesList.html($('<p></p>').addClass('lead').text('No categories have been created yet.'))
-    } else {
-      this.$categoriesList.empty()
-      let sortedCategories = _.sortBy(categories, 'createdAt')
-      let manageable = identityProvider.getIdentity().isAdmin() && !contestProvider.getContest().isFinished()
-      for (let category of sortedCategories) {
-        let options = {
-          id: category.id,
-          title: category.title,
-          description: category.description,
-          updatedAt: moment(category.updatedAt).format('lll'),
-          manageable: manageable
-        }
-
-        this.$categoriesList.append($(renderTemplate('category-supervisor-partial', options)))
-      }
-    }
+    $('#themis-categories-list').html(window.themis.quals.templates.categoryList({
+      _: _,
+      identity: identityProvider.getIdentity(),
+      contest: contestProvider.getContest(),
+      categories: categoryProvider.getCategories(),
+      templates: window.themis.quals.templates,
+      moment: moment
+    }))
   }
 
   present () {
     this.$main = $('#main')
-    this.$main.html(renderTemplate('loading-view'))
 
     $
-      .when(identityProvider.fetchIdentity())
-      .done((identity) => {
-        if (identity.isSupervisor()) {
-          identityProvider.subscribe()
+      .when(
+        identityProvider.initIdentity(),
+        categoryProvider.initCategories(),
+        contestProvider.initContest()
+      )
+      .done((identity, categories, contest) => {
+        identityProvider.subscribe()
+        newNavigationBar.present()
+        newStatusBar.present()
 
-          navigationBar.present({ active: 'categories' })
-
-          $
-            .when(categoryProvider.fetchCategories(), contestProvider.fetchContest())
-            .done((categories, contest) => {
-              statusBar.present()
-              this.$main.html(renderTemplate('categories-view', { identity: identity, contest: contest }))
-
-              this.$categoriesList = $('#themis-categories-list')
-
-              this.renderCategories()
-
-              let urlParams = new URLSearchParams(window.location.search)
-              if (urlParams.get('action') === 'scrollTo' && urlParams.has('categoryId')) {
-                let $el = $(`div.themis-category[data-id="${urlParams.get('categoryId')}"]`)
-                if ($el.length > 0) {
-                  $el.get(0).scrollIntoView()
-                }
-              }
-
-              this.initCreateCategoryModal()
-              this.initEditCategoryModal()
-              this.initDeleteCategoryModal()
-
-              this.onCreateCategory = () => {
-                this.renderCategories()
-                return false
-              }
-
-              this.onUpdateCategory = () => {
-                this.renderCategories()
-                return false
-              }
-
-              this.onDeleteCategory = () => {
-                this.renderCategories()
-                return false
-              }
-
-              categoryProvider.subscribe()
-              categoryProvider.on('createCategory', this.onCreateCategory)
-              categoryProvider.on('updateCategory', this.onUpdateCategory)
-              categoryProvider.on('deleteCategory', this.onDeleteCategory)
-
-              this.onUpdateContest = (contest) => {
-                this.renderCategories()
-                return false
-              }
-
-              contestProvider.on('updateContest', this.onUpdateContest)
-            })
-            .fail((err) => {
-              console.error(err)
-              this.$main.html(renderTemplate('internal-error-view'))
-            })
-        } else {
-          this.$main.html(renderTemplate('access-forbidden-view', {
-            urlPath: window.location.pathname
-          }))
+        let urlParams = new URLSearchParams(window.location.search)
+        if (urlParams.get('action') === 'scrollTo' && urlParams.has('categoryId')) {
+          let $el = $(`div.themis-category[data-id="${urlParams.get('categoryId')}"]`)
+          if ($el.length > 0) {
+            $el.get(0).scrollIntoView()
+          }
         }
-      })
-      .fail((err) => {
-        console.error(err)
-        navigationBar.present()
-        this.$main.html(renderTemplate('internal-error-view'))
+
+        this.initCreateCategoryModal()
+        this.initEditCategoryModal()
+        this.initDeleteCategoryModal()
+
+        this.onCreateCategory = () => {
+          this.renderCategories()
+          return false
+        }
+
+        this.onUpdateCategory = () => {
+          this.renderCategories()
+          return false
+        }
+
+        this.onDeleteCategory = () => {
+          this.renderCategories()
+          return false
+        }
+
+        categoryProvider.subscribe()
+        categoryProvider.on('createCategory', this.onCreateCategory)
+        categoryProvider.on('updateCategory', this.onUpdateCategory)
+        categoryProvider.on('deleteCategory', this.onDeleteCategory)
+
+        this.onUpdateContest = (contest) => {
+          this.renderCategories()
+          return false
+        }
+
+        contestProvider.on('updateContest', this.onUpdateContest)
       })
   }
 }

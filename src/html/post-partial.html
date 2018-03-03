@@ -13,7 +13,7 @@
             <% if (identity.role === 'manager' || identity.role === 'admin') { %>
             <a href="/news?action=scrollTo&postId=<%- post.id %>" target="_blank">Permalink</a>
             &nbsp;
-            <button type="button" class="btn btn-default btn-sm" data-action="edit-post" data-toggle="modal" data-target="#edit-post-modal" data-post-id="<%- post.id %>">
+            <button type="button" class="btn btn-secondary btn-sm" data-action="edit-post" data-toggle="modal" data-target="#edit-post-modal" data-post-id="<%- post.id %>">
                 Edit
             </button>
             <button type="button" class="btn btn-danger btn-sm" data-action="delete-post" data-toggle="modal" data-target="#delete-post-modal" data-post-id="<%- post.id %>">

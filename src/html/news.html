@@ -30,9 +30,11 @@
                 <header>
                     <h1>News</h1>
                     <% if (identity.role === 'manager' || identity.role === 'admin') { %>
-                    <button type="button" class="btn btn-success" data-action="create-post" data-toggle="modal" data-target="#create-post-modal">
-                        Create
-                    </button>
+                    <div class="mb-4">
+                        <button type="button" class="btn btn-primary" data-action="create-post" data-toggle="modal" data-target="#create-post-modal">
+                            Create
+                        </button>
+                    </div>
                     <% } %>
                 </header>
                 <section id="#news">

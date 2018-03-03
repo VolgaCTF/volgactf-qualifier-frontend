@@ -76,7 +76,18 @@ class NewsView extends View {
     let $submitError = $modal.find('.submit-error > p')
     let $submitButton = $modal.find('button[data-action="complete-create-post"]')
     let $form = $modal.find('form')
-    $form.parsley()
+    $form.parsley({
+      errorClass: 'is-invalid',
+      successClass: 'is-valid',
+      classHandler: function (ParsleyField) {
+        return ParsleyField.$element;
+      },
+      errorsContainer: function (ParsleyField) {
+        return ParsleyField.$element.parents('form-group')
+      },
+      errorsWrapper: '<div class="invalid-feedback">',
+      errorTemplate: '<span></span>'
+    })
 
     $submitButton.on('click', (e) => {
       $form.trigger('submit')
@@ -156,7 +167,18 @@ class NewsView extends View {
     let $submitError = $modal.find('.submit-error > p')
     let $submitButton = $modal.find('button[data-action="complete-edit-post"]')
     let $form = $modal.find('form')
-    $form.parsley()
+    $form.parsley({
+      errorClass: 'is-invalid',
+      successClass: 'is-valid',
+      classHandler: function (ParsleyField) {
+        return ParsleyField.$element;
+      },
+      errorsContainer: function (ParsleyField) {
+        return ParsleyField.$element.parents('form-group')
+      },
+      errorsWrapper: '<div class="invalid-feedback">',
+      errorTemplate: '<span></span>'
+    })
 
     $submitButton.on('click', (e) => {
       $form.trigger('submit')

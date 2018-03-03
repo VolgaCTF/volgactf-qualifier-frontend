@@ -86,6 +86,15 @@ class CategoryProvider extends EventEmitter {
     this.categories = []
   }
 
+  initCategories () {
+    const promise = $.Deferred()
+    this.categories = _.map(window.themis.quals.data.categories, function (options) {
+      return new CategoryModel(options)
+    })
+    promise.resolve(this.categories)
+    return promise
+  }
+
   fetchCategories () {
     let promise = $.Deferred()
     let url = '/api/category/index'

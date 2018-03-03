@@ -1,0 +1,9 @@
+<% if (categories.length === 0) { %>
+	<p class="lead">No categories have been created yet.</p>
+<% } else { %>
+	<% var sortedCategories = _.sortBy(categories, 'createdAt').reverse() %>
+	<% for (var i=0; i<sortedCategories.length; ++i) { %>
+		<% var category = sortedCategories[i] %>
+		<%= templates.categoryPartial({ _: _, category: category, identity: identity, contest: contest, moment: moment }) %>
+	<% } %>
+<% } %>

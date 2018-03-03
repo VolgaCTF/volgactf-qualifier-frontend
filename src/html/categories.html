@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <title><%- contestTitle %> :: Categories</title>
+
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link rel="stylesheet" href="/assets/css/{{#cachebusting}}{{#themis_quals}}{{ css }}{{/themis_quals}}{{/cachebusting}}">
+        {{#partials}}
+        {{#head}}
+        <!--=include {{{path}}} -->
+        {{/head}}
+        {{/partials}}
+
+        <% if (google_tag_id) { %>
+        <%= templates.analytics({ _: _, google_tag_id: google_tag_id }) %>
+        <% } %>
+    </head>
+    <body>
+        <%= templates.navbar({ _: _, active: 'categories', identity: identity, templates: templates, contestTitle: contestTitle, contestTitle: contestTitle }) %>
+        <div id="themis-statusbar">
+            <%= templates.statusbar({ _: _, identity: identity, contest: contest, templates: templates, moment: moment }) %>
+        </div>
+
+        <div id="main" class="pb-4">
+            <div class="container">
+                <header>
+                    <h1>Categories</h1>
+                </header>
+                <section>
+                    <% if (identity.role === 'admin' && contest.state !== 4) { %>
+                    <div class="mb-4">
+                        <button type="button" class="btn btn-primary" data-action="create-category" data-toggle="modal" data-target="#create-category-modal">
+                            Create
+                        </button>
+                    </div>
+                    <% } %>
+                    <div id="themis-categories-list">
+                        <%= templates.categoryList({ _: _, identity: identity, contest: contest, categories: categories, templates: templates, moment: moment }) %>
+                    </div>
+                </section>
+            </div>
+
+            <% if (identity.role === 'admin' && contest.state !== 4) { %>
+            <div class="modal fade" id="create-category-modal" tabindex="-1" role="dialog">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title">Create task category</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <form method="POST" action="/api/category/create" novalidate>
+                                <div class="form-group">
+                                    <label for="create-category-title" class="control-label">Title</label>
+                                    <input type="text" class="form-control" id="create-category-title" name="title" autofocus required minlength="2" maxlength="20">
+                                </div>
+                                <div class="form-group">
+                                    <label for="create-category-description" class="control-label">Description</label>
+                                    <textarea class="form-control themis-category-description" id="create-category-description" minlength="0" maxlength="150" name="description"></textarea>
+                                </div>
+                                <div class="submit-error">
+                                    <p class="text-danger"></p>
+                                </div>
+                            </form>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                            <button type="button" class="btn btn-primary" data-action="complete-create-category">Create</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal fade" id="delete-category-modal" tabindex="-1" role="dialog">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title">Delete category</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <p class="confirmation"></p>
+                            <div class="submit-error">
+                                <p class="text-danger"></p>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                            <button type="button" class="btn btn-danger" data-action="complete-delete-category">Delete</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal fade" id="edit-category-modal" tabindex="-1" role="dialog">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title">Edit task category</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <form method="POST" novalidate>
+                                <div class="form-group">
+                                    <label for="edit-category-title" class="control-label">Title</label>
+                                    <input type="text" class="form-control" id="edit-category-title" name="title" autofocus required minlength="2" maxlength="20">
+                                </div>
+                                <div class="form-group">
+                                    <label for="edit-category-description" class="control-label">Description</label>
+                                    <textarea class="form-control themis-category-description" id="edit-category-description" minlength="0" maxlength="150" name="description"></textarea>
+                                </div>
+                                <div class="submit-error">
+                                    <p class="text-danger"></p>
+                                </div>
+                            </form>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                            <button type="button" class="btn btn-primary" data-action="complete-edit-category">Save</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <% } %>
+        </div>
+
+        <footer class="footer">
+            {{#partials}}
+            {{#footer}}
+            <!--=include {{{path}}} -->
+            {{/footer}}
+            {{^footer}}
+            <!--=include ../partials/footer.html -->
+            {{/footer}}
+            {{/partials}}
+        </footer>
+
+        <script>
+            window.themis = {
+                quals: {
+                    view: 'categories',
+                    data: {
+                        identity: <%= jsesc(identity, { json: true, isScriptContext: true }) %>,
+                        contest: <%= jsesc(contest, { json: true, isScriptContext: true }) %>,
+                        teamScores: <%= jsesc(teamScores, { json: true, isScriptContext: true }) %>,
+                        categories: <%= jsesc(categories, { json: true, isScriptContext: true }) %>
+                    },
+                    templates: {
+                        contestStatePartial: <%= templates.contestStatePartial.source %>,
+                        contestTimer: <%= templates.contestTimer.source %>,
+                        contestScore: <%= templates.contestScore.source %>,
+                        categoryList: <%= templates.categoryList.source %>,
+                        categoryPartial: <%= templates.categoryPartial.source %>,
+                        streamStatePartial: <%= templates.streamStatePartial.source %>
+                    }
+                }
+            }
+        </script>
+        <script src="/assets/js/{{#cachebusting}}{{#themis_quals}}{{ js }}{{/themis_quals}}{{/cachebusting}}"></script>
+    </body>
+</html>
