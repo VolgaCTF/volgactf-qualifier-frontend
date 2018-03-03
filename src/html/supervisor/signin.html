@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
     <head>
-        <title>{{#event}}{{ title }}{{/event}} :: Supervisor :: Sign in</title>
+        <title><%- contestTitle %> :: Supervisor :: Sign in</title>
 
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -11,14 +11,13 @@
         <!--=include {{{path}}} -->
         {{/head}}
         {{/partials}}
-        <script type="text/x-metadata" data-name="event-title" data-value="{{#event}}{{ title }}{{/event}}"></script>
 
         <% if (google_tag_id) { %>
         <%= templates.analytics({ _: _, google_tag_id: google_tag_id }) %>
         <% } %>
     </head>
     <body>
-        <%= templates.navbar({ _: _, active: null, identity: identity, templates: templates }) %>
+        <%= templates.navbar({ _: _, active: null, identity: identity, templates: templates, contestTitle: contestTitle }) %>
         <div id="themis-statusbar">
         </div>
 

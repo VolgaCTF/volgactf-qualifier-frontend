@@ -5,7 +5,6 @@ import renderTemplate from '../utils/render-template'
 import dataStore from '../data-store'
 import navigationBar from '../navigation-bar'
 import statusBar from '../status-bar'
-import metadataStore from '../utils/metadata-store'
 import contestProvider from '../providers/contest'
 import identityProvider from '../providers/identity'
 import moment from 'moment'
@@ -67,7 +66,7 @@ class EventsView extends View {
   }
 
   getTitle () {
-    return `${metadataStore.getMetadata('event-title')} :: Events`
+    return ` :: Events`
   }
 
   renderEvent (eventName, eventData, createdAt) {

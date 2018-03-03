@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
     <head>
-        <title>{{#event}}{{ title }}{{/event}} :: Main</title>
+        <title><%- contestTitle %> :: Main</title>
 
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -11,14 +11,13 @@
         <!--=include {{{path}}} -->
         {{/head}}
         {{/partials}}
-        <script type="text/x-metadata" data-name="event-title" data-value="{{#event}}{{ title }}{{/event}}"></script>
 
         <% if (google_tag_id) { %>
         <%= templates.analytics({ _: _, google_tag_id: google_tag_id }) %>
         <% } %>
     </head>
     <body>
-        <%= templates.navbar({ _: _, active: null, identity: identity, templates: templates }) %>
+        <%= templates.navbar({ _: _, active: null, identity: identity, templates: templates, contestTitle: contestTitle, contestTitle: contestTitle }) %>
         <div id="themis-statusbar">
             <%= templates.statusbar({ _: _, identity: identity, contest: contest, templates: templates, moment: moment }) %>
         </div>
@@ -49,15 +48,15 @@
                 <h1>Welcome!</h1>
                 <% if (contest.state === 1) { %>
                 <p class="lead">
-                    {{#event}}{{ title }}{{/event}} has not started yet.
+                    <%- contestTitle %> has not started yet.
                 </p>
                 <% } else if (contest.state === 2 || contest.state === 3) { %>
                 <p class="lead">
-                    {{#event}}{{ title }}{{/event}} has started!
+                    <%- contestTitle %> has started!
                 </p>
                 <% } else if (contest.state === 4) { %>
                 <p class="lead">
-                    {{#event}}{{ title }}{{/event}} has finished!
+                    <%- contestTitle %> has finished!
                 </p>
                 <% } %>
                 <ul class="lead list-unstyled">

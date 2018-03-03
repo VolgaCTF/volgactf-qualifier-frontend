@@ -5,7 +5,6 @@ import renderTemplate from '../utils/render-template'
 import dataStore from '../data-store'
 import navigationBar from '../navigation-bar'
 import statusBar from '../status-bar'
-import metadataStore from '../utils/metadata-store'
 import moment from 'moment'
 import categoryProvider from '../providers/category'
 import taskCategoryProvider from '../providers/task-category'
@@ -50,7 +49,7 @@ class TasksView extends View {
   }
 
   getTitle () {
-    return `${metadataStore.getMetadata('event-title')} :: Tasks`
+    return ` :: Tasks`
   }
 
   initCreateTaskModal () {
