@@ -1,0 +1,11 @@
+<% if (solvedTeamCount === 0) { %>
+No team has solved this task yet.
+<% } else { %>
+This task has been solved by <strong><%- solvedTeamCount %></strong> <% print((solvedTeamCount > 1) ? 'teams' : 'team'); %>.
+<% } %>
+<br><br>
+<% if (ratedTeamCount > 0) { %>
+This task has been rated by <strong><%- ratedTeamCount %></strong> <% print((ratedTeamCount > 1) ? 'teams' : 'team'); %>. The average rating is <strong><%- averageRating.toFixed(2) %></strong> (5.00 max).
+<% } else { %>
+This task has not been rated yet.
+<% } %>

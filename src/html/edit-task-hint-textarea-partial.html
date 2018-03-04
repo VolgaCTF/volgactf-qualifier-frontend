@@ -1,0 +1,11 @@
+<div class="themis-task-hint-group mb-2" id="edit-task-hint-<%- number %>" data-state-disabled="<% print(editable ? 'false' : 'true') %>">
+    <h5>
+        Hint #<%- number %>
+        <% if (editable) { %>
+        <a href="#" class="text-danger" data-action="remove-task-hint" data-number="<%- number %>">
+            <span class="oi oi-trash"></span>
+        </a>
+        <% } %>
+    </h5>
+    <textarea class="form-control" required data-parsley-length="[2,1024]"<% print(editable ? '' : ' disabled'); %>><%- hint %></textarea>
+</div>

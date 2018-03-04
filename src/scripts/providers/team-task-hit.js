@@ -145,6 +145,15 @@ class TeamTaskHitProvider extends EventEmitter {
     return promise
   }
 
+  initTeamHits () {
+    const promise = $.Deferred()
+    this.teamTaskHits = _.map(window.themis.quals.data.teamHits, function (options) {
+      return new TeamTaskHitModel(options)
+    })
+    promise.resolve(this.teamTaskHits)
+    return promise
+  }
+
   fetchTeamHits (teamId) {
     let promise = $.Deferred()
     let url = `/api/team/${teamId}/hit/index`

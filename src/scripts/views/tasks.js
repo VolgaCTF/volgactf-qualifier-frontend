@@ -1,10 +1,9 @@
 import $ from 'jquery'
 import _ from 'underscore'
 import View from './base'
-import renderTemplate from '../utils/render-template'
 import dataStore from '../data-store'
-import navigationBar from '../navigation-bar'
-import statusBar from '../status-bar'
+import newNavigationBar from '../new-navigation-bar'
+import newStatusBar from '../new-status-bar'
 import moment from 'moment'
 import categoryProvider from '../providers/category'
 import taskCategoryProvider from '../providers/task-category'
@@ -48,10 +47,6 @@ class TasksView extends View {
     this.onRenderTasks = null
   }
 
-  getTitle () {
-    return ` :: Tasks`
-  }
-
   initCreateTaskModal () {
     let $modal = $('#create-task-modal')
     $modal.modal({ show: false })
@@ -59,7 +54,18 @@ class TasksView extends View {
     let $submitError = $modal.find('.submit-error > p')
     let $submitButton = $modal.find('button[data-action="complete-create-task"]')
     let $form = $modal.find('form')
-    $form.parsley()
+    $form.parsley({
+      errorClass: 'is-invalid',
+      successClass: 'is-valid',
+      classHandler: function (ParsleyField) {
+        return ParsleyField.$element;
+      },
+      errorsContainer: function (ParsleyField) {
+        return ParsleyField.$element.parents('form-group')
+      },
+      errorsWrapper: '<div class="invalid-feedback">',
+      errorTemplate: '<span></span>'
+    })
 
     $submitButton.on('click', (e) => {
       $form.trigger('submit')
@@ -87,11 +93,11 @@ class TasksView extends View {
 
     $taskHints.find('a[data-action="create-task-hint"]').on('click', (e) => {
       e.preventDefault()
-      let options = {
+      $taskHintList.append(window.themis.quals.templates.createTaskHintTextareaPartial({
+        _: _,
         number: $taskHintList.children().length + 1,
         hint: ''
-      }
-      $taskHintList.append($(renderTemplate('create-task-hint-textarea-partial', options)))
+      }))
     })
 
     function getHints () {
@@ -111,22 +117,22 @@ class TasksView extends View {
       let hints = getHints()
       $taskHintList.empty()
       _.each(hints, (hint, ndx) => {
-        let options = {
+        $taskHintList.append(window.themis.quals.templates.createTaskHintTextareaPartial({
+          _: _,
           number: ndx + 1,
           hint: hint
-        }
-        $taskHintList.append($(renderTemplate('create-task-hint-textarea-partial', options)))
+        }))
       })
     })
 
     $taskAnswers.find('a[data-action="create-task-answer"]').on('click', (e) => {
       e.preventDefault()
-      let options = {
+      $taskAnswerList.append(window.themis.quals.templates.createTaskAnswerInputPartial({
+        _: _,
         number: $taskAnswerList.children().length + 1,
         answer: '',
         caseSensitive: true
-      }
-      $taskAnswerList.append($(renderTemplate('create-task-answer-input-partial', options)))
+      }))
     })
 
     function getAnswers () {
@@ -149,28 +155,26 @@ class TasksView extends View {
       let answers = getAnswers()
       $taskAnswerList.empty()
       _.each(answers, (entry, ndx) => {
-        let options = {
+        $taskAnswerList.append(window.themis.quals.templates.createTaskAnswerInputPartial({
+          _: _,
           number: ndx + 1,
           answer: entry.answer,
           caseSensitive: entry.caseSensitive
-        }
-        $taskAnswerList.append($(renderTemplate('create-task-answer-input-partial', options)))
+        }))
       })
     })
 
     $tabPreview.on('show.bs.tab', (e) => {
-      let md = new MarkdownRenderer()
-      let hintsFormatted = getHints().map((hint) => {
-        return md.render(hint)
-      })
+      const md = new MarkdownRenderer()
 
-      let options = {
+      $taskPreview.html(window.themis.quals.templates.taskContentPartial({
+        _: _,
         title: $taskTitle.val(),
         description: md.render($taskDescription.val()),
-        hints: hintsFormatted
-      }
-
-      $taskPreview.html(renderTemplate('task-content-partial', options))
+        hints: getHints().map((hint) => {
+          return md.render(hint)
+        })
+      }))
     })
 
     $modal.on('show.bs.modal', (e) => {
@@ -238,7 +242,18 @@ class TasksView extends View {
     let $submitError = $modal.find('.submit-error > p')
     let $submitButton = $modal.find('button[data-action="complete-edit-task"]')
     let $form = $modal.find('form')
-    $form.parsley()
+    $form.parsley({
+      errorClass: 'is-invalid',
+      successClass: 'is-valid',
+      classHandler: function (ParsleyField) {
+        return ParsleyField.$element;
+      },
+      errorsContainer: function (ParsleyField) {
+        return ParsleyField.$element.parents('form-group')
+      },
+      errorsWrapper: '<div class="invalid-feedback">',
+      errorTemplate: '<span></span>'
+    })
 
     $submitButton.on('click', (e) => {
       $form.trigger('submit')
@@ -266,12 +281,12 @@ class TasksView extends View {
 
     $taskHints.find('a[data-action="create-task-hint"]').on('click', (e) => {
       e.preventDefault()
-      let options = {
+      $taskHintList.append(window.themis.quals.templates.editTaskHintTextareaPartial({
+        _: _,
         number: $taskHintList.children().length + 1,
         hint: '',
         editable: true
-      }
-      $taskHintList.append($(renderTemplate('edit-task-hint-textarea-partial', options)))
+      }))
     })
 
     function getHints () {
@@ -294,30 +309,32 @@ class TasksView extends View {
       let hints = getHints()
       $taskHintList.empty()
       _.each(savedTaskHints, (entry, ndx) => {
-        $taskHintList.append($(renderTemplate('edit-task-hint-textarea-partial', {
+        $taskHintList.append(window.themis.quals.templates.editTaskHintTextareaPartial({
+          _: _,
           number: ndx + 1,
           editable: false,
           hint: entry.hint
-        })))
+        }))
       })
       _.each(hints, (hint, ndx) => {
-        $taskHintList.append($(renderTemplate('edit-task-hint-textarea-partial', {
+        $taskHintList.append(window.themis.quals.templates.editTaskHintTextareaPartial({
+          _: _,
           number: savedTaskHints.length + ndx + 1,
           editable: true,
           hint: hint
-        })))
+        }))
       })
     })
 
     $taskAnswers.find('a[data-action="create-task-answer"]').on('click', (e) => {
       e.preventDefault()
-      let options = {
+      $taskAnswerList.append(window.themis.quals.templates.editTaskAnswerInputPartial({
+        _: _,
         number: $taskAnswerList.children().length + 1,
         editable: true,
         answer: '',
         caseSensitive: true
-      }
-      $taskAnswerList.append($(renderTemplate('edit-task-answer-input-partial', options)))
+      }))
     })
 
     function getAnswers () {
@@ -342,20 +359,22 @@ class TasksView extends View {
       let answers = getAnswers()
       $taskAnswerList.empty()
       _.each(savedTaskAnswers, (entry, ndx) => {
-        $taskAnswerList.append($(renderTemplate('edit-task-answer-input-partial', {
+        $taskAnswerList.append(window.themis.quals.templates.editTaskAnswerInputPartial({
+          _: _,
           number: ndx + 1,
           editable: false,
           answer: entry.answer,
           caseSensitive: entry.caseSensitive
-        })))
+        }))
       })
       _.each(answers, (entry, ndx) => {
-        $taskAnswerList.append($(renderTemplate('edit-task-answer-input-partial', {
+        $taskAnswerList.append(window.themis.quals.templates.editTaskAnswerInputPartial({
+          _: _,
           number: savedTaskAnswers.length + ndx + 1,
           editable: true,
           answer: entry.answer,
           caseSensitive: entry.caseSensitive
-        })))
+        }))
       })
     })
 
@@ -367,13 +386,12 @@ class TasksView extends View {
         return md.render(hint)
       })
 
-      let options = {
+      $taskPreview.html(window.themis.quals.templates.taskContentPartial({
+        _: _,
         title: $taskTitle.val(),
         description: md.render($taskDescription.val()),
         hints: hintsFormatted
-      }
-
-      $taskPreview.html(renderTemplate('task-content-partial', options))
+      }))
     })
 
     $modal.on('show.bs.modal', (e) => {
@@ -421,21 +439,23 @@ class TasksView extends View {
 
           $taskHintList.empty()
           _.each(taskHints, (entry, ndx) => {
-            $taskHintList.append($(renderTemplate('edit-task-hint-textarea-partial', {
+            $taskHintList.append(window.themis.quals.templates.editTaskHintTextareaPartial({
+              _: _,
               number: ndx + 1,
               editable: false,
               hint: entry.hint
-            })))
+            }))
           })
 
           $taskAnswerList.empty()
           _.each(taskAnswers, (entry, ndx) => {
-            $taskAnswerList.append($(renderTemplate('edit-task-answer-input-partial', {
+            $taskAnswerList.append(window.themis.quals.templates.editTaskAnswerInputPartial({
+              _: _,
               number: ndx + 1,
               editable: false,
               answer: entry.answer,
               caseSensitive: entry.caseSensitive
-            })))
+            }))
           })
         })
         .fail((err) => {
@@ -492,7 +512,18 @@ class TasksView extends View {
     let $taskStatus = $modal.find('#revise-task-status')
     let $submitButton = $modal.find('button[data-action="complete-revise-task"]')
     let $form = $modal.find('form')
-    $form.parsley()
+    $form.parsley({
+      errorClass: 'is-invalid',
+      successClass: 'is-valid',
+      classHandler: function (ParsleyField) {
+        return ParsleyField.$element;
+      },
+      errorsContainer: function (ParsleyField) {
+        return ParsleyField.$element.parents('form-group')
+      },
+      errorsWrapper: '<div class="invalid-feedback">',
+      errorTemplate: '<span></span>'
+    })
 
     $submitButton.on('click', (e) => {
       $form.trigger('submit')
@@ -528,7 +559,8 @@ class TasksView extends View {
         .done((task, taskHints, taskHitStatistics, taskReviewStatistics) => {
           let md = new MarkdownRenderer()
 
-          $taskContents.html(renderTemplate('task-content-partial', {
+          $taskContents.html(window.themis.quals.templates.taskContentPartial({
+            _: _,
             title: task.title,
             description: md.render(task.description),
             hints: _.map(taskHints, (taskHint) => {
@@ -536,7 +568,8 @@ class TasksView extends View {
             })
           }))
 
-          $taskStatus.html(renderTemplate('revise-task-status-partial', {
+          $taskStatus.html(window.themis.quals.templates.reviseTaskStatusPartial({
+            _: _,
             solvedTeamCount: taskHitStatistics.count,
             averageRating: taskReviewStatistics.averageRating,
             ratedTeamCount: taskReviewStatistics.count
@@ -568,7 +601,7 @@ class TasksView extends View {
         success: (responseText, textStatus, jqXHR) => {
           $taskAnswerGroup.hide()
           $submitButton.hide()
-          $submitSuccess.text('Answer is correct!')
+          $submitSuccess.text('The answer is correct!')
           let hideModal = () => {
             $modal.modal('hide')
             if (!dataStore.connectedRealtime()) {
@@ -604,7 +637,8 @@ class TasksView extends View {
       let taskId = parseInt($(e.relatedTarget).data('task-id'), 10)
       $modal.data('task-id', taskId)
       let taskPreview = _.findWhere(taskProvider.getTaskPreviews(), { id: taskId })
-      $modalBody.html(renderTemplate('open-task-confirmation', { title: taskPreview.title }))
+      const msgTemplate = _.template('You are about to open the task <mark><%- title %></mark>. Teams will be able to submit answers for the task. Continue?')
+      $modalBody.html(msgTemplate({ title: taskPreview.title }))
       $submitError.text('')
     })
 
@@ -636,7 +670,8 @@ class TasksView extends View {
       let taskId = parseInt($(e.relatedTarget).data('task-id'), 10)
       $modal.data('task-id', taskId)
       let taskPreview = _.findWhere(taskProvider.getTaskPreviews(), { id: taskId })
-      $modalBody.html(renderTemplate('close-task-confirmation', { title: taskPreview.title }))
+      const msgTemplate = _.template('You are about to close the task <mark><%- title %></mark>. Teams will not be able to submit answers for the task although the scores will not be recalculated. Continue?')
+      $modalBody.html(msgTemplate({ title: taskPreview.title }))
       $submitError.text('')
     })
 
@@ -665,7 +700,18 @@ class TasksView extends View {
     let $submitSuccess = $modal.find('.submit-success > p')
     let $submitButton = $modal.find('button[data-action="complete-submit-task"]')
     let $submitForm = $modal.find('form[data-target="submit"]')
-    $submitForm.parsley()
+    $submitForm.parsley({
+      errorClass: 'is-invalid',
+      successClass: 'is-valid',
+      classHandler: function (ParsleyField) {
+        return ParsleyField.$element;
+      },
+      errorsContainer: function (ParsleyField) {
+        return ParsleyField.$element.parents('form-group')
+      },
+      errorsWrapper: '<div class="invalid-feedback">',
+      errorTemplate: '<span></span>'
+    })
 
     $submitButton.on('click', (e) => {
       $submitForm.trigger('submit')
@@ -677,7 +723,18 @@ class TasksView extends View {
 
     let $reviewButton = $modal.find('button[data-action="complete-review-task"]')
     let $reviewForm = $modal.find('form[data-target="review"]')
-    $reviewForm.parsley()
+    $reviewForm.parsley({
+      errorClass: 'is-invalid',
+      successClass: 'is-valid',
+      classHandler: function (ParsleyField) {
+        return ParsleyField.$element;
+      },
+      errorsContainer: function (ParsleyField) {
+        return ParsleyField.$element.parents('form-group')
+      },
+      errorsWrapper: '<div class="invalid-feedback">',
+      errorTemplate: '<span></span>'
+    })
     let $reviewError = $modal.find('.review-error > p')
     let $reviewSuccess = $modal.find('.review-success > p')
 
@@ -780,24 +837,25 @@ class TasksView extends View {
           _.each(taskHints, (entry) => {
             hintsFormatted.push(md.render(entry.hint))
           })
-          let options = {
+          $taskContents.html(window.themis.quals.templates.taskContentPartial({
+            _: _,
             title: task.title,
             description: md.render(task.description),
             hints: hintsFormatted
-          }
-          $taskContents.html(renderTemplate('task-content-partial', options))
+          }))
 
           teamTaskReview = _.findWhere(teamTaskReviews, { taskId: taskId, teamId: identityProvider.getIdentity().id })
 
-          $taskInfo.show().html(renderTemplate('submit-task-status-partial', {
-            taskSolvedAt: taskSolvedAt ? moment(taskSolvedAt).format('lll') : null,
+          $taskInfo.show().html(window.themis.quals.templates.submitTaskStatusPartial({
+            _: _,
+            taskSolvedAt: taskSolvedAt ? moment(taskSolvedAt).format('MMM D [at] HH:mm [UTC]') : null,
             solvedTeamCount: taskHitStatistics.count,
             reviewAverageRating: taskReviewStatistics.averageRating,
             reviewCount: taskReviewStatistics.count,
             teamReview: teamTaskReview ? {
               rating: teamTaskReview.rating,
               comment: teamTaskReview.comment,
-              createdAt: moment(teamTaskReview.createdAt).format('lll')
+              createdAt: moment(teamTaskReview.createdAt).format('MMM D [at] HH:mm [UTC]')
             } : null
           }))
 
@@ -920,7 +978,18 @@ class TasksView extends View {
     let $submitSuccess = $modal.find('.submit-success > p')
     let $submitButton = $modal.find('button[data-action="complete-check-task"]')
     let $form = $modal.find('form')
-    $form.parsley()
+    $form.parsley({
+      errorClass: 'is-invalid',
+      successClass: 'is-valid',
+      classHandler: function (ParsleyField) {
+        return ParsleyField.$element;
+      },
+      errorsContainer: function (ParsleyField) {
+        return ParsleyField.$element.parents('form-group')
+      },
+      errorsWrapper: '<div class="invalid-feedback">',
+      errorTemplate: '<span></span>'
+    })
 
     $submitButton.on('click', (e) => {
       $form.trigger('submit')
@@ -959,7 +1028,7 @@ class TasksView extends View {
         } else {
           $taskAnswerGroup.hide()
           $submitButton.hide()
-          $submitError.html(renderTemplate('check-task-guest-error'))
+          $submitError.html('You must be authorized in order to view the task and submit answers. Please <u><a class="text-danger" href="/team/signin">sign in</a></u>. If you have not registered yet, please <u><a class="text-danger" href="/team/signup">sign up</a></u>.')
         }
       } else {
         $taskAnswerGroup.hide()
@@ -988,12 +1057,12 @@ class TasksView extends View {
               hintsFormatted.push(md.render(entry.hint))
             })
 
-            let options = {
+            $taskContents.html(window.themis.quals.templates.taskContentPartial({
+              _: _,
               title: task.title,
               description: md.render(task.description),
               hints: hintsFormatted
-            }
-            $taskContents.html(renderTemplate('task-content-partial', options))
+            }))
             $submitButton.prop('disabled', false)
           })
           .fail((err) => {
@@ -1071,130 +1140,45 @@ class TasksView extends View {
   }
 
   renderTaskPreviews () {
-    let taskPreviews = taskProvider.getTaskPreviews()
-    let identity = identityProvider.getIdentity()
-
-    if (taskPreviews.length === 0) {
-      this.$taskPreviewsList.empty()
-      let text = null
-      if (identity.isGuest() || identity.isTeam()) {
-        text = 'No tasks have been opened yet.'
-      } else if (identity.isSupervisor()) {
-        text = 'No tasks have been created yet.'
-      }
-
-      this.$taskPreviewsList.html($('<p></p>').addClass('lead').text(text))
-    } else {
-      let solvedTaskIds = []
-      if (identity.isTeam()) {
-        let taskHits = _.where(teamTaskHitProvider.getTeamTaskHits(), { teamId: identity.id })
-        solvedTaskIds = _.map(taskHits, (taskHit) => {
-          return taskHit.taskId
-        })
-      }
-
-      let getSortResultByKey = (a, b, getValueFunc) => {
-        let valA = getValueFunc(a)
-        let valB = getValueFunc(b)
-        if (valA < valB) {
-          return -1
-        } else if (valA > valB) {
-          return 1
-        } else {
-          return 0
-        }
-      }
-
-      let sortTaskPreviewsFunc = (a, b) => {
-        if (a.state === b.state) {
-          let solvedA = _.contains(solvedTaskIds, a.id)
-          let solvedB = _.contains(solvedTaskIds, b.id)
-          if (!solvedA && !solvedB) {
-            return getSortResultByKey(a, b, (v) => {
-              return v.updatedAt.getTime()
-            })
-          } else if (solvedA && !solvedB) {
-            return 1
-          } else if (!solvedA && solvedB) {
-            return -1
-          } else {
-            return getSortResultByKey(a, b, (v) => {
-              return v.updatedAt.getTime()
-            })
-          }
-        } else {
-          if (a.isOpened()) {
-            return -1
-          } if (b.isOpened()) {
-            return 1
-          } if (a.isClosed() && b.isInitial()) {
-            return -1
-          } if (a.isInitial() && b.isClosed()) {
-            return 1
-          }
-
-          return 0
-        }
-      }
-
-      let categories = categoryProvider.getCategories()
-      let allTaskCategories = taskCategoryProvider.getTaskCategories()
-
-      this.$taskPreviewsList.empty()
-      taskPreviews.sort(sortTaskPreviewsFunc)
-      let contest = contestProvider.getContest()
-      for (let taskPreview of taskPreviews) {
-        let categoriesList = ''
-        let taskCategories = _.where(allTaskCategories, { taskId: taskPreview.id })
-        for (let taskCategory of taskCategories) {
-          let category = _.findWhere(categories, { id: taskCategory.categoryId })
-          if (category) {
-            categoriesList += renderTemplate('category-partial', {
-              title: category.title,
-              description: category.description
-            })
-          }
-        }
-
-        let taskIsSolved = (identity.isTeam() && _.contains(solvedTaskIds, taskPreview.id))
-
-        let options = {
-          task: taskPreview,
-          categoriesList: categoriesList,
-          identity: identity,
-          contest: contest,
-          taskIsSolved: taskIsSolved
-        }
-
-        this.$taskPreviewsList.append($(renderTemplate('task-preview-partial', options)))
-      }
+    const identity = identityProvider.getIdentity()
+    let teamHits = []
+    if (identity.isTeam()) {
+      teamHits = _.where(teamTaskHitProvider.getTeamTaskHits(), { teamId: identity.id })
     }
+
+    this.$taskPreviewsList.html(window.themis.quals.templates.taskList({
+      _: _,
+      templates: window.themis.quals.templates,
+      identity: identity,
+      contest: contestProvider.getContest(),
+      categories: categoryProvider.getCategories(),
+      taskPreviews: taskProvider.getTaskPreviews(),
+      taskCategories: taskCategoryProvider.getTaskCategories(),
+      teamHits: teamHits
+    }))
   }
 
   present () {
     this.$main = $('#main')
-    this.$main.html(renderTemplate('loading-view'))
 
     $
-      .when(identityProvider.fetchIdentity(), contestProvider.fetchContest())
+      .when(identityProvider.initIdentity(), contestProvider.initContest())
       .done((identity, contest) => {
         identityProvider.subscribe()
-        this.$main.html(renderTemplate('tasks-view', { identity: identity, contest: contest }))
-
-        navigationBar.present({ active: 'tasks' })
+        newNavigationBar.present()
 
         let promise = null
         if (identity.isTeam()) {
-          promise = $.when(taskProvider.fetchTaskPreviews(), categoryProvider.fetchCategories(), taskCategoryProvider.fetchTaskCategories(), teamTaskHitProvider.fetchTeamHits(identity.id), contestProvider.fetchTeamScores())
+          promise = $.when(taskProvider.initTaskPreviews(), categoryProvider.initCategories(), taskCategoryProvider.initTaskCategories(), teamTaskHitProvider.initTeamHits(), contestProvider.initTeamScores())
         } else if (identity.isSupervisor()) {
-          promise = $.when(taskProvider.fetchTaskPreviews(), categoryProvider.fetchCategories(), taskCategoryProvider.fetchTaskCategories())
+          promise = $.when(taskProvider.initTaskPreviews(), categoryProvider.initCategories(), taskCategoryProvider.initTaskCategories())
         } else {
-          promise = $.when(taskProvider.fetchTaskPreviews(), categoryProvider.fetchCategories(), taskCategoryProvider.fetchTaskCategories())
+          promise = $.when(taskProvider.initTaskPreviews(), categoryProvider.initCategories(), taskCategoryProvider.initTaskCategories())
         }
 
         promise
           .done((taskPreviews, categories) => {
-            statusBar.present()
+            newStatusBar.present()
 
             if (identity.isSupervisor()) {
               this.initReviseTaskModal()
@@ -1315,95 +1299,8 @@ class TasksView extends View {
             }
 
             this.renderTasksInterval = window.setInterval(this.onRenderTasks, 500)
-            this.requestRenderTasks()
-          })
-          .fail((err) => {
-            console.error(err)
-            this.$main.html(renderTemplate('internal-error-view'))
           })
       })
-      .fail((err) => {
-        console.error(err)
-        navigationBar.present()
-        this.$main.html(renderTemplate('internal-error-view'))
-      })
-  }
-
-  dismiss () {
-    identityProvider.unsubscribe()
-
-    if (this.onCreateTeamTaskHit) {
-      contestProvider.off('createTeamTaskHit', this.onCreateTeamTaskHit)
-      this.onCreateTeamTaskHit = null
-      teamTaskHitProvider.unsubscribe()
-    }
-
-    if (this.onUpdateCategory) {
-      categoryProvider.off('updateCategory', this.onUpdateCategory)
-      this.onUpdateCategory = null
-    }
-
-    categoryProvider.unsubscribe()
-
-    if (this.onCreateTask) {
-      taskProvider.off('createTask', this.onCreateTask)
-      this.onCreateTask = null
-    }
-
-    if (this.onOpenTask) {
-      taskProvider.off('openTask', this.onOpenTask)
-      this.onOpenTask = null
-    }
-
-    if (this.onCloseTask) {
-      taskProvider.off('closeTask', this.onCloseTask)
-      this.onCloseTask = null
-    }
-
-    if (this.onUpdateTask) {
-      taskProvider.off('updateTask', this.onUpdateTask)
-      this.onUpdateTask = null
-    }
-
-    taskProvider.unsubscribe()
-    teamProvider.unsubscribe()
-
-    if (this.onUpdateContest) {
-      contestProvider.off('updateContest', this.onUpdateContest)
-      this.onUpdateContest = null
-    }
-
-    if (this.onCreateTaskCategory) {
-      taskCategoryProvider.off('createTaskCategory', this.onCreateTaskCategory)
-      this.onCreateTaskCategory = null
-    }
-
-    if (this.onDeleteTaskCategory) {
-      taskCategoryProvider.off('deleteTaskCategory', this.onDeleteTaskCategory)
-      this.onDeleteTaskCategory = null
-    }
-
-    if (this.onRevealTaskCategory) {
-      taskCategoryProvider.off('revealTaskCategory', this.onRevealTaskCategory)
-      this.onRevealTaskCategory = null
-    }
-
-    taskCategoryProvider.unsubscribe()
-
-    window.clearInterval(this.renderTasksInterval)
-    this.onRenderTasks = null
-    this.flagRenderTasks = false
-    this.flagRenderingTasks = false
-
-    this.$main.empty()
-    this.$main = null
-    this.$taskPreviewsList = null
-    navigationBar.dismiss()
-    statusBar.dismiss()
-
-    if (dataStore.supportsRealtime()) {
-      dataStore.disconnectRealtime()
-    }
   }
 }
 

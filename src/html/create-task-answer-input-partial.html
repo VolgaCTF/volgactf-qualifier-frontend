@@ -1,0 +1,25 @@
+<div id="create-task-answer-<%- number %>">
+    <div class="input-group themis-task-answer-group" >
+        <div class="input-group-prepend">
+            <span class="input-group-text"><%- number %></span>
+        </div>
+        <input type="text" class="form-control" required data-parsley-errors-container="#create-task-answer-errors-<%- number %>" data-parsley-length="[2,256]" value="<%- answer %>">
+        <div class="input-group-append">
+            <div class="form-check input-group-text pl-4">
+              <input class="form-check-input" type="checkbox" id="task-answer-<%- number %>-case-sensitive" data-parsley-excluded="true" value=""<% print(caseSensitive ? ' checked' : '') %>>
+              <label class="form-check-label" for="task-answer-<%- number %>-case-sensitive">
+                Aa
+              </label>
+            </div>
+        </div>
+        <div class="input-group-append">
+            <span class="input-group-text">
+                <a href="#" class="text-danger" data-action="remove-task-answer" data-number="<%- number %>">
+                    <span class="oi oi-trash"></span>
+                </a>
+            </span>
+        </div>
+    </div>
+    <div id="create-task-answer-errors-<%- number %>">
+    </div>
+</div>

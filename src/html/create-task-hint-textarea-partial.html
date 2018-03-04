@@ -1,0 +1,9 @@
+<div class="themis-task-hint-group mb-2" id="create-task-hint-<%- number %>">
+    <h6>
+        Hint #<%- number %>
+        <a href="#" class="text-danger" data-action="remove-task-hint" data-number="<%- number %>">
+            <span class="oi oi-trash"></span>
+        </a>
+    </h6>
+    <textarea class="form-control" required data-parsley-length="[2,1024]"><%- hint %></textarea>
+</div>

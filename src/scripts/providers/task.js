@@ -109,6 +109,15 @@ class TaskProvider extends EventEmitter {
     this.taskPreviews = []
   }
 
+  initTaskPreviews () {
+    const promise = $.Deferred()
+    this.taskPreviews = _.map(window.themis.quals.data.taskPreviews, function (options) {
+      return new TaskPreviewModel(options)
+    })
+    promise.resolve(this.taskPreviews)
+    return promise
+  }
+
   fetchTaskPreviews () {
     let promise = $.Deferred()
     let url = '/api/task/index'

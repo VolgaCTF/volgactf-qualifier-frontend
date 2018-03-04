@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <title><%- contestTitle %> :: Tasks</title>
+
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link rel="stylesheet" href="/assets/css/{{#cachebusting}}{{#themis_quals}}{{ css }}{{/themis_quals}}{{/cachebusting}}">
+        {{#partials}}
+        {{#head}}
+        <!--=include {{{path}}} -->
+        {{/head}}
+        {{/partials}}
+
+        <% if (google_tag_id) { %>
+        <%= templates.analytics({ _: _, google_tag_id: google_tag_id }) %>
+        <% } %>
+    </head>
+    <body>
+        <%= templates.navbar({ _: _, active: 'tasks', identity: identity, templates: templates, contestTitle: contestTitle, contestTitle: contestTitle }) %>
+        <div id="themis-statusbar">
+            <%= templates.statusbar({ _: _, identity: identity, contest: contest, templates: templates, moment: moment }) %>
+        </div>
+
+        <div id="main" class="pb-4">
+            <div class="container">
+                <% if (identity.role === 'team' && !identity.emailConfirmed) { %>
+                <!--=include ../partials/alert_email_verification.html -->
+                <% } %>
+                <header>
+                    <h1>Tasks</h1>
+                </header>
+                <section>
+                    <% if (identity.role === 'admin' && contest.state !== 4) { %>
+                    <div class="mb-4">
+                        <button type="button" class="btn btn-primary" data-action="create-task" data-toggle="modal" data-target="#create-task-modal">
+                            Create
+                        </button>
+                    </div>
+                    <% } %>
+                    <div id="themis-task-previews">
+                        <%= templates.taskList({ _: _, templates: templates, identity: identity, contest: contest, categories: categories, taskPreviews: taskPreviews, taskCategories: taskCategories, teamHits: teamHits }) %>
+                    </div>
+                </section>
+            </div>
+
+            <% if (identity.role === 'team') { %>
+            <div class="modal fade" id="submit-task-modal" tabindex="-1" role="dialog">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title">Submit task</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="themis-task-contents">
+                            </div>
+                        </div>
+                        <div class="modal-body">
+                            <form method="POST" data-target="submit" novalidate>
+                                <div class="form-group" id="submit-task-field-group">
+                                    <label for="submit-task-answer" class="control-label">Answer</label>
+                                    <input type="text" class="form-control" id="submit-task-answer" name="answer" required data-parsley-length="[2,256]">
+                                </div>
+                                <div class="submit-error">
+                                    <p class="text-danger"></p>
+                                </div>
+                                <div class="submit-info">
+                                    <p class="text-secondary"></p>
+                                </div>
+                                <div class="submit-success">
+                                    <p class="text-success"></p>
+                                </div>
+                            </form>
+                            <form method="POST" data-target="review" novalidate>
+                                <div class="form-group" id="review-task-field-group">
+                                    <hr>
+                                    <p><strong>We would greatly appreciate your feedback!</strong></p>
+                                    <label for="review-task-rating" class="control-label">Rating</label>
+                                    <select class="form-control" id="review-task-rating" name="rating" required>
+                                        <option value="5">5 &ndash; Excellent</option>
+                                        <option value="4">4 &ndash; Good</option>
+                                        <option value="3">3 &ndash; Average</option>
+                                        <option value="2">2 &ndash; Fair</option>
+                                        <option value="1">1 &ndash; Poor</option>
+                                    </select>
+                                    <label for="review-task-comment" class="control-label">Comment</label>
+                                    <textarea class="form-control" id="review-task-comment" name="comment" required data-parsley-length="[0,300]"></textarea>
+                                    <p class="text-secondary">
+                                        <small>
+                                            Note that your comment may be posted publicly. Please avoid obscene language.
+                                            <br>
+                                            You can submit only one review on your team's behalf. It cannot be altered afterwards.
+                                        </small>
+                                    </p>
+                                </div>
+                                <div class="review-error">
+                                    <p class="text-danger"></p>
+                                </div>
+                                <div class="review-success">
+                                    <p class="text-success"></p>
+                                </div>
+                            </form>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                            <button type="button" class="btn btn-primary" data-action="complete-submit-task">Submit</button>
+                            <button type="button" class="btn btn-primary" data-action="complete-review-task">Submit review</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <% } %>
+
+            <% if (identity.role === 'guest' || identity.role === 'team') { %>
+            <div class="modal fade" id="check-task-modal" tabindex="-1" role="dialog">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title">Check task</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="themis-task-contents">
+                            </div>
+                        </div>
+                        <div class="modal-body">
+                            <form method="POST" novalidate>
+                                <div class="form-group" id="check-task-answer-group">
+                                    <label for="check-task-answer" class="control-label">Answer</label>
+                                    <input type="text" class="form-control" id="check-task-answer" name="answer" required data-parsley-length="[2,256]">
+                                    <span class="help-block" id="check-task-status"></span>
+                                </div>
+                                <div class="submit-error">
+                                    <p class="text-danger"></p>
+                                </div>
+                                <div class="submit-success">
+                                    <p class="text-success"></p>
+                                </div>
+                            </form>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                            <button type="button" class="btn btn-primary" data-action="complete-check-task">Check</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <% } %>
+
+            <% if (identity.role === 'admin' || identity.role === 'manager') { %>
+            <div class="modal fade" id="revise-task-modal" tabindex="-1" role="dialog">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title">Revise task</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="themis-task-contents">
+                            </div>
+                        </div>
+                        <div class="modal-body">
+                            <form method="POST" novalidate>
+                                <div class="form-group" id="revise-task-answer-group">
+                                    <label for="revise-task-answer" class="control-label">Answer</label>
+                                    <input type="text" class="form-control" id="revise-task-answer" name="answer" required data-parsley-length="[2,256]">
+                                </div>
+                                <div>
+                                    <p class="text-secondary" id="revise-task-status"></p>
+                                </div>
+                                <div class="submit-error">
+                                    <p class="text-danger"></p>
+                                </div>
+                                <div class="submit-success">
+                                    <p class="text-success"></p>
+                                </div>
+                            </form>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                            <button type="button" class="btn btn-primary" data-action="complete-revise-task">Check</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <% } %>
+
+            <% if (identity.role === 'admin') { %>
+            <div class="modal fade" id="open-task-modal" tabindex="-1" role="dialog">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title">Open task</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <p class="confirmation"></p>
+                            <div class="submit-error">
+                                <p class="text-danger"></p>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">No</button>
+                            <button type="button" class="btn btn-success" data-action="complete-open-task">Yes</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <% } %>
+
+            <% if (identity.role === 'admin') { %>
+            <div class="modal fade" id="close-task-modal" tabindex="-1" role="dialog">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title">Close task</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <p class="confirmation"></p>
+                            <div class="submit-error">
+                                <p class="text-danger"></p>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">No</button>
+                            <button type="button" class="btn btn-danger" data-action="complete-close-task">Yes</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <% } %>
+
+            <% if (identity.role === 'admin') { %>
+            <div class="modal fade" id="create-task-modal" tabindex="-1" role="dialog">
+                <div class="modal-dialog modal-lg">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title">Create task</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <div>
+                                <ul class="nav nav-tabs" id="create-task-tablist">
+                                    <li class="nav-item"><a class="nav-link" href="#create-task-data" role="tab" data-toggle="tab">Data</a></li>
+                                    <li class="nav-item"><a class="nav-link" href="#create-task-preview" role="tab" data-toggle="tab">Preview</a></li>
+                                </ul>
+
+                                <div class="tab-content">
+                                    <div role="tabpanel" class="tab-pane" id="create-task-data">
+                                        <form method="POST" action="/api/task/create" novalidate>
+                                            <div class="container-fluid">
+                                                <div class="row">
+                                                    <div class="col-sm-6">
+                                                        <div class="form-group">
+                                                            <label for="create-task-title" class="control-label">Title</label>
+                                                            <input type="text" class="form-control" id="create-task-title" required minlength="2" maxlength="50" name="title">
+                                                        </div>
+                                                        <div class="form-group">
+                                                            <label for="create-task-description" class="control-label">Description</label>
+                                                            <textarea class="form-control themis-task-description" id="create-task-description" required minlength="2" maxlength="4096" name="description"></textarea>
+                                                        </div>
+                                                        <div class="form-group">
+                                                            <label for="create-task-value" class="control-label">Value</label>
+                                                            <input type="number" class="form-control" id="create-task-value" name="value" required data-parsley-type="integer" data-parsley-min="10" data-parsley-max="1000">
+                                                        </div>
+                                                        <div class="form-group">
+                                                            <label for="create-categories" class="control-label">Categories</label>
+                                                            <select class="form-control" multiple size="5" id="create-categories" required name="categories"></select>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-sm-6">
+                                                        <div class="form-group" id="create-task-hints">
+                                                            <label class="control-label">
+                                                                Hints
+                                                                &nbsp;
+                                                                <a href="#" class="text-primary" data-action="create-task-hint">
+                                                                    <span class="oi oi-plus"></span>
+                                                                </a>
+                                                            </label>
+                                                            <div id="create-task-hint-list">
+                                                            </div>
+                                                        </div>
+                                                        <div class="form-group" id="create-task-answers">
+                                                            <label class="control-label">
+                                                                Answers
+                                                                &nbsp;
+                                                                <a href="#" class="text-primary" data-action="create-task-answer">
+                                                                    <span class="oi oi-plus"></span>
+                                                                </a>
+                                                            </label>
+                                                            <div id="create-task-answer-list">
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="submit-error">
+                                                <p class="text-danger"></p>
+                                            </div>
+                                        </form>
+                                    </div>
+                                    <div role="tabpanel" class="tab-pane" id="create-task-preview">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                            <button type="button" class="btn btn-primary" data-action="complete-create-task">Create</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <% } %>
+
+            <% if (identity.role === 'admin') { %>
+            <div class="modal fade" id="edit-task-modal" tabindex="-1" role="dialog">
+                <div class="modal-dialog modal-lg">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title">Edit task</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <div>
+                                <ul class="nav nav-tabs" id="edit-task-tablist">
+                                    <li class="nav-item"><a class="nav-link" href="#edit-task-data" role="tab" data-toggle="tab">Data</a></li>
+                                    <li class="nav-item"><a class="nav-link" href="#edit-task-preview" role="tab" data-toggle="tab">Preview</a></li>
+                                </ul>
+
+                                <div class="tab-content">
+                                    <div role="tabpanel" class="tab-pane" id="edit-task-data">
+                                        <form method="POST" novalidate>
+                                            <div class="container-fluid">
+                                                <div class="row">
+                                                    <div class="col-sm-6">
+                                                        <div class="form-group">
+                                                            <label for="edit-task-title" class="control-label">Title</label>
+                                                            <input type="text" class="form-control" id="edit-task-title" required minlength="2" maxlength="50" name="title" disabled>
+                                                        </div>
+                                                        <div class="form-group">
+                                                            <label for="edit-task-description" class="control-label">Description</label>
+                                                            <textarea class="form-control themis-task-description" id="edit-task-description" required minlength="2" maxlength="4096" name="description"></textarea>
+                                                        </div>
+                                                        <div class="form-group">
+                                                            <label for="edit-task-value" class="control-label">Value</label>
+                                                            <input type="number" class="form-control" id="edit-task-value" name="value" required data-parsley-type="integer" data-parsley-min="10" data-parsley-max="1000" disabled>
+                                                        </div>
+                                                        <div class="form-group">
+                                                            <label for="edit-categories" class="control-label">Categories</label>
+                                                            <select class="form-control" multiple size="5" id="edit-categories" required name="categories"></select>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-sm-6">
+                                                        <div class="form-group" id="edit-task-hints">
+                                                            <label class="control-label">
+                                                                Hints
+                                                                &nbsp;
+                                                                <a href="#" class="text-primary" data-action="create-task-hint">
+                                                                    <span class="oi oi-plus"></span>
+                                                                </a>
+                                                            </label>
+                                                            <div id="edit-task-hint-list">
+                                                            </div>
+                                                        </div>
+                                                        <div class="form-group" id="edit-task-answers">
+                                                            <label class="control-label">
+                                                                Answers
+                                                                &nbsp;
+                                                                <a href="#" class="text-primary" data-action="create-task-answer">
+                                                                    <span class="oi oi-plus"></span>
+                                                                </a>
+                                                            </label>
+                                                            <div id="edit-task-answer-list">
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="submit-error">
+                                                <p class="text-danger"></p>
+                                            </div>
+                                        </form>
+                                    </div>
+                                    <div role="tabpanel" class="tab-pane" id="edit-task-preview">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                            <button type="button" class="btn btn-primary" data-action="complete-edit-task">Update</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <% } %>
+        </div>
+
+        <footer class="footer">
+            {{#partials}}
+            {{#footer}}
+            <!--=include {{{path}}} -->
+            {{/footer}}
+            {{^footer}}
+            <!--=include ../partials/footer.html -->
+            {{/footer}}
+            {{/partials}}
+        </footer>
+
+        <script>
+            window.themis = {
+                quals: {
+                    view: 'tasks',
+                    data: {
+                        identity: <%= jsesc(identity, { json: true, isScriptContext: true }) %>,
+                        contest: <%= jsesc(contest, { json: true, isScriptContext: true }) %>,
+                        categories: <%= jsesc(categories, { json: true, isScriptContext: true }) %>,
+                        taskPreviews: <%= jsesc(taskPreviews, { json: true, isScriptContext: true }) %>,
+                        taskCategories: <%= jsesc(taskCategories, { json: true, isScriptContext: true }) %>,
+                        teamHits: <%= jsesc(teamHits, { json: true, isScriptContext: true }) %>,
+                        teamScores: <%= jsesc(teamScores, { json: true, isScriptContext: true }) %>
+                    },
+                    templates: {
+                        contestStatePartial: <%= templates.contestStatePartial.source %>,
+                        contestTimer: <%= templates.contestTimer.source %>,
+                        contestScore: <%= templates.contestScore.source %>,
+                        streamStatePartial: <%= templates.streamStatePartial.source %>,
+                        taskContentPartial: <%= templates.taskContentPartial.source %>,
+                        createTaskHintTextareaPartial: <%= templates.createTaskHintTextareaPartial.source %>,
+                        createTaskAnswerInputPartial: <%= templates.createTaskAnswerInputPartial.source %>,
+                        editTaskHintTextareaPartial: <%= templates.editTaskHintTextareaPartial.source %>,
+                        editTaskAnswerInputPartial: <%= templates.editTaskAnswerInputPartial.source %>,
+                        taskList: <%= templates.taskList.source %>,
+                        taskCard: <%= templates.taskCard.source %>,
+                        reviseTaskStatusPartial: <%= templates.reviseTaskStatusPartial.source %>,
+                        submitTaskStatusPartial: <%= templates.submitTaskStatusPartial.source %>
+                    }
+                }
+            }
+        </script>
+        <script src="/assets/js/{{#cachebusting}}{{#themis_quals}}{{ js }}{{/themis_quals}}{{/cachebusting}}"></script>
+    </body>
+</html>

@@ -4,7 +4,7 @@
 	<div class="col-lg-4 col-sm-6 mb-4">
 		<% var team = sortedTeams[i] %>
 		<% var country = _.findWhere(countries, { id: team.countryId }) %>
-		<%= templates.teamProfileSimplifiedPartial({ _: _, team: team, country: country, moment: moment }) %>
+		<%= templates.teamCard({ _: _, team: team, country: country, moment: moment }) %>
 	</div>
 	<% } %>
 </div>

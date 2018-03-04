@@ -1,0 +1,26 @@
+<% if (solvedTeamCount === 0) { %>
+No team has solved this task yet.
+<% } else { %>
+    <% if (taskSolvedAt) { %>
+        <% if (solvedTeamCount === 1) { %>
+            Your team has solved this task on <strong><%- taskSolvedAt %></strong>.<br>
+            No other team has managed to do the same.
+        <% } else { %>
+            Your team has solved this task on <strong><%- taskSolvedAt %></strong>.<br>
+            <strong><% print(solvedTeamCount - 1) %></strong> other <% print((solvedTeamCount > 2) ? 'teams have' : 'team has'); %> managed to do the same.
+        <% } %>
+    <% } else { %>
+    This task has been solved by <strong><%- solvedTeamCount %></strong> <% print((solvedTeamCount > 1) ? 'teams' : 'team'); %>.
+    <% } %>
+<% } %>
+<br><br>
+<% if (reviewCount > 0) { %>
+This task has been rated by <strong><%- reviewCount %></strong> <% print((reviewCount > 1) ? 'teams' : 'team'); %>. The average rating is <strong><%- reviewAverageRating.toFixed(2) %></strong> (5.00 max).
+<% } else { %>
+This task has not been rated yet.
+<% } %>
+<% if (teamReview) { %>
+<br>
+Your team has given this task <strong><%- teamReview.rating %></strong> rating <% print((teamReview.rating === 1) ? 'point' : 'points'); %> on <strong><%- teamReview.createdAt %></strong> and has made the following comment:
+<blockquote><%- teamReview.comment %></blockquote>
+<% } %>

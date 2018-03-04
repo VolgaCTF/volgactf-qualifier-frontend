@@ -11,7 +11,7 @@ import teamProfileView from './views/team/profile'
 import aboutView from './views/about'
 import teamsView from './views/teams'
 import categoriesView from './views/categories'
-// import tasksView from './views/tasks'
+import tasksView from './views/tasks'
 import scoreboardView from './views/scoreboard'
 // import eventsView from './views/events'
 import teamRestoreView from './views/team/restore'
@@ -20,7 +20,6 @@ import defaultView from './views/default'
 // import taskStatisticsView from './views/task/statistics'
 
 import dataStore from './data-store'
-
 
 $(document).ready(function () {
   if (dataStore.supportsRealtime()) {
@@ -32,6 +31,7 @@ $(document).ready(function () {
     teams: teamsView,
     news: newsView,
     scoreboard: scoreboardView,
+    tasks: tasksView,
     about: aboutView,
     categories: categoriesView,
 

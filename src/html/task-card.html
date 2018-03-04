@@ -1,0 +1,63 @@
+<% var headerBgClass = 'bg-secondary' %>
+<% if (task.state === 2) { %>
+    <% headerBgClass = solved ? 'bg-success' : 'bg-primary' %>
+<% } else if (task.state === 3) { %>
+    <% headerBgClass = solved ? 'bg-success' : 'bg-danger' %>
+<% } %>
+
+<% var submitAnswerModal = 'check-task-modal' %>
+<% if (identity.role === 'admin' || identity.role === 'manager') { %>
+<% submitAnswerModal = 'revise-task-modal' %>
+<% } else if (identity.role === 'team') { %>
+<% submitAnswerModal = 'submit-task-modal' %>
+<% } %>
+
+<div class="card h-100 text-center themis-task-preview-container" data-task-id="<%- task.id %>">
+    <h5 class="card-header pointer <%- headerBgClass %> text-white" data-task-id="<%- task.id %>" data-toggle="modal" data-target="#<%- submitAnswerModal %>">
+        <%- task.title %>
+    </h5>
+    <% if (identity.role === 'admin' || identity.role === 'manager') { %>
+    <div class="card-body" style="padding: 0.25rem;">
+        <% if (identity.role === 'admin') { %>
+            <% if (task.state !== 3 && contest.state !== 4) { %>
+                <a class="btn btn-primary btn-sm" href="#" data-action="edit-task" data-toggle="modal" data-target="#edit-task-modal" data-task-id="<%- task.id %>" title="Edit task">
+                    <span class="oi oi-pencil"></span>
+                </a>
+            <% } %>
+            <% if (contest.state === 2) { %>
+                <% if (task.state === 1) { %>
+                <a class="btn btn-success btn-sm" href="#" data-action="open-task" data-toggle="modal" data-target="#open-task-modal" data-task-id="<%- task.id %>" title="Open task">
+                    <span class="oi oi-eye"></span>
+                </a>
+                <% } else if (task.state === 2) { %>
+                <a class="btn btn-danger btn-sm" href="#" data-action="close-task" data-toggle="modal" data-target="#close-task-modal" data-task-id="<%- task.id %>" title="Close task">
+                    <span class="oi oi-lock-locked"></span>
+                </a>
+                <% } %>
+            <% } %>
+        <% } %>
+        <a class="btn btn-secondary btn-sm" href="/task/<%- task.id %>/statistics" target="_blank" title="Task statistics">
+            <span class="oi oi-graph"></span>
+        </a>
+        <a class="btn btn-secondary btn-sm" href="/tasks?action=show&taskId=<%- task.id %>" target="_blank" title="Task permalink">
+            <span class="oi oi-pin"></span>
+        </a>
+    </div>
+    <% } %>
+    <div class="card-body pointer" data-task-id="<%- task.id %>" data-toggle="modal" data-target="#<%- submitAnswerModal %>">
+
+        <div class="themis-task-value">
+            <%- task.value %>
+        </div>
+    </div>
+    <div class="card-footer pointer" data-task-id="<%- task.id %>" data-toggle="modal" data-target="#<%- submitAnswerModal %>">
+        <% var sortedTaskCategories = _.sortBy(taskCategories, 'createdAt') %>
+        <% for (var i=0; i<sortedTaskCategories.length; ++i) { %>
+            <% var category = _.findWhere(categories, { id: sortedTaskCategories[i].categoryId }) %>
+            <span class="badge badge-secondary" title="<%- category.description %>">
+                <span class="oi oi-tag"></span>
+                &nbsp;<%- category.title %>
+            </span>
+        <% } %>
+    </div>
+</div>

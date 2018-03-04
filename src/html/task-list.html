@@ -1,0 +1,56 @@
+<% if (taskPreviews.length === 0) { %>
+    <p class="lead">
+    <% if (identity.role === 'guest' || identity.role === 'team') { %>
+        No tasks have been opened yet.
+    <% } else if (identity.role === 'manager' || identity.role === 'admin') { %>
+        No tasks have been created yet.
+    <% } %>
+    </p>
+<% } else { %>
+    <% var entries = _.map(taskPreviews, function (taskPreview) {
+        var solved = (identity.role === 'team') && _.findWhere(teamHits, { teamId: identity.id, taskId: taskPreview.id })
+        var weight = 0
+        if (taskPreview.state === 3) {
+            weight = 1
+        } else if (taskPreview.state === 1) {
+            weight = 2
+        } else if (taskPreview.state === 2) {
+            weight = solved ? 4 : 3
+        }
+        var createdAt = (taskPreview.createdAt instanceof Date) ? taskPreview.createdAt : new Date(taskPreview.createdAt)
+        return {
+            task: taskPreview,
+            solved: solved,
+            weight: weight,
+            created: createdAt.getTime()
+        }
+    }) %>
+
+    <% function rank (a, b) {
+        if (a.weight > b.weight) {
+            return -1
+        } else if (a.weight < b.weight) {
+            return 1
+        } else {
+            if (a.created < b.created) {
+                return -1
+            } else if (a.created > b.created) {
+                return 1
+            } else {
+                return 0
+            }
+        }
+    } %>
+
+    <% entries.sort(rank) %>
+
+    <div class="row">
+        <% for (var i=0; i<entries.length; ++i) { %>
+        <div class="col-lg-3 col-sm-4 mb-4">
+            <% var entry = entries[i] %>
+            <% var filteredTaskCategories = _.where(taskCategories, { taskId: entry.task.id }) %>
+            <%= templates.taskCard({ _: _, identity: identity, contest: contest, task: entry.task, categories: categories, taskCategories: filteredTaskCategories, solved: entry.solved }) %>
+        </div>
+        <% } %>
+    </div>
+<% } %>

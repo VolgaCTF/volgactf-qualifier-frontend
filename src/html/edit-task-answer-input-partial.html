@@ -1,0 +1,27 @@
+<div id="edit-task-answer-<%- number %>">
+    <div class="input-group themis-task-answer-group" data-state-disabled="<% print(editable ? 'false' : 'true') %>">
+        <div class="input-group-prepend">
+            <span class="input-group-text"><%- number %></span>
+        </div>
+        <input type="text" class="form-control" required data-parsley-errors-container="#edit-task-answer-errors-<%- number %>" data-parsley-length="[2,256]" value="<%- answer %>"<% print(editable ? '' : ' disabled'); %>>
+        <div class="input-group-append">
+            <div class="form-check input-group-text pl-4">
+              <input class="form-check-input" type="checkbox" id="task-answer-<%- number %>-case-sensitive" data-parsley-excluded="true" value=""<% print(caseSensitive ? ' checked' : '') %><% print(editable ? '' : ' disabled'); %>>
+              <label class="form-check-label" for="task-answer-<%- number %>-case-sensitive">
+                Aa
+              </label>
+            </div>
+        </div>
+        <% if (editable) { %>
+        <div class="input-group-append">
+            <span class="input-group-text">
+                <a href="#" class="text-danger" data-action="remove-task-answer" data-number="<%- number %>">
+                    <span class="oi oi-trash"></span>
+                </a>
+            </span>
+        </div>
+        <% } %>
+    </div>
+    <div id="edit-task-answer-errors-<%- number %>">
+    </div>
+</div>

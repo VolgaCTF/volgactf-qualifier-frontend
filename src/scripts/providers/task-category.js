@@ -86,6 +86,15 @@ class TaskCategoryProvider extends EventEmitter {
     this.taskCategories = []
   }
 
+  initTaskCategories () {
+    const promise = $.Deferred()
+    this.taskCategories = _.map(window.themis.quals.data.taskCategories, function (options) {
+      return new TaskCategoryModel(options)
+    })
+    promise.resolve(this.taskCategories)
+    return promise
+  }
+
   fetchTaskCategories () {
     let promise = $.Deferred()
     let url = '/api/task/category/index'

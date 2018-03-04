@@ -1,0 +1,18 @@
+<div>
+    <header>
+        <h4><%- title %></h4>
+    </header>
+    <section>
+        <%= description %>
+    </section>
+    <% if (hints.length > 0) { %>
+    <section>
+        <h5>Hints</h5>
+        <ol>
+            <% for (var i=0; i<hints.length; ++i) { %>
+            <li><%= hints[i] %></li>
+            <% } %>
+        </ol>
+    </section>
+    <% } %>
+</div>
