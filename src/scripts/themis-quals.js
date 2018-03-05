@@ -18,6 +18,7 @@ import teamRestoreView from './views/team/restore'
 import teamResetPasswordView from './views/team/reset-password'
 import defaultView from './views/default'
 // import taskStatisticsView from './views/task/statistics'
+import contestView from './views/contest'
 
 import dataStore from './data-store'
 
@@ -34,6 +35,7 @@ $(document).ready(function () {
     tasks: tasksView,
     about: aboutView,
     categories: categoriesView,
+    contest: contestView,
 
     teamSignin: teamSigninView,
     teamSignup: teamSignupView,

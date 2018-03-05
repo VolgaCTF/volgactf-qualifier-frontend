@@ -4,9 +4,6 @@ import dataStore from './data-store'
 import moment from 'moment'
 import contestProvider from './providers/contest'
 import identityProvider from './providers/identity'
-import 'bootstrap'
-import 'parsley'
-import 'tempusdominius-bootstrap-4'
 
 class NewStatusBar {
   constructor () {
@@ -25,113 +22,12 @@ class NewStatusBar {
     this.renderingTeamScore = false
   }
 
-  initUpdateContestModal () {
-    let $modal = $('#update-contest-modal')
-    $modal.modal({ show: false })
-
-    let $submitError = $modal.find('.submit-error > p')
-    let $submitButton = $modal.find('button[data-action="complete-update-contest"]')
-    let $form = $modal.find('form')
-    $form.parsley()
-
-    let $contestState = $('#update-contest-state')
-    let $contestStartsAt = $('#update-contest-starts')
-    let $contestFinishesAt = $('#update-contest-finishes')
-
-    let pickerFormat = 'D MMM YYYY [at] HH:mm'
-
-    $contestStartsAt.datetimepicker({
-      showClose: true,
-      sideBySide: true,
-      format: pickerFormat
-    })
-
-    $contestFinishesAt.datetimepicker({
-      showClose: true,
-      sideBySide: true,
-      format: pickerFormat
-    })
-
-    $submitButton.on('click', (e) => {
-      $form.trigger('submit')
-    })
-
-    let updateOptions = (initial, started, paused, finished) => {
-      $contestState.find('option[value="1"]').prop('disabled', !initial)
-      $contestState.find('option[value="2"]').prop('disabled', !started)
-      $contestState.find('option[value="3"]').prop('disabled', !paused)
-      $contestState.find('option[value="4"]').prop('disabled', !finished)
-    }
-
-    $modal.on('show.bs.modal', (e) => {
-      let contest = contestProvider.getContest()
-      $contestState.val(contest.state)
-
-      if (contest.isInitial()) {
-        updateOptions(true, true, false, false)
-      } else if (contest.isStarted()) {
-        updateOptions(false, true, true, true)
-      } else if (contest.isPaused()) {
-        updateOptions(false, true, true, true)
-      } else if (contest.isFinished()) {
-        updateOptions(false, false, false, true)
-      }
-
-      $contestStartsAt.datetimepicker('date', contest.startsAt)
-      $contestFinishesAt.datetimepicker('date', contest.finishesAt)
-      $submitError.text('')
-    })
-
-    $modal.on('shown.bs.modal', (e) => {
-      $contestState.focus()
-    })
-
-    $form.on('submit', (e) => {
-      let valStartsAt = $contestStartsAt.datetimepicker('date')
-      let valFinishesAt = $contestFinishesAt.datetimepicker('date')
-
-      e.preventDefault()
-      $form.ajaxSubmit({
-        beforeSubmit: () => {
-          $submitError.text('')
-          $submitButton.prop('disabled', true)
-        },
-        clearForm: true,
-        data: {
-          startsAt: (valStartsAt) ? valStartsAt.seconds(0).milliseconds(0).valueOf() : null,
-          finishesAt: (valFinishesAt) ? valFinishesAt.seconds(0).milliseconds(0).valueOf() : null
-        },
-        dataType: 'json',
-        headers: {
-          'X-CSRF-Token': identityProvider.getIdentity().token
-        },
-        success: (responseJSON, textStatus, jqXHR) => {
-          $modal.modal('hide')
-          if (!dataStore.connectedRealtime()) {
-            window.location.reload()
-          }
-        },
-        error: (jqXHR, textStatus, errorThrown) => {
-          if (jqXHR.responseJSON) {
-            $submitError.text(jqXHR.responseJSON)
-          } else {
-            $submitError.text('Unknown error. Please try again later.')
-          }
-        },
-        complete: () => {
-          $submitButton.prop('disabled', false)
-        }
-      })
-    })
-  }
-
   renderContestState () {
     let contest = contestProvider.getContest()
 
     this.$stateContainer.html(window.themis.quals.templates.contestStatePartial({
       _: _,
-      contest: contest,
-      identity: identityProvider.getIdentity()
+      contest: contest
     }))
   }
 
@@ -181,10 +77,6 @@ class NewStatusBar {
     this.$scoreContainer = $('#themis-contest-score')
     if (identity.isTeam()) {
       this.renderTeamScore()
-    }
-
-    if (identity.isAdmin()) {
-      this.initUpdateContestModal()
     }
 
     this.onUpdateContest = (e) => {

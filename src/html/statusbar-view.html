@@ -1,7 +1,7 @@
 <div class="container themis-statusbar">
     <div class="row">
         <div class="col-md-3" id="themis-contest-state">
-            <%= templates.contestStatePartial({ _: _, identity: identity, contest: contest }) %>
+            <%= templates.contestStatePartial({ _: _, contest: contest }) %>
         </div>
         <div class="col-md-6" id="themis-contest-timer">
             <%= templates.contestTimer({ _: _, contest: contest, moment: moment }) %>
@@ -10,63 +10,3 @@
         </div>
     </div>
 </div>
-
-<% if (identity.role === 'admin') { %>
-<div class="modal fade" id="update-contest-modal" tabindex="-1" role="dialog">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">Update contest</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <div class="modal-body">
-                <form method="POST" action="/api/contest/update">
-                    <div class="form-group">
-                        <label for="update-contest-state" class="control-label">State</label>
-                        <select id="update-contest-state" class="form-control" name="state" autofocus required>
-                            <option value="1">Not started</option>
-                            <option value="2">Started</option>
-                            <option value="3">Paused</option>
-                            <option value="4">Finished</option>
-                        </select>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="update-contest-starts" class="control-label">Starts at</label>
-                        <div class='input-group date' id='update-contest-starts' data-target-input="nearest">
-                            <input type='text' class="form-control datetimepicker-input" data-target="#update-contest-starts">
-                            <div class="input-group-append" data-target="#update-contest-starts" data-toggle="datetimepicker">
-                                <span class="input-group-text">
-                                    <span class="oi oi-calendar"></span>
-                                </span>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="update-contest-finishes" class="control-label">Finishes at</label>
-                        <div class='input-group date' id='update-contest-finishes' data-target-input="nearest">
-                            <input type='text' class="form-control datetimepicker-input" data-target="#update-contest-finishes">
-                            <div class="input-group-append" data-target="#update-contest-finishes" data-toggle="datetimepicker">
-                                <span class="input-group-text">
-                                    <span class="oi oi-calendar"></span>
-                                </span>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="submit-error">
-                        <p class="text-danger"></p>
-                    </div>
-                </form>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                <button type="button" class="btn btn-primary" data-action="complete-update-contest">Update</button>
-            </div>
-        </div>
-    </div>
-</div>
-<% } %>
