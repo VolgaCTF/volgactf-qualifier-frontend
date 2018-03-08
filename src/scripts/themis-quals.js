@@ -19,6 +19,7 @@ import teamResetPasswordView from './views/team/reset-password'
 import defaultView from './views/default'
 // import taskStatisticsView from './views/task/statistics'
 import contestView from './views/contest'
+import remoteCheckersView from './views/remote-checkers'
 
 import dataStore from './data-store'
 
@@ -36,6 +37,7 @@ $(document).ready(function () {
     about: aboutView,
     categories: categoriesView,
     contest: contestView,
+    remoteCheckers: remoteCheckersView,
 
     teamSignin: teamSigninView,
     teamSignup: teamSignupView,

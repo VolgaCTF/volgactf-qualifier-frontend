@@ -1,0 +1,23 @@
+<div data-id="<%- remoteChecker.id %>">
+    <header>
+        <h4><%- remoteChecker.name %></h4>
+    </header>
+    <section>
+        <p><a href="<%- remoteChecker.url %>" target="_blank"><%- remoteChecker.url %></a></p>
+        <p><code><%- remoteChecker.authUsername %>:******</code></p>
+    </section>
+    <footer>
+        <% var updatedAt = (remoteChecker.updatedAt instanceof Date) ? remoteChecker.updatedAt : new Date(remoteChecker.updatedAt) %>
+        <p class="text-muted"><small>Updated on <%- moment(updatedAt).utc().format('MMM D [at] HH:mm [UTC]') %></small>
+            <% if (identity.role === 'admin' && contest.state !== 4) { %>
+            &nbsp;
+            <button type="button" class="btn btn-secondary btn-sm" data-action="edit-remote-checker" data-toggle="modal" data-target="#edit-remote-checker-modal" data-remote-checker-id="<%- remoteChecker.id %>">
+                Edit
+            </button>
+            <button type="button" class="btn btn-danger btn-sm" data-action="delete-remote-checker" data-toggle="modal" data-target="#delete-remote-checker-modal" data-remote-checker-id="<%- remoteChecker.id %>">
+                Delete
+            </button>
+            <% } %>
+        </p>
+    </footer>
+</div>

@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <title><%- contestTitle %> :: Remote checkers</title>
+
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link rel="stylesheet" href="/assets/css/{{#cachebusting}}{{#themis_quals}}{{ css }}{{/themis_quals}}{{/cachebusting}}">
+        {{#partials}}
+        {{#head}}
+        <!--=include {{{path}}} -->
+        {{/head}}
+        {{/partials}}
+
+        <% if (google_tag_id) { %>
+        <%= templates.analytics({ _: _, google_tag_id: google_tag_id }) %>
+        <% } %>
+    </head>
+    <body>
+        <%= templates.navbar({ _: _, active: 'remote_checkers', identity: identity, templates: templates, contestTitle: contestTitle, contestTitle: contestTitle }) %>
+        <div id="themis-statusbar">
+            <%= templates.statusbar({ _: _, identity: identity, contest: contest, templates: templates, moment: moment }) %>
+        </div>
+
+        <div id="main" class="pb-4">
+            <div class="container">
+                <header>
+                    <h1>Remote checkers</h1>
+                </header>
+                <section>
+                    <% if (identity.role === 'admin' && contest.state !== 4) { %>
+                    <div class="mb-4">
+                        <button type="button" class="btn btn-primary" data-action="create-remote-checker" data-toggle="modal" data-target="#create-remote-checker-modal">
+                            Create
+                        </button>
+                    </div>
+                    <% } %>
+                    <div id="themis-quals-remote-checker-list">
+                        <%= templates.remoteCheckerList({ _: _, identity: identity, contest: contest, remoteCheckers: remoteCheckers, templates: templates, moment: moment }) %>
+                    </div>
+                </section>
+            </div>
+
+            <% if (identity.role === 'admin' && contest.state !== 4) { %>
+            <div class="modal fade" id="create-remote-checker-modal" tabindex="-1" role="dialog">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title">Create a remote checker</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <form method="POST" action="/api/remote_checker/create" novalidate>
+                                <div class="form-group">
+                                    <label for="create-remote-checker-name" class="control-label">Name</label>
+                                    <input type="text" class="form-control" id="create-remote-checker-name" name="name" autofocus required minlength="2" maxlength="50">
+                                </div>
+                                <div class="form-group">
+                                    <label for="create-remote-checker-url" class="control-label">URL</label>
+                                    <input type="url" class="form-control" id="create-remote-checker-url" name="url" required minlength="2" maxlength="256">
+                                </div>
+                                <div class="form-group">
+                                    <label for="create-remote-checker-auth-username" class="control-label">Auth username</label>
+                                    <input type="text" class="form-control" id="create-remote-checker-auth-username" name="authUsername" required minlength="2" maxlength="50">
+                                </div>
+                                <div class="form-group">
+                                    <label for="create-remote-checker-auth-password" class="control-label">Auth password</label>
+                                    <input type="password" class="form-control" id="create-remote-checker-auth-password" name="authPassword" required minlength="6" maxlength="40" pattern="^[A-Za-z0-9\x5b\x5d\x28\x29\x7b\x7d\x7e\x60\x21\x40\x23\x24\x25\x5e\x26\x2a\x2d\x5f\x3d\x2b\x27\x22\x3a\x3b\x7c\x2f\x5c\x2e\x2c\x3f\x3c\x3e]+$">
+                                </div>
+                                <div class="submit-error">
+                                    <p class="text-danger"></p>
+                                </div>
+                            </form>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                            <button type="button" class="btn btn-primary" data-action="complete-create-remote-checker">Create</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal fade" id="delete-remote-checker-modal" tabindex="-1" role="dialog">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title">Delete a remote checker</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <p class="confirmation"></p>
+                            <div class="submit-error">
+                                <p class="text-danger"></p>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                            <button type="button" class="btn btn-danger" data-action="complete-delete-remote-checker">Delete</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal fade" id="edit-remote-checker-modal" tabindex="-1" role="dialog">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title">Edit a remote checker</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <form method="POST" novalidate>
+                                <div class="form-group">
+                                    <label for="edit-remote-checker-name" class="control-label">Name</label>
+                                    <input type="text" class="form-control" id="edit-remote-checker-name" name="name" autofocus required minlength="2" maxlength="50">
+                                </div>
+                                <div class="form-group">
+                                    <label for="edit-remote-checker-url" class="control-label">URL</label>
+                                    <input type="url" class="form-control" id="edit-remote-checker-url" name="url" required minlength="2" maxlength="256">
+                                </div>
+                                <div class="form-group">
+                                    <label for="edit-remote-checker-auth-username" class="control-label">Auth username</label>
+                                    <input type="text" class="form-control" id="edit-remote-checker-auth-username" name="authUsername" required minlength="2" maxlength="50">
+                                </div>
+                                <div class="form-group">
+                                    <label for="edit-remote-checker-auth-password" class="control-label">Auth password</label>
+                                    <input type="password" class="form-control" id="edit-remote-checker-auth-password" name="authPassword" required minlength="6" maxlength="40" pattern="^[A-Za-z0-9\x5b\x5d\x28\x29\x7b\x7d\x7e\x60\x21\x40\x23\x24\x25\x5e\x26\x2a\x2d\x5f\x3d\x2b\x27\x22\x3a\x3b\x7c\x2f\x5c\x2e\x2c\x3f\x3c\x3e]+$">
+                                </div>
+                                <div class="submit-error">
+                                    <p class="text-danger"></p>
+                                </div>
+                            </form>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                            <button type="button" class="btn btn-primary" data-action="complete-edit-remote-checker">Save</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <% } %>
+        </div>
+
+        <footer class="footer">
+            {{#partials}}
+            {{#footer}}
+            <!--=include {{{path}}} -->
+            {{/footer}}
+            {{^footer}}
+            <!--=include ../partials/footer.html -->
+            {{/footer}}
+            {{/partials}}
+        </footer>
+
+        <script>
+            window.themis = {
+                quals: {
+                    view: 'remoteCheckers',
+                    data: {
+                        identity: <%= jsesc(identity, { json: true, isScriptContext: true }) %>,
+                        contest: <%= jsesc(contest, { json: true, isScriptContext: true }) %>,
+                        remoteCheckers: <%= jsesc(remoteCheckers, { json: true, isScriptContext: true }) %>
+                    },
+                    templates: {
+                        contestStatePartial: <%= templates.contestStatePartial.source %>,
+                        contestTimer: <%= templates.contestTimer.source %>,
+                        contestScore: <%= templates.contestScore.source %>,
+                        streamStatePartial: <%= templates.streamStatePartial.source %>,
+                        remoteCheckerList: <%= templates.remoteCheckerList.source %>,
+                        remoteCheckerBlock: <%= templates.remoteCheckerBlock.source %>
+                    }
+                }
+            }
+        </script>
+        <script src="/assets/js/{{#cachebusting}}{{#themis_quals}}{{ js }}{{/themis_quals}}{{/cachebusting}}"></script>
+    </body>
+</html>

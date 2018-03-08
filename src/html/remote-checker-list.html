@@ -1,0 +1,9 @@
+<% if (remoteCheckers.length === 0) { %>
+    <p class="lead">No remote checkers have been created yet.</p>
+<% } else { %>
+    <% var sortedRemoteCheckers = _.sortBy(remoteCheckers, 'createdAt').reverse() %>
+    <% for (var i=0; i<sortedRemoteCheckers.length; ++i) { %>
+        <% var remoteChecker = sortedRemoteCheckers[i] %>
+        <%= templates.remoteCheckerBlock({ _: _, remoteChecker: remoteChecker, identity: identity, contest: contest, moment: moment }) %>
+    <% } %>
+<% } %>
