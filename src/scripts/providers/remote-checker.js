@@ -91,7 +91,7 @@ class RemoteCheckerProvider extends EventEmitter {
     this.remoteCheckers = _.map(window.themis.quals.data.remoteCheckers, function (options) {
       return new RemoteCheckerModel(options)
     })
-    promise.resolve(this.categories)
+    promise.resolve(this.remoteCheckers)
     return promise
   }
 

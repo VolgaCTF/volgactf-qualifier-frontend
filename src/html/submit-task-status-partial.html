@@ -22,5 +22,5 @@ This task has not been rated yet.
 <% if (teamReview) { %>
 <br>
 Your team has given this task <strong><%- teamReview.rating %></strong> rating <% print((teamReview.rating === 1) ? 'point' : 'points'); %> on <strong><%- teamReview.createdAt %></strong> and has made the following comment:
-<blockquote><%- teamReview.comment %></blockquote>
+<blockquote class="blockquote text-info"><%- teamReview.comment %></blockquote>
 <% } %>

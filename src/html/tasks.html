@@ -294,7 +294,21 @@
                                                             <div id="create-task-hint-list">
                                                             </div>
                                                         </div>
-                                                        <div class="form-group" id="create-task-answers">
+                                                        <div class="form-group" id="create-task-check-method">
+                                                            <div class="form-check form-check-inline">
+                                                                <input class="form-check-input" type="radio" name="checkMethod" id="create-task-check-method-list" value="list">
+                                                                <label class="form-check-label" for="create-task-check-method-list">
+                                                                    Answer list
+                                                                </label>
+                                                            </div>
+                                                            <div class="form-check form-check-inline">
+                                                                <input class="form-check-input" type="radio" name="checkMethod" id="create-task-check-method-remote" value="remote">
+                                                                <label class="form-check-label" for="create-task-check-method-remote">
+                                                                    Remote checker
+                                                                </label>
+                                                            </div>
+                                                        </div>
+                                                        <div class="form-group" id="create-task-answer-group">
                                                             <label class="control-label">
                                                                 Answers
                                                                 &nbsp;
@@ -304,6 +318,12 @@
                                                             </label>
                                                             <div id="create-task-answer-list">
                                                             </div>
+                                                        </div>
+                                                        <div class="form-group" id="create-task-remote-checker-group">
+                                                            <label for="create-task-remote-checker" class="control-label">
+                                                                Name
+                                                            </label>
+                                                            <select class="form-control" id="create-task-remote-checker" required name="remoteChecker"></select>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -379,7 +399,21 @@
                                                             <div id="edit-task-hint-list">
                                                             </div>
                                                         </div>
-                                                        <div class="form-group" id="edit-task-answers">
+                                                        <div class="form-group" id="edit-task-check-method">
+                                                            <div class="form-check form-check-inline">
+                                                                <input class="form-check-input" type="radio" name="checkMethod" id="edit-task-check-method-list" value="list" disabled>
+                                                                <label class="form-check-label" for="edit-task-check-method-list">
+                                                                    Answer list
+                                                                </label>
+                                                            </div>
+                                                            <div class="form-check form-check-inline">
+                                                                <input class="form-check-input" type="radio" name="checkMethod" id="edit-task-check-method-remote" value="remote" disabled>
+                                                                <label class="form-check-label" for="edit-task-check-method-remote">
+                                                                    Remote checker
+                                                                </label>
+                                                            </div>
+                                                        </div>
+                                                        <div class="form-group" id="edit-task-answer-group">
                                                             <label class="control-label">
                                                                 Answers
                                                                 &nbsp;
@@ -389,6 +423,12 @@
                                                             </label>
                                                             <div id="edit-task-answer-list">
                                                             </div>
+                                                        </div>
+                                                        <div class="form-group" id="edit-task-remote-checker-group">
+                                                            <label for="edit-task-remote-checker" class="control-label">
+                                                                Name
+                                                            </label>
+                                                            <select class="form-control" id="edit-task-remote-checker" required name="remoteChecker" disabled></select>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -435,7 +475,9 @@
                         taskPreviews: <%= jsesc(taskPreviews, { json: true, isScriptContext: true }) %>,
                         taskCategories: <%= jsesc(taskCategories, { json: true, isScriptContext: true }) %>,
                         teamHits: <%= jsesc(teamHits, { json: true, isScriptContext: true }) %>,
-                        teamScores: <%= jsesc(teamScores, { json: true, isScriptContext: true }) %>
+                        teamScores: <%= jsesc(teamScores, { json: true, isScriptContext: true }) %>,
+                        remoteCheckers: <%= jsesc(remoteCheckers, { json: true, isScriptContext: true }) %>,
+                        taskRemoteCheckers: <%= jsesc(taskRemoteCheckers, { json: true, isScriptContext: true }) %>
                     },
                     templates: {
                         contestStatePartial: <%= templates.contestStatePartial.source %>,

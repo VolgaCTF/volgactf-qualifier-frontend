@@ -21,6 +21,9 @@ import 'bootstrap'
 import 'jquery-form'
 import 'parsley'
 
+import remoteCheckerProvider from '../providers/remote-checker'
+import taskRemoteCheckerProvider from '../providers/task-remote-checker'
+
 class TasksView extends View {
   constructor () {
     super()
@@ -83,8 +86,15 @@ class TasksView extends View {
     let $taskHints = $('#create-task-hints')
     let $taskHintList = $('#create-task-hint-list')
 
-    let $taskAnswers = $('#create-task-answers')
+    const $taskCheckMethod = $('#create-task-check-method')
+    const $taskCheckMethodList = $('#create-task-check-method-list')
+    const $taskCheckMethodRemote = $('#create-task-check-method-remote')
+
+    let $taskAnswerGroup = $('#create-task-answer-group')
     let $taskAnswerList = $('#create-task-answer-list')
+
+    const $taskRemoteCheckerGroup = $('#create-task-remote-checker-group')
+    const $taskRemoteChecker = $('#create-task-remote-checker')
 
     let $taskPreview = $('#create-task-preview')
 
@@ -125,7 +135,7 @@ class TasksView extends View {
       })
     })
 
-    $taskAnswers.find('a[data-action="create-task-answer"]').on('click', (e) => {
+    $taskAnswerGroup.find('a[data-action="create-task-answer"]').on('click', (e) => {
       e.preventDefault()
       $taskAnswerList.append(window.themis.quals.templates.createTaskAnswerInputPartial({
         _: _,
@@ -177,6 +187,12 @@ class TasksView extends View {
       }))
     })
 
+    $taskCheckMethod.on('change', () => {
+      const method = $('input[type="radio"]:checked', $taskCheckMethod).val()
+      $taskAnswerGroup.toggle(method === 'list')
+      $taskRemoteCheckerGroup.toggle(method === 'remote')
+    })
+
     $modal.on('show.bs.modal', (e) => {
       $tabData.tab('show')
       $taskTitle.val('')
@@ -188,8 +204,23 @@ class TasksView extends View {
         $categories.append($('<option></option>').attr('value', category.id).text(category.title))
       })
 
+      $taskRemoteChecker.empty()
+      _.each(remoteCheckerProvider.getRemoteCheckers(), (remoteChecker) => {
+        $taskRemoteChecker
+        .append($('<option></option>')
+        .attr('value', remoteChecker.id)
+        .prop('disabled', _.where(taskRemoteCheckerProvider.getTaskRemoteCheckers(), { remoteCheckerId: remoteChecker.id }).length > 0)
+        .text(remoteChecker.name))
+      })
+
       $taskHintList.empty()
       $taskAnswerList.empty()
+
+      $taskCheckMethodList.prop('checked', true)
+      $taskAnswerGroup.show()
+
+      $taskCheckMethodRemote.prop('checked', false)
+      $taskRemoteCheckerGroup.hide()
 
       $submitError.text('')
       $form.parsley().reset()
@@ -201,6 +232,7 @@ class TasksView extends View {
 
     $form.on('submit', (e) => {
       e.preventDefault()
+
       $form.ajaxSubmit({
         beforeSubmit: () => {
           $submitError.text('')
@@ -271,8 +303,15 @@ class TasksView extends View {
     let $taskHints = $('#edit-task-hints')
     let $taskHintList = $('#edit-task-hint-list')
 
-    let $taskAnswers = $('#edit-task-answers')
+    const $taskCheckMethod = $('#edit-task-check-method')
+    const $taskCheckMethodList = $('#edit-task-check-method-list')
+    const $taskCheckMethodRemote = $('#edit-task-check-method-remote')
+
+    let $taskAnswerGroup = $('#edit-task-answer-group')
     let $taskAnswerList = $('#edit-task-answer-list')
+
+    const $taskRemoteCheckerGroup = $('#edit-task-remote-checker-group')
+    const $taskRemoteChecker = $('#edit-task-remote-checker')
 
     let $taskPreview = $('#edit-task-preview')
 
@@ -326,7 +365,7 @@ class TasksView extends View {
       })
     })
 
-    $taskAnswers.find('a[data-action="create-task-answer"]').on('click', (e) => {
+    $taskAnswerGroup.find('a[data-action="create-task-answer"]').on('click', (e) => {
       e.preventDefault()
       $taskAnswerList.append(window.themis.quals.templates.editTaskAnswerInputPartial({
         _: _,
@@ -411,6 +450,26 @@ class TasksView extends View {
       $taskHintList.empty()
       $taskAnswerList.empty()
 
+      let checkMethod = 'list'
+      if (_.where(taskRemoteCheckerProvider.getTaskRemoteCheckers(), { taskId: taskId }).length > 0) {
+        checkMethod = 'remote'
+      }
+
+      $taskRemoteChecker.empty()
+      _.each(remoteCheckerProvider.getRemoteCheckers(), (remoteChecker) => {
+        $taskRemoteChecker
+        .append($('<option></option>')
+        .attr('value', remoteChecker.id)
+        .prop('selected', _.where(taskRemoteCheckerProvider.getTaskRemoteCheckers(), { taskId: taskId, remoteCheckerId: remoteChecker.id }).length > 0)
+        .text(remoteChecker.name))
+      })
+
+      $taskCheckMethodList.prop('checked', checkMethod === 'list')
+      $taskAnswerGroup.toggle(checkMethod === 'list')
+
+      $taskCheckMethodRemote.prop('checked', checkMethod === 'remote')
+      $taskRemoteCheckerGroup.toggle(checkMethod === 'remote')
+
       $submitError.text('')
       $form.parsley().reset()
       $form.attr('action', `/api/task/${taskId}/update`)
@@ -469,6 +528,13 @@ class TasksView extends View {
 
     $form.on('submit', (e) => {
       e.preventDefault()
+
+      const taskId = $modal.data('task-id')
+      let checkMethod = 'list'
+      if (_.where(taskRemoteCheckerProvider.getTaskRemoteCheckers(), { taskId: taskId }).length > 0) {
+        checkMethod = 'remote'
+      }
+
       $form.ajaxSubmit({
         beforeSubmit: () => {
           $submitError.text('')
@@ -477,6 +543,7 @@ class TasksView extends View {
         clearForm: true,
         dataType: 'json',
         data: {
+          checkMethod: checkMethod,
           hints: getHints(),
           answers: getAnswers()
         },
@@ -1170,8 +1237,8 @@ class TasksView extends View {
         let promise = null
         if (identity.isTeam()) {
           promise = $.when(taskProvider.initTaskPreviews(), categoryProvider.initCategories(), taskCategoryProvider.initTaskCategories(), teamTaskHitProvider.initTeamHits(), contestProvider.initTeamScores())
-        } else if (identity.isSupervisor()) {
-          promise = $.when(taskProvider.initTaskPreviews(), categoryProvider.initCategories(), taskCategoryProvider.initTaskCategories())
+        } else if (identity.isAdmin()) {
+          promise = $.when(taskProvider.initTaskPreviews(), categoryProvider.initCategories(), taskCategoryProvider.initTaskCategories(), remoteCheckerProvider.initRemoteCheckers(), taskRemoteCheckerProvider.initTaskRemoteCheckers())
         } else {
           promise = $.when(taskProvider.initTaskPreviews(), categoryProvider.initCategories(), taskCategoryProvider.initTaskCategories())
         }
@@ -1185,6 +1252,9 @@ class TasksView extends View {
             }
 
             if (identity.isAdmin()) {
+              remoteCheckerProvider.subscribe()
+              taskRemoteCheckerProvider.subscribe()
+
               this.initCreateTaskModal()
               this.initOpenTaskModal()
               this.initCloseTaskModal()
