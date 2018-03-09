@@ -66,7 +66,7 @@ class EventsView extends View {
   }
 
   getTitle () {
-    return ` :: Events`
+    return ' :: Events'
   }
 
   renderEvent (eventName, eventData, createdAt) {

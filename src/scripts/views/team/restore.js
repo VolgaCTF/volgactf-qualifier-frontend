@@ -16,11 +16,11 @@ class RestoreView extends View {
     $form.parsley({
       errorClass: 'is-invalid',
       successClass: 'is-valid',
-      classHandler: function(ParsleyField) {
-        return ParsleyField.$element;
+      classHandler: function (ParsleyField) {
+        return ParsleyField.$element
       },
-      errorsContainer: function(ParsleyField) {
-        return ParsleyField.$element.parents('form-group');
+      errorsContainer: function (ParsleyField) {
+        return ParsleyField.$element.parents('form-group')
       },
       errorsWrapper: '<div class="invalid-feedback">',
       errorTemplate: '<span></span>'

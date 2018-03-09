@@ -35,7 +35,7 @@ class RemoteCheckersView extends View {
       errorClass: 'is-invalid',
       successClass: 'is-valid',
       classHandler: function (ParsleyField) {
-        return ParsleyField.$element;
+        return ParsleyField.$element
       },
       errorsContainer: function (ParsleyField) {
         return ParsleyField.$element.parents('form-group')
@@ -100,7 +100,7 @@ class RemoteCheckersView extends View {
       errorClass: 'is-invalid',
       successClass: 'is-valid',
       classHandler: function (ParsleyField) {
-        return ParsleyField.$element;
+        return ParsleyField.$element
       },
       errorsContainer: function (ParsleyField) {
         return ParsleyField.$element.parents('form-group')

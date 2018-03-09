@@ -4,7 +4,6 @@ import newNavigationBar from '../../new-navigation-bar'
 import identityProvider from '../../providers/identity'
 import 'parsley'
 import 'jquery-form'
-import parsleyBootstrapOptions from '../../utils/parsley-bootstrap'
 
 class TeamSigninView extends View {
   constructor () {
@@ -18,7 +17,7 @@ class TeamSigninView extends View {
       errorClass: 'is-invalid',
       successClass: 'is-valid',
       classHandler: function (ParsleyField) {
-        return ParsleyField.$element;
+        return ParsleyField.$element
       },
       errorsContainer: function (ParsleyField) {
         return ParsleyField.$element.parents('form-group')

@@ -1,6 +1,5 @@
 import $ from 'jquery'
 import View from './base'
-import dataStore from '../data-store'
 import newNavigationBar from '../new-navigation-bar'
 import newStatusBar from '../new-status-bar'
 import contestProvider from '../providers/contest'

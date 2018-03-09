@@ -4,7 +4,7 @@ import identityProvider from './providers/identity'
 import dataStore from './data-store'
 
 class NewNavigationBar {
-  constructor() {
+  constructor () {
     this.$streamStateContainer = null
 
     this.streamStateInterval = null
@@ -59,7 +59,7 @@ class NewNavigationBar {
     const $signout = $navbar.find('a[data-action="signout"]')
 
     if ($signout.length > 0) {
-      $signout.on('click', function(e) {
+      $signout.on('click', function (e) {
         e.preventDefault()
         e.stopPropagation()
 

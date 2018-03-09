@@ -1,6 +1,5 @@
 import $ from 'jquery'
 import _ from 'underscore'
-import dataStore from './data-store'
 import moment from 'moment'
 import contestProvider from './providers/contest'
 import identityProvider from './providers/identity'

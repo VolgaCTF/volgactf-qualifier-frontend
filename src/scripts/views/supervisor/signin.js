@@ -1,6 +1,5 @@
 import $ from 'jquery'
 import View from '../base'
-import renderTemplate from '../../utils/render-template'
 import newNavigationBar from '../../new-navigation-bar'
 import identityProvider from '../../providers/identity'
 import 'parsley'
@@ -17,11 +16,11 @@ class SupervisorSigninView extends View {
     $form.parsley({
       errorClass: 'is-invalid',
       successClass: 'is-valid',
-      classHandler: function(ParsleyField) {
-        return ParsleyField.$element;
+      classHandler: function (ParsleyField) {
+        return ParsleyField.$element
       },
-      errorsContainer: function(ParsleyField) {
-        return ParsleyField.$element.parents('form-group');
+      errorsContainer: function (ParsleyField) {
+        return ParsleyField.$element.parents('form-group')
       },
       errorsWrapper: '<div class="invalid-feedback">',
       errorTemplate: '<span></span>'

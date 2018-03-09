@@ -61,7 +61,7 @@ class TasksView extends View {
       errorClass: 'is-invalid',
       successClass: 'is-valid',
       classHandler: function (ParsleyField) {
-        return ParsleyField.$element;
+        return ParsleyField.$element
       },
       errorsContainer: function (ParsleyField) {
         return ParsleyField.$element.parents('form-group')
@@ -278,7 +278,7 @@ class TasksView extends View {
       errorClass: 'is-invalid',
       successClass: 'is-valid',
       classHandler: function (ParsleyField) {
-        return ParsleyField.$element;
+        return ParsleyField.$element
       },
       errorsContainer: function (ParsleyField) {
         return ParsleyField.$element.parents('form-group')
@@ -303,7 +303,7 @@ class TasksView extends View {
     let $taskHints = $('#edit-task-hints')
     let $taskHintList = $('#edit-task-hint-list')
 
-    const $taskCheckMethod = $('#edit-task-check-method')
+    // const $taskCheckMethod = $('#edit-task-check-method')
     const $taskCheckMethodList = $('#edit-task-check-method-list')
     const $taskCheckMethodRemote = $('#edit-task-check-method-remote')
 
@@ -583,7 +583,7 @@ class TasksView extends View {
       errorClass: 'is-invalid',
       successClass: 'is-valid',
       classHandler: function (ParsleyField) {
-        return ParsleyField.$element;
+        return ParsleyField.$element
       },
       errorsContainer: function (ParsleyField) {
         return ParsleyField.$element.parents('form-group')
@@ -771,7 +771,7 @@ class TasksView extends View {
       errorClass: 'is-invalid',
       successClass: 'is-valid',
       classHandler: function (ParsleyField) {
-        return ParsleyField.$element;
+        return ParsleyField.$element
       },
       errorsContainer: function (ParsleyField) {
         return ParsleyField.$element.parents('form-group')
@@ -794,7 +794,7 @@ class TasksView extends View {
       errorClass: 'is-invalid',
       successClass: 'is-valid',
       classHandler: function (ParsleyField) {
-        return ParsleyField.$element;
+        return ParsleyField.$element
       },
       errorsContainer: function (ParsleyField) {
         return ParsleyField.$element.parents('form-group')
@@ -1049,7 +1049,7 @@ class TasksView extends View {
       errorClass: 'is-invalid',
       successClass: 'is-valid',
       classHandler: function (ParsleyField) {
-        return ParsleyField.$element;
+        return ParsleyField.$element
       },
       errorsContainer: function (ParsleyField) {
         return ParsleyField.$element.parents('form-group')

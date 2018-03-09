@@ -6,8 +6,6 @@ import identityProvider from '../../providers/identity'
 import countryProvider from '../../providers/country'
 import 'parsley'
 import 'jquery-form'
-import parsleyBootstrapOptions from '../../utils/parsley-bootstrap'
-
 
 class TeamSignupView extends View {
   constructor () {
@@ -20,11 +18,11 @@ class TeamSignupView extends View {
     $form.parsley({
       errorClass: 'is-invalid',
       successClass: 'is-valid',
-      classHandler: function(ParsleyField) {
-        return ParsleyField.$element;
+      classHandler: function (ParsleyField) {
+        return ParsleyField.$element
       },
-      errorsContainer: function(ParsleyField) {
-        return ParsleyField.$element.parents('.col-sm-8');
+      errorsContainer: function (ParsleyField) {
+        return ParsleyField.$element.parents('.col-sm-8')
       },
       errorsWrapper: '<div class="invalid-feedback">',
       errorTemplate: '<span></span>'
@@ -37,18 +35,18 @@ class TeamSignupView extends View {
     let $submitError = $form.find('.submit-error > p')
     let $submitButton = $form.find('button')
 
-    $("input[type=file]").change(function () {
-      var fieldVal = $(this).val();
+    $('input[type="file"]').change(function () {
+      var fieldVal = $(this).val()
 
       // Change the node's value by removing the fake path (Chrome)
-      fieldVal = fieldVal.replace("C:\\fakepath\\", "");
+      fieldVal = fieldVal.replace('C:\\fakepath\\', '')
 
-      if (fieldVal != undefined || fieldVal != "") {
-        $(this).next(".custom-file-label").attr('data-content', fieldVal);
-        $(this).next(".custom-file-label").text(fieldVal);
+      if (typeof fieldVal !== 'undefined' || fieldVal !== '') {
+        $(this).next('.custom-file-label').attr('data-content', fieldVal)
+        $(this).next('.custom-file-label').text(fieldVal)
       } else {
-        $(this).next('.custom-file-label').attr('data-content', '');
-        $(this).next('.custom-file-label').text('Choose file');
+        $(this).next('.custom-file-label').attr('data-content', '')
+        $(this).next('.custom-file-label').text('Choose file')
       }
     })
 

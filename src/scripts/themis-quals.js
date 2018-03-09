@@ -17,7 +17,7 @@ import scoreboardView from './views/scoreboard'
 import teamRestoreView from './views/team/restore'
 import teamResetPasswordView from './views/team/reset-password'
 import defaultView from './views/default'
-// import taskStatisticsView from './views/task/statistics'
+import taskStatisticsView from './views/task/statistics'
 import contestView from './views/contest'
 import remoteCheckersView from './views/remote-checkers'
 
@@ -45,6 +45,8 @@ $(document).ready(function () {
     teamProfile: teamProfileView,
     teamRestore: teamRestoreView,
     teamResetPassword: teamResetPasswordView,
+
+    taskStatistics: taskStatisticsView,
 
     supervisorSignin: supervisorSigninView,
     default: defaultView

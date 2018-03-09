@@ -1,7 +1,5 @@
 import $ from 'jquery'
-import _ from 'underscore'
 import View from '../base'
-import renderTemplate from '../../utils/render-template'
 import newNavigationBar from '../../new-navigation-bar'
 import newStatusBar from '../../new-status-bar'
 import identityProvider from '../../providers/identity'
@@ -11,7 +9,6 @@ import countryProvider from '../../providers/country'
 import taskProvider from '../../providers/task'
 import teamTaskHitProvider from '../../providers/team-task-hit'
 import teamTaskReviewProvider from '../../providers/team-task-review'
-import moment from 'moment'
 import 'parsley'
 import 'jquery-form'
 
@@ -36,7 +33,7 @@ class TeamProfileView extends View {
         errorClass: 'is-invalid',
         successClass: 'is-valid',
         classHandler: function (ParsleyField) {
-          return ParsleyField.$element;
+          return ParsleyField.$element
         },
         errorsContainer: function (ParsleyField) {
           return ParsleyField.$element.parents('form-group')
@@ -51,7 +48,7 @@ class TeamProfileView extends View {
         // Change the node's value by removing the fake path (Chrome)
         fieldVal = fieldVal.replace('C:\\fakepath\\', '')
 
-        if (fieldVal != undefined || fieldVal != '') {
+        if (typeof fieldVal !== 'undefined' || fieldVal !== '') {
           $(this).next('.custom-file-label').attr('data-content', fieldVal)
           $(this).next('.custom-file-label').text(fieldVal)
         } else {
@@ -117,7 +114,7 @@ class TeamProfileView extends View {
         errorClass: 'is-invalid',
         successClass: 'is-valid',
         classHandler: function (ParsleyField) {
-          return ParsleyField.$element;
+          return ParsleyField.$element
         },
         errorsContainer: function (ParsleyField) {
           return ParsleyField.$element.parents('form-group')
@@ -249,7 +246,7 @@ class TeamProfileView extends View {
         errorClass: 'is-invalid',
         successClass: 'is-valid',
         classHandler: function (ParsleyField) {
-          return ParsleyField.$element;
+          return ParsleyField.$element
         },
         errorsContainer: function (ParsleyField) {
           return ParsleyField.$element.parents('form-group')
@@ -329,7 +326,7 @@ class TeamProfileView extends View {
         errorClass: 'is-invalid',
         successClass: 'is-valid',
         classHandler: function (ParsleyField) {
-          return ParsleyField.$element;
+          return ParsleyField.$element
         },
         errorsContainer: function (ParsleyField) {
           return ParsleyField.$element.parents('form-group')

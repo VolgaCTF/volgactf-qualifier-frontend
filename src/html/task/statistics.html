@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <title><%- contestTitle %> :: Task :: <%- task.title %></title>
+
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link rel="stylesheet" href="/assets/css/{{#cachebusting}}{{#themis_quals}}{{ css }}{{/themis_quals}}{{/cachebusting}}">
+        {{#partials}}
+        {{#head}}
+        <!--=include {{{path}}} -->
+        {{/head}}
+        {{/partials}}
+
+        <% if (google_tag_id) { %>
+        <%= templates.analytics({ _: _, google_tag_id: google_tag_id }) %>
+        <% } %>
+    </head>
+    <body>
+        <%= templates.navbar({ _: _, active: null, identity: identity, templates: templates, contestTitle: contestTitle, contestTitle: contestTitle }) %>
+        <div id="themis-statusbar">
+            <%= templates.statusbar({ _: _, identity: identity, contest: contest, templates: templates, moment: moment }) %>
+        </div>
+
+        <div id="main" class="pb-4">
+            <div class="container">
+                <header>
+                    <h1><%- task.title %></h1>
+                    <% var taskCreatedAt = (task.createdAt instanceof Date) ? task.createdAt : new Date(task.createdAt) %>
+                    <span class="text-secondary">Created on <%- moment(taskCreatedAt).utc().format('MMM D [at] HH:mm [UTC]') %></span>
+                </header>
+                <section>
+                    <h3>Description</h3>
+                    <div>
+                        <%= md.render(task.description) %>
+                    </div>
+                </section>
+                <section>
+                    <h3>Hints</h3>
+                    <% if (taskHints.length > 0) { %>
+                    <table class="table table-sm">
+                        <thead>
+                            <tr>
+                                <th scope="col">#</th>
+                                <th scope="col">Hint</th>
+                                <th scope="col">Created</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <% var sortedTaskHints = _.sortBy(taskHints, 'createdAt') %>
+                            <% var hintCreatedAt = null %>
+                            <% for (var i=0; i<sortedTaskHints.length; ++i) { %>
+                            <tr>
+                                <th scope="row"><% print(i + 1) %></th>
+                                <td><%= md.render(sortedTaskHints[i].hint) %></td>
+                                <% var taskHintCreatedAt = (sortedTaskHints[i].createdAt instanceof Date) ? sortedTaskHints[i].createdAt : new Date(sortedTaskHints[i].createdAt) %>
+                                <td><%- moment(taskHintCreatedAt).utc().format('MMM D [at] HH:mm [UTC]') %></td>
+                            </tr>
+                            <% } %>
+                        </tbody>
+                    </table>
+                    <% } else { %>
+                    <p>No hints have been provided for this task yet.</p>
+                    <% } %>
+                </section>
+                <section>
+                    <h3>Hits</h3>
+                    <% if (teamTaskHits.length > 0) { %>
+                    <table class="table table-sm">
+                        <thead>
+                            <tr>
+                                <th scope="col">#</th>
+                                <th scope="col">Team</th>
+                                <th scope="col">Solved</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <% var sortedTeamTaskHits = _.sortBy(teamTaskHits, 'createdAt'); %>
+                            <% var team = null; %>
+                            <% for (var i=0; i<sortedTeamTaskHits.length; ++i) { %>
+                                <% team = _.findWhere(teams, { id: sortedTeamTaskHits[i].teamId }); %>
+                                <% if (team) { %>
+                                <tr>
+                                    <th scope="row"><% print(i + 1) %></th>
+                                    <td><a href="/team/<%- team.id %>/profile" target="_blank"><%- team.name %></a></td>
+                                    <% var teamTaskHitCreatedAt = (sortedTeamTaskHits[i].createdAt instanceof Date) ? sortedTeamTaskHits[i].createdAt : new Date(sortedTeamTaskHits[i].createdAt) %>
+                                    <td><%- moment(teamTaskHitCreatedAt).utc().format('MMM D [at] HH:mm [UTC]') %></td>
+                                </tr>
+                                <% } %>
+                            <% } %>
+                        </tbody>
+                    </table>
+                    <% } else { %>
+                    <p>No team has solved this task yet.</p>
+                    <% } %>
+                </section>
+                <section>
+                    <h3>Reviews</h3>
+                    <% if (teamTaskReviews.length > 0) { %>
+                    <% var averageRating = _.reduce(teamTaskReviews, function (memo, teamTaskReview) {
+                        return memo + teamTaskReview.rating;
+                    }, 0) / (teamTaskReviews.length === 0 ? 1 : teamTaskReviews.length); %>
+                    <p class="text-muted">Average rating is <strong><%- averageRating.toFixed(2) %></strong> (max 5.00)</p>
+                    <table class="table table-sm">
+                        <thead>
+                            <tr>
+                                <th scope="col">#</th>
+                                <th scope="col">Team</th>
+                                <th scope="col">Rating</th>
+                                <th scope="col">Comment</th>
+                                <th scope="col">Created</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <% var sortedTeamTaskReviews = _.sortBy(teamTaskReviews, 'createdAt') %>
+                            <% var team = null; %>
+                            <% for (var i=0; i<sortedTeamTaskReviews.length; ++i) { %>
+                                <% team = _.findWhere(teams, { id: sortedTeamTaskReviews[i].teamId }) %>
+                                <% if (team) { %>
+                                <tr>
+                                    <th scope="row"><% print(i + 1) %></th>
+                                    <td><a href="/team/<%- team.id %>/profile" target="_blank"><%- team.name %></a></td>
+                                    <td><%- sortedTeamTaskReviews[i].rating.toFixed(2) %></td>
+                                    <td><%- sortedTeamTaskReviews[i].comment %></td>
+                                    <% var teamTaskReviewCreatedAt = (sortedTeamTaskReviews[i].createdAt instanceof Date) ? sortedTeamTaskReviews[i].createdAt : new Date(sortedTeamTaskReviews[i].createdAt) %>
+                                    <td><%- moment(teamTaskReviewCreatedAt).utc().format('MMM D [at] HH:mm [UTC]') %></td>
+                                </tr>
+                                <% } %>
+                            <% } %>
+                        </tbody>
+                    </table>
+                    <% } else { %>
+                    <p>No team has rated this task yet.</p>
+                    <% } %>
+                </section>
+            </div>
+        </div>
+
+        <footer class="footer">
+            {{#partials}}
+            {{#footer}}
+            <!--=include {{{path}}} -->
+            {{/footer}}
+            {{^footer}}
+            <!--=include ../partials/footer.html -->
+            {{/footer}}
+            {{/partials}}
+        </footer>
+
+        <script>
+            window.themis = {
+                quals: {
+                    view: 'taskStatistics',
+                    data: {
+                        identity: <%= jsesc(identity, { json: true, isScriptContext: true }) %>,
+                        contest: <%= jsesc(contest, { json: true, isScriptContext: true }) %>,
+                        teamScores: <%= jsesc(teamScores, { json: true, isScriptContext: true }) %>
+                    },
+                    templates: {
+                        contestStatePartial: <%= templates.contestStatePartial.source %>,
+                        contestTimer: <%= templates.contestTimer.source %>,
+                        contestScore: <%= templates.contestScore.source %>,
+                        streamStatePartial: <%= templates.streamStatePartial.source %>
+                    }
+                }
+            }
+        </script>
+        <script src="/assets/js/{{#cachebusting}}{{#themis_quals}}{{ js }}{{/themis_quals}}{{/cachebusting}}"></script>
+    </body>
+</html>
