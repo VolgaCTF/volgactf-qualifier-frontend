@@ -415,9 +415,9 @@ class TeamProfileView extends View {
             promise = $.when(
               teamProvider.initTeamProfile(),
               countryProvider.initCountries(),
-              teamTaskHitProvider.fetchTeamHits(teamId),
-              teamTaskReviewProvider.fetchTeamReviews(teamId),
-              taskProvider.fetchTaskPreviews()
+              teamTaskHitProvider.initTeamTaskHits(),
+              teamTaskReviewProvider.initTeamTaskReviews(),
+              taskProvider.initTaskPreviews()
             )
           }
         } else if (identity.isExactTeam(teamId)) {
@@ -430,10 +430,10 @@ class TeamProfileView extends View {
             promise = $.when(
               teamProvider.initTeamProfile(),
               countryProvider.initCountries(),
-              teamTaskHitProvider.fetchTeamHits(teamId),
-              teamTaskReviewProvider.fetchTeamReviews(teamId),
-              contestProvider.fetchTeamScores(),
-              taskProvider.fetchTaskPreviews()
+              teamTaskHitProvider.initTeamTaskHits(),
+              teamTaskReviewProvider.initTeamTaskReviews(),
+              contestProvider.initTeamScores(),
+              taskProvider.initTaskPreviews()
             )
           }
         } else if (identity.isTeam()) {
@@ -448,7 +448,7 @@ class TeamProfileView extends View {
               countryProvider.initCountries(),
               teamTaskHitProvider.fetchTeamHitStatistics(teamId),
               teamTaskReviewProvider.fetchTeamReviewStatistics(teamId),
-              contestProvider.fetchTeamScores()
+              contestProvider.initTeamScores()
             )
           }
         } else {
@@ -475,35 +475,7 @@ class TeamProfileView extends View {
             newStatusBar.present()
 
             this.team = team
-            let opts = {
-              identity: identity,
-              team: team,
-              tasks: null,
-              taskHits: null,
-              taskReviews: null,
-              teamHitStatistics: null,
-              teamReviewStatistics: null,
-              utils: {
-                underscore: _,
-                moment: moment
-              }
-            }
 
-            let country = _.findWhere(countries, { id: team.countryId })
-            opts.country = country.name
-
-            if (!contest.isInitial()) {
-              if (identity.isSupervisor() || identity.isExactTeam(teamId)) {
-                opts.tasks = taskProvider.getTaskPreviews()
-                opts.taskHits = teamTaskHits
-                opts.taskReviews = teamTaskReviews
-              } else {
-                opts.teamHitStatistics = teamTaskHits
-                opts.teamReviewStatistics = teamTaskReviews
-              }
-            }
-
-            // this.$main.find('section').html(renderTemplate('team-profile-partial', opts))
             if (identity.isExactTeam(team.id)) {
               this.initUploadLogoModal()
 

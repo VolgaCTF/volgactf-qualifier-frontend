@@ -39,7 +39,7 @@
                     </div>
                     <% } %>
                     <div id="themis-task-previews">
-                        <%= templates.taskList({ _: _, templates: templates, identity: identity, contest: contest, categories: categories, taskPreviews: taskPreviews, taskCategories: taskCategories, teamHits: teamHits }) %>
+                        <%= templates.taskList({ _: _, templates: templates, identity: identity, contest: contest, categories: categories, taskPreviews: taskPreviews, taskCategories: taskCategories, teamTaskHits: teamTaskHits }) %>
                     </div>
                 </section>
             </div>
@@ -474,7 +474,7 @@
                         categories: <%= jsesc(categories, { json: true, isScriptContext: true }) %>,
                         taskPreviews: <%= jsesc(taskPreviews, { json: true, isScriptContext: true }) %>,
                         taskCategories: <%= jsesc(taskCategories, { json: true, isScriptContext: true }) %>,
-                        teamHits: <%= jsesc(teamHits, { json: true, isScriptContext: true }) %>,
+                        teamTaskHits: <%= jsesc(teamTaskHits, { json: true, isScriptContext: true }) %>,
                         teamScores: <%= jsesc(teamScores, { json: true, isScriptContext: true }) %>,
                         remoteCheckers: <%= jsesc(remoteCheckers, { json: true, isScriptContext: true }) %>,
                         taskRemoteCheckers: <%= jsesc(taskRemoteCheckers, { json: true, isScriptContext: true }) %>

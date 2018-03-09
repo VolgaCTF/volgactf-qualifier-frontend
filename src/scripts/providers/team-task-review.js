@@ -80,6 +80,15 @@ class TeamTaskReviewProvider extends EventEmitter {
     return promise
   }
 
+  initTeamTaskReviews () {
+    const promise = $.Deferred()
+    this.teamTaskReviews = _.map(window.themis.quals.data.teamTaskReviews, function (options) {
+      return new TeamTaskReviewModel(options)
+    })
+    promise.resolve(this.teamTaskReviews)
+    return promise
+  }
+
   fetchTeamReviews (teamId) {
     let promise = $.Deferred()
     let url = `/api/team/${teamId}/review/index`

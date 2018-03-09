@@ -1208,9 +1208,9 @@ class TasksView extends View {
 
   renderTaskPreviews () {
     const identity = identityProvider.getIdentity()
-    let teamHits = []
+    let teamTaskHits = []
     if (identity.isTeam()) {
-      teamHits = _.where(teamTaskHitProvider.getTeamTaskHits(), { teamId: identity.id })
+      teamTaskHits = _.where(teamTaskHitProvider.getTeamTaskHits(), { teamId: identity.id })
     }
 
     this.$taskPreviewsList.html(window.themis.quals.templates.taskList({
@@ -1221,7 +1221,7 @@ class TasksView extends View {
       categories: categoryProvider.getCategories(),
       taskPreviews: taskProvider.getTaskPreviews(),
       taskCategories: taskCategoryProvider.getTaskCategories(),
-      teamHits: teamHits
+      teamTaskHits: teamTaskHits
     }))
   }
 
@@ -1236,7 +1236,7 @@ class TasksView extends View {
 
         let promise = null
         if (identity.isTeam()) {
-          promise = $.when(taskProvider.initTaskPreviews(), categoryProvider.initCategories(), taskCategoryProvider.initTaskCategories(), teamTaskHitProvider.initTeamHits(), contestProvider.initTeamScores())
+          promise = $.when(taskProvider.initTaskPreviews(), categoryProvider.initCategories(), taskCategoryProvider.initTaskCategories(), teamTaskHitProvider.initTeamTaskHits(), contestProvider.initTeamScores())
         } else if (identity.isAdmin()) {
           promise = $.when(taskProvider.initTaskPreviews(), categoryProvider.initCategories(), taskCategoryProvider.initTaskCategories(), remoteCheckerProvider.initRemoteCheckers(), taskRemoteCheckerProvider.initTaskRemoteCheckers())
         } else {

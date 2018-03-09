@@ -62,24 +62,24 @@
 </section>
 
 <% if (identity.role === 'guest' || !sameTeam) { %>
-    <% if (teamHitStatistics) { %>
+    <% if (teamTaskHitStatistics) { %>
     <section>
         <h3>Task hits</h3>
         <p class="text-muted">
-            <% if (teamHitStatistics.count > 0) { %>
-            Team has solved <strong><%- teamHitStatistics.count %></strong> <% print((teamHitStatistics.count === 1) ? 'task' : 'tasks') %>
+            <% if (teamTaskHitStatistics.count > 0) { %>
+            Team has solved <strong><%- teamTaskHitStatistics.count %></strong> <% print((teamTaskHitStatistics.count === 1) ? 'task' : 'tasks') %>
             <% } else { %>
             Team has not solved a single task
             <% } %>
         </p>
     </section>
     <% } %>
-    <% if (teamReviewStatistics) { %>
+    <% if (teamTaskReviewStatistics) { %>
     <section>
         <h3>Task reviews</h3>
         <p class="text-muted">
-            <% if (teamReviewStatistics.count > 0) { %>
-            Team has reviewed <strong><%- teamReviewStatistics.count %></strong> <% print((teamReviewStatistics.count === 1) ? 'task' : 'tasks') %> and has given <strong><%- teamReviewStatistics.averageRating.toFixed(2) %></strong> rating points on average
+            <% if (teamTaskReviewStatistics.count > 0) { %>
+            Team has reviewed <strong><%- teamTaskReviewStatistics.count %></strong> <% print((teamTaskReviewStatistics.count === 1) ? 'task' : 'tasks') %> and has given <strong><%- teamTaskReviewStatistics.averageRating.toFixed(2) %></strong> rating points on average
             <% } else { %>
             Team has not reviewed a single task
             <% } %>
@@ -89,28 +89,30 @@
 <% } %>
 
 <% if (sameTeam || identity.role === 'manager' || identity.role === 'admin') { %>
-    <% if (taskHits) { %>
+    <% if (teamTaskHits) { %>
     <section>
         <h3>Task hits</h3>
-        <% if (taskHits.length > 0) { %>
-        <table class="table table-condensed">
+        <% if (teamTaskHits.length > 0) { %>
+        <table class="table table-sm">
             <thead>
-                <th>#</th>
-                <th>Task</th>
-                <th>Value</th>
-                <th>Solved at</th>
+                <tr>
+                    <th scope="col">#</th>
+                    <th scope="col">Task</th>
+                    <th scope="col">Value</th>
+                    <th scope="col">Solved</th>
+                </tr>
             </thead>
             <tbody>
-                <% var sortedTaskHits = _.sortBy(taskHits, 'createdAt') %>
+                <% var sortedTeamTaskHits = _.sortBy(teamTaskHits, 'createdAt') %>
                 <% var task = null %>
-                <% for (var i=0; i<sortedTaskHits.length; ++i) { %>
-                    <% task = _.findWhere(tasks, { id: sortedTaskHits[i].taskId }); %>
+                <% for (var i=0; i<sortedTeamTaskHits.length; ++i) { %>
+                    <% task = _.findWhere(tasks, { id: sortedTeamTaskHits[i].taskId }); %>
                     <% if (task) { %>
                     <tr>
-                        <td><% print(i + 1) %></td>
+                        <th scope="row"><% print(i + 1) %></th>
                         <td><%- task.title %></td>
                         <td><%- task.value %></td>
-                        <td><%- moment(sortedTaskHits[i].createdAt).utc().format('MMM D [at] HH:mm [UTC]') %></td>
+                        <td><%- moment(sortedTeamTaskHits[i].createdAt).utc().format('MMM D [at] HH:mm [UTC]') %></td>
                     </tr>
                     <% } %>
                 <% } %>
@@ -121,36 +123,38 @@
         <% } %>
     </section>
     <% } %>
-    <% if (taskReviews) { %>
+    <% if (teamTaskReviews) { %>
     <section>
         <h3>Task reviews</h3>
-        <% if (taskReviews.length > 0) { %>
-        <% var averageRating = _.reduce(taskReviews, function (memo, taskReview) {
+        <% if (teamTaskReviews.length > 0) { %>
+        <% var averageRating = _.reduce(teamTaskReviews, function (memo, taskReview) {
             return memo + taskReview.rating;
-        }, 0) / (taskReviews.length === 0 ? 1 : taskReviews.length); %>
+        }, 0) / (teamTaskReviews.length === 0 ? 1 : teamTaskReviews.length); %>
         <p class="text-muted">Average rating is <strong><%- averageRating.toFixed(2) %></strong> (max 5.00)</p>
-        <table class="table table-condensed">
+        <table class="table table-sm">
             <thead>
-                <th>#</th>
-                <th>Task</th>
-                <th>Value</th>
-                <th>Rating</th>
-                <th>Comment</th>
-                <th>Created at</th>
+                <tr>
+                    <th scope="col">#</th>
+                    <th scope="col">Task</th>
+                    <th scope="col">Value</th>
+                    <th scope="col">Rating</th>
+                    <th scope="col">Comment</th>
+                    <th scope="col">Created</th>
+                </tr>
             </thead>
             <tbody>
-                <% var sortedTaskReviews = _.sortBy(taskReviews, 'createdAt') %>
+                <% var sortedTeamTaskReviews = _.sortBy(teamTaskReviews, 'createdAt') %>
                 <% var task = null %>
-                <% for (var i=0; i<sortedTaskReviews.length; ++i) { %>
-                    <% task = _.findWhere(tasks, { id: sortedTaskReviews[i].taskId }) %>
+                <% for (var i=0; i<sortedTeamTaskReviews.length; ++i) { %>
+                    <% task = _.findWhere(tasks, { id: sortedTeamTaskReviews[i].taskId }) %>
                     <% if (task) { %>
                     <tr>
-                        <td><% print(i + 1) %></td>
+                        <th scope="row"><% print(i + 1) %></th>
                         <td><%- task.title %></td>
                         <td><%- task.value %></td>
-                        <td><%- sortedTaskReviews[i].rating.toFixed(2) %></td>
-                        <td><%- sortedTaskReviews[i].comment %></td>
-                        <td><%- moment(sortedTaskReviews[i].createdAt).utc().format('MMM D [at] HH:mm [UTC]') %></td>
+                        <td><%- sortedTeamTaskReviews[i].rating.toFixed(2) %></td>
+                        <td><%- sortedTeamTaskReviews[i].comment %></td>
+                        <td><%- moment(sortedTeamTaskReviews[i].createdAt).utc().format('MMM D [at] HH:mm [UTC]') %></td>
                     </tr>
                     <% } %>
                 <% } %>

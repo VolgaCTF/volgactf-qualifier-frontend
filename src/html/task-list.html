@@ -8,7 +8,7 @@
     </p>
 <% } else { %>
     <% var entries = _.map(taskPreviews, function (taskPreview) {
-        var solved = (identity.role === 'team') && _.findWhere(teamHits, { teamId: identity.id, taskId: taskPreview.id })
+        var solved = (identity.role === 'team') && _.findWhere(teamTaskHits, { teamId: identity.id, taskId: taskPreview.id })
         var weight = 0
         if (taskPreview.state === 3) {
             weight = 1
