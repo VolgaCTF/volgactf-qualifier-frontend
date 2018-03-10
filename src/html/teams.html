@@ -55,13 +55,11 @@
                         identity: <%= jsesc(identity, { json: true, isScriptContext: true }) %>,
                         contest: <%= jsesc(contest, { json: true, isScriptContext: true }) %>,
                         countries: <%= jsesc(countries, { json: true, isScriptContext: true }) %>,
-                        teams: <%= jsesc(teams, { json: true, isScriptContext: true }) %>,
-                        teamScores: <%= jsesc(teamScores, { json: true, isScriptContext: true }) %>
+                        teams: <%= jsesc(teams, { json: true, isScriptContext: true }) %>
                     },
                     templates: {
                         contestStatePartial: <%= templates.contestStatePartial.source %>,
                         contestTimer: <%= templates.contestTimer.source %>,
-                        contestScore: <%= templates.contestScore.source %>,
                         teamList: <%= templates.teamList.source %>,
                         teamCard: <%= templates.teamCard.source %>,
                         streamStatePartial: <%= templates.streamStatePartial.source %>

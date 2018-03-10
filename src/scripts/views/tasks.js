@@ -2,8 +2,8 @@ import $ from 'jquery'
 import _ from 'underscore'
 import View from './base'
 import dataStore from '../data-store'
-import newNavigationBar from '../new-navigation-bar'
-import newStatusBar from '../new-status-bar'
+import navigationBar from '../new-navigation-bar'
+import statusBar from '../new-status-bar'
 import moment from 'moment'
 import categoryProvider from '../providers/category'
 import taskCategoryProvider from '../providers/task-category'
@@ -1229,14 +1229,17 @@ class TasksView extends View {
     this.$main = $('#main')
 
     $
-      .when(identityProvider.initIdentity(), contestProvider.initContest())
+      .when(
+        identityProvider.initIdentity(),
+        contestProvider.initContest()
+      )
       .done((identity, contest) => {
         identityProvider.subscribe()
-        newNavigationBar.present()
+        navigationBar.present()
 
         let promise = null
         if (identity.isTeam()) {
-          promise = $.when(taskProvider.initTaskPreviews(), categoryProvider.initCategories(), taskCategoryProvider.initTaskCategories(), teamTaskHitProvider.initTeamTaskHits(), contestProvider.initTeamScores())
+          promise = $.when(taskProvider.initTaskPreviews(), categoryProvider.initCategories(), taskCategoryProvider.initTaskCategories(), teamTaskHitProvider.initTeamTaskHits())
         } else if (identity.isAdmin()) {
           promise = $.when(taskProvider.initTaskPreviews(), categoryProvider.initCategories(), taskCategoryProvider.initTaskCategories(), remoteCheckerProvider.initRemoteCheckers(), taskRemoteCheckerProvider.initTaskRemoteCheckers())
         } else {
@@ -1245,7 +1248,7 @@ class TasksView extends View {
 
         promise
           .done((taskPreviews, categories) => {
-            newStatusBar.present()
+            statusBar.present()
 
             if (identity.isSupervisor()) {
               this.initReviseTaskModal()

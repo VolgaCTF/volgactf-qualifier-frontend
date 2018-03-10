@@ -228,13 +228,11 @@
                         tasks: <%= jsesc(tasks, { json: true, isScriptContext: true }) %>,
                         teamTaskHits: <%= jsesc(teamTaskHits, { json: true, isScriptContext: true }) %>,
                         teamTaskHitStatistics: <%= jsesc(teamTaskHitStatistics, { json: true, isScriptContext: true }) %>,
-                        teamScores: <%= jsesc(teamScores, { json: true, isScriptContext: true }) %>,
                         teamTaskReviewStatistics: <%= jsesc(teamTaskReviewStatistics, { json: true, isScriptContext: true }) %>
                     },
                     templates: {
                         contestStatePartial: <%= templates.contestStatePartial.source %>,
                         contestTimer: <%= templates.contestTimer.source %>,
-                        contestScore: <%= templates.contestScore.source %>,
                         teamProfilePartial: <%= templates.teamProfilePartial.source %>,
                         streamStatePartial: <%= templates.streamStatePartial.source %>
                     }

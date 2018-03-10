@@ -3,8 +3,8 @@ import _ from 'underscore'
 import View from './base'
 import renderTemplate from '../utils/render-template'
 import dataStore from '../data-store'
-import navigationBar from '../navigation-bar'
-import statusBar from '../status-bar'
+import newNavigationBar from '../new-navigation-bar'
+import newStatusBar from '../new-status-bar'
 import contestProvider from '../providers/contest'
 import identityProvider from '../providers/identity'
 import moment from 'moment'
@@ -771,8 +771,8 @@ class EventsView extends View {
         if (identity.isSupervisor()) {
           identityProvider.subscribe()
 
-          navigationBar.present({ active: 'events' })
-          statusBar.present()
+          newNavigationBar.present({ active: 'events' })
+          newStatusBar.present()
 
           this.subscribeToContestEvents()
           this.subscribeToCategoryEvents()
@@ -794,7 +794,7 @@ class EventsView extends View {
       })
       .fail((err) => {
         console.error(err)
-        navigationBar.present()
+        newNavigationBar.present()
         this.$main.html(renderTemplate('internal-error-view'))
       })
   }
@@ -815,8 +815,8 @@ class EventsView extends View {
     this.unsubscribeFromTeamTaskReviewEvents()
     this.unsubscribeFromTeamTaskHitEvents()
 
-    navigationBar.dismiss()
-    statusBar.dismiss()
+    newNavigationBar.dismiss()
+    newStatusBar.dismiss()
 
     if (dataStore.supportsRealtime()) {
       dataStore.disconnectRealtime()

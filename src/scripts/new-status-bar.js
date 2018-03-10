@@ -11,14 +11,14 @@ class NewStatusBar {
     this.$timerContainer = null
 
     this.onUpdateContest = null
-    this.onUpdateTeamScore = null
+    // this.onUpdateTeamScore = null
 
     this.timerInterval = null
 
-    this.onReloadTeamScore = null
-    this.reloadTeamScore = false
-    this.reloadTeamScoreInterval = null
-    this.renderingTeamScore = false
+    // this.onReloadTeamScore = null
+    // this.reloadTeamScore = false
+    // this.reloadTeamScoreInterval = null
+    // this.renderingTeamScore = false
   }
 
   renderContestState () {
@@ -40,30 +40,30 @@ class NewStatusBar {
     }))
   }
 
-  renderTeamScore () {
-    this.$scoreContainer.empty()
-    let identity = identityProvider.getIdentity()
-    let contest = contestProvider.getContest()
+  // renderTeamScore () {
+  //   this.$scoreContainer.empty()
+  //   let identity = identityProvider.getIdentity()
+  //   let contest = contestProvider.getContest()
 
-    if (!identity.isTeam() || contest.isInitial()) {
-      return
-    }
+  //   if (!identity.isTeam() || contest.isInitial()) {
+  //     return
+  //   }
 
-    let teamScores = contestProvider.getTeamScores()
-    let teamScore = _.findWhere(teamScores, { teamId: identity.id })
-    if (teamScore) {
-      teamScores.sort(contestProvider.teamRankFunc)
-      let teamNdx = _.findIndex(teamScores, (teamScore) => {
-        return teamScore.teamId === identity.id
-      })
+  //   let teamScores = contestProvider.getTeamScores()
+  //   let teamScore = _.findWhere(teamScores, { teamId: identity.id })
+  //   if (teamScore) {
+  //     teamScores.sort(contestProvider.teamRankFunc)
+  //     let teamNdx = _.findIndex(teamScores, (teamScore) => {
+  //       return teamScore.teamId === identity.id
+  //     })
 
-      this.$scoreContainer.html(window.themis.quals.templates.contestScore({
-        _: _,
-        teamRank: teamNdx + 1,
-        teamScore: teamScore.score
-      }))
-    }
-  }
+  //     this.$scoreContainer.html(window.themis.quals.templates.contestScore({
+  //       _: _,
+  //       teamRank: teamNdx + 1,
+  //       teamScore: teamScore.score
+  //     }))
+  //   }
+  // }
 
   present () {
     this.$container = $('#themis-statusbar')
@@ -73,10 +73,10 @@ class NewStatusBar {
 
     let identity = identityProvider.getIdentity()
 
-    this.$scoreContainer = $('#themis-contest-score')
-    if (identity.isTeam()) {
-      this.renderTeamScore()
-    }
+    // this.$scoreContainer = $('#themis-contest-score')
+    // if (identity.isTeam()) {
+    //   this.renderTeamScore()
+    // }
 
     this.onUpdateContest = (e) => {
       this.renderContestState()
@@ -95,23 +95,23 @@ class NewStatusBar {
 
     if (identity.isTeam()) {
       this.onUpdateTeamScore = (teamScore) => {
-        this.reloadTeamScore = true
+        // this.reloadTeamScore = true
         return false
       }
 
-      contestProvider.on('updateTeamScore', this.onUpdateTeamScore)
+      // contestProvider.on('updateTeamScore', this.onUpdateTeamScore)
 
-      this.onReloadTeamScore = () => {
-        if (!this.reloadTeamScore || this.renderingTeamScore) {
-          return
-        }
-        this.renderingTeamScore = true
-        this.renderTeamScore()
-        this.reloadTeamScore = false
-        this.renderingTeamScore = false
-      }
+      // this.onReloadTeamScore = () => {
+      //   if (!this.reloadTeamScore || this.renderingTeamScore) {
+      //     return
+      //   }
+      //   this.renderingTeamScore = true
+      //   this.renderTeamScore()
+      //   this.reloadTeamScore = false
+      //   this.renderingTeamScore = false
+      // }
 
-      this.reloadTeamScoreInterval = setInterval(this.onReloadTeamScore, 1000)
+      // this.reloadTeamScoreInterval = setInterval(this.onReloadTeamScore, 1000)
     }
   }
 }

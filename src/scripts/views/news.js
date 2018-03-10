@@ -2,8 +2,8 @@ import $ from 'jquery'
 import _ from 'underscore'
 import View from './base'
 import dataStore from '../data-store'
-import newNavigationBar from '../new-navigation-bar'
-import newStatusBar from '../new-status-bar'
+import navigationBar from '../new-navigation-bar'
+import statusBar from '../new-status-bar'
 import MarkdownRenderer from '../utils/markdown'
 import moment from 'moment'
 import postProvider from '../providers/post'
@@ -259,57 +259,51 @@ class NewsView extends View {
     this.$main = $('#main')
 
     $
-      .when(identityProvider.initIdentity())
-      .done((identity) => {
-        let promise = null
-        if (identity.isTeam()) {
-          promise = $.when(contestProvider.initContest(), postProvider.initPosts(), contestProvider.initTeamScores())
-        } else {
-          promise = $.when(contestProvider.initContest(), postProvider.initPosts())
+    .when(
+      identityProvider.initIdentity(),
+      contestProvider.initContest(),
+      postProvider.initPosts()
+    )
+    .done((identity) => {
+      identityProvider.subscribe()
+
+      navigationBar.present()
+      statusBar.present()
+
+      if (identity.isSupervisor()) {
+        this.initCreatePostModal()
+        this.initDeletePostModal()
+        this.initEditPostModal()
+      }
+
+      let urlParams = new URLSearchParams(window.location.search)
+      if (urlParams.get('action') === 'scrollTo' && urlParams.has('postId')) {
+        let $el = $(`div.themis-post[data-id="${urlParams.get('postId')}"]`)
+        if ($el.length > 0) {
+          $el.get(0).scrollIntoView()
         }
+      }
 
-        promise
-          .done((contest) => {
-            identityProvider.subscribe()
+      this.onCreatePost = () => {
+        this.renderPosts()
+        return false
+      }
 
-            newNavigationBar.present()
-            newStatusBar.present()
+      this.onUpdatePost = () => {
+        this.renderPosts()
+        return false
+      }
 
-            if (identity.isSupervisor()) {
-              this.initCreatePostModal()
-              this.initDeletePostModal()
-              this.initEditPostModal()
-            }
+      this.onDeletePost = () => {
+        this.renderPosts()
+        return false
+      }
 
-            let urlParams = new URLSearchParams(window.location.search)
-            if (urlParams.get('action') === 'scrollTo' && urlParams.has('postId')) {
-              let $el = $(`div.themis-post[data-id="${urlParams.get('postId')}"]`)
-              if ($el.length > 0) {
-                $el.get(0).scrollIntoView()
-              }
-            }
-
-            this.onCreatePost = () => {
-              this.renderPosts()
-              return false
-            }
-
-            this.onUpdatePost = () => {
-              this.renderPosts()
-              return false
-            }
-
-            this.onDeletePost = () => {
-              this.renderPosts()
-              return false
-            }
-
-            postProvider.subscribe()
-            postProvider.on('createPost', this.onCreatePost)
-            postProvider.on('updatePost', this.onUpdatePost)
-            postProvider.on('deletePost', this.onDeletePost)
-          })
-      })
+      postProvider.subscribe()
+      postProvider.on('createPost', this.onCreatePost)
+      postProvider.on('updatePost', this.onUpdatePost)
+      postProvider.on('deletePost', this.onDeletePost)
+    })
   }
 }
 

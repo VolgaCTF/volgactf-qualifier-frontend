@@ -99,13 +99,11 @@
                     view: 'index',
                     data: {
                         identity: <%= jsesc(identity, { json: true, isScriptContext: true }) %>,
-                        contest: <%= jsesc(contest, { json: true, isScriptContext: true }) %>,
-                        teamScores: <%= jsesc(teamScores, { json: true, isScriptContext: true }) %>
+                        contest: <%= jsesc(contest, { json: true, isScriptContext: true }) %>
                     },
                     templates: {
                         contestStatePartial: <%= templates.contestStatePartial.source %>,
                         contestTimer: <%= templates.contestTimer.source %>,
-                        contestScore: <%= templates.contestScore.source %>,
                         streamStatePartial: <%= templates.streamStatePartial.source %>
                     }
                 }

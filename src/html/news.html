@@ -172,13 +172,11 @@
                     data: {
                         identity: <%= jsesc(identity, { json: true, isScriptContext: true }) %>,
                         contest: <%= jsesc(contest, { json: true, isScriptContext: true }) %>,
-                        teamScores: <%= jsesc(teamScores, { json: true, isScriptContext: true }) %>,
                         posts: <%= jsesc(posts, { json: true, isScriptContext: true }) %>
                     },
                     templates: {
                         contestStatePartial: <%= templates.contestStatePartial.source %>,
                         contestTimer: <%= templates.contestTimer.source %>,
-                        contestScore: <%= templates.contestScore.source %>,
                         postList: <%= templates.postList.source %>,
                         postPartial: <%= templates.postPartial.source %>,
                         postSimplifiedPartial: <%= templates.postSimplifiedPartial.source %>,

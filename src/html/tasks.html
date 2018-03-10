@@ -475,14 +475,12 @@
                         taskPreviews: <%= jsesc(taskPreviews, { json: true, isScriptContext: true }) %>,
                         taskCategories: <%= jsesc(taskCategories, { json: true, isScriptContext: true }) %>,
                         teamTaskHits: <%= jsesc(teamTaskHits, { json: true, isScriptContext: true }) %>,
-                        teamScores: <%= jsesc(teamScores, { json: true, isScriptContext: true }) %>,
                         remoteCheckers: <%= jsesc(remoteCheckers, { json: true, isScriptContext: true }) %>,
                         taskRemoteCheckers: <%= jsesc(taskRemoteCheckers, { json: true, isScriptContext: true }) %>
                     },
                     templates: {
                         contestStatePartial: <%= templates.contestStatePartial.source %>,
                         contestTimer: <%= templates.contestTimer.source %>,
-                        contestScore: <%= templates.contestScore.source %>,
                         streamStatePartial: <%= templates.streamStatePartial.source %>,
                         taskContentPartial: <%= templates.taskContentPartial.source %>,
                         createTaskHintTextareaPartial: <%= templates.createTaskHintTextareaPartial.source %>,

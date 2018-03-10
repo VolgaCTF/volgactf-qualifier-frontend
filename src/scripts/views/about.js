@@ -1,37 +1,22 @@
 import $ from 'jquery'
 import View from './base'
-import newNavigationBar from '../new-navigation-bar'
-import newStatusBar from '../new-status-bar'
+import navigationBar from '../new-navigation-bar'
+import statusBar from '../new-status-bar'
 import contestProvider from '../providers/contest'
 import identityProvider from '../providers/identity'
 
 class AboutView extends View {
-  constructor () {
-    super()
-    this.$main = null
-  }
-
   present () {
-    this.$main = $('#main')
-
     $
-      .when(identityProvider.initIdentity())
-      .done((identity) => {
-        let promise = null
-        if (identity.isTeam()) {
-          promise = $.when(contestProvider.initContest(), contestProvider.initTeamScores())
-        } else {
-          promise = $.when(contestProvider.initContest())
-        }
-
-        promise
-          .done((contest) => {
-            identityProvider.subscribe()
-
-            newNavigationBar.present()
-            newStatusBar.present()
-          })
-      })
+    .when(
+      identityProvider.initIdentity(),
+      contestProvider.initContest()
+    )
+    .done((identity, contest) => {
+      identityProvider.subscribe()
+      navigationBar.present()
+      statusBar.present()
+    })
   }
 }
 

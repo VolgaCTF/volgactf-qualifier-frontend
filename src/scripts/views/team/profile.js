@@ -1,7 +1,7 @@
 import $ from 'jquery'
 import View from '../base'
-import newNavigationBar from '../../new-navigation-bar'
-import newStatusBar from '../../new-status-bar'
+import navigationBar from '../../new-navigation-bar'
+import statusBar from '../../new-status-bar'
 import identityProvider from '../../providers/identity'
 import teamProvider from '../../providers/team'
 import contestProvider from '../../providers/contest'
@@ -429,7 +429,6 @@ class TeamProfileView extends View {
               countryProvider.initCountries(),
               teamTaskHitProvider.initTeamTaskHits(),
               teamTaskReviewProvider.initTeamTaskReviews(),
-              contestProvider.initTeamScores(),
               taskProvider.initTaskPreviews()
             )
           }
@@ -444,8 +443,7 @@ class TeamProfileView extends View {
               teamProvider.initTeamProfile(),
               countryProvider.initCountries(),
               teamTaskHitProvider.fetchTeamHitStatistics(teamId),
-              teamTaskReviewProvider.fetchTeamReviewStatistics(teamId),
-              contestProvider.initTeamScores()
+              teamTaskReviewProvider.fetchTeamReviewStatistics(teamId)
             )
           }
         } else {
@@ -468,8 +466,8 @@ class TeamProfileView extends View {
           .done((team, countries, teamTaskHits, teamTaskReviews) => {
             identityProvider.subscribe()
 
-            newNavigationBar.present()
-            newStatusBar.present()
+            navigationBar.present()
+            statusBar.present()
 
             this.team = team
 

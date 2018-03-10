@@ -26,30 +26,6 @@ class ContestProvider extends EventEmitter {
     return this.teamScores
   }
 
-  teamRankFunc (a, b) {
-    if (a.score > b.score) {
-      return -1
-    } else if (a.score < b.score) {
-      return 1
-    } else {
-      if (a.updatedAt && b.updatedAt) {
-        if (a.updatedAt.getTime() < b.updatedAt.getTime()) {
-          return -1
-        } else if (a.updatedAt.getTime() > b.updatedAt.getTime()) {
-          return 1
-        } else {
-          return 0
-        }
-      } else if (a.updatedAt && !b.updatedAt) {
-        return -1
-      } else if (!a.updatedAt && b.updatedAt) {
-        return 1
-      } else {
-        return 0
-      }
-    }
-  }
-
   subscribe () {
     if (!dataStore.supportsRealtime()) {
       return

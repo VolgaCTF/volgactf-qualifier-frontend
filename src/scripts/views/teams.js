@@ -1,8 +1,8 @@
 import $ from 'jquery'
 import _ from 'underscore'
 import View from './base'
-import newNavigationBar from '../new-navigation-bar'
-import newStatusBar from '../new-status-bar'
+import navigationBar from '../new-navigation-bar'
+import statusBar from '../new-status-bar'
 import contestProvider from '../providers/contest'
 import identityProvider from '../providers/identity'
 import teamProvider from '../providers/team'
@@ -37,86 +37,70 @@ class TeamsView extends View {
     this.$main = $('#main')
 
     $
-      .when(identityProvider.initIdentity())
-      .done((identity) => {
-        let promise = null
-        if (identity.isTeam()) {
-          promise = $.when(
-            contestProvider.initContest(),
-            teamProvider.initTeams(),
-            countryProvider.initCountries(),
-            contestProvider.initTeamScores()
-          )
-        } else {
-          promise = $.when(
-            contestProvider.initContest(),
-            teamProvider.initTeams(),
-            countryProvider.initCountries()
-          )
+    .when(
+      identityProvider.initIdentity(),
+      contestProvider.initContest(),
+      teamProvider.initTeams(),
+      countryProvider.initCountries()
+    )
+    .done((identity) => {
+      identityProvider.subscribe()
+
+      navigationBar.present()
+      statusBar.present()
+
+      teamProvider.subscribe()
+
+      this.onUpdateTeamProfile = (team) => {
+        this.renderTeams()
+        return false
+      }
+
+      teamProvider.on('updateTeamProfile', this.onUpdateTeamProfile)
+
+      this.onUpdateTeamLogo = (team) => {
+        const teamId = team.id
+        setTimeout(() => {
+          let el = document.getElementById(`team-${teamId}-logo`)
+          if (el) {
+            el.setAttribute('src', `/api/team/${teamId}/logo?timestamp=${(new Date()).getTime()}`)
+          }
+        }, 500)
+        return false
+      }
+
+      teamProvider.on('updateTeamLogo', this.onUpdateTeamLogo)
+
+      this.onQualifyTeam = (team) => {
+        this.renderTeams()
+        return false
+      }
+
+      teamProvider.on('qualifyTeam', this.onQualifyTeam)
+
+      this.onDisqualifyTeam = (team) => {
+        this.renderTeams()
+        return false
+      }
+
+      teamProvider.on('disqualifyTeam', this.onDisqualifyTeam)
+
+      if (identity.isSupervisor()) {
+        this.onCreateTeam = (team) => {
+          this.renderTeams()
+          return false
         }
 
-        promise
-          .done(() => {
-            identityProvider.subscribe()
+        teamProvider.on('createTeam', this.onCreateTeam)
 
-            newNavigationBar.present()
-            newStatusBar.present()
+        this.onUpdateTeamEmail = (team) => {
+          this.renderTeams()
+          return false
+        }
 
-            // this.renderTeams()
-
-            teamProvider.subscribe()
-
-            this.onUpdateTeamProfile = (team) => {
-              this.renderTeams()
-              return false
-            }
-
-            teamProvider.on('updateTeamProfile', this.onUpdateTeamProfile)
-
-            this.onUpdateTeamLogo = (team) => {
-              const teamId = team.id
-              setTimeout(() => {
-                let el = document.getElementById(`team-${teamId}-logo`)
-                if (el) {
-                  el.setAttribute('src', `/api/team/${teamId}/logo?timestamp=${(new Date()).getTime()}`)
-                }
-              }, 500)
-              return false
-            }
-
-            teamProvider.on('updateTeamLogo', this.onUpdateTeamLogo)
-
-            this.onQualifyTeam = (team) => {
-              this.renderTeams()
-              return false
-            }
-
-            teamProvider.on('qualifyTeam', this.onQualifyTeam)
-
-            this.onDisqualifyTeam = (team) => {
-              this.renderTeams()
-              return false
-            }
-
-            teamProvider.on('disqualifyTeam', this.onDisqualifyTeam)
-
-            if (identity.isSupervisor()) {
-              this.onCreateTeam = (team) => {
-                this.renderTeams()
-                return false
-              }
-
-              teamProvider.on('createTeam', this.onCreateTeam)
-
-              this.onUpdateTeamEmail = (team) => {
-                this.renderTeams()
-                return false
-              }
-
-              teamProvider.on('updateTeamEmail', this.onUpdateTeamEmail)
-            }
-          })
-      })
+        teamProvider.on('updateTeamEmail', this.onUpdateTeamEmail)
+      }
+    })
   }
 }
 
