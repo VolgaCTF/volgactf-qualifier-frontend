@@ -61,31 +61,6 @@ class RemoteCheckerProvider extends EventEmitter {
     realtimeProvider.addEventListener('deleteRemoteChecker', this.onDelete)
   }
 
-  unsubscribe () {
-    if (!dataStore.supportsRealtime()) {
-      return
-    }
-
-    let realtimeProvider = dataStore.getRealtimeProvider()
-
-    if (this.onCreate) {
-      realtimeProvider.removeEventListener('createRemoteChecker', this.onCreate)
-      this.onCreate = null
-    }
-
-    if (this.onUpdate) {
-      realtimeProvider.removeEventListener('updateRemoteChecker', this.onUpdate)
-      this.onUpdate = null
-    }
-
-    if (this.onDelete) {
-      realtimeProvider.removeEventListener('deleteRemoteChecker', this.onDelete)
-      this.onDelete = null
-    }
-
-    this.remoteCheckers = []
-  }
-
   initRemoteCheckers () {
     const promise = $.Deferred()
     this.remoteCheckers = _.map(window.themis.quals.data.remoteCheckers, function (options) {

@@ -11,11 +11,11 @@
     <td><%- team.locality %></td>
     <td><%- team.institution %></td>
     <% } %>
-    <td><%- teamScore.score %></td>
-    <% if (teamScore.updatedAt) { %>
-        <% var updatedAt = (teamScore.updatedAt instanceof Date) ? teamScore.updatedAt : new Date(teamScore.updatedAt) %>
-        <td><%- moment(updatedAt).utc().format('MMM D [at] HH:mm [UTC]') %></td>
+    <td><%- teamRanking.score %></td>
+    <% if (teamRanking.lastUpdated) { %>
+        <% var lastUpdated = (teamRanking.lastUpdated instanceof Date) ? teamRanking.lastUpdated : new Date(teamRanking.lastUpdated) %>
+        <td><%- moment(lastUpdated).utc().format('MMM D [at] HH:mm [UTC]') %></td>
     <% } else { %>
-        <td>never</td>
+        <td>n/a</td>
     <% } %>
 </tr>

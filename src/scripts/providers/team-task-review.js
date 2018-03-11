@@ -130,19 +130,6 @@ class TeamTaskReviewProvider extends EventEmitter {
 
     realtimeProvider.addEventListener('createTeamTaskReview', this.onCreateTeamTaskReview)
   }
-
-  unsubscribe () {
-    if (!dataStore.supportsRealtime()) {
-      return
-    }
-
-    let realtimeProvider = dataStore.getRealtimeProvider()
-
-    if (this.onCreateTeamTaskReview) {
-      realtimeProvider.removeEventListener('createTeamTaskReview', this.onCreateTeamTaskReview)
-      this.onCreateTeamTaskReview = null
-    }
-  }
 }
 
 export default new TeamTaskReviewProvider()

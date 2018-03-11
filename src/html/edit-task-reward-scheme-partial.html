@@ -1,0 +1,23 @@
+<% if (rewardScheme === 'fixed') { %>
+    <div class="form-group">
+        <label for="edit-task-reward-scheme-fixed-value" class="control-label">Value</label>
+        <input type="number" class="form-control" id="edit-task-reward-scheme-fixed-value" required data-parsley-type="integer" data-parsley-min="10" data-parsley-max="1000" value="<% print(taskRewardScheme ? taskRewardScheme.maxValue : '') %>">
+    </div>
+<% } else if (rewardScheme === 'variable') { %>
+    <div class="form-group">
+        <label for="edit-task-reward-scheme-variable-max-value" class="control-label">Max value</label>
+        <input type="number" class="form-control" id="edit-task-reward-scheme-variable-max-value" required data-parsley-type="integer" data-parsley-min="10" data-parsley-max="1000" value="<% print(taskRewardScheme ? taskRewardScheme.maxValue : '') %>">
+    </div>
+    <div class="form-group">
+        <label for="edit-task-reward-scheme-variable-min-value" class="control-label">Min value</label>
+        <input type="number" class="form-control" id="edit-task-reward-scheme-variable-min-value" required data-parsley-type="integer" data-parsley-min="10" data-parsley-max="1000" value="<% print(taskRewardScheme ? taskRewardScheme.minValue : '') %>">
+    </div>
+    <div class="form-group">
+        <label for="edit-task-reward-scheme-variable-subtract-points" class="control-label">Subtract points</label>
+        <input type="number" class="form-control" id="edit-task-reward-scheme-variable-subtract-points" required data-parsley-type="integer" data-parsley-min="1" data-parsley-max="100" value="<% print(taskRewardScheme ? taskRewardScheme.subtractPoints : '') %>">
+    </div>
+    <div class="form-group">
+        <label for="edit-task-reward-scheme-variable-subtract-hit-count" class="control-label">Subtract hit count</label>
+        <input type="number" class="form-control" id="edit-task-reward-scheme-variable-subtract-hit-count" required data-parsley-type="integer" data-parsley-min="1" data-parsley-max="500" value="<% print(taskRewardScheme ? taskRewardScheme.subtractHitCount : '') %>">
+    </div>
+<% } %>

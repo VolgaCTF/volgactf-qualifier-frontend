@@ -47,7 +47,15 @@
     <div class="card-body pointer" data-task-id="<%- task.id %>" data-toggle="modal" data-target="#<%- submitAnswerModal %>">
 
         <div class="themis-task-value">
-            <%- task.value %>
+        <% if (taskValue && taskRewardScheme) { %>
+            <% if (_.isNull(taskRewardScheme.minValue)) { %>
+                <%- taskValue.value %>
+            <% } else { %>
+                ~<%- taskValue.value %><sup class="text-primary">*</sup>
+            <% } %>
+        <% } else { %>
+            n/a
+        <% } %>
         </div>
     </div>
     <div class="card-footer pointer" data-task-id="<%- task.id %>" data-toggle="modal" data-target="#<%- submitAnswerModal %>">

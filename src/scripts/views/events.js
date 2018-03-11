@@ -324,15 +324,6 @@ class EventsView extends View {
     teamTaskReviewProvider.on('createTeamTaskReview', this.onCreateTeamTaskReview)
   }
 
-  unsubscribeFromTeamTaskReviewEvents () {
-    if (this.onCreateTeamTaskReview) {
-      teamTaskReviewProvider.off('createTeamTaskReview', this.onCreateTeamTaskReview)
-      this.onCreateTeamTaskReview = null
-    }
-
-    teamTaskReviewProvider.unsubscribe()
-  }
-
   subscribeToTeamTaskHitEvents () {
     teamTaskHitProvider.subscribe()
 
@@ -351,20 +342,6 @@ class EventsView extends View {
     teamTaskHitProvider.on('createTeamTaskHitAttempt', this.onCreateTeamTaskHitAttempt)
   }
 
-  unsubscribeFromTeamTaskHitEvents () {
-    if (this.onCreateTeamTaskHit) {
-      contestProvider.off('createTeamTaskHit', this.onCreateTeamTaskHit)
-      this.onCreateTeamTaskHit = null
-    }
-
-    if (this.onCreateTeamTaskHitAttempt) {
-      teamTaskHitProvider.off('createTeamTaskHitAttempt', this.onCreateTeamTaskHitAttempt)
-      this.onCreateTeamTaskHitAttempt = null
-    }
-
-    teamTaskHitProvider.unsubscribe()
-  }
-
   subscribeToContestEvents () {
     this.onUpdateContest = (e, createdAt) => {
       this.appendLog('updateContest', e, createdAt)
@@ -379,18 +356,6 @@ class EventsView extends View {
     }
 
     contestProvider.on('updateTeamScore', this.onUpdateTeamScore)
-  }
-
-  unsubscribeFromContestEvents () {
-    if (this.onUpdateContest) {
-      contestProvider.off('updateContest', this.onUpdateContest)
-      this.onUpdateContest = null
-    }
-
-    if (this.onUpdateTeamScore) {
-      contestProvider.off('updateTeamScore', this.onUpdateTeamScore)
-      this.onUpdateTeamScore = null
-    }
   }
 
   subscribeToCategoryEvents () {
@@ -418,25 +383,6 @@ class EventsView extends View {
     categoryProvider.on('deleteCategory', this.onDeleteCategory)
   }
 
-  unsubscribeFromCategoryEvents () {
-    if (this.onCreateCategory) {
-      categoryProvider.off('createCategory', this.onCreateCategory)
-      this.onCreateCategory = null
-    }
-
-    if (this.onUpdateCategory) {
-      categoryProvider.off('updateCategory', this.onUpdateCategory)
-      this.onUpdateCategory = null
-    }
-
-    if (this.onDeleteCategory) {
-      categoryProvider.off('deleteCategory', this.onDeleteCategory)
-      this.onDeleteCategory = null
-    }
-
-    categoryProvider.unsubscribe()
-  }
-
   subscribeToPostEvents () {
     postProvider.subscribe()
 
@@ -460,25 +406,6 @@ class EventsView extends View {
     }
 
     postProvider.on('deletePost', this.onDeletePost)
-  }
-
-  unsubscribeFromPostEvents () {
-    if (this.onCreatePost) {
-      postProvider.off('createPost', this.onCreatePost)
-      this.onCreatePost = null
-    }
-
-    if (this.onUpdatePost) {
-      postProvider.off('updatePost', this.onUpdatePost)
-      this.onUpdatePost = null
-    }
-
-    if (this.onDeletePost) {
-      postProvider.off('deletePost', this.onDeletePost)
-      this.onDeletePost = null
-    }
-
-    postProvider.unsubscribe()
   }
 
   subscribeToSupervisorEvents () {
@@ -520,35 +447,6 @@ class EventsView extends View {
     supervisorProvider.on('logoutSupervisor', this.onLogoutSupervisor)
   }
 
-  unsubscribeFromSupervisorEvents () {
-    if (this.onCreateSupervisor) {
-      supervisorProvider.off('createSupervisor', this.onCreateSupervisor)
-      this.onCreateSupervisor = null
-    }
-
-    if (this.onDeleteSupervisor) {
-      supervisorProvider.off('deleteSupervisor', this.onDeleteSupervisor)
-      this.onDeleteSupervisor = null
-    }
-
-    if (this.onUpdateSupervisorPassword) {
-      supervisorProvider.off('updateSupervisorPassword', this.onUpdateSupervisorPassword)
-      this.onUpdateSupervisorPassword = null
-    }
-
-    if (this.onLoginSupervisor) {
-      supervisorProvider.off('loginSupervisor', this.onLoginSupervisor)
-      this.onLoginSupervisor = null
-    }
-
-    if (this.onLogoutSupervisor) {
-      supervisorProvider.off('logoutSupervisor', this.onLogoutSupervisor)
-      this.onLogoutSupervisor = null
-    }
-
-    supervisorProvider.unsubscribe()
-  }
-
   subscribeToTaskEvents () {
     taskProvider.subscribe()
 
@@ -581,30 +479,6 @@ class EventsView extends View {
     taskProvider.on('closeTask', this.onCloseTask)
   }
 
-  unsubscribeFromTaskEvents () {
-    if (this.onCreateTask) {
-      taskProvider.off('createTask', this.onCreateTask)
-      this.onCreateTask = null
-    }
-
-    if (this.onUpdateTask) {
-      taskProvider.off('updateTask', this.onUpdateTask)
-      this.onUpdateTask = null
-    }
-
-    if (this.onOpenTask) {
-      taskProvider.off('openTask', this.onOpenTask)
-      this.onOpenTask = null
-    }
-
-    if (this.onCloseTask) {
-      taskProvider.off('closeTask', this.onCloseTask)
-      this.onCloseTask = null
-    }
-
-    taskProvider.unsubscribe()
-  }
-
   subscribeToTaskCategoryEvents () {
     taskCategoryProvider.subscribe()
 
@@ -621,20 +495,6 @@ class EventsView extends View {
     }
 
     taskCategoryProvider.on('deleteTaskCategory', this.onDeleteTaskCategory)
-  }
-
-  unsubscribeFromTaskCategoryEvents () {
-    if (this.onCreateTaskCategory) {
-      taskCategoryProvider.off('createTaskCategory', this.onCreateTaskCategory)
-      this.onCreateTaskCategory = null
-    }
-
-    if (this.onDeleteTaskCategory) {
-      taskCategoryProvider.off('deleteTaskCategory', this.onDeleteTaskCategory)
-      this.onDeleteTaskCategory = null
-    }
-
-    taskCategoryProvider.unsubscribe()
   }
 
   subscribeToTeamEvents () {
@@ -704,55 +564,6 @@ class EventsView extends View {
     teamProvider.on('logoutTeam', this.onLogoutTeam)
   }
 
-  unsubscribeFromTeamEvents () {
-    if (this.onCreateTeam) {
-      teamProvider.off('createTeam', this.onCreateTeam)
-      this.onCreateTeam = null
-    }
-
-    if (this.onUpdateTeamEmail) {
-      teamProvider.off('updateTeamEmail', this.onUpdateTeamEmail)
-      this.onUpdateTeamEmail = null
-    }
-
-    if (this.onUpdateTeamProfile) {
-      teamProvider.off('updateTeamProfile', this.onUpdateTeamProfile)
-      this.onUpdateTeamProfile = null
-    }
-
-    if (this.onUpdateTeamPassword) {
-      teamProvider.off('updateTeamPassword', this.onUpdateTeamPassword)
-      this.onUpdateTeamPassword = null
-    }
-
-    if (this.onUpdateTeamLogo) {
-      teamProvider.off('updateTeamLogo', this.onUpdateTeamLogo)
-      this.onUpdateTeamLogo = null
-    }
-
-    if (this.onQualifyTeam) {
-      teamProvider.off('qualifyTeam', this.onQualifyTeam)
-      this.onQualifyTeam = null
-    }
-
-    if (this.onDisqualifyTeam) {
-      teamProvider.off('disqualifyTeam', this.onDisqualifyTeam)
-      this.onDisqualifyTeam = null
-    }
-
-    if (this.onLoginTeam) {
-      teamProvider.off('loginTeam', this.onLoginTeam)
-      this.onLoginTeam = null
-    }
-
-    if (this.onLogoutTeam) {
-      teamProvider.off('logoutTeam', this.onLogoutTeam)
-      this.onLogoutTeam = null
-    }
-
-    teamProvider.unsubscribe()
-  }
-
   present () {
     this.$main = $('#main')
     this.$main.html(renderTemplate('loading-view'))
@@ -797,30 +608,6 @@ class EventsView extends View {
         newNavigationBar.present()
         this.$main.html(renderTemplate('internal-error-view'))
       })
-  }
-
-  dismiss () {
-    identityProvider.unsubscribe()
-
-    this.$main.empty()
-    this.$main = null
-
-    this.unsubscribeFromContestEvents()
-    this.unsubscribeFromCategoryEvents()
-    this.unsubscribeFromPostEvents()
-    this.unsubscribeFromSupervisorEvents()
-    this.unsubscribeFromTaskEvents()
-    this.unsubscribeFromTaskCategoryEvents()
-    this.unsubscribeFromTeamEvents()
-    this.unsubscribeFromTeamTaskReviewEvents()
-    this.unsubscribeFromTeamTaskHitEvents()
-
-    newNavigationBar.dismiss()
-    newStatusBar.dismiss()
-
-    if (dataStore.supportsRealtime()) {
-      dataStore.disconnectRealtime()
-    }
   }
 }
 

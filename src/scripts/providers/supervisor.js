@@ -61,39 +61,6 @@ class SupervisorProvider extends EventEmitter {
 
     realtimeProvider.addEventListener('logoutSupervisor', this.onLogout)
   }
-
-  unsubscribe () {
-    if (!dataStore.supportsRealtime()) {
-      return
-    }
-
-    let realtimeProvider = dataStore.getRealtimeProvider()
-
-    if (this.onCreate) {
-      realtimeProvider.removeEventListener('createSupervisor', this.onCreate)
-      this.onCreate = null
-    }
-
-    if (this.onDelete) {
-      realtimeProvider.removeEventListener('deleteSupervisor', this.onDelete)
-      this.onDelete = null
-    }
-
-    if (this.onUpdatePassword) {
-      realtimeProvider.removeEventListener('updateSupervisorPassword', this.onUpdatePassword)
-      this.onUpdatePassword = null
-    }
-
-    if (this.onLogin) {
-      realtimeProvider.removeEventListener('loginSupervisor', this.onLogin)
-      this.onLogin = null
-    }
-
-    if (this.onLogout) {
-      realtimeProvider.removeEventListener('logoutSupervisor', this.onLogout)
-      this.onLogout = null
-    }
-  }
 }
 
 export default new SupervisorProvider()

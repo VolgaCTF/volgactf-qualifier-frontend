@@ -10,6 +10,8 @@ import teamProvider from '../providers/team'
 import URLSearchParams from 'url-search-params'
 import countryProvider from '../providers/country'
 
+import teamRankingProvider from '../providers/team-ranking'
+
 class ScoreboardView extends View {
   constructor () {
     super()
@@ -18,6 +20,8 @@ class ScoreboardView extends View {
     this.onUpdateTeamScore = null
     this.onUpdateTeamLogo = null
     this.onUpdateTeamProfile = null
+
+    this.onUpdateTeamRankings = null
 
     this.onReloadScoreboard = null
     this.reloadScoreboard = false
@@ -34,7 +38,7 @@ class ScoreboardView extends View {
       detailed: this.detailed,
       templates: window.themis.quals.templates,
       teams: teamProvider.getTeams(),
-      teamScores: contestProvider.getTeamScores(),
+      teamRankings: teamRankingProvider.getTeamRankings(),
       countries: countryProvider.getCountries(),
       identity: identityProvider.getIdentity()
     }))
@@ -48,16 +52,18 @@ class ScoreboardView extends View {
       identityProvider.initIdentity(),
       contestProvider.initContest(),
       teamProvider.initTeams(),
-      contestProvider.initTeamScores(),
+      teamRankingProvider.initTeamRankings(),
       countryProvider.initCountries()
     )
-    .done((identity, contest, teams, teamScores, countries) => {
+    .done((identity, contest, teams, teamRankings, countries) => {
       identityProvider.subscribe()
 
       let urlParams = new URLSearchParams(window.location.search)
       this.detailed = urlParams.has('detailed')
 
       teamProvider.subscribe()
+
+      teamRankingProvider.subscribe()
 
       navigationBar.present()
       statusBar.present()
@@ -68,6 +74,12 @@ class ScoreboardView extends View {
       }
 
       contestProvider.on('updateTeamScore', this.onUpdateTeamScore)
+
+      this.onUpdateTeamRankings = () => {
+        this.reloadScoreboard = true
+        return false
+      }
+      teamRankingProvider.on('updateTeamRankings', this.onUpdateTeamRankings)
 
       this.onUpdateTeamLogo = (team) => {
         const teamId = team.id

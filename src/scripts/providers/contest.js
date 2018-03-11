@@ -89,37 +89,6 @@ class ContestProvider extends EventEmitter {
     realtimeProvider.addEventListener('disqualifyTeam', this.onDisqualifyTeam)
   }
 
-  unsubscribe () {
-    if (!dataStore.supportsRealtime()) {
-      return
-    }
-
-    let realtimeProvider = dataStore.getRealtimeProvider()
-
-    if (this.onUpdate) {
-      realtimeProvider.removeEventListener('updateContest', this.onUpdate)
-      this.onUpdate = null
-    }
-
-    if (this.onUpdateTeamScore) {
-      realtimeProvider.removeEventListener('updateTeamScore', this.onUpdateTeamScore)
-      this.onUpdateTeamScore = null
-    }
-
-    if (this.onQualifyTeam) {
-      realtimeProvider.removeEventListener('qualifyTeam', this.onQualifyTeam)
-      this.onQualifyTeam = null
-    }
-
-    if (this.onDisqualifyTeam) {
-      realtimeProvider.removeEventListener('disqualifyTeam', this.onDisqualifyTeam)
-      this.onDisqualifyTeam = null
-    }
-
-    this.contest = null
-    this.teamScores = []
-  }
-
   initContest () {
     const promise = $.Deferred()
     this.contest = new ContestModel(window.themis.quals.data.contest)

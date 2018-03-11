@@ -31,7 +31,7 @@
                     <h1>Scoreboard</h1>
                 </header>
                 <section>
-                    <%= templates.scoreboardTable({ _: _, moment: moment, detailed: detailed, templates: templates, teams: teams, teamScores: teamScores, countries: countries, identity: identity }) %>
+                    <%= templates.scoreboardTable({ _: _, moment: moment, detailed: detailed, templates: templates, teams: teams, teamRankings: teamRankings, countries: countries, identity: identity }) %>
                 </section>
             </div>
         </div>
@@ -56,7 +56,7 @@
                         contest: <%= jsesc(contest, { json: true, isScriptContext: true }) %>,
                         countries: <%= jsesc(countries, { json: true, isScriptContext: true}) %>,
                         teams: <%= jsesc(teams, { json: true, isScriptContext: true }) %>,
-                        teamScores: <%= jsesc(teamScores, { json: true, isScriptContext: true }) %>
+                        teamRankings: <%= jsesc(teamRankings, { json: true, isScriptContext: true }) %>
                     },
                     templates: {
                         contestStatePartial: <%= templates.contestStatePartial.source %>,

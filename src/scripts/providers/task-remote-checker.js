@@ -33,21 +33,6 @@ class TaskRemoteCheckerProvider extends EventEmitter {
     realtimeProvider.addEventListener('createTaskRemoteChecker', this.onCreate)
   }
 
-  unsubscribe () {
-    if (!dataStore.supportsRealtime()) {
-      return
-    }
-
-    let realtimeProvider = dataStore.getRealtimeProvider()
-
-    if (this.onCreate) {
-      realtimeProvider.removeEventListener('createTaskRemoteChecker', this.onCreate)
-      this.onCreate = null
-    }
-
-    this.taskRemoteCheckers = []
-  }
-
   initTaskRemoteCheckers () {
     const promise = $.Deferred()
     this.taskRemoteCheckers = _.map(window.themis.quals.data.taskRemoteCheckers, function (options) {

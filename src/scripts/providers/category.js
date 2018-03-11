@@ -61,31 +61,6 @@ class CategoryProvider extends EventEmitter {
     realtimeProvider.addEventListener('deleteCategory', this.onDelete)
   }
 
-  unsubscribe () {
-    if (!dataStore.supportsRealtime()) {
-      return
-    }
-
-    let realtimeProvider = dataStore.getRealtimeProvider()
-
-    if (this.onCreate) {
-      realtimeProvider.removeEventListener('createCategory', this.onCreate)
-      this.onCreate = null
-    }
-
-    if (this.onUpdate) {
-      realtimeProvider.removeEventListener('updateCategory', this.onUpdate)
-      this.onUpdate = null
-    }
-
-    if (this.onDelete) {
-      realtimeProvider.removeEventListener('deleteCategory', this.onDelete)
-      this.onDelete = null
-    }
-
-    this.categories = []
-  }
-
   initCategories () {
     const promise = $.Deferred()
     this.categories = _.map(window.themis.quals.data.categories, function (options) {

@@ -1,0 +1,20 @@
+<% if (checkMethod === 'list') { %>
+<div class="form-group">
+    <label class="control-label">
+        Answers
+        &nbsp;
+        <a href="#" class="text-primary" data-action="create-task-answer">
+            <span class="oi oi-plus"></span>
+        </a>
+    </label>
+    <div id="edit-task-answer-list">
+    </div>
+</div>
+<% } else if (checkMethod === 'remote') { %>
+<div class="form-group">
+    <label for="edit-task-remote-checker" class="control-label">
+        Name
+    </label>
+    <select class="form-control" id="edit-task-remote-checker" required name="remoteChecker" disabled></select>
+</div>
+<% } %>

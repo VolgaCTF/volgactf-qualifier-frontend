@@ -9,10 +9,6 @@ class IdentityProvider {
   subscribe () {
   }
 
-  unsubscribe () {
-    this.identity = null
-  }
-
   getIdentity () {
     return this.identity
   }

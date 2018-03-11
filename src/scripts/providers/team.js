@@ -131,59 +131,6 @@ class TeamProvider extends EventEmitter {
     }
   }
 
-  unsubscribe () {
-    if (!dataStore.supportsRealtime()) {
-      return
-    }
-
-    let realtimeProvider = dataStore.getRealtimeProvider()
-
-    if (this.onUpdateProfile) {
-      realtimeProvider.removeEventListener('updateTeamProfile', this.onUpdateProfile)
-      this.onUpdateProfile = null
-    }
-
-    if (this.onCreate) {
-      realtimeProvider.removeEventListener('createTeam', this.onCreate)
-      this.onCreate = null
-    }
-
-    if (this.onUpdateEmail) {
-      realtimeProvider.removeEventListener('updateTeamEmail', this.onUpdateEmail)
-      this.onUpdateEmail = null
-    }
-
-    if (this.onQualify) {
-      realtimeProvider.removeEventListener('qualifyTeam', this.onQualify)
-      this.onQualify = null
-    }
-
-    if (this.onDisqualify) {
-      realtimeProvider.removeEventListener('disqualifyTeam', this.onDisqualify)
-      this.onDisqualify = null
-    }
-
-    if (this.onUpdatePassword) {
-      realtimeProvider.removeEventListener('updateTeamPassword', this.onUpdatePassword)
-      this.onUpdatePassword = null
-    }
-
-    if (this.onUpdateLogo) {
-      realtimeProvider.removeEventListener('updateTeamLogo', this.onUpdateLogo)
-      this.onUpdateLogo = null
-    }
-
-    if (this.onLogin) {
-      realtimeProvider.removeEventListener('loginTeam', this.onLogin)
-      this.onLogin = null
-    }
-
-    if (this.onLogout) {
-      realtimeProvider.removeEventListener('logoutTeam', this.onLogout)
-      this.onLogout = null
-    }
-  }
-
   initTeamProfile () {
     const promise = $.Deferred()
     promise.resolve(new TeamModel(window.themis.quals.data.team))

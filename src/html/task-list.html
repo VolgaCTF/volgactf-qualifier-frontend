@@ -49,8 +49,11 @@
         <div class="col-lg-3 col-sm-4 mb-4">
             <% var entry = entries[i] %>
             <% var filteredTaskCategories = _.where(taskCategories, { taskId: entry.task.id }) %>
-            <%= templates.taskCard({ _: _, identity: identity, contest: contest, task: entry.task, categories: categories, taskCategories: filteredTaskCategories, solved: entry.solved }) %>
+            <% var taskValue = _.findWhere(taskValues, { taskId: entry.task.id }) %>
+            <% var taskRewardScheme = _.findWhere(taskRewardSchemes, { taskId: entry.task.id }) %>
+            <%= templates.taskCard({ _: _, identity: identity, contest: contest, task: entry.task, categories: categories, taskCategories: filteredTaskCategories, taskValue: taskValue, taskRewardScheme: taskRewardScheme, solved: entry.solved }) %>
         </div>
         <% } %>
     </div>
+    <p class="text-secondary"><sup class="text-primary">*</sup> indicates that a task value may decrease based on the number of teams which solved the corresponding task</p>
 <% } %>

@@ -56,26 +56,6 @@ class TeamTaskHitProvider extends EventEmitter {
     }
   }
 
-  unsubscribe () {
-    if (!dataStore.supportsRealtime()) {
-      return
-    }
-
-    let realtimeProvider = dataStore.getRealtimeProvider()
-
-    if (this.onCreateTeamTaskHitAttempt) {
-      realtimeProvider.removeEventListener('createTeamTaskHitAttempt', this.onCreateTeamTaskHitAttempt)
-      this.onCreateTeamTaskHitAttempt = null
-    }
-
-    if (this.onCreateTeamTaskHit) {
-      realtimeProvider.removeEventListener('createTeamTaskHit', this.onCreateTeamTaskHit)
-      this.onCreateTeamTaskHit = null
-    }
-
-    this.teamTaskHits = []
-  }
-
   fetchTaskHitStatistics (taskId) {
     let promise = $.Deferred()
     let url = `/api/task/${taskId}/hit/statistics`

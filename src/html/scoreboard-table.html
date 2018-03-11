@@ -13,55 +13,22 @@
         </tr>
     </thead>
     <tbody id="themis-scoreboard-table-body">
-        <% var entries = _.map(teamScores, function (teamScore) {
-            var team = _.findWhere(teams, { id: teamScore.teamId })
-            var scoreUpdatedAt = null
-            if (teamScore.updatedAt) {
-                scoreUpdatedAt = (teamScore.updatedAt instanceof Date) ? teamScore.updatedAt : new Date(teamScore.updatedAt)
-            }
-            var teamCreatedAt = (team.createdAt instanceof Date) ? team.createdAt : new Date(team.createdAt)
+        <% var entries = _.map(teamRankings, function (teamRanking) {
+            var team = _.findWhere(teams, { id: teamRanking.teamId })
             return {
                 team: team,
-                teamScore: teamScore,
-                country: _.findWhere(countries, { id: team.countryId }),
-                scoreUpdated: scoreUpdatedAt ? scoreUpdatedAt.getTime() : null,
-                teamCreated: teamCreatedAt.getTime()
+                teamRanking: teamRanking,
+                country: _.findWhere(countries, { id: team.countryId })
             }
         }) %>
 
         <% function rank (a, b) {
-            if (a.teamScore.score > b.teamScore.score) {
+            if (a.teamRanking.position < b.teamRanking.position) {
                 return -1
-            } else if (a.teamScore.score < b.teamScore.score) {
+            } else if (a.teamRanking.position > b.teamRanking.position) {
                 return 1
             } else {
-                if (a.scoreUpdated && b.scoreUpdated) {
-                    if (a.scoreUpdated < b.scoreUpdated) {
-                        return -1
-                    } else if (a.scoreUpdated > b.scoreUpdated) {
-                        return 1
-                    } else {
-                        if (a.teamCreated < b.teamCreated) {
-                            return -1
-                        } else if (a.teamCreated > b.teamCreated) {
-                            return 1
-                        } else {
-                            return 0
-                        }
-                    }
-                } else if (a.scoreUpdated && !b.scoreUpdated) {
-                    return -1
-                } else if (!a.scoreUpdated && b.scoreUpdated) {
-                    return 1
-                } else {
-                    if (a.teamCreated < b.teamCreated) {
-                        return -1
-                    } else if (a.teamCreated > b.teamCreated) {
-                        return 1
-                    } else {
-                        return 0
-                    }
-                }
+                return 0
             }
         } %>
 
@@ -69,7 +36,7 @@
 
         <% for (var i=0; i<entries.length; ++i) { %>
             <% var entry = entries[i] %>
-            <%= templates.scoreboardTableRowPartial({ _: _, identity: identity, detailed: detailed, rank: i + 1, teamScore: entry.teamScore, team: entry.team, country: entry.country, moment: moment }) %>
+            <%= templates.scoreboardTableRowPartial({ _: _, identity: identity, detailed: detailed, rank: i + 1, teamRanking: entry.teamRanking, team: entry.team, country: entry.country, moment: moment }) %>
         <% } %>
     </tbody>
 </table>

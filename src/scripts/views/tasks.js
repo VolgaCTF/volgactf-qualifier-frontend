@@ -24,6 +24,9 @@ import 'parsley'
 import remoteCheckerProvider from '../providers/remote-checker'
 import taskRemoteCheckerProvider from '../providers/task-remote-checker'
 
+import taskValueProvider from '../providers/task-value'
+import taskRewardSchemeProvider from '../providers/task-reward-scheme'
+
 class TasksView extends View {
   constructor () {
     super()
@@ -43,6 +46,14 @@ class TasksView extends View {
 
     this.onCreateTeamTaskHit = null
     this.onUpdateContest = null
+
+    this.onCreateTaskValue = null
+    this.onUpdateTaskValue = null
+    this.onRevealTaskValue = null
+
+    this.onCreateTaskRewardScheme = null
+    this.onUpdateTaskRewardScheme = null
+    this.onRevealTaskRewardScheme = null
 
     this.flagRenderTasks = false
     this.flagRenderingTasks = false
@@ -80,28 +91,27 @@ class TasksView extends View {
 
     let $taskTitle = $('#create-task-title')
     let $taskDescription = $('#create-task-description')
-    let $taskValue = $('#create-task-value')
     let $categories = $('#create-categories')
 
     let $taskHints = $('#create-task-hints')
     let $taskHintList = $('#create-task-hint-list')
 
+    const $taskRewardScheme = $('#create-task-reward-scheme')
+    const $taskRewardSchemeFixed = $('#create-task-reward-scheme-fixed')
+    const $taskRewardSchemeVariable = $('#create-task-reward-scheme-variable')
+    const $taskRewardSchemeGroup = $('#create-task-reward-scheme-group')
+
     const $taskCheckMethod = $('#create-task-check-method')
     const $taskCheckMethodList = $('#create-task-check-method-list')
     const $taskCheckMethodRemote = $('#create-task-check-method-remote')
-
-    let $taskAnswerGroup = $('#create-task-answer-group')
-    let $taskAnswerList = $('#create-task-answer-list')
-
-    const $taskRemoteCheckerGroup = $('#create-task-remote-checker-group')
-    const $taskRemoteChecker = $('#create-task-remote-checker')
+    const $taskCheckMethodGroup = $('#create-task-check-method-group')
 
     let $taskPreview = $('#create-task-preview')
 
     $tabData.tab()
     $tabPreview.tab()
 
-    $taskHints.find('a[data-action="create-task-hint"]').on('click', (e) => {
+    $taskHints.on('click', 'a[data-action="create-task-hint"]', (e) => {
       e.preventDefault()
       $taskHintList.append(window.themis.quals.templates.createTaskHintTextareaPartial({
         _: _,
@@ -109,16 +119,6 @@ class TasksView extends View {
         hint: ''
       }))
     })
-
-    function getHints () {
-      let hints = []
-      $taskHintList.find('.themis-task-hint-group').each((ndx, el) => {
-        let $el = $(el)
-        hints.push($el.find('textarea').val())
-      })
-
-      return hints
-    }
 
     $taskHintList.on('click', 'a[data-action="remove-task-hint"]', (e) => {
       e.preventDefault()
@@ -135,8 +135,19 @@ class TasksView extends View {
       })
     })
 
-    $taskAnswerGroup.find('a[data-action="create-task-answer"]').on('click', (e) => {
+    function getHints () {
+      let hints = []
+      $taskHintList.find('.themis-task-hint-group').each((ndx, el) => {
+        let $el = $(el)
+        hints.push($el.find('textarea').val())
+      })
+
+      return hints
+    }
+
+    $taskCheckMethodGroup.on('click', 'a[data-action="create-task-answer"]', (e) => {
       e.preventDefault()
+      const $taskAnswerList = $('#create-task-answer-list')
       $taskAnswerList.append(window.themis.quals.templates.createTaskAnswerInputPartial({
         _: _,
         number: $taskAnswerList.children().length + 1,
@@ -145,21 +156,9 @@ class TasksView extends View {
       }))
     })
 
-    function getAnswers () {
-      let answers = []
-      $taskAnswerList.find('.themis-task-answer-group').each((ndx, el) => {
-        let $el = $(el)
-        answers.push({
-          answer: $el.find('input[type=text]').val(),
-          caseSensitive: $el.find('input[type=checkbox]').prop('checked')
-        })
-      })
-
-      return answers
-    }
-
-    $taskAnswerList.on('click', 'a[data-action="remove-task-answer"]', (e) => {
+    $taskCheckMethodGroup.on('click', 'a[data-action="remove-task-answer"]', (e) => {
       e.preventDefault()
+      const $taskAnswerList = $('#create-task-answer-list')
       let number = $(e.target).closest('a').attr('data-number')
       $(`#create-task-answer-${number}`).remove()
       let answers = getAnswers()
@@ -173,6 +172,20 @@ class TasksView extends View {
         }))
       })
     })
+
+    function getAnswers () {
+      let answers = []
+      const $taskAnswerList = $('#create-task-answer-list')
+      $taskAnswerList.find('.themis-task-answer-group').each((ndx, el) => {
+        let $el = $(el)
+        answers.push({
+          answer: $el.find('input[type=text]').val(),
+          caseSensitive: $el.find('input[type=checkbox]').prop('checked')
+        })
+      })
+
+      return answers
+    }
 
     $tabPreview.on('show.bs.tab', (e) => {
       const md = new MarkdownRenderer()
@@ -189,38 +202,72 @@ class TasksView extends View {
 
     $taskCheckMethod.on('change', () => {
       const method = $('input[type="radio"]:checked', $taskCheckMethod).val()
-      $taskAnswerGroup.toggle(method === 'list')
-      $taskRemoteCheckerGroup.toggle(method === 'remote')
+      $taskCheckMethodGroup.html(window.themis.quals.templates.createTaskCheckMethodPartial({
+        checkMethod: method
+      }))
+      if (method === 'remote') {
+        const $taskRemoteChecker = $('#create-task-remote-checker')
+        _.each(remoteCheckerProvider.getRemoteCheckers(), (remoteChecker) => {
+          $taskRemoteChecker
+          .append($('<option></option>')
+          .attr('value', remoteChecker.id)
+          .prop('disabled', _.where(taskRemoteCheckerProvider.getTaskRemoteCheckers(), { remoteCheckerId: remoteChecker.id }).length > 0)
+          .text(remoteChecker.name))
+        })
+      }
+    })
+
+    function getReward () {
+      const scheme = $('input[type="radio"]:checked', $taskRewardScheme).val()
+      if (scheme === 'fixed') {
+        return {
+          maxValue: $('#create-task-reward-scheme-fixed-value').val(),
+          minValue: null,
+          subtractPoints: null,
+          subtractHitCount: null
+        }
+      } else if (scheme === 'variable') {
+        return {
+          maxValue: $('#create-task-reward-scheme-variable-max-value').val(),
+          minValue: $('#create-task-reward-scheme-variable-min-value').val(),
+          subtractPoints: $('#create-task-reward-scheme-variable-subtract-points').val(),
+          subtractHitCount: $('#create-task-reward-scheme-variable-subtract-hit-count').val()
+        }
+      } else {
+        return {}
+      }
+    }
+
+    $taskRewardScheme.on('change', () => {
+      const scheme = $('input[type="radio"]:checked', $taskRewardScheme).val()
+      $taskRewardSchemeGroup.html(window.themis.quals.templates.createTaskRewardSchemePartial({
+        rewardScheme: scheme
+      }))
     })
 
     $modal.on('show.bs.modal', (e) => {
       $tabData.tab('show')
       $taskTitle.val('')
       $taskDescription.val('')
-      $taskValue.val('')
 
       $categories.empty()
       _.each(categoryProvider.getCategories(), (category) => {
         $categories.append($('<option></option>').attr('value', category.id).text(category.title))
       })
 
-      $taskRemoteChecker.empty()
-      _.each(remoteCheckerProvider.getRemoteCheckers(), (remoteChecker) => {
-        $taskRemoteChecker
-        .append($('<option></option>')
-        .attr('value', remoteChecker.id)
-        .prop('disabled', _.where(taskRemoteCheckerProvider.getTaskRemoteCheckers(), { remoteCheckerId: remoteChecker.id }).length > 0)
-        .text(remoteChecker.name))
-      })
-
       $taskHintList.empty()
-      $taskAnswerList.empty()
 
       $taskCheckMethodList.prop('checked', true)
-      $taskAnswerGroup.show()
-
       $taskCheckMethodRemote.prop('checked', false)
-      $taskRemoteCheckerGroup.hide()
+      $taskCheckMethodGroup.html(window.themis.quals.templates.createTaskCheckMethodPartial({
+        checkMethod: 'list'
+      }))
+
+      $taskRewardSchemeFixed.prop('checked', true)
+      $taskRewardSchemeVariable.prop('checked', false)
+      $taskRewardSchemeGroup.html(window.themis.quals.templates.createTaskRewardSchemePartial({
+        rewardScheme: 'fixed'
+      }))
 
       $submitError.text('')
       $form.parsley().reset()
@@ -242,7 +289,8 @@ class TasksView extends View {
         dataType: 'json',
         data: {
           hints: getHints(),
-          answers: getAnswers()
+          answers: getAnswers(),
+          reward: getReward()
         },
         headers: {
           'X-CSRF-Token': identityProvider.getIdentity().token
@@ -297,28 +345,26 @@ class TasksView extends View {
 
     let $taskTitle = $('#edit-task-title')
     let $taskDescription = $('#edit-task-description')
-    let $taskValue = $('#edit-task-value')
     let $categories = $('#edit-categories')
+
+    const $taskRewardScheme = $('#edit-task-reward-scheme')
+    const $taskRewardSchemeFixed = $('#edit-task-reward-scheme-fixed')
+    const $taskRewardSchemeVariable = $('#edit-task-reward-scheme-variable')
+    const $taskRewardSchemeGroup = $('#edit-task-reward-scheme-group')
 
     let $taskHints = $('#edit-task-hints')
     let $taskHintList = $('#edit-task-hint-list')
 
-    // const $taskCheckMethod = $('#edit-task-check-method')
     const $taskCheckMethodList = $('#edit-task-check-method-list')
     const $taskCheckMethodRemote = $('#edit-task-check-method-remote')
-
-    let $taskAnswerGroup = $('#edit-task-answer-group')
-    let $taskAnswerList = $('#edit-task-answer-list')
-
-    const $taskRemoteCheckerGroup = $('#edit-task-remote-checker-group')
-    const $taskRemoteChecker = $('#edit-task-remote-checker')
+    const $taskCheckMethodGroup = $('#edit-task-check-method-group')
 
     let $taskPreview = $('#edit-task-preview')
 
     $tabData.tab()
     $tabPreview.tab()
 
-    $taskHints.find('a[data-action="create-task-hint"]').on('click', (e) => {
+    $taskHints.on('click', 'a[data-action="create-task-hint"]', (e) => {
       e.preventDefault()
       $taskHintList.append(window.themis.quals.templates.editTaskHintTextareaPartial({
         _: _,
@@ -327,18 +373,6 @@ class TasksView extends View {
         editable: true
       }))
     })
-
-    function getHints () {
-      let hints = []
-      $taskHintList.find('.themis-task-hint-group[data-state-disabled=false]').each((ndx, el) => {
-        let $el = $(el)
-        hints.push($el.find('textarea').val())
-      })
-
-      return hints
-    }
-
-    let savedTaskHints = null
 
     $taskHintList.on('click', 'a[data-action="remove-task-hint"]', (e) => {
       e.preventDefault()
@@ -365,8 +399,21 @@ class TasksView extends View {
       })
     })
 
-    $taskAnswerGroup.find('a[data-action="create-task-answer"]').on('click', (e) => {
+    function getHints () {
+      let hints = []
+      $taskHintList.find('.themis-task-hint-group[data-state-disabled=false]').each((ndx, el) => {
+        let $el = $(el)
+        hints.push($el.find('textarea').val())
+      })
+
+      return hints
+    }
+
+    let savedTaskHints = null
+
+    $taskCheckMethodGroup.on('click', 'a[data-action="create-task-answer"]', (e) => {
       e.preventDefault()
+      const $taskAnswerList = $('#edit-task-answer-list')
       $taskAnswerList.append(window.themis.quals.templates.editTaskAnswerInputPartial({
         _: _,
         number: $taskAnswerList.children().length + 1,
@@ -376,26 +423,12 @@ class TasksView extends View {
       }))
     })
 
-    function getAnswers () {
-      let answers = []
-      $taskAnswerList.find('.themis-task-answer-group[data-state-disabled=false]').each((ndx, el) => {
-        let $el = $(el)
-        answers.push({
-          answer: $el.find('input[type=text]').val(),
-          caseSensitive: $el.find('input[type=checkbox]').prop('checked')
-        })
-      })
-
-      return answers
-    }
-
-    let savedTaskAnswers = null
-
-    $taskAnswerList.on('click', 'a[data-action="remove-task-answer"]', (e) => {
+    $taskCheckMethodGroup.on('click', 'a[data-action="remove-task-answer"]', (e) => {
       e.preventDefault()
       let number = $(e.target).closest('a').attr('data-number')
       $(`#edit-task-answer-${number}`).remove()
       let answers = getAnswers()
+      const $taskAnswerList = $('#edit-task-answer-list')
       $taskAnswerList.empty()
       _.each(savedTaskAnswers, (entry, ndx) => {
         $taskAnswerList.append(window.themis.quals.templates.editTaskAnswerInputPartial({
@@ -417,6 +450,22 @@ class TasksView extends View {
       })
     })
 
+    function getAnswers () {
+      let answers = []
+      const $taskAnswerList = $('#edit-task-answer-list')
+      $taskAnswerList.find('.themis-task-answer-group[data-state-disabled=false]').each((ndx, el) => {
+        let $el = $(el)
+        answers.push({
+          answer: $el.find('input[type=text]').val(),
+          caseSensitive: $el.find('input[type=checkbox]').prop('checked')
+        })
+      })
+
+      return answers
+    }
+
+    let savedTaskAnswers = null
+
     $tabPreview.on('show.bs.tab', (e) => {
       let md = new MarkdownRenderer()
       let hintsFormatted = savedTaskHints.map((entry) => {
@@ -433,6 +482,37 @@ class TasksView extends View {
       }))
     })
 
+    function getReward () {
+      const scheme = $('input[type="radio"]:checked', $taskRewardScheme).val()
+      if (scheme === 'fixed') {
+        return {
+          maxValue: $('#edit-task-reward-scheme-fixed-value').val(),
+          minValue: null,
+          subtractPoints: null,
+          subtractHitCount: null
+        }
+      } else if (scheme === 'variable') {
+        return {
+          maxValue: $('#edit-task-reward-scheme-variable-max-value').val(),
+          minValue: $('#edit-task-reward-scheme-variable-min-value').val(),
+          subtractPoints: $('#edit-task-reward-scheme-variable-subtract-points').val(),
+          subtractHitCount: $('#edit-task-reward-scheme-variable-subtract-hit-count').val()
+        }
+      } else {
+        return {}
+      }
+    }
+
+    $taskRewardScheme.on('change', () => {
+      const scheme = $('input[type="radio"]:checked', $taskRewardScheme).val()
+      const taskId = $modal.data('task-id')
+      const taskRewardScheme = _.findWhere(taskRewardSchemeProvider.getTaskRewardSchemes(), { taskId: taskId })
+      $taskRewardSchemeGroup.html(window.themis.quals.templates.editTaskRewardSchemePartial({
+        rewardScheme: scheme,
+        taskRewardScheme: taskRewardScheme
+      }))
+    })
+
     $modal.on('show.bs.modal', (e) => {
       let taskId = parseInt($(e.relatedTarget).data('task-id'), 10)
       $modal.data('task-id', taskId)
@@ -440,35 +520,37 @@ class TasksView extends View {
       $tabData.tab('show')
       $taskTitle.val('')
       $taskDescription.val('')
-      $taskValue.val('')
 
       $categories.empty()
       _.each(categoryProvider.getCategories(), (category) => {
         $categories.append($('<option></option>').attr('value', category.id).text(category.title))
       })
 
+      const taskRewardScheme = _.findWhere(taskRewardSchemeProvider.getTaskRewardSchemes(), { taskId: taskId })
+      let rewardScheme = 'fixed'
+      if (taskRewardScheme && !_.isNull(taskRewardScheme.minValue)) {
+        rewardScheme = 'variable'
+      }
+      $taskRewardSchemeFixed.prop('checked', rewardScheme === 'fixed')
+      $taskRewardSchemeVariable.prop('checked', rewardScheme === 'variable')
+      $taskRewardSchemeGroup.html(window.themis.quals.templates.editTaskRewardSchemePartial({
+        rewardScheme: rewardScheme,
+        taskRewardScheme: taskRewardScheme
+      }))
+
       $taskHintList.empty()
-      $taskAnswerList.empty()
+      $taskCheckMethodGroup.empty()
 
       let checkMethod = 'list'
       if (_.where(taskRemoteCheckerProvider.getTaskRemoteCheckers(), { taskId: taskId }).length > 0) {
         checkMethod = 'remote'
       }
 
-      $taskRemoteChecker.empty()
-      _.each(remoteCheckerProvider.getRemoteCheckers(), (remoteChecker) => {
-        $taskRemoteChecker
-        .append($('<option></option>')
-        .attr('value', remoteChecker.id)
-        .prop('selected', _.where(taskRemoteCheckerProvider.getTaskRemoteCheckers(), { taskId: taskId, remoteCheckerId: remoteChecker.id }).length > 0)
-        .text(remoteChecker.name))
-      })
-
       $taskCheckMethodList.prop('checked', checkMethod === 'list')
-      $taskAnswerGroup.toggle(checkMethod === 'list')
-
       $taskCheckMethodRemote.prop('checked', checkMethod === 'remote')
-      $taskRemoteCheckerGroup.toggle(checkMethod === 'remote')
+      $taskCheckMethodGroup.html(window.themis.quals.templates.editTaskCheckMethodPartial({
+        checkMethod: checkMethod
+      }))
 
       $submitError.text('')
       $form.parsley().reset()
@@ -490,7 +572,6 @@ class TasksView extends View {
 
           $taskTitle.val(task.title)
           $taskDescription.val(task.description)
-          $taskValue.val(task.value)
 
           $categories.val(taskCategories.map((taskCategory) => {
             return taskCategory.categoryId
@@ -506,16 +587,33 @@ class TasksView extends View {
             }))
           })
 
-          $taskAnswerList.empty()
-          _.each(taskAnswers, (entry, ndx) => {
-            $taskAnswerList.append(window.themis.quals.templates.editTaskAnswerInputPartial({
-              _: _,
-              number: ndx + 1,
-              editable: false,
-              answer: entry.answer,
-              caseSensitive: entry.caseSensitive
-            }))
-          })
+          let checkMethod = 'list'
+          if (_.where(taskRemoteCheckerProvider.getTaskRemoteCheckers(), { taskId: taskId }).length > 0) {
+            checkMethod = 'remote'
+          }
+
+          if (checkMethod === 'list') {
+            const $taskAnswerList = $('#edit-task-answer-list')
+            _.each(taskAnswers, (entry, ndx) => {
+              $taskAnswerList.append(window.themis.quals.templates.editTaskAnswerInputPartial({
+                _: _,
+                number: ndx + 1,
+                editable: false,
+                answer: entry.answer,
+                caseSensitive: entry.caseSensitive
+              }))
+            })
+          } else if (checkMethod === 'remote') {
+            const $taskRemoteChecker = $('#edit-task-remote-checker')
+            $taskRemoteChecker.empty()
+            _.each(remoteCheckerProvider.getRemoteCheckers(), (remoteChecker) => {
+              $taskRemoteChecker
+              .append($('<option></option>')
+              .attr('value', remoteChecker.id)
+              .prop('selected', _.where(taskRemoteCheckerProvider.getTaskRemoteCheckers(), { taskId: taskId, remoteCheckerId: remoteChecker.id }).length > 0)
+              .text(remoteChecker.name))
+            })
+          }
         })
         .fail((err) => {
           $submitError.text(err)
@@ -545,7 +643,8 @@ class TasksView extends View {
         data: {
           checkMethod: checkMethod,
           hints: getHints(),
-          answers: getAnswers()
+          answers: getAnswers(),
+          reward: getReward()
         },
         headers: {
           'X-CSRF-Token': identityProvider.getIdentity().token
@@ -1221,6 +1320,8 @@ class TasksView extends View {
       categories: categoryProvider.getCategories(),
       taskPreviews: taskProvider.getTaskPreviews(),
       taskCategories: taskCategoryProvider.getTaskCategories(),
+      taskValues: taskValueProvider.getTaskValues(),
+      taskRewardSchemes: taskRewardSchemeProvider.getTaskRewardSchemes(),
       teamTaskHits: teamTaskHits
     }))
   }
@@ -1239,11 +1340,11 @@ class TasksView extends View {
 
         let promise = null
         if (identity.isTeam()) {
-          promise = $.when(taskProvider.initTaskPreviews(), categoryProvider.initCategories(), taskCategoryProvider.initTaskCategories(), teamTaskHitProvider.initTeamTaskHits())
+          promise = $.when(taskProvider.initTaskPreviews(), categoryProvider.initCategories(), taskCategoryProvider.initTaskCategories(), taskValueProvider.initTaskValues(), taskRewardSchemeProvider.initTaskRewardSchemes(), teamTaskHitProvider.initTeamTaskHits())
         } else if (identity.isAdmin()) {
-          promise = $.when(taskProvider.initTaskPreviews(), categoryProvider.initCategories(), taskCategoryProvider.initTaskCategories(), remoteCheckerProvider.initRemoteCheckers(), taskRemoteCheckerProvider.initTaskRemoteCheckers())
+          promise = $.when(taskProvider.initTaskPreviews(), categoryProvider.initCategories(), taskCategoryProvider.initTaskCategories(), taskValueProvider.initTaskValues(), taskRewardSchemeProvider.initTaskRewardSchemes(), remoteCheckerProvider.initRemoteCheckers(), taskRemoteCheckerProvider.initTaskRemoteCheckers())
         } else {
-          promise = $.when(taskProvider.initTaskPreviews(), categoryProvider.initCategories(), taskCategoryProvider.initTaskCategories())
+          promise = $.when(taskProvider.initTaskPreviews(), categoryProvider.initCategories(), taskCategoryProvider.initTaskCategories(), taskValueProvider.initTaskValues(), taskRewardSchemeProvider.initTaskRewardSchemes())
         }
 
         promise
@@ -1352,6 +1453,54 @@ class TasksView extends View {
             taskCategoryProvider.subscribe()
             taskCategoryProvider.on('createTaskCategory', this.onCreateTaskCategory)
             taskCategoryProvider.on('deleteTaskCategory', this.onDeleteTaskCategory)
+
+            taskValueProvider.subscribe(identity)
+            taskRewardSchemeProvider.subscribe(identity)
+
+            this.onUpdateTaskValue = () => {
+              this.requestRenderTasks()
+              return false
+            }
+            taskValueProvider.on('updateTaskValue', this.onUpdateTaskValue)
+
+            if (identity.isSupervisor()) {
+              this.onCreateTaskValue = () => {
+                this.requestRenderTasks()
+                return false
+              }
+              taskValueProvider.on('createTaskValue', this.onCreateTaskValue)
+            }
+
+            if (identity.isTeam() || identity.isGuest()) {
+              this.onRevealTaskValue = () => {
+                this.requestRenderTasks()
+                return false
+              }
+              taskValueProvider.on('revealTaskValue', this.onRevealTaskValue)
+            }
+
+            this.onUpdateTaskRewardScheme = () => {
+              this.requestRenderTasks()
+              return false
+            }
+            taskRewardSchemeProvider.on('updateTaskRewardScheme', this.onUpdateTaskRewardScheme)
+
+            if (identity.isSupervisor()) {
+              this.onCreateTaskRewardScheme = () => {
+                this.requestRenderTasks()
+                return false
+              }
+              taskRewardSchemeProvider.on('createTaskRewardScheme', this.onCreateTaskRewardScheme)
+            }
+
+            if (identity.isTeam() || identity.isGuest()) {
+              this.onRevealTaskRewardScheme = () => {
+                this.requestRenderTasks()
+                return false
+              }
+              taskValueProvider.on('revealTaskRewardScheme', this.onRevealTaskRewardScheme)
+            }
+
 
             let firstRender = true
 

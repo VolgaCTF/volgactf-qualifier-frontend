@@ -79,36 +79,6 @@ class TaskProvider extends EventEmitter {
     realtimeProvider.addEventListener('updateTask', this.onUpdateTask)
   }
 
-  unsubscribe () {
-    if (!dataStore.supportsRealtime()) {
-      return
-    }
-
-    let realtimeProvider = dataStore.getRealtimeProvider()
-
-    if (this.onCreateTask) {
-      realtimeProvider.removeEventListener('createTask', this.onCreate)
-      this.onCreateTask = null
-    }
-
-    if (this.onOpenTask) {
-      realtimeProvider.removeEventListener('openTask', this.onOpen)
-      this.onOpenTask = null
-    }
-
-    if (this.onCloseTask) {
-      realtimeProvider.removeEventListener('closeTask', this.onClose)
-      this.onCloseTask = null
-    }
-
-    if (this.onUpdateTask) {
-      realtimeProvider.removeEventListener('updateTask', this.onUpdate)
-      this.onUpdateTask = null
-    }
-
-    this.taskPreviews = []
-  }
-
   initTaskPreviews () {
     const promise = $.Deferred()
     this.taskPreviews = _.map(window.themis.quals.data.taskPreviews, function (options) {

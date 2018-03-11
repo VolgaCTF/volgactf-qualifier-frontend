@@ -39,7 +39,7 @@
                     </div>
                     <% } %>
                     <div id="themis-task-previews">
-                        <%= templates.taskList({ _: _, templates: templates, identity: identity, contest: contest, categories: categories, taskPreviews: taskPreviews, taskCategories: taskCategories, teamTaskHits: teamTaskHits }) %>
+                        <%= templates.taskList({ _: _, templates: templates, identity: identity, contest: contest, categories: categories, taskPreviews: taskPreviews, taskCategories: taskCategories, taskValues: taskValues, taskRewardSchemes: taskRewardSchemes, teamTaskHits: teamTaskHits }) %>
                     </div>
                 </section>
             </div>
@@ -266,26 +266,45 @@
                                                 <div class="row">
                                                     <div class="col-sm-6">
                                                         <div class="form-group">
-                                                            <label for="create-task-title" class="control-label">Title</label>
+                                                            <label for="create-task-title" class="control-label">
+                                                                <strong>Title</strong>
+                                                            </label>
                                                             <input type="text" class="form-control" id="create-task-title" required minlength="2" maxlength="50" name="title">
                                                         </div>
                                                         <div class="form-group">
-                                                            <label for="create-task-description" class="control-label">Description</label>
+                                                            <label for="create-task-description" class="control-label">
+                                                                <strong>Description</strong>
+                                                            </label>
                                                             <textarea class="form-control themis-task-description" id="create-task-description" required minlength="2" maxlength="4096" name="description"></textarea>
                                                         </div>
                                                         <div class="form-group">
-                                                            <label for="create-task-value" class="control-label">Value</label>
-                                                            <input type="number" class="form-control" id="create-task-value" name="value" required data-parsley-type="integer" data-parsley-min="10" data-parsley-max="1000">
-                                                        </div>
-                                                        <div class="form-group">
-                                                            <label for="create-categories" class="control-label">Categories</label>
-                                                            <select class="form-control" multiple size="5" id="create-categories" required name="categories"></select>
+                                                            <label for="create-categories" class="control-label">
+                                                                <strong>Categories</strong>
+                                                            </label>
+                                                            <select class="form-control" multiple size="8" id="create-categories" required name="categories"></select>
                                                         </div>
                                                     </div>
                                                     <div class="col-sm-6">
+                                                        <div class="form-group" id="create-task-reward-scheme">
+                                                            <strong>Reward scheme</strong><br>
+                                                            <div class="form-check form-check-inline">
+                                                                <input class="form-check-input" type="radio" name="rewardScheme" id="create-task-reward-scheme-fixed" value="fixed">
+                                                                <label class="form-check-label" for="create-task-reward-scheme-fixed">
+                                                                    Fixed
+                                                                </label>
+                                                            </div>
+                                                            <div class="form-check form-check-inline">
+                                                                <input class="form-check-input" type="radio" name="rewardScheme" id="create-task-reward-scheme-variable" value="variable">
+                                                                <label class="form-check-label" for="create-task-reward-scheme-variable">
+                                                                    Variable
+                                                                </label>
+                                                            </div>
+                                                        </div>
+                                                        <div id="create-task-reward-scheme-group">
+                                                        </div>
                                                         <div class="form-group" id="create-task-hints">
                                                             <label class="control-label">
-                                                                Hints
+                                                                <strong>Hints</strong>
                                                                 &nbsp;
                                                                 <a href="#" class="text-primary" data-action="create-task-hint">
                                                                     <span class="oi oi-plus"></span>
@@ -295,6 +314,7 @@
                                                             </div>
                                                         </div>
                                                         <div class="form-group" id="create-task-check-method">
+                                                            <strong>Check method</strong><br>
                                                             <div class="form-check form-check-inline">
                                                                 <input class="form-check-input" type="radio" name="checkMethod" id="create-task-check-method-list" value="list">
                                                                 <label class="form-check-label" for="create-task-check-method-list">
@@ -308,22 +328,7 @@
                                                                 </label>
                                                             </div>
                                                         </div>
-                                                        <div class="form-group" id="create-task-answer-group">
-                                                            <label class="control-label">
-                                                                Answers
-                                                                &nbsp;
-                                                                <a href="#" class="text-primary" data-action="create-task-answer">
-                                                                    <span class="oi oi-plus"></span>
-                                                                </a>
-                                                            </label>
-                                                            <div id="create-task-answer-list">
-                                                            </div>
-                                                        </div>
-                                                        <div class="form-group" id="create-task-remote-checker-group">
-                                                            <label for="create-task-remote-checker" class="control-label">
-                                                                Name
-                                                            </label>
-                                                            <select class="form-control" id="create-task-remote-checker" required name="remoteChecker"></select>
+                                                        <div id="create-task-check-method-group">
                                                         </div>
                                                     </div>
                                                 </div>
@@ -371,26 +376,45 @@
                                                 <div class="row">
                                                     <div class="col-sm-6">
                                                         <div class="form-group">
-                                                            <label for="edit-task-title" class="control-label">Title</label>
+                                                            <label for="edit-task-title" class="control-label">
+                                                                <strong>Title</strong>
+                                                            </label>
                                                             <input type="text" class="form-control" id="edit-task-title" required minlength="2" maxlength="50" name="title" disabled>
                                                         </div>
                                                         <div class="form-group">
-                                                            <label for="edit-task-description" class="control-label">Description</label>
+                                                            <label for="edit-task-description" class="control-label">
+                                                                <strong>Description</strong>
+                                                            </label>
                                                             <textarea class="form-control themis-task-description" id="edit-task-description" required minlength="2" maxlength="4096" name="description"></textarea>
                                                         </div>
                                                         <div class="form-group">
-                                                            <label for="edit-task-value" class="control-label">Value</label>
-                                                            <input type="number" class="form-control" id="edit-task-value" name="value" required data-parsley-type="integer" data-parsley-min="10" data-parsley-max="1000" disabled>
-                                                        </div>
-                                                        <div class="form-group">
-                                                            <label for="edit-categories" class="control-label">Categories</label>
-                                                            <select class="form-control" multiple size="5" id="edit-categories" required name="categories"></select>
+                                                            <label for="edit-categories" class="control-label">
+                                                                <strong>Categories</strong>
+                                                            </label>
+                                                            <select class="form-control" multiple size="8" id="edit-categories" required name="categories"></select>
                                                         </div>
                                                     </div>
                                                     <div class="col-sm-6">
+                                                        <div class="form-group" id="edit-task-reward-scheme">
+                                                            <strong>Reward scheme</strong><br>
+                                                            <div class="form-check form-check-inline">
+                                                                <input class="form-check-input" type="radio" name="rewardScheme" id="edit-task-reward-scheme-fixed" value="fixed">
+                                                                <label class="form-check-label" for="edit-task-reward-scheme-fixed">
+                                                                    Fixed
+                                                                </label>
+                                                            </div>
+                                                            <div class="form-check form-check-inline">
+                                                                <input class="form-check-input" type="radio" name="rewardScheme" id="edit-task-reward-scheme-variable" value="variable">
+                                                                <label class="form-check-label" for="edit-task-reward-scheme-variable">
+                                                                    Variable
+                                                                </label>
+                                                            </div>
+                                                        </div>
+                                                        <div id="edit-task-reward-scheme-group">
+                                                        </div>
                                                         <div class="form-group" id="edit-task-hints">
                                                             <label class="control-label">
-                                                                Hints
+                                                                <strong>Hints</strong>
                                                                 &nbsp;
                                                                 <a href="#" class="text-primary" data-action="create-task-hint">
                                                                     <span class="oi oi-plus"></span>
@@ -400,6 +424,7 @@
                                                             </div>
                                                         </div>
                                                         <div class="form-group" id="edit-task-check-method">
+                                                            <strong>Check method</strong><br>
                                                             <div class="form-check form-check-inline">
                                                                 <input class="form-check-input" type="radio" name="checkMethod" id="edit-task-check-method-list" value="list" disabled>
                                                                 <label class="form-check-label" for="edit-task-check-method-list">
@@ -413,22 +438,7 @@
                                                                 </label>
                                                             </div>
                                                         </div>
-                                                        <div class="form-group" id="edit-task-answer-group">
-                                                            <label class="control-label">
-                                                                Answers
-                                                                &nbsp;
-                                                                <a href="#" class="text-primary" data-action="create-task-answer">
-                                                                    <span class="oi oi-plus"></span>
-                                                                </a>
-                                                            </label>
-                                                            <div id="edit-task-answer-list">
-                                                            </div>
-                                                        </div>
-                                                        <div class="form-group" id="edit-task-remote-checker-group">
-                                                            <label for="edit-task-remote-checker" class="control-label">
-                                                                Name
-                                                            </label>
-                                                            <select class="form-control" id="edit-task-remote-checker" required name="remoteChecker" disabled></select>
+                                                        <div id="edit-task-check-method-group">
                                                         </div>
                                                     </div>
                                                 </div>
@@ -474,6 +484,8 @@
                         categories: <%= jsesc(categories, { json: true, isScriptContext: true }) %>,
                         taskPreviews: <%= jsesc(taskPreviews, { json: true, isScriptContext: true }) %>,
                         taskCategories: <%= jsesc(taskCategories, { json: true, isScriptContext: true }) %>,
+                        taskValues: <%= jsesc(taskValues, { json: true, isScriptContext: true }) %>,
+                        taskRewardSchemes: <%= jsesc(taskRewardSchemes, { json: true, isScriptContext: true}) %>,
                         teamTaskHits: <%= jsesc(teamTaskHits, { json: true, isScriptContext: true }) %>,
                         remoteCheckers: <%= jsesc(remoteCheckers, { json: true, isScriptContext: true }) %>,
                         taskRemoteCheckers: <%= jsesc(taskRemoteCheckers, { json: true, isScriptContext: true }) %>
@@ -485,8 +497,12 @@
                         taskContentPartial: <%= templates.taskContentPartial.source %>,
                         createTaskHintTextareaPartial: <%= templates.createTaskHintTextareaPartial.source %>,
                         createTaskAnswerInputPartial: <%= templates.createTaskAnswerInputPartial.source %>,
+                        createTaskRewardSchemePartial: <%= templates.createTaskRewardSchemePartial.source %>,
+                        createTaskCheckMethodPartial: <%= templates.createTaskCheckMethodPartial.source %>,
                         editTaskHintTextareaPartial: <%= templates.editTaskHintTextareaPartial.source %>,
                         editTaskAnswerInputPartial: <%= templates.editTaskAnswerInputPartial.source %>,
+                        editTaskRewardSchemePartial: <%= templates.editTaskRewardSchemePartial.source %>,
+                        editTaskCheckMethodPartial: <%= templates.editTaskCheckMethodPartial.source %>,
                         taskList: <%= templates.taskList.source %>,
                         taskCard: <%= templates.taskCard.source %>,
                         reviseTaskStatusPartial: <%= templates.reviseTaskStatusPartial.source %>,

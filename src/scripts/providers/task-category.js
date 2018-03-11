@@ -61,31 +61,6 @@ class TaskCategoryProvider extends EventEmitter {
     realtimeProvider.addEventListener('deleteTaskCategory', this.onDelete)
   }
 
-  unsubscribe () {
-    if (!dataStore.supportsRealtime()) {
-      return
-    }
-
-    let realtimeProvider = dataStore.getRealtimeProvider()
-
-    if (this.onCreate) {
-      realtimeProvider.removeEventListener('createTaskCategory', this.onCreate)
-      this.onCreate = null
-    }
-
-    if (this.onReveal) {
-      realtimeProvider.removeEventListener('revealTaskCategory', this.onReveal)
-      this.onReveal = null
-    }
-
-    if (this.onDelete) {
-      realtimeProvider.removeEventListener('deleteTaskCategory', this.onDelete)
-      this.onDelete = null
-    }
-
-    this.taskCategories = []
-  }
-
   initTaskCategories () {
     const promise = $.Deferred()
     this.taskCategories = _.map(window.themis.quals.data.taskCategories, function (options) {
