@@ -1501,23 +1501,18 @@ class TasksView extends View {
               taskValueProvider.on('revealTaskRewardScheme', this.onRevealTaskRewardScheme)
             }
 
-
-            let firstRender = true
-
             this.onRenderTasks = (force = false) => {
               if ((this.flagRenderTasks || force) && !this.flagRenderingTasks) {
                 this.flagRenderingTasks = true
                 this.renderTaskPreviews()
                 this.flagRenderingTasks = false
                 this.flagRenderTasks = false
-                if (firstRender) {
-                  firstRender = false
-                  const urlParams = new URLSearchParams(window.location.search)
-                  if (urlParams.get('action') === 'show' && urlParams.has('taskId')) {
-                    this.showTaskModal(identity, parseInt(urlParams.get('taskId'), 10))
-                  }
-                }
               }
+            }
+
+            const urlParams = new URLSearchParams(window.location.search)
+            if (urlParams.get('action') === 'show' && urlParams.has('taskId')) {
+              this.showTaskModal(identity, parseInt(urlParams.get('taskId'), 10))
             }
 
             this.renderTasksInterval = window.setInterval(this.onRenderTasks, 500)
