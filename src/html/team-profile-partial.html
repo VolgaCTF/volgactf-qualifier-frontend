@@ -105,13 +105,15 @@
             <tbody>
                 <% var sortedTeamTaskHits = _.sortBy(teamTaskHits, 'createdAt') %>
                 <% var task = null %>
+                <% var taskValue = null %>
                 <% for (var i=0; i<sortedTeamTaskHits.length; ++i) { %>
-                    <% task = _.findWhere(tasks, { id: sortedTeamTaskHits[i].taskId }); %>
-                    <% if (task) { %>
+                    <% task = _.findWhere(tasks, { id: sortedTeamTaskHits[i].taskId }) %>
+                    <% taskValue = _.findWhere(taskValues, { id: sortedTeamTaskHits[i].taskId }) %>
+                    <% if (task && taskValue) { %>
                     <tr>
                         <th scope="row"><% print(i + 1) %></th>
                         <td><%- task.title %></td>
-                        <td><%- task.value %></td>
+                        <td><%- taskValue.value %></td>
                         <td><%- moment(sortedTeamTaskHits[i].createdAt).utc().format('MMM D [at] HH:mm [UTC]') %></td>
                     </tr>
                     <% } %>
@@ -145,13 +147,15 @@
             <tbody>
                 <% var sortedTeamTaskReviews = _.sortBy(teamTaskReviews, 'createdAt') %>
                 <% var task = null %>
+                <% var taskValue = null %>
                 <% for (var i=0; i<sortedTeamTaskReviews.length; ++i) { %>
                     <% task = _.findWhere(tasks, { id: sortedTeamTaskReviews[i].taskId }) %>
-                    <% if (task) { %>
+                    <% taskValue = _.findWhere(taskValues, { id: sortedTeamTaskHits[i].taskId }) %>
+                    <% if (task && taskValue) { %>
                     <tr>
                         <th scope="row"><% print(i + 1) %></th>
                         <td><%- task.title %></td>
-                        <td><%- task.value %></td>
+                        <td><%- taskValue.value %></td>
                         <td><%- sortedTeamTaskReviews[i].rating.toFixed(2) %></td>
                         <td><%- sortedTeamTaskReviews[i].comment %></td>
                         <td><%- moment(sortedTeamTaskReviews[i].createdAt).utc().format('MMM D [at] HH:mm [UTC]') %></td>

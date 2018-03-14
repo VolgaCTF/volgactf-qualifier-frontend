@@ -17,7 +17,6 @@ class ScoreboardView extends View {
     super()
     this.$main = null
 
-    this.onUpdateTeamScore = null
     this.onUpdateTeamLogo = null
     this.onUpdateTeamProfile = null
 
@@ -67,13 +66,6 @@ class ScoreboardView extends View {
 
       navigationBar.present()
       statusBar.present()
-
-      this.onUpdateTeamScore = (teamScore) => {
-        this.reloadScoreboard = true
-        return false
-      }
-
-      contestProvider.on('updateTeamScore', this.onUpdateTeamScore)
 
       this.onUpdateTeamRankings = () => {
         this.reloadScoreboard = true

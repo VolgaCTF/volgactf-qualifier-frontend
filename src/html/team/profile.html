@@ -29,7 +29,7 @@
                 <% } %>
                 <section>
                     <% var country = _.findWhere(countries, { id: team.countryId }) %>
-                    <%= templates.teamProfilePartial({ _: _, identity: identity, team: team, country: country, contest: contest, moment: moment, tasks: tasks, teamTaskHits: teamTaskHits, teamTaskReviews: teamTaskReviews, teamTaskHitStatistics: teamTaskHitStatistics, teamTaskReviewStatistics: teamTaskReviewStatistics }) %>
+                    <%= templates.teamProfilePartial({ _: _, identity: identity, team: team, country: country, contest: contest, moment: moment, tasks: tasks, taskValues: taskValues, teamTaskHits: teamTaskHits, teamTaskReviews: teamTaskReviews, teamTaskHitStatistics: teamTaskHitStatistics, teamTaskReviewStatistics: teamTaskReviewStatistics }) %>
                 </section>
             </div>
 
@@ -226,6 +226,7 @@
                         team: <%= jsesc(team, { json: true, isScriptContext: true }) %>,
                         countries: <%= jsesc(countries, { json: true, isScriptContext: true }) %>,
                         tasks: <%= jsesc(tasks, { json: true, isScriptContext: true }) %>,
+                        taskValues: <%= jsesc(taskValues, { json: true, isScriptContext: true }) %>,
                         teamTaskHits: <%= jsesc(teamTaskHits, { json: true, isScriptContext: true }) %>,
                         teamTaskHitStatistics: <%= jsesc(teamTaskHitStatistics, { json: true, isScriptContext: true }) %>,
                         teamTaskReviewStatistics: <%= jsesc(teamTaskReviewStatistics, { json: true, isScriptContext: true }) %>
