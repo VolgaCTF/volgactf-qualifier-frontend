@@ -1,6 +1,5 @@
 import $ from 'jquery'
 import View from '../base'
-import newNavigationBar from '../../new-navigation-bar'
 import identityProvider from '../../providers/identity'
 import 'parsley'
 import 'jquery-form'
@@ -61,15 +60,10 @@ class SupervisorSigninView extends View {
   present () {
     this.$main = $('#main')
 
-    $
-      .when(identityProvider.initIdentity())
-      .done((identity) => {
-        identityProvider.subscribe()
-        newNavigationBar.present()
-        if (identity.isGuest()) {
-          this.initLoginForm()
-        }
-      })
+    const identity = identityProvider.getIdentity()
+    if (identity.isGuest()) {
+      this.initLoginForm()
+    }
   }
 }
 

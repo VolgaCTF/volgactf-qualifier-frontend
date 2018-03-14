@@ -1,17 +1,20 @@
 <% if (contest.state === 1) { %>
-    <span class="themis-contest-not-started">
-        &#9679;&nbsp;Not started
+    <% var startsAt = (contest.startsAt instanceof Date) ? contest.startsAt : new Date(contest.startsAt) %>
+    <span class="navbar-text text-primary" title="Contest starts on <%- moment(startsAt).utc().format('MMM D [at] HH:mm [UTC]') %> (<%- moment(startsAt).fromNow() %>)">
+        <span class="oi oi-timer"></span>&nbsp;Not started
     </span>
 <% } else if (contest.state === 2) { %>
-    <span class="themis-contest-started">
-        &#9679;&nbsp;Started
+    <% var finishesAt = (contest.finishesAt instanceof Date) ? contest.finishesAt : new Date(contest.finishesAt) %>
+    <span class="navbar-text text-success" title="Contest finishes on <%- moment(finishesAt).utc().format('MMM D [at] HH:mm [UTC]') %> (<%- moment(finishesAt).fromNow() %>)">
+        <span class="oi oi-timer"></span>&nbsp;Started
     </span>
 <% } else if (contest.state === 3) { %>
-    <span class="themis-contest-paused">
-        &#9679;&nbsp;Paused
+    <span class="navbar-text text-warning" title="Contest is paused">
+        <span class="oi oi-timer"></span>&nbsp;Paused
     </span>
 <% } else if (contest.state === 4) { %>
-    <span class="themis-contest-finished">
-        &#9679;&nbsp;Finished
+    <% var finishesAt = (contest.finishesAt instanceof Date) ? contest.finishesAt : new Date(contest.finishesAt) %>
+    <span class="navbar-text text-danger" title="Contest has finished on <%- moment(finishesAt).utc().format('MMM D [at] HH:mm [UTC]') %> (<%- moment(finishesAt).fromNow() %>)">
+        <span class="oi oi-timer"></span>&nbsp;Finished
     </span>
 <% } %>

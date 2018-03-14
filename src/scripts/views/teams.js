@@ -1,9 +1,6 @@
 import $ from 'jquery'
 import _ from 'underscore'
 import View from './base'
-import navigationBar from '../new-navigation-bar'
-import statusBar from '../new-status-bar'
-import contestProvider from '../providers/contest'
 import identityProvider from '../providers/identity'
 import teamProvider from '../providers/team'
 import countryProvider from '../providers/country'
@@ -38,16 +35,11 @@ class TeamsView extends View {
 
     $
     .when(
-      identityProvider.initIdentity(),
-      contestProvider.initContest(),
       teamProvider.initTeams(),
       countryProvider.initCountries()
     )
-    .done((identity) => {
-      identityProvider.subscribe()
-
-      navigationBar.present()
-      statusBar.present()
+    .done(() => {
+      const identity = identityProvider.getIdentity()
 
       teamProvider.subscribe()
 

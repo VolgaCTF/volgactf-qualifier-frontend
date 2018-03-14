@@ -2,12 +2,9 @@ import $ from 'jquery'
 import _ from 'underscore'
 import View from './base'
 import dataStore from '../data-store'
-import navigationBar from '../new-navigation-bar'
-import statusBar from '../new-status-bar'
 import MarkdownRenderer from '../utils/markdown'
 import moment from 'moment'
 import postProvider from '../providers/post'
-import contestProvider from '../providers/contest'
 import identityProvider from '../providers/identity'
 import URLSearchParams from 'url-search-params'
 import 'jquery-form'
@@ -260,15 +257,10 @@ class NewsView extends View {
 
     $
     .when(
-      identityProvider.initIdentity(),
-      contestProvider.initContest(),
       postProvider.initPosts()
     )
-    .done((identity) => {
-      identityProvider.subscribe()
-
-      navigationBar.present()
-      statusBar.present()
+    .done(() => {
+      const identity = identityProvider.getIdentity()
 
       if (identity.isSupervisor()) {
         this.initCreatePostModal()

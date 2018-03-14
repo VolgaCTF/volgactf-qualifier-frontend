@@ -1,7 +1,5 @@
 import $ from 'jquery'
 import View from './base'
-import newNavigationBar from '../new-navigation-bar'
-import newStatusBar from '../new-status-bar'
 import contestProvider from '../providers/contest'
 import identityProvider from '../providers/identity'
 import dataStore from '../data-store'
@@ -134,21 +132,8 @@ class ContestView extends View {
 
   present () {
     this.$main = $('#main')
-
-    $
-    .when(
-      identityProvider.initIdentity(),
-      contestProvider.initContest()
-    )
-    .done((identity, contest) => {
-      identityProvider.subscribe()
-
-      newNavigationBar.present()
-      newStatusBar.present()
-      this.initForm()
-
-      contestProvider.on('updateContest', this.onUpdateContest)
-    })
+    this.initForm()
+    contestProvider.on('updateContest', this.onUpdateContest)
   }
 }
 

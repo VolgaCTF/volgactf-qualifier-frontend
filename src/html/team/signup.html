@@ -17,9 +17,7 @@
         <% } %>
     </head>
     <body>
-        <%= templates.navbar({ _: _, active: null, identity: identity, templates: templates, contestTitle: contestTitle }) %>
-        <div id="themis-statusbar">
-        </div>
+        <%= templates.navbar({ _: _, active: null, identity: identity, templates: templates, contestTitle: contestTitle, contest: contest, moment: moment }) %>
 
         <div id="main" class="pb-4">
             <div class="container">
@@ -169,7 +167,8 @@
                         countries: <%= jsesc(countries, { json: true, isScriptContext: true }) %>
                     },
                     templates: {
-                        streamStatePartial: <%= templates.streamStatePartial.source %>
+                        streamStatePartial: <%= templates.streamStatePartial.source %>,
+                        contestStatePartial: <%= templates.contestStatePartial.source %>
                     }
                 }
             }

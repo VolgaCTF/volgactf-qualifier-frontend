@@ -1,7 +1,5 @@
 import $ from 'jquery'
 import View from '../base'
-import navigationBar from '../../new-navigation-bar'
-import statusBar from '../../new-status-bar'
 import identityProvider from '../../providers/identity'
 import teamProvider from '../../providers/team'
 import contestProvider from '../../providers/contest'
@@ -395,95 +393,88 @@ class TeamProfileView extends View {
   present () {
     this.$main = $('#main')
 
-    $
-      .when(identityProvider.initIdentity(), contestProvider.initContest())
-      .done((identity, contest) => {
-        let urlParts = window.location.pathname.split('/')
-        let teamId = parseInt(urlParts[urlParts.length - 2], 10)
-        let promise = null
+    const identity = identityProvider.getIdentity()
+    const contest = contestProvider.getContest()
+    let urlParts = window.location.pathname.split('/')
+    let teamId = parseInt(urlParts[urlParts.length - 2], 10)
+    let promise = null
 
-        if (identity.isSupervisor()) {
-          if (contest.isInitial()) {
-            promise = $.when(
-              teamProvider.initTeamProfile(),
-              countryProvider.initCountries()
-            )
-          } else {
-            promise = $.when(
-              teamProvider.initTeamProfile(),
-              countryProvider.initCountries(),
-              teamTaskHitProvider.initTeamTaskHits(),
-              teamTaskReviewProvider.initTeamTaskReviews(),
-              taskProvider.initTaskPreviews()
-            )
-          }
-        } else if (identity.isExactTeam(teamId)) {
-          if (contest.isInitial()) {
-            promise = $.when(
-              teamProvider.initTeamProfile(),
-              countryProvider.initCountries()
-            )
-          } else {
-            promise = $.when(
-              teamProvider.initTeamProfile(),
-              countryProvider.initCountries(),
-              teamTaskHitProvider.initTeamTaskHits(),
-              teamTaskReviewProvider.initTeamTaskReviews(),
-              taskProvider.initTaskPreviews()
-            )
-          }
-        } else if (identity.isTeam()) {
-          if (contest.isInitial()) {
-            promise = $.when(
-              teamProvider.initTeamProfile(),
-              countryProvider.initCountries()
-            )
-          } else {
-            promise = $.when(
-              teamProvider.initTeamProfile(),
-              countryProvider.initCountries(),
-              teamTaskHitProvider.fetchTeamHitStatistics(teamId),
-              teamTaskReviewProvider.fetchTeamReviewStatistics(teamId)
-            )
-          }
-        } else {
-          if (contest.isInitial()) {
-            promise = $.when(
-              teamProvider.initTeamProfile(),
-              countryProvider.initCountries()
-            )
-          } else {
-            promise = $.when(
-              teamProvider.initTeamProfile(),
-              countryProvider.initCountries(),
-              teamTaskHitProvider.fetchTeamHitStatistics(teamId),
-              teamTaskReviewProvider.fetchTeamReviewStatistics(teamId)
-            )
-          }
+    if (identity.isSupervisor()) {
+      if (contest.isInitial()) {
+        promise = $.when(
+          teamProvider.initTeamProfile(),
+          countryProvider.initCountries()
+        )
+      } else {
+        promise = $.when(
+          teamProvider.initTeamProfile(),
+          countryProvider.initCountries(),
+          teamTaskHitProvider.initTeamTaskHits(),
+          teamTaskReviewProvider.initTeamTaskReviews(),
+          taskProvider.initTaskPreviews()
+        )
+      }
+    } else if (identity.isExactTeam(teamId)) {
+      if (contest.isInitial()) {
+        promise = $.when(
+          teamProvider.initTeamProfile(),
+          countryProvider.initCountries()
+        )
+      } else {
+        promise = $.when(
+          teamProvider.initTeamProfile(),
+          countryProvider.initCountries(),
+          teamTaskHitProvider.initTeamTaskHits(),
+          teamTaskReviewProvider.initTeamTaskReviews(),
+          taskProvider.initTaskPreviews()
+        )
+      }
+    } else if (identity.isTeam()) {
+      if (contest.isInitial()) {
+        promise = $.when(
+          teamProvider.initTeamProfile(),
+          countryProvider.initCountries()
+        )
+      } else {
+        promise = $.when(
+          teamProvider.initTeamProfile(),
+          countryProvider.initCountries(),
+          teamTaskHitProvider.fetchTeamHitStatistics(teamId),
+          teamTaskReviewProvider.fetchTeamReviewStatistics(teamId)
+        )
+      }
+    } else {
+      if (contest.isInitial()) {
+        promise = $.when(
+          teamProvider.initTeamProfile(),
+          countryProvider.initCountries()
+        )
+      } else {
+        promise = $.when(
+          teamProvider.initTeamProfile(),
+          countryProvider.initCountries(),
+          teamTaskHitProvider.fetchTeamHitStatistics(teamId),
+          teamTaskReviewProvider.fetchTeamReviewStatistics(teamId)
+        )
+      }
+    }
+
+    promise
+    .done((team, countries, teamTaskHits, teamTaskReviews) => {
+      this.team = team
+
+      if (identity.isExactTeam(team.id)) {
+        this.initUploadLogoModal()
+
+        if (!identity.emailConfirmed) {
+          this.initResendConfirmationModal()
+          this.initChangeEmailModal()
         }
 
-        promise
-          .done((team, countries, teamTaskHits, teamTaskReviews) => {
-            identityProvider.subscribe()
-
-            navigationBar.present()
-            statusBar.present()
-
-            this.team = team
-
-            if (identity.isExactTeam(team.id)) {
-              this.initUploadLogoModal()
-
-              if (!identity.emailConfirmed) {
-                this.initResendConfirmationModal()
-                this.initChangeEmailModal()
-              }
-
-              this.initEditProfileModal()
-              this.initChangePasswordModal()
-            }
-          })
-      })
+        this.initEditProfileModal()
+        this.initChangePasswordModal()
+      }
+    })
   }
 }
 

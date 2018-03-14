@@ -17,10 +17,7 @@
         <% } %>
     </head>
     <body>
-        <%= templates.navbar({ _: _, active: 'tasks', identity: identity, templates: templates, contestTitle: contestTitle, contestTitle: contestTitle }) %>
-        <div id="themis-statusbar">
-            <%= templates.statusbar({ _: _, identity: identity, contest: contest, templates: templates, moment: moment }) %>
-        </div>
+        <%= templates.navbar({ _: _, active: 'tasks', identity: identity, templates: templates, contestTitle: contestTitle, contest: contest, moment: moment }) %>
 
         <div id="main" class="pb-4">
             <div class="container">
@@ -492,7 +489,6 @@
                     },
                     templates: {
                         contestStatePartial: <%= templates.contestStatePartial.source %>,
-                        contestTimer: <%= templates.contestTimer.source %>,
                         streamStatePartial: <%= templates.streamStatePartial.source %>,
                         taskContentPartial: <%= templates.taskContentPartial.source %>,
                         createTaskHintTextareaPartial: <%= templates.createTaskHintTextareaPartial.source %>,

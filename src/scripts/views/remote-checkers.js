@@ -2,8 +2,6 @@ import $ from 'jquery'
 import _ from 'underscore'
 import View from './base'
 import dataStore from '../data-store'
-import newNavigationBar from '../new-navigation-bar'
-import newStatusBar from '../new-status-bar'
 import moment from 'moment'
 import remoteCheckerProvider from '../providers/remote-checker'
 import contestProvider from '../providers/contest'
@@ -220,49 +218,44 @@ class RemoteCheckersView extends View {
     this.$main = $('#main')
 
     $
-      .when(
-        identityProvider.initIdentity(),
-        contestProvider.initContest(),
-        remoteCheckerProvider.initRemoteCheckers()
-      )
-      .done((identity, contest) => {
-        identityProvider.subscribe()
-        newNavigationBar.present()
-        newStatusBar.present()
+    .when(
+      remoteCheckerProvider.initRemoteCheckers()
+    )
+    .done(() => {
+      const identity = identityProvider.getIdentity()
+      if (identity.isAdmin()) {
+        this.initCreateRemoteCheckerModal()
+        this.initEditRemoteCheckerModal()
+        this.initDeleteRemoteCheckerModal()
+      }
 
-        if (identity.isAdmin()) {
-          this.initCreateRemoteCheckerModal()
-          this.initEditRemoteCheckerModal()
-          this.initDeleteRemoteCheckerModal()
-        }
+      this.onCreateRemoteChecker = () => {
+        this.renderRemoteCheckers()
+        return false
+      }
 
-        this.onCreateRemoteChecker = () => {
-          this.renderRemoteCheckers()
-          return false
-        }
+      this.onUpdateRemoteChecker = () => {
+        this.renderRemoteCheckers()
+        return false
+      }
 
-        this.onUpdateRemoteChecker = () => {
-          this.renderRemoteCheckers()
-          return false
-        }
+      this.onDeleteRemoteChecker = () => {
+        this.renderRemoteCheckers()
+        return false
+      }
 
-        this.onDeleteRemoteChecker = () => {
-          this.renderRemoteCheckers()
-          return false
-        }
+      remoteCheckerProvider.subscribe()
+      remoteCheckerProvider.on('createRemoteChecker', this.onCreateRemoteChecker)
+      remoteCheckerProvider.on('updateRemoteChecker', this.onUpdateRemoteChecker)
+      remoteCheckerProvider.on('deleteRemoteChecker', this.onDeleteRemoteChecker)
 
-        remoteCheckerProvider.subscribe()
-        remoteCheckerProvider.on('createRemoteChecker', this.onCreateRemoteChecker)
-        remoteCheckerProvider.on('updateRemoteChecker', this.onUpdateRemoteChecker)
-        remoteCheckerProvider.on('deleteRemoteChecker', this.onDeleteRemoteChecker)
+      this.onUpdateContest = (contest) => {
+        this.renderRemoteCheckers()
+        return false
+      }
 
-        this.onUpdateContest = (contest) => {
-          this.renderRemoteCheckers()
-          return false
-        }
-
-        contestProvider.on('updateContest', this.onUpdateContest)
-      })
+      contestProvider.on('updateContest', this.onUpdateContest)
+    })
   }
 }
 

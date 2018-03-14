@@ -1,6 +1,5 @@
 import $ from 'jquery'
 import View from '../base'
-import newNavigationBar from '../../new-navigation-bar'
 import contestProvider from '../../providers/contest'
 import identityProvider from '../../providers/identity'
 import countryProvider from '../../providers/country'
@@ -88,19 +87,16 @@ class TeamSignupView extends View {
     this.$main = $('#main')
 
     $
-      .when(
-        identityProvider.initIdentity(),
-        contestProvider.initContest(),
-        countryProvider.initCountries()
-      )
-      .done((identity, contest, countries) => {
-        identityProvider.subscribe()
-        newNavigationBar.present()
-
-        if (identity.isGuest() && !contest.isFinished()) {
-          this.initSignupForm()
-        }
-      })
+    .when(
+      countryProvider.initCountries()
+    )
+    .done((countries) => {
+      const identity = identityProvider.getIdentity()
+      const contest = contestProvider.getContest()
+      if (identity.isGuest() && !contest.isFinished()) {
+        this.initSignupForm()
+      }
+    })
   }
 }
 

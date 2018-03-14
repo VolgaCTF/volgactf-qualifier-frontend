@@ -17,10 +17,7 @@
         <% } %>
     </head>
     <body>
-        <%= templates.navbar({ _: _, active: null, identity: identity, templates: templates, contestTitle: contestTitle }) %>
-        <div id="themis-statusbar">
-            <%= templates.statusbar({ _: _, identity: identity, contest: contest, templates: templates, moment: moment }) %>
-        </div>
+        <%= templates.navbar({ _: _, active: null, identity: identity, templates: templates, contestTitle: contestTitle, contest: contest, moment: moment }) %>
 
         <div id="main" class="pb-4">
             <div class="container">
@@ -28,7 +25,7 @@
                 <!--=include ../partials/alert_email_verification.html -->
                 <% } %>
                 <header>
-                    <h2>Teams&nbsp;<span class="themis-team-count">(<%- teams.length %>)</span></h2>
+                    <h1>Teams&nbsp;<span class="themis-team-count">(<%- teams.length %>)</span></h1>
                 </header>
                 <section>
                     <%= templates.teamList({ _: _, teams: teams, countries: countries, templates: templates, moment: moment }) %>
@@ -59,7 +56,6 @@
                     },
                     templates: {
                         contestStatePartial: <%= templates.contestStatePartial.source %>,
-                        contestTimer: <%= templates.contestTimer.source %>,
                         teamList: <%= templates.teamList.source %>,
                         teamCard: <%= templates.teamCard.source %>,
                         streamStatePartial: <%= templates.streamStatePartial.source %>

@@ -1,10 +1,7 @@
 import $ from 'jquery'
 import _ from 'underscore'
 import View from './base'
-import navigationBar from '../new-navigation-bar'
-import statusBar from '../new-status-bar'
 import moment from 'moment'
-import contestProvider from '../providers/contest'
 import identityProvider from '../providers/identity'
 import teamProvider from '../providers/team'
 import URLSearchParams from 'url-search-params'
@@ -48,24 +45,16 @@ class ScoreboardView extends View {
 
     $
     .when(
-      identityProvider.initIdentity(),
-      contestProvider.initContest(),
       teamProvider.initTeams(),
       teamRankingProvider.initTeamRankings(),
       countryProvider.initCountries()
     )
-    .done((identity, contest, teams, teamRankings, countries) => {
-      identityProvider.subscribe()
-
+    .done((teams, teamRankings, countries) => {
       let urlParams = new URLSearchParams(window.location.search)
       this.detailed = urlParams.has('detailed')
 
       teamProvider.subscribe()
-
       teamRankingProvider.subscribe()
-
-      navigationBar.present()
-      statusBar.present()
 
       this.onUpdateTeamRankings = () => {
         this.reloadScoreboard = true

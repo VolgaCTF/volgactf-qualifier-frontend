@@ -2,8 +2,6 @@ import $ from 'jquery'
 import _ from 'underscore'
 import View from './base'
 import dataStore from '../data-store'
-import navigationBar from '../new-navigation-bar'
-import statusBar from '../new-status-bar'
 import moment from 'moment'
 import categoryProvider from '../providers/category'
 import taskCategoryProvider from '../providers/task-category'
@@ -1329,195 +1327,185 @@ class TasksView extends View {
   present () {
     this.$main = $('#main')
 
-    $
-      .when(
-        identityProvider.initIdentity(),
-        contestProvider.initContest()
-      )
-      .done((identity, contest) => {
-        identityProvider.subscribe()
-        navigationBar.present()
+    const identity = identityProvider.getIdentity()
 
-        let promise = null
-        if (identity.isTeam()) {
-          promise = $.when(taskProvider.initTaskPreviews(), categoryProvider.initCategories(), taskCategoryProvider.initTaskCategories(), taskValueProvider.initTaskValues(), taskRewardSchemeProvider.initTaskRewardSchemes(), teamTaskHitProvider.initTeamTaskHits())
-        } else if (identity.isAdmin()) {
-          promise = $.when(taskProvider.initTaskPreviews(), categoryProvider.initCategories(), taskCategoryProvider.initTaskCategories(), taskValueProvider.initTaskValues(), taskRewardSchemeProvider.initTaskRewardSchemes(), remoteCheckerProvider.initRemoteCheckers(), taskRemoteCheckerProvider.initTaskRemoteCheckers())
-        } else {
-          promise = $.when(taskProvider.initTaskPreviews(), categoryProvider.initCategories(), taskCategoryProvider.initTaskCategories(), taskValueProvider.initTaskValues(), taskRewardSchemeProvider.initTaskRewardSchemes())
+    let promise = null
+    if (identity.isTeam()) {
+      promise = $.when(taskProvider.initTaskPreviews(), categoryProvider.initCategories(), taskCategoryProvider.initTaskCategories(), taskValueProvider.initTaskValues(), taskRewardSchemeProvider.initTaskRewardSchemes(), teamTaskHitProvider.initTeamTaskHits())
+    } else if (identity.isAdmin()) {
+      promise = $.when(taskProvider.initTaskPreviews(), categoryProvider.initCategories(), taskCategoryProvider.initTaskCategories(), taskValueProvider.initTaskValues(), taskRewardSchemeProvider.initTaskRewardSchemes(), remoteCheckerProvider.initRemoteCheckers(), taskRemoteCheckerProvider.initTaskRemoteCheckers())
+    } else {
+      promise = $.when(taskProvider.initTaskPreviews(), categoryProvider.initCategories(), taskCategoryProvider.initTaskCategories(), taskValueProvider.initTaskValues(), taskRewardSchemeProvider.initTaskRewardSchemes())
+    }
+
+    promise
+    .done((taskPreviews, categories) => {
+      if (identity.isSupervisor()) {
+        this.initReviseTaskModal()
+      }
+
+      if (identity.isAdmin()) {
+        remoteCheckerProvider.subscribe()
+        taskRemoteCheckerProvider.subscribe()
+
+        this.initCreateTaskModal()
+        this.initOpenTaskModal()
+        this.initCloseTaskModal()
+        this.initEditTaskModal()
+      }
+
+      if (identity.isTeam()) {
+        this.initSubmitTaskModal()
+      }
+
+      if (identity.isGuest()) {
+        this.initCheckTaskModal()
+      }
+
+      this.$taskPreviewsList = $('#themis-task-previews')
+
+      this.onCreateTaskCategory = (taskCategory) => {
+        this.requestRenderTasks()
+        return false
+      }
+
+      if (identity.isTeam() || identity.isGuest()) {
+        this.onRevealTaskCategory = (taskCategory) => {
+          this.requestRenderTasks()
+          return false
+        }
+      }
+
+      this.onDeleteTaskCategory = () => {
+        this.requestRenderTasks()
+        return false
+      }
+
+      this.onUpdateCategory = (category) => {
+        this.requestRenderTasks()
+        return false
+      }
+
+      categoryProvider.subscribe()
+      categoryProvider.on('updateCategory', this.onUpdateCategory)
+
+      taskProvider.subscribe()
+      if (identity.isSupervisor()) {
+        this.onCreateTask = (taskPreview) => {
+          this.requestRenderTasks()
+          return false
         }
 
-        promise
-          .done((taskPreviews, categories) => {
-            statusBar.present()
+        taskProvider.on('createTask', this.onCreateTask)
+      }
 
-            if (identity.isSupervisor()) {
-              this.initReviseTaskModal()
-            }
+      this.onOpenTask = (taskPreview) => {
+        this.requestRenderTasks()
+        return false
+      }
 
-            if (identity.isAdmin()) {
-              remoteCheckerProvider.subscribe()
-              taskRemoteCheckerProvider.subscribe()
+      taskProvider.on('openTask', this.onOpenTask)
 
-              this.initCreateTaskModal()
-              this.initOpenTaskModal()
-              this.initCloseTaskModal()
-              this.initEditTaskModal()
-            }
+      this.onCloseTask = (taskPreview) => {
+        this.requestRenderTasks()
+        return false
+      }
 
-            if (identity.isTeam()) {
-              this.initSubmitTaskModal()
-            }
+      taskProvider.on('closeTask', this.onCloseTask)
 
-            if (identity.isGuest()) {
-              this.initCheckTaskModal()
-            }
+      this.onUpdateTask = (taskPreview) => {
+        this.requestRenderTasks()
+        return false
+      }
 
-            this.$taskPreviewsList = $('#themis-task-previews')
+      taskProvider.on('updateTask', this.onUpdateTask)
 
-            this.onCreateTaskCategory = (taskCategory) => {
-              this.requestRenderTasks()
-              return false
-            }
+      if (identity.isTeam()) {
+        teamTaskHitProvider.subscribe()
 
-            if (identity.isTeam() || identity.isGuest()) {
-              this.onRevealTaskCategory = (taskCategory) => {
-                this.requestRenderTasks()
-                return false
-              }
-            }
+        this.onCreateTeamTaskHit = (teamTaskHit) => {
+          this.requestRenderTasks()
+          return false
+        }
 
-            this.onDeleteTaskCategory = () => {
-              this.requestRenderTasks()
-              return false
-            }
+        teamTaskHitProvider.on('createTeamTaskHit', this.onCreateTeamTaskHit)
+      }
 
-            this.onUpdateCategory = (category) => {
-              this.requestRenderTasks()
-              return false
-            }
+      this.onUpdateContest = (contest) => {
+        this.requestRenderTasks()
+        return false
+      }
 
-            categoryProvider.subscribe()
-            categoryProvider.on('updateCategory', this.onUpdateCategory)
+      contestProvider.on('updateContest', this.onUpdateContest)
 
-            taskProvider.subscribe()
-            if (identity.isSupervisor()) {
-              this.onCreateTask = (taskPreview) => {
-                this.requestRenderTasks()
-                return false
-              }
+      teamProvider.subscribe()
+      taskCategoryProvider.subscribe()
+      taskCategoryProvider.on('createTaskCategory', this.onCreateTaskCategory)
+      taskCategoryProvider.on('deleteTaskCategory', this.onDeleteTaskCategory)
 
-              taskProvider.on('createTask', this.onCreateTask)
-            }
+      taskValueProvider.subscribe(identity)
+      taskRewardSchemeProvider.subscribe(identity)
 
-            this.onOpenTask = (taskPreview) => {
-              this.requestRenderTasks()
-              return false
-            }
+      this.onUpdateTaskValue = () => {
+        this.requestRenderTasks()
+        return false
+      }
+      taskValueProvider.on('updateTaskValue', this.onUpdateTaskValue)
 
-            taskProvider.on('openTask', this.onOpenTask)
+      if (identity.isSupervisor()) {
+        this.onCreateTaskValue = () => {
+          this.requestRenderTasks()
+          return false
+        }
+        taskValueProvider.on('createTaskValue', this.onCreateTaskValue)
+      }
 
-            this.onCloseTask = (taskPreview) => {
-              this.requestRenderTasks()
-              return false
-            }
+      if (identity.isTeam() || identity.isGuest()) {
+        this.onRevealTaskValue = () => {
+          this.requestRenderTasks()
+          return false
+        }
+        taskValueProvider.on('revealTaskValue', this.onRevealTaskValue)
+      }
 
-            taskProvider.on('closeTask', this.onCloseTask)
+      this.onUpdateTaskRewardScheme = () => {
+        this.requestRenderTasks()
+        return false
+      }
+      taskRewardSchemeProvider.on('updateTaskRewardScheme', this.onUpdateTaskRewardScheme)
 
-            this.onUpdateTask = (taskPreview) => {
-              this.requestRenderTasks()
-              return false
-            }
+      if (identity.isSupervisor()) {
+        this.onCreateTaskRewardScheme = () => {
+          this.requestRenderTasks()
+          return false
+        }
+        taskRewardSchemeProvider.on('createTaskRewardScheme', this.onCreateTaskRewardScheme)
+      }
 
-            taskProvider.on('updateTask', this.onUpdateTask)
+      if (identity.isTeam() || identity.isGuest()) {
+        this.onRevealTaskRewardScheme = () => {
+          this.requestRenderTasks()
+          return false
+        }
+        taskValueProvider.on('revealTaskRewardScheme', this.onRevealTaskRewardScheme)
+      }
 
-            if (identity.isTeam()) {
-              teamTaskHitProvider.subscribe()
+      this.onRenderTasks = (force = false) => {
+        if ((this.flagRenderTasks || force) && !this.flagRenderingTasks) {
+          this.flagRenderingTasks = true
+          this.renderTaskPreviews()
+          this.flagRenderingTasks = false
+          this.flagRenderTasks = false
+        }
+      }
 
-              this.onCreateTeamTaskHit = (teamTaskHit) => {
-                this.requestRenderTasks()
-                return false
-              }
+      const urlParams = new URLSearchParams(window.location.search)
+      if (urlParams.get('action') === 'show' && urlParams.has('taskId')) {
+        this.showTaskModal(identity, parseInt(urlParams.get('taskId'), 10))
+      }
 
-              teamTaskHitProvider.on('createTeamTaskHit', this.onCreateTeamTaskHit)
-            }
-
-            this.onUpdateContest = (contest) => {
-              this.requestRenderTasks()
-              return false
-            }
-
-            contestProvider.on('updateContest', this.onUpdateContest)
-
-            teamProvider.subscribe()
-            taskCategoryProvider.subscribe()
-            taskCategoryProvider.on('createTaskCategory', this.onCreateTaskCategory)
-            taskCategoryProvider.on('deleteTaskCategory', this.onDeleteTaskCategory)
-
-            taskValueProvider.subscribe(identity)
-            taskRewardSchemeProvider.subscribe(identity)
-
-            this.onUpdateTaskValue = () => {
-              this.requestRenderTasks()
-              return false
-            }
-            taskValueProvider.on('updateTaskValue', this.onUpdateTaskValue)
-
-            if (identity.isSupervisor()) {
-              this.onCreateTaskValue = () => {
-                this.requestRenderTasks()
-                return false
-              }
-              taskValueProvider.on('createTaskValue', this.onCreateTaskValue)
-            }
-
-            if (identity.isTeam() || identity.isGuest()) {
-              this.onRevealTaskValue = () => {
-                this.requestRenderTasks()
-                return false
-              }
-              taskValueProvider.on('revealTaskValue', this.onRevealTaskValue)
-            }
-
-            this.onUpdateTaskRewardScheme = () => {
-              this.requestRenderTasks()
-              return false
-            }
-            taskRewardSchemeProvider.on('updateTaskRewardScheme', this.onUpdateTaskRewardScheme)
-
-            if (identity.isSupervisor()) {
-              this.onCreateTaskRewardScheme = () => {
-                this.requestRenderTasks()
-                return false
-              }
-              taskRewardSchemeProvider.on('createTaskRewardScheme', this.onCreateTaskRewardScheme)
-            }
-
-            if (identity.isTeam() || identity.isGuest()) {
-              this.onRevealTaskRewardScheme = () => {
-                this.requestRenderTasks()
-                return false
-              }
-              taskValueProvider.on('revealTaskRewardScheme', this.onRevealTaskRewardScheme)
-            }
-
-            this.onRenderTasks = (force = false) => {
-              if ((this.flagRenderTasks || force) && !this.flagRenderingTasks) {
-                this.flagRenderingTasks = true
-                this.renderTaskPreviews()
-                this.flagRenderingTasks = false
-                this.flagRenderTasks = false
-              }
-            }
-
-            const urlParams = new URLSearchParams(window.location.search)
-            if (urlParams.get('action') === 'show' && urlParams.has('taskId')) {
-              this.showTaskModal(identity, parseInt(urlParams.get('taskId'), 10))
-            }
-
-            this.renderTasksInterval = window.setInterval(this.onRenderTasks, 500)
-          })
-      })
+      this.renderTasksInterval = window.setInterval(this.onRenderTasks, 500)
+    })
   }
 }
 

@@ -23,6 +23,10 @@ import remoteCheckersView from './views/remote-checkers'
 
 import dataStore from './data-store'
 
+import contestProvider from './providers/contest'
+import identityProvider from './providers/identity'
+import navigationBar from './navigation-bar'
+
 $(document).ready(function () {
   if (dataStore.supportsRealtime()) {
     dataStore.connectRealtime()
@@ -52,8 +56,18 @@ $(document).ready(function () {
     default: defaultView
   }
 
-  const viewName = window.themis.quals.view
-  if (viewName && views.hasOwnProperty(viewName)) {
-    views[viewName].present()
-  }
+  $
+  .when(
+    identityProvider.initIdentity(),
+    contestProvider.initContest()
+  )
+  .done(function (identity, contest) {
+    contestProvider.subscribe()
+    navigationBar.present()
+
+    const viewName = window.themis.quals.view
+    if (viewName && views.hasOwnProperty(viewName)) {
+      views[viewName].present()
+    }
+  })
 })

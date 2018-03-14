@@ -6,16 +6,18 @@
         &nbsp;
         <a href="/team/<%- team.id %>/profile" class="themis-team-link"><%- team.name %></a>
     </td>
-    <td><%- country.name %></td>
+    <td class="d-none d-md-table-cell"><%- country.name %></td>
     <% if (detailed) { %>
-    <td><%- team.locality %></td>
-    <td><%- team.institution %></td>
+    <td class="d-none d-lg-table-cell"><%- team.locality %></td>
+    <td class="d-none d-lg-table-cell"><%- team.institution %></td>
     <% } %>
     <td><%- teamRanking.score %></td>
+    <td class="d-none d-sm-table-cell">
     <% if (teamRanking.lastUpdated) { %>
         <% var lastUpdated = (teamRanking.lastUpdated instanceof Date) ? teamRanking.lastUpdated : new Date(teamRanking.lastUpdated) %>
-        <td><%- moment(lastUpdated).utc().format('MMM D [at] HH:mm [UTC]') %></td>
+        <%- moment(lastUpdated).utc().format('MMM D [at] HH:mm [UTC]') %>
     <% } else { %>
-        <td>n/a</td>
+        n/a
     <% } %>
+    </td>
 </tr>

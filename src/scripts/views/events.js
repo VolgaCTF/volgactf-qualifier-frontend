@@ -2,8 +2,7 @@ import $ from 'jquery'
 import _ from 'underscore'
 import View from './base'
 import renderTemplate from '../utils/render-template'
-import newNavigationBar from '../new-navigation-bar'
-import newStatusBar from '../new-status-bar'
+import newNavigationBar from '../navigation-bar'
 import contestProvider from '../providers/contest'
 import identityProvider from '../providers/identity'
 import moment from 'moment'
@@ -579,10 +578,7 @@ class EventsView extends View {
       )
       .done((identity, contest) => {
         if (identity.isSupervisor()) {
-          identityProvider.subscribe()
-
           newNavigationBar.present({ active: 'events' })
-          newStatusBar.present()
 
           this.subscribeToContestEvents()
           this.subscribeToCategoryEvents()

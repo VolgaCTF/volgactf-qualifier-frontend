@@ -2,8 +2,6 @@ import $ from 'jquery'
 import _ from 'underscore'
 import View from './base'
 import dataStore from '../data-store'
-import newNavigationBar from '../new-navigation-bar'
-import newStatusBar from '../new-status-bar'
 import moment from 'moment'
 import categoryProvider from '../providers/category'
 import contestProvider from '../providers/contest'
@@ -212,55 +210,49 @@ class CategoriesView extends View {
     this.$main = $('#main')
 
     $
-      .when(
-        identityProvider.initIdentity(),
-        categoryProvider.initCategories(),
-        contestProvider.initContest()
-      )
-      .done((identity, categories, contest) => {
-        identityProvider.subscribe()
-        newNavigationBar.present()
-        newStatusBar.present()
-
-        let urlParams = new URLSearchParams(window.location.search)
-        if (urlParams.get('action') === 'scrollTo' && urlParams.has('categoryId')) {
-          let $el = $(`div.themis-category[data-id="${urlParams.get('categoryId')}"]`)
-          if ($el.length > 0) {
-            $el.get(0).scrollIntoView()
-          }
+    .when(
+      categoryProvider.initCategories()
+    )
+    .done((categories) => {
+      let urlParams = new URLSearchParams(window.location.search)
+      if (urlParams.get('action') === 'scrollTo' && urlParams.has('categoryId')) {
+        let $el = $(`div.themis-category[data-id="${urlParams.get('categoryId')}"]`)
+        if ($el.length > 0) {
+          $el.get(0).scrollIntoView()
         }
+      }
 
-        this.initCreateCategoryModal()
-        this.initEditCategoryModal()
-        this.initDeleteCategoryModal()
+      this.initCreateCategoryModal()
+      this.initEditCategoryModal()
+      this.initDeleteCategoryModal()
 
-        this.onCreateCategory = () => {
-          this.renderCategories()
-          return false
-        }
+      this.onCreateCategory = () => {
+        this.renderCategories()
+        return false
+      }
 
-        this.onUpdateCategory = () => {
-          this.renderCategories()
-          return false
-        }
+      this.onUpdateCategory = () => {
+        this.renderCategories()
+        return false
+      }
 
-        this.onDeleteCategory = () => {
-          this.renderCategories()
-          return false
-        }
+      this.onDeleteCategory = () => {
+        this.renderCategories()
+        return false
+      }
 
-        categoryProvider.subscribe()
-        categoryProvider.on('createCategory', this.onCreateCategory)
-        categoryProvider.on('updateCategory', this.onUpdateCategory)
-        categoryProvider.on('deleteCategory', this.onDeleteCategory)
+      categoryProvider.subscribe()
+      categoryProvider.on('createCategory', this.onCreateCategory)
+      categoryProvider.on('updateCategory', this.onUpdateCategory)
+      categoryProvider.on('deleteCategory', this.onDeleteCategory)
 
-        this.onUpdateContest = (contest) => {
-          this.renderCategories()
-          return false
-        }
+      this.onUpdateContest = (contest) => {
+        this.renderCategories()
+        return false
+      }
 
-        contestProvider.on('updateContest', this.onUpdateContest)
-      })
+      contestProvider.on('updateContest', this.onUpdateContest)
+    })
   }
 }
 
