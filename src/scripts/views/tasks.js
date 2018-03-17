@@ -1516,6 +1516,14 @@ class TasksView extends View {
     }
   }
 
+  disposeTooltips () {
+    this.$taskPreviewsList.find('[data-action="show-task-reward-information"]').tooltip('dispose')
+  }
+
+  setupTooltips () {
+    this.$taskPreviewsList.find('[data-action="show-task-reward-information"]').tooltip()
+  }
+
   renderTaskPreviews () {
     const identity = identityProvider.getIdentity()
     let teamTaskHits = []
@@ -1523,6 +1531,7 @@ class TasksView extends View {
       teamTaskHits = _.where(teamTaskHitProvider.getTeamTaskHits(), { teamId: identity.id })
     }
 
+    this.disposeTooltips()
     this.$taskPreviewsList.html(window.themis.quals.templates.taskList({
       _: _,
       templates: window.themis.quals.templates,
@@ -1535,6 +1544,7 @@ class TasksView extends View {
       taskRewardSchemes: taskRewardSchemeProvider.getTaskRewardSchemes(),
       teamTaskHits: teamTaskHits
     }))
+    this.setupTooltips()
   }
 
   present () {
@@ -1577,6 +1587,7 @@ class TasksView extends View {
       }
 
       this.$taskPreviewsList = $('#themis-task-previews')
+      this.setupTooltips()
 
       this.onCreateTaskCategory = (taskCategory) => {
         this.requestRenderTasks()
