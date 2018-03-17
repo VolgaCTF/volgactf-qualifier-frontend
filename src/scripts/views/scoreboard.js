@@ -46,15 +46,13 @@ class ScoreboardView extends View {
     $
     .when(
       teamProvider.initTeams(),
-      teamRankingProvider.initTeamRankings(),
       countryProvider.initCountries()
     )
-    .done((teams, teamRankings, countries) => {
+    .done((teams, countries) => {
       let urlParams = new URLSearchParams(window.location.search)
       this.detailed = urlParams.has('detailed')
 
       teamProvider.subscribe()
-      teamRankingProvider.subscribe()
 
       this.onUpdateTeamRankings = () => {
         this.reloadScoreboard = true

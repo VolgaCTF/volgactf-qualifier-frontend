@@ -55,6 +55,9 @@
             <%= templates.contestStatePartial({ _: _, moment: moment, contest: contest }) %>
         </div>
 
+        <div id="themis-quals-team-ranking">
+        </div>
+
         <ul class="navbar-nav ml-auto">
             <% if (identity.role === 'guest') { %>
             <li class="nav-item <% print((active === 'signin') ? 'active' : ''); %>">

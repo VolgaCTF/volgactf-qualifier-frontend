@@ -4,12 +4,14 @@ import moment from 'moment'
 
 import identityProvider from './providers/identity'
 import contestProvider from './providers/contest'
+import teamRankingProvider from './providers/team-ranking'
 import dataStore from './data-store'
 
 class NavigationBar {
   constructor () {
     this.$streamStateContainer = null
     this.$contestStateContainer = null
+    this.$teamRankingContainer = null
 
     this.streamStateInterval = null
     this.onStreamState = null
@@ -17,6 +19,9 @@ class NavigationBar {
     this.onUpdateContest = null
     this.onUpdateTimer = null
     this.timerInterval = null
+
+    this.onUpdateTeamRankings = null
+    this.teamRankingTemplate = null
 
     dataStore.onConnectedRealtime(() => {
       this.renderStreamState()
@@ -103,6 +108,36 @@ class NavigationBar {
     }
   }
 
+  formatOrdinal (n) {
+    const s = ['th', 'st', 'nd', 'rd']
+    const v = n % 100;
+    return n.toString() + (s[(v - 20) % 10] || s[v] || s[0])
+  }
+
+  renderTeamRanking () {
+    if (!identityProvider.getIdentity().isTeam()) {
+      return
+    }
+    const identityId = identityProvider.getIdentity().id
+    const orderedTeamRankings = _.sortBy(teamRankingProvider.getTeamRankings(), 'position')
+    const ndx = _.findIndex(orderedTeamRankings, function (entry) {
+      return entry.teamId === identityId
+    })
+    if (ndx !== -1) {
+      if (_.isNull(this.teamRankingTemplate)) {
+        this.teamRankingTemplate = _.template('<span class="navbar-text text-info"><span class="oi oi-spreadsheet"></span>&nbsp;<%- rankFormatted %>&nbsp;/&nbsp;<%- score %>&nbsp;pts</span>')
+      }
+
+      this.$teamRankingContainer.html(this.teamRankingTemplate({
+        _: _,
+        rankFormatted: this.formatOrdinal(ndx + 1),
+        score: orderedTeamRankings[ndx].score
+      }))
+    } else {
+      this.$teamRankingContainer.empty()
+    }
+  }
+
   present () {
     const $navbar = $('#themis-navbar')
     const $signout = $navbar.find('a[data-action="signout"]')
@@ -156,6 +191,25 @@ class NavigationBar {
     this.timerInterval = setInterval(this.onUpdateTimer, 15000)
 
     contestProvider.on('updateContest', this.onUpdateContest)
+
+    if (identityProvider.getIdentity().isTeam()) {
+      this.$teamRankingContainer = $('#themis-quals-team-ranking')
+
+      this.onUpdateTeamRankings = (teamRankings) => {
+        this.renderTeamRanking()
+      }
+
+      teamRankingProvider.on('updateTeamRankings', this.onUpdateTeamRankings)
+
+      $
+      .when(teamRankingProvider.fetchTeamRankings())
+      .done((teamRankings) => {
+        this.renderTeamRanking()
+      })
+      .fail((err) => {
+        console.log(err)
+      })
+    }
   }
 }
 

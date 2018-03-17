@@ -33,12 +33,27 @@ class TeamRankingProvider extends EventEmitter {
     realtimeProvider.addEventListener('updateTeamRankings', this.onUpdate)
   }
 
-  initTeamRankings () {
+  fetchTeamRankings () {
     const promise = $.Deferred()
-    this.teamRankings = _.map(window.themis.quals.data.teamRankings, function (options) {
-      return new TeamRankingModel(options)
+
+    $.ajax({
+      url: '/api/team/ranking/index',
+      dataType: 'json',
+      success: (responseJSON, textStatus, jqXHR) => {
+        this.teamRankings = _.map(responseJSON, (options) => {
+          return new TeamRankingModel(options)
+        })
+
+        promise.resolve(this.teamRankings)
+      },
+      error: (jqXHR, textStatus, errorThrown) => {
+        if (jqXHR.responseJSON) {
+          promise.reject(jqXHR.responseJSON)
+        } else {
+          promise.reject('Unknown error. Please try again later.')
+        }
+      }
     })
-    promise.resolve(this.teamRankings)
 
     return promise
   }

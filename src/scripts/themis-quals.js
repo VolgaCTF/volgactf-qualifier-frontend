@@ -24,6 +24,7 @@ import remoteCheckersView from './views/remote-checkers'
 import dataStore from './data-store'
 
 import contestProvider from './providers/contest'
+import teamRankingProvider from './providers/team-ranking'
 import identityProvider from './providers/identity'
 import navigationBar from './navigation-bar'
 
@@ -63,6 +64,7 @@ $(document).ready(function () {
   )
   .done(function (identity, contest) {
     contestProvider.subscribe()
+    teamRankingProvider.subscribe()
     navigationBar.present()
 
     const viewName = window.themis.quals.view
