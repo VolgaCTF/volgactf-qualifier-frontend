@@ -5,6 +5,7 @@ import sub from 'markdown-it-sub'
 import sup from 'markdown-it-sup'
 import ins from 'markdown-it-ins'
 import mark from 'markdown-it-mark'
+import linkAttributes from 'markdown-it-link-attributes'
 
 export default class MarkdownRenderer {
   constructor () {
@@ -15,6 +16,12 @@ export default class MarkdownRenderer {
       .use(ins)
       .use(sup)
       .use(sub)
+      .use(linkAttributes, {
+        attrs: {
+          target: '_blank',
+          rel: 'noopener'
+        }
+      })
 
     this.md.renderer.rules.emoji = (token, idx) => {
       return twemoji.parse(token[idx].content)

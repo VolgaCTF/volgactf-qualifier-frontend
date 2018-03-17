@@ -1,0 +1,9 @@
+<% if (taskFiles.length === 0) { %>
+    <p>No task files have been uploaded yet.</p>
+<% } else { %>
+    <% var sortedTaskFiles = _.sortBy(taskFiles, 'createdAt').reverse() %>
+    <% for (var i=0; i<sortedTaskFiles.length; ++i) { %>
+        <% var taskFile = sortedTaskFiles[i] %>
+        <%= templates.taskFilePartialCompact({ window: window, _: _, taskFile: taskFile, moment: moment }) %>
+    <% } %>
+<% } %>

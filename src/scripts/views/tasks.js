@@ -19,11 +19,15 @@ import 'bootstrap'
 import 'jquery-form'
 import 'parsley'
 
+import ClipboardJS from 'clipboard'
+
 import remoteCheckerProvider from '../providers/remote-checker'
 import taskRemoteCheckerProvider from '../providers/task-remote-checker'
 
 import taskValueProvider from '../providers/task-value'
 import taskRewardSchemeProvider from '../providers/task-reward-scheme'
+
+import taskFileProvider from '../providers/task-file'
 
 class TasksView extends View {
   constructor () {
@@ -57,6 +61,180 @@ class TasksView extends View {
     this.flagRenderingTasks = false
     this.renderTasksInterval = null
     this.onRenderTasks = null
+  }
+
+  initManageTaskFilesModal () {
+    const $modal = $('#manage-task-files-modal')
+    $modal.modal({ show: false })
+
+    const $submitError = $modal.find('.submit-error > p')
+    const $submitSuccess = $modal.find('.submit-success > p')
+    const $submitButton = $modal.find('button[data-action="upload-file"]')
+    const $form = $modal.find('form')
+    $form.parsley({
+      errorClass: 'is-invalid',
+      successClass: 'is-valid',
+      classHandler: function (ParsleyField) {
+        return ParsleyField.$element
+      },
+      errorsContainer: function (ParsleyField) {
+        return ParsleyField.$element.parents('form-group')
+      },
+      errorsWrapper: '<div class="invalid-feedback">',
+      errorTemplate: '<span></span>'
+    })
+
+    const $fileInput = $('#manage-task-files-file')
+    const $nameInput = $('#manage-task-files-name')
+
+    const $progressControl = $('#manage-task-files-progress')
+
+    const $uploadedContainer = $('#manage-task-files-uploaded')
+
+    let clipboard = null
+
+    const updateProgressControl = function (value) {
+      $progressControl.css('width', `${value}%`)
+      $progressControl.attr('aria-valuenow', value)
+    }
+
+    $('input[type="file"]', $form).change(function () {
+      var fieldVal = $(this).val()
+
+      fieldVal = fieldVal.replace('C:\\fakepath\\', '')
+
+      if (typeof fieldVal !== 'undefined' || fieldVal !== '') {
+        $(this).next('.custom-file-label').attr('data-content', fieldVal)
+        $(this).next('.custom-file-label').text(fieldVal)
+        $nameInput.val(fieldVal)
+      } else {
+        $(this).next('.custom-file-label').attr('data-content', '')
+        $(this).next('.custom-file-label').text('Choose file')
+      }
+    })
+
+    $submitButton.on('click', (e) => {
+      $form.trigger('submit')
+    })
+
+    const reloadUploadedList = function () {
+      const taskId = $modal.data('task-id')
+      $uploadedContainer.find('[data-action="copy-to-clipboard"]').tooltip('dispose')
+      if (!_.isNull(clipboard)) {
+        clipboard.destroy()
+      }
+      $
+      .when(
+        taskFileProvider.fetchTaskFilesByTask(taskId)
+      )
+      .done(function (taskFiles) {
+        $uploadedContainer.html(window.themis.quals.templates.taskFileList({
+          window: window,
+          _: _,
+          moment: moment,
+          taskFiles: taskFiles,
+          templates: window.themis.quals.templates
+        }))
+        $uploadedContainer.find('[data-action="copy-to-clipboard"]').tooltip({
+          trigger: 'manual'
+        })
+        clipboard = new ClipboardJS('#manage-task-files-uploaded [data-action="copy-to-clipboard"]', {
+          container: $modal[0]
+        })
+        clipboard.on('success', function (e) {
+          const $btn = $(e.trigger)
+          $btn.tooltip('show')
+          setTimeout(function () {
+            $btn.tooltip('hide')
+          }, 1000)
+        })
+      })
+    }
+
+    const reinitializeForm = function () {
+      $fileInput.val('')
+      $fileInput.trigger('change')
+      $nameInput.val('')
+      updateProgressControl(0)
+
+      $submitError.text('')
+      $form.parsley().reset()
+      $submitButton.prop('disabled', false)
+
+      reloadUploadedList()
+    }
+
+    $modal.on('dblclick', '[data-action="delete-task-file"]', function (e) {
+      const taskId = $modal.data('task-id')
+      const taskFileId = parseInt($(this).attr('data-task-file-id'), 10)
+      const $btn = $(this)
+      $btn.prop('disabled', true)
+
+      $
+      .when(
+        taskFileProvider.deleteTaskFile(taskId, taskFileId, identityProvider.getIdentity().token)
+      )
+      .done(() => {
+        setTimeout(function () {
+          reloadUploadedList()
+        }, 1000)
+      })
+      .fail((err) => {
+        console.log(err)
+        $btn.prop('disabled', false)
+      })
+    })
+
+    $modal.on('show.bs.modal', (e) => {
+      const taskId = parseInt($(e.relatedTarget).data('task-id'), 10)
+      $modal.data('task-id', taskId)
+      $form.attr('action', `/api/task/${taskId}/file/create`)
+      reinitializeForm()
+    })
+
+    $modal.on('shown.bs.modal', (e) => {
+    })
+
+    $form.on('submit', (e) => {
+      e.preventDefault()
+
+      $form.ajaxSubmit({
+        beforeSubmit: () => {
+          $submitError.text('')
+          $submitSuccess.text('')
+          $submitButton.prop('disabled', true)
+        },
+        clearForm: true,
+        dataType: 'json',
+        headers: {
+          'X-CSRF-Token': identityProvider.getIdentity().token
+        },
+        success: (responseText, textStatus, jqXHR) => {
+          $submitSuccess.text('Uploaded!')
+          setTimeout(function () {
+            $submitSuccess.text('')
+            reinitializeForm()
+          }, 1500)
+        },
+        error: (jqXHR, textStatus, errorThrown) => {
+          if (jqXHR.responseJSON) {
+            $submitError.text(jqXHR.responseJSON)
+          } else {
+            if (jqXHR.status === 413) {
+              $submitError.text('Task file size must not exceed 100 Mb.')
+            } else {
+              $submitError.text('Unknown error. Please try again later.')
+            }
+          }
+        },
+        uploadProgress: (e, position, total, percentComplete) => {
+          updateProgressControl(percentComplete)
+        },
+        complete: () => {
+          $submitButton.prop('disabled', false)
+        }
+      })
+    })
   }
 
   initCreateTaskModal () {
@@ -339,6 +517,7 @@ class TasksView extends View {
 
     let $tabList = $('#edit-task-tablist')
     let $tabData = $tabList.find('a[href="#edit-task-data"]')
+    const $tabFiles = $tabList.find('a[href="#edit-task-files"]')
     let $tabPreview = $tabList.find('a[href="#edit-task-preview"]')
 
     let $taskTitle = $('#edit-task-title')
@@ -359,7 +538,11 @@ class TasksView extends View {
 
     let $taskPreview = $('#edit-task-preview')
 
+    const $tabFileContainer = $('#edit-task-files')
+    let clipboard = null
+
     $tabData.tab()
+    $tabFiles.tab()
     $tabPreview.tab()
 
     $taskHints.on('click', 'a[data-action="create-task-hint"]', (e) => {
@@ -511,6 +694,33 @@ class TasksView extends View {
       }))
     })
 
+    const reloadFileList = function (taskFiles) {
+      $tabFileContainer.find('[data-action="copy-to-clipboard"]').tooltip('dispose')
+      if (!_.isNull(clipboard)) {
+        clipboard.destroy()
+      }
+      $tabFileContainer.html(window.themis.quals.templates.taskFileListCompact({
+        window: window,
+        _: _,
+        moment: moment,
+        taskFiles: taskFiles,
+        templates: window.themis.quals.templates
+      }))
+      $tabFileContainer.find('[data-action="copy-to-clipboard"]').tooltip({
+        trigger: 'manual'
+      })
+      clipboard = new ClipboardJS('#edit-task-files [data-action="copy-to-clipboard"]', {
+        container: $modal[0]
+      })
+      clipboard.on('success', function (e) {
+        const $btn = $(e.trigger)
+        $btn.tooltip('show')
+        setTimeout(function () {
+          $btn.tooltip('hide')
+        }, 1000)
+      })
+    }
+
     $modal.on('show.bs.modal', (e) => {
       let taskId = parseInt($(e.relatedTarget).data('task-id'), 10)
       $modal.data('task-id', taskId)
@@ -561,9 +771,10 @@ class TasksView extends View {
           taskProvider.fetchTask(taskId),
           taskCategoryProvider.fetchTaskCategoriesByTask(taskId),
           taskAnswerProvider.fetchTaskAnswersByTask(taskId),
-          taskHintProvider.fetchTaskHintsByTask(taskId)
+          taskHintProvider.fetchTaskHintsByTask(taskId),
+          taskFileProvider.fetchTaskFilesByTask(taskId)
         )
-        .done((task, taskCategories, taskAnswers, taskHints) => {
+        .done((task, taskCategories, taskAnswers, taskHints, taskFiles) => {
           savedTaskAnswers = taskAnswers
           savedTaskHints = taskHints
           $submitButton.prop('disabled', false)
@@ -612,6 +823,8 @@ class TasksView extends View {
               .text(remoteChecker.name))
             })
           }
+
+          reloadFileList(taskFiles)
         })
         .fail((err) => {
           $submitError.text(err)
@@ -1352,6 +1565,7 @@ class TasksView extends View {
         this.initOpenTaskModal()
         this.initCloseTaskModal()
         this.initEditTaskModal()
+        this.initManageTaskFilesModal()
       }
 
       if (identity.isTeam()) {

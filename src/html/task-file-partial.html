@@ -1,0 +1,22 @@
+<div>
+    <header>
+        <h6><%- taskFile.filename %></h6>
+    </header>
+    <footer>
+        <p class="text-muted">
+            <% var createdAt = (taskFile.createdAt instanceof Date) ? taskFile.createdAt : new Date(taskFile.createdAt) %>
+            <small>Created on <%- moment(createdAt).utc().format('MMM D [at] HH:mm [UTC]') %></small>
+            &nbsp;
+            <% var downloadLink = window.location.protocol + '//' + window.location.hostname + '/files/' + taskFile.prefix + '/' + taskFile.filename %>
+            <a class="btn btn-secondary btn-sm" href="<%- downloadLink %>" target="_blank" title="Download" role="button">
+                <span class="oi oi-data-transfer-download"></span>
+            </a>
+            <button type="button" class="btn btn-secondary btn-sm" data-action="copy-to-clipboard" data-clipboard-text="<%- downloadLink %>" title="Copied!">
+                <span class="oi oi-clipboard"></span>
+            </button>
+            <button type="button" class="btn btn-danger btn-sm" data-action="delete-task-file" data-task-file-id="<%- taskFile.id %>" title="Delete">
+                <span class="oi oi-trash"></span>
+            </button>
+        </p>
+    </footer>
+</div>
