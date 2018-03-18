@@ -1,0 +1,5 @@
+<p>
+    <% var eventCreated = (createdAt instanceof Date) ? createdAt : new Date(createdAt) %>
+    <span><code class="text-dark"><%- moment(eventCreated).utc().format('MM/DD HH:mm:ss.SSS [UTC]') %></code>&nbsp;</span>
+    <span class="text-danger">File <strong><%- taskFile.filename %></strong> has been deleted from the task <strong><u><a class="text-danger" href="/tasks?action=show&taskId=<%- task.id %>" target="_blank"><%- task.title %></a></u></strong></span>
+</p>

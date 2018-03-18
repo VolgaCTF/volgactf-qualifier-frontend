@@ -2,8 +2,16 @@ import $ from 'jquery'
 import _ from 'underscore'
 import EventEmitter from 'wolfy87-eventemitter'
 import TaskFileModel from '../models/task-file'
+import dataStore from '../data-store'
+import identityProvider from './identity'
 
 class TaskFileProvider extends EventEmitter {
+  constructor () {
+    super()
+    this.onCreate = null
+    this.onDelete = null
+  }
+
   fetchTaskFilesByTask (taskId) {
     let promise = $.Deferred()
     let url = `/api/task/${taskId}/file/index`
@@ -55,6 +63,31 @@ class TaskFileProvider extends EventEmitter {
     })
 
     return promise
+  }
+
+  subscribe () {
+    if (!dataStore.supportsRealtime()) {
+      return
+    }
+
+    const realtimeProvider = dataStore.getRealtimeProvider()
+    const identity = identityProvider.getIdentity()
+
+    if (identity.isSupervisor()) {
+      this.onCreate = (e) => {
+        const options = JSON.parse(e.data)
+        const taskFile = new TaskFileModel(options)
+        this.trigger('createTaskFile', [taskFile, new Date(options.__metadataCreatedAt)])
+      }
+      realtimeProvider.addEventListener('createTaskFile', this.onCreate)
+
+      this.onDelete = (e) => {
+        const options = JSON.parse(e.data)
+        const taskFile = new TaskFileModel(options)
+        this.trigger('deleteTaskFile', [taskFile, new Date(options.__metadataCreatedAt)])
+      }
+      realtimeProvider.addEventListener('deleteTaskFile', this.onDelete)
+    }
   }
 }
 

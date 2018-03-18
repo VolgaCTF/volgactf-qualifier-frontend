@@ -1,0 +1,7 @@
+<p>
+    <% var eventCreated = (createdAt instanceof Date) ? createdAt : new Date(createdAt) %>
+    <span><code class="text-dark"><%- moment(eventCreated).utc().format('MM/DD HH:mm:ss.SSS [UTC]') %></code>&nbsp;</span>
+    <span class="text-success">
+        Category <strong><u><a class="text-success" href="/categories?action=scrollTo&categoryId=<%- category.id %>" target="_blank"><%- category.title %></a></u></strong> has been created
+    </span>
+</p>

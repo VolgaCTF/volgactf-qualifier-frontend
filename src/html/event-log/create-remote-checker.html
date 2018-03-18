@@ -1,0 +1,7 @@
+<p>
+    <% var eventCreated = (createdAt instanceof Date) ? createdAt : new Date(createdAt) %>
+    <span><code class="text-dark"><%- moment(eventCreated).utc().format('MM/DD HH:mm:ss.SSS [UTC]') %></code>&nbsp;</span>
+    <span class="text-success">
+        Remote checker <strong><u><a class="text-success" href="/remote_checkers?action=scrollTo&remoteCheckerId=<%- remoteChecker.id %>" target="_blank"><%- remoteChecker.name %></a></u></strong> has been created
+    </span>
+</p>

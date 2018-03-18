@@ -9,6 +9,7 @@ import identityProvider from '../providers/identity'
 import 'bootstrap'
 import 'jquery-form'
 import 'parsley'
+import URLSearchParams from 'url-search-params'
 
 class RemoteCheckersView extends View {
   constructor () {
@@ -227,6 +228,14 @@ class RemoteCheckersView extends View {
         this.initCreateRemoteCheckerModal()
         this.initEditRemoteCheckerModal()
         this.initDeleteRemoteCheckerModal()
+      }
+
+      let urlParams = new URLSearchParams(window.location.search)
+      if (urlParams.get('action') === 'scrollTo' && urlParams.has('remoteCheckerId')) {
+        let $el = $(`div.themis-quals-remote-checker[data-id="${urlParams.get('remoteCheckerId')}"]`)
+        if ($el.length > 0) {
+          $el.get(0).scrollIntoView()
+        }
       }
 
       this.onCreateRemoteChecker = () => {

@@ -1,0 +1,7 @@
+<p>
+    <% var eventCreated = (createdAt instanceof Date) ? createdAt : new Date(createdAt) %>
+    <span><code class="text-dark"><%- moment(eventCreated).utc().format('MM/DD HH:mm:ss.SSS [UTC]') %></code>&nbsp;</span>
+    <span class="text-danger">
+        Remote checker <strong><%- remoteChecker.name %></strong> has been deleted
+    </span>
+</p>

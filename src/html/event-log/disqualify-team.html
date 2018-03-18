@@ -1,0 +1,5 @@
+<p>
+    <% var eventCreated = (createdAt instanceof Date) ? createdAt : new Date(createdAt) %>
+    <span><code class="text-dark"><%- moment(eventCreated).utc().format('MM/DD HH:mm:ss.SSS [UTC]') %></code>&nbsp;</span>
+    <span class="text-danger">Team <strong><u><a class="text-danger" href="/team/<%- team.id %>/profile" target="_blank"><%- team.name %></a></u></strong> has been disqualified</span>
+</p>

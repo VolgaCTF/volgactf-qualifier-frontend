@@ -1,0 +1,13 @@
+<p>
+    <% var eventCreated = (createdAt instanceof Date) ? createdAt : new Date(createdAt) %>
+    <span><code class="text-dark"><%- moment(eventCreated).utc().format('MM/DD HH:mm:ss.SSS [UTC]') %></code>&nbsp;</span>
+    <% if (contest.state === 1) { %>
+    <span class="text-secondary">Contest state has been set to <strong>Not started</strong></span>
+    <% } else if (contest.state === 2) { %>
+    <span class="text-success">Contest state has been set to <strong>Started</strong></span>
+    <% } else if (contest.state === 3) { %>
+    <span class="text-warning">Contest state has been set to <strong>Paused</strong></span>
+    <% } else if (contest.state === 4) { %>
+    <span class="text-danger">Contest state has been set to <strong>Finished</strong></span>
+    <% } %>
+</p>

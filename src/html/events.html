@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <title><%- contestTitle %> :: Events</title>
+
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link rel="stylesheet" href="/assets/css/{{#cachebusting}}{{#themis_quals}}{{ css }}{{/themis_quals}}{{/cachebusting}}">
+        {{#partials}}
+        {{#head}}
+        <!--=include {{{path}}} -->
+        {{/head}}
+        {{/partials}}
+
+        <% if (google_tag_id) { %>
+        <%= templates.analytics({ _: _, google_tag_id: google_tag_id }) %>
+        <% } %>
+    </head>
+    <body>
+        <%= templates.navbar({ _: _, active: null, identity: identity, templates: templates, contestTitle: contestTitle, contest: contest, moment: moment }) %>
+
+        <div id="main" class="pb-4">
+            <div class="container">
+                <header>
+                    <h1>Events</h1>
+                </header>
+                <section>
+                    <div id="themis-quals-events">
+                    </div>
+                </section>
+            </div>
+        </div>
+
+        <footer class="footer">
+            {{#partials}}
+            {{#footer}}
+            <!--=include {{{path}}} -->
+            {{/footer}}
+            {{^footer}}
+            <!--=include ../partials/footer.html -->
+            {{/footer}}
+            {{/partials}}
+        </footer>
+
+        <script>
+            window.themis = {
+                quals: {
+                    view: 'events',
+                    data: {
+                        identity: <%= jsesc(identity, { json: true, isScriptContext: true }) %>,
+                        contest: <%= jsesc(contest, { json: true, isScriptContext: true }) %>,
+                        categories: <%= jsesc(categories, { json: true, isScriptContext: true }) %>,
+                        posts: <%= jsesc(posts, { json: true, isScriptContext: true }) %>,
+                        taskPreviews: <%= jsesc(taskPreviews, { json: true, isScriptContext: true }) %>,
+                        taskCategories: <%= jsesc(taskCategories, { json: true, isScriptContext: true }) %>,
+                        taskValues: <%= jsesc(taskValues, { json: true, isScriptContext: true }) %>,
+                        taskRewardSchemes: <%= jsesc(taskRewardSchemes, { json: true, isScriptContext: true}) %>,
+                        remoteCheckers: <%= jsesc(remoteCheckers, { json: true, isScriptContext: true }) %>,
+                        teams: <%= jsesc(teams, { json: true, isScriptContext: true }) %>
+                    },
+                    templates: {
+                        <% for (var templateName in templates) { %>
+                        <% if (templateName === 'analytics' || templateName === 'navbar') continue %>
+                        <%- templateName %>: <%= templates[templateName].source %>,
+                        <% } %>
+                    }
+                }
+            }
+        </script>
+        <script src="/assets/js/{{#cachebusting}}{{#themis_quals}}{{ js }}{{/themis_quals}}{{/cachebusting}}"></script>
+    </body>
+</html>

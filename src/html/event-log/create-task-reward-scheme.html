@@ -1,0 +1,13 @@
+<p>
+    <% var eventCreated = (createdAt instanceof Date) ? createdAt : new Date(createdAt) %>
+    <span><code class="text-dark"><%- moment(eventCreated).utc().format('MM/DD HH:mm:ss.SSS [UTC]') %></code>&nbsp;</span>
+    <span class="text-success">
+        <% var desc = null %>
+        <% if (_.isNull(taskRewardScheme.minValue)) { %>
+            <% var desc = '<strong>fixed</strong> (' + taskRewardScheme.maxValue.toString() + ' pts)' %>
+        <% } else { %>
+            <% var desc = '<strong>variable</strong> (' + taskRewardScheme.minValue.toString() + '&ndash;' + taskRewardScheme.maxValue.toString() + ' pts; decrease by ' + taskRewardScheme.subtractPoints.toString() + ' pts each ' + taskRewardScheme.subtractHitCount.toString() + ' hit' + ((taskRewardScheme.subtractHitCount > 1) ? 's' : '') + ')' %>
+        <% } %>
+        Task <strong><u><a class="text-success" href="/tasks?action=show&taskId=<%- task.id %>" target="_blank"><%- task.title %></a></u></strong> reward scheme has been set to <%= desc %>
+    </span>
+</p>
