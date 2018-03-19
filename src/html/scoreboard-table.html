@@ -1,4 +1,8 @@
 <table class="table table-sm">
+    <caption class="text-secondary" style="caption-side: top">
+        <% var updated = (lastUpdated instanceof Date) ? lastUpdated : new Date(lastUpdated) %>
+        <small>Last updated on <%- moment(updated).utc().format('MMM D [at] HH:mm:ss [UTC]') %></small>
+    </caption>
     <thead>
         <tr>
             <th scope="col">#</th>
@@ -39,4 +43,10 @@
             <%= templates.scoreboardTableRowPartial({ _: _, identity: identity, detailed: detailed, rank: i + 1, teamRanking: entry.teamRanking, team: entry.team, country: entry.country, moment: moment }) %>
         <% } %>
     </tbody>
+    <% if (teamRankings.length > 19) { %>
+    <caption class="text-secondary" style="caption-side: bottom">
+        <% var updated = (lastUpdated instanceof Date) ? lastUpdated : new Date(lastUpdated) %>
+        <small>Last updated on <%- moment(updated).utc().format('MMM D [at] HH:mm:ss [UTC]') %></small>
+    </caption>
+    <% } %>
 </table>

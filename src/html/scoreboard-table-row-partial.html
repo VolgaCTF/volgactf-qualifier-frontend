@@ -15,7 +15,7 @@
     <td class="d-none d-sm-table-cell">
     <% if (teamRanking.lastUpdated) { %>
         <% var lastUpdated = (teamRanking.lastUpdated instanceof Date) ? teamRanking.lastUpdated : new Date(teamRanking.lastUpdated) %>
-        <%- moment(lastUpdated).utc().format('MMM D [at] HH:mm [UTC]') %>
+        <%- moment(lastUpdated).utc().format('MMM D [at] HH:mm:ss [UTC]') %>
     <% } else { %>
         n/a
     <% } %>
