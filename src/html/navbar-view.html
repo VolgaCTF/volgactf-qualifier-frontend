@@ -65,16 +65,16 @@
             </li>
             <% } else { %>
             <li class="nav-item dropdown">
-                <% if (identity.role === 'team') { %>
-                <img class="profile-image d-inline-block" width="32px" height="32px" src="/api/team/<%- identity.id %>/logo">
-                <% } %>
                 <a href="#" class="nav-link dropdown-toggle d-inline-block" data-toggle="dropdown" role="button" aria-expanded="false">
                     <% if (identity.role === 'admin') { %>
                     <span class="badge badge-success">A</span>
                     <% } else if (identity.role === 'manager') { %>
                     <span class="badge badge-primary">M</span>
+                    <% } else if (identity.role === 'team') {%>
+                    <img class="d-inline-block align-middle mr-1" width="32px" height="32px" src="/api/team/<%- identity.id %>/logo">
                     <% } %>
-                    <%- identity.name %>&nbsp;<span class="caret"></span>
+                    <span class="d-inline-block align-middle themis-quals-navbar-identity-name"><%- identity.name %></span>
+                    &nbsp;<span class="caret"></span>
                 </a>
                 <div class="dropdown-menu themis-quals-dropdown-menu" role="menu">
                     <% if (identity.role === 'team') { %>
