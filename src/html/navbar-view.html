@@ -39,6 +39,9 @@
                 </a>
                 <div class="dropdown-menu" aria-labelledby="supervisorDropdown">
                     <a class="dropdown-item" href="/contest">Contest</a>
+                    <% if (identity.role === 'admin') { %>
+                    <a class="dropdown-item" href="/supervisors">Supervisors</a>
+                    <% } %>
                     <a class="dropdown-item" href="/categories">Categories</a>
                     <a class="dropdown-item" href="/remote_checkers">Remote checkers</a>
                     <a class="dropdown-item" href="/events">Events</a>

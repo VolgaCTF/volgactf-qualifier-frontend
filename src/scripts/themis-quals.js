@@ -20,6 +20,8 @@ import defaultView from './views/default'
 import taskStatisticsView from './views/task/statistics'
 import contestView from './views/contest'
 import remoteCheckersView from './views/remote-checkers'
+import supervisorsView from './views/supervisors'
+import supervisorCreateView from './views/supervisor/create'
 
 import dataStore from './data-store'
 
@@ -55,6 +57,9 @@ $(document).ready(function () {
     taskStatistics: taskStatisticsView,
 
     supervisorSignin: supervisorSigninView,
+    supervisorCreate: supervisorCreateView,
+    supervisors: supervisorsView,
+
     default: defaultView
   }
 
