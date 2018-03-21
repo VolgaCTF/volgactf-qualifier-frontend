@@ -18,6 +18,7 @@ import URLSearchParams from 'url-search-params'
 import 'bootstrap'
 import 'jquery-form'
 import 'parsley'
+import 'tempusdominius-bootstrap-4'
 
 import ClipboardJS from 'clipboard'
 
@@ -269,6 +270,8 @@ class TasksView extends View {
     let $taskDescription = $('#create-task-description')
     let $categories = $('#create-categories')
 
+    const $openAt = $('#create-open-at')
+
     let $taskHints = $('#create-task-hints')
     let $taskHintList = $('#create-task-hint-list')
 
@@ -286,6 +289,31 @@ class TasksView extends View {
 
     $tabData.tab()
     $tabPreview.tab()
+
+    const pickerFormat = 'D MMM YYYY [at] HH:mm'
+
+    const icons = {
+      time: 'oi oi-clock',
+      date: 'oi oi-calendar',
+      up: 'oi oi-chevron-top',
+      down: 'oi oi-chevron-bottom',
+      previous: 'oi oi-chevron-left',
+      next: 'oi oi-chevron-right',
+      today: 'oi oi-check',
+      clear: 'oi oi-trash',
+      close: 'oi oi-x'
+    }
+
+    $openAt.datetimepicker({
+      showClose: true,
+      sideBySide: true,
+      format: pickerFormat,
+      icons: icons
+    })
+
+    $('#create-open-at-clear').on('click', (e) => {
+      $openAt.datetimepicker('clear')
+    })
 
     $taskHints.on('click', 'a[data-action="create-task-hint"]', (e) => {
       e.preventDefault()
@@ -425,6 +453,7 @@ class TasksView extends View {
       $tabData.tab('show')
       $taskTitle.val('')
       $taskDescription.val('')
+      $openAt.datetimepicker('clear')
 
       $categories.empty()
       _.each(categoryProvider.getCategories(), (category) => {
@@ -455,7 +484,7 @@ class TasksView extends View {
 
     $form.on('submit', (e) => {
       e.preventDefault()
-
+      const valOpenAt = $openAt.datetimepicker('date')
       $form.ajaxSubmit({
         beforeSubmit: () => {
           $submitError.text('')
@@ -466,7 +495,8 @@ class TasksView extends View {
         data: {
           hints: getHints(),
           answers: getAnswers(),
-          reward: getReward()
+          reward: getReward(),
+          openAt: (valOpenAt) ? valOpenAt.seconds(0).milliseconds(0).valueOf() : null
         },
         headers: {
           'X-CSRF-Token': identityProvider.getIdentity().token
@@ -524,6 +554,8 @@ class TasksView extends View {
     let $taskDescription = $('#edit-task-description')
     let $categories = $('#edit-categories')
 
+    const $openAt = $('#edit-open-at')
+
     const $taskRewardScheme = $('#edit-task-reward-scheme')
     const $taskRewardSchemeFixed = $('#edit-task-reward-scheme-fixed')
     const $taskRewardSchemeVariable = $('#edit-task-reward-scheme-variable')
@@ -544,6 +576,33 @@ class TasksView extends View {
     $tabData.tab()
     $tabFiles.tab()
     $tabPreview.tab()
+
+    const pickerFormat = 'D MMM YYYY [at] HH:mm'
+
+    const icons = {
+      time: 'oi oi-clock',
+      date: 'oi oi-calendar',
+      up: 'oi oi-chevron-top',
+      down: 'oi oi-chevron-bottom',
+      previous: 'oi oi-chevron-left',
+      next: 'oi oi-chevron-right',
+      today: 'oi oi-check',
+      clear: 'oi oi-trash',
+      close: 'oi oi-x'
+    }
+
+    $openAt.datetimepicker({
+      showClose: true,
+      sideBySide: true,
+      format: pickerFormat,
+      icons: icons
+    })
+
+    $('#edit-open-at-clear').on('click', (e) => {
+      if (!$openAt.find('input').prop('disabled')) {
+        $openAt.datetimepicker('clear')
+      }
+    })
 
     $taskHints.on('click', 'a[data-action="create-task-hint"]', (e) => {
       e.preventDefault()
@@ -728,6 +787,7 @@ class TasksView extends View {
       $tabData.tab('show')
       $taskTitle.val('')
       $taskDescription.val('')
+      $openAt.datetimepicker('clear')
 
       $categories.empty()
       _.each(categoryProvider.getCategories(), (category) => {
@@ -781,6 +841,8 @@ class TasksView extends View {
 
           $taskTitle.val(task.title)
           $taskDescription.val(task.description)
+          $openAt.datetimepicker('date', task.openAt)
+          $openAt.datetimepicker((task.state === 1) ? 'enable' : 'disable')
 
           $categories.val(taskCategories.map((taskCategory) => {
             return taskCategory.categoryId
@@ -837,6 +899,7 @@ class TasksView extends View {
 
     $form.on('submit', (e) => {
       e.preventDefault()
+      const valOpenAt = $openAt.datetimepicker('date')
 
       const taskId = $modal.data('task-id')
       let checkMethod = 'list'
@@ -855,7 +918,8 @@ class TasksView extends View {
           checkMethod: checkMethod,
           hints: getHints(),
           answers: getAnswers(),
-          reward: getReward()
+          reward: getReward(),
+          openAt: (valOpenAt) ? valOpenAt.seconds(0).milliseconds(0).valueOf() : null
         },
         headers: {
           'X-CSRF-Token': identityProvider.getIdentity().token
@@ -1534,6 +1598,7 @@ class TasksView extends View {
     this.disposeTooltips()
     this.$taskPreviewsList.html(window.themis.quals.templates.taskList({
       _: _,
+      moment: moment,
       templates: window.themis.quals.templates,
       identity: identity,
       contest: contestProvider.getContest(),

@@ -36,7 +36,7 @@
                     </div>
                     <% } %>
                     <div id="themis-task-previews">
-                        <%= templates.taskList({ _: _, templates: templates, identity: identity, contest: contest, categories: categories, taskPreviews: taskPreviews, taskCategories: taskCategories, taskValues: taskValues, taskRewardSchemes: taskRewardSchemes, teamTaskHits: teamTaskHits }) %>
+                        <%= templates.taskList({ _: _, moment: moment, templates: templates, identity: identity, contest: contest, categories: categories, taskPreviews: taskPreviews, taskCategories: taskCategories, taskValues: taskValues, taskRewardSchemes: taskRewardSchemes, teamTaskHits: teamTaskHits }) %>
                     </div>
                 </section>
             </div>
@@ -280,6 +280,24 @@
                                                             </label>
                                                             <select class="form-control" multiple size="8" id="create-categories" required name="categories"></select>
                                                         </div>
+                                                        <div class="form-group">
+                                                            <label for="create-open-at" class="control-label">
+                                                                <strong>Opening schedule</strong>
+                                                            </label>
+                                                            <div class="input-group date" id="create-open-at" data-target-input="nearest">
+                                                                <input type="text" class="form-control datetimepicker-input" data-target="#create-open-at">
+                                                                <div class="input-group-append" data-target="#create-open-at" data-toggle="datetimepicker">
+                                                                    <span class="input-group-text">
+                                                                        <span class="oi oi-calendar"></span>
+                                                                    </span>
+                                                                </div>
+                                                                <div class="input-group-append" id="create-open-at-clear">
+                                                                    <span class="input-group-text">
+                                                                        <span class="oi oi-x"></span>
+                                                                    </span>
+                                                                </div>
+                                                            </div>
+                                                        </div>
                                                     </div>
                                                     <div class="col-sm-6">
                                                         <div class="form-group" id="create-task-reward-scheme">
@@ -390,6 +408,24 @@
                                                                 <strong>Categories</strong>
                                                             </label>
                                                             <select class="form-control" multiple size="8" id="edit-categories" required name="categories"></select>
+                                                        </div>
+                                                        <div class="form-group">
+                                                            <label for="edit-open-at" class="control-label">
+                                                                <strong>Opening schedule</strong>
+                                                            </label>
+                                                            <div class="input-group date" id="edit-open-at" data-target-input="nearest">
+                                                                <input type="text" class="form-control datetimepicker-input" data-target="#edit-open-at">
+                                                                <div class="input-group-append" data-target="#edit-open-at" data-toggle="datetimepicker">
+                                                                    <span class="input-group-text">
+                                                                        <span class="oi oi-calendar"></span>
+                                                                    </span>
+                                                                </div>
+                                                                <div class="input-group-append" id="edit-open-at-clear">
+                                                                    <span class="input-group-text">
+                                                                        <span class="oi oi-x"></span>
+                                                                    </span>
+                                                                </div>
+                                                            </div>
                                                         </div>
                                                     </div>
                                                     <div class="col-sm-6">

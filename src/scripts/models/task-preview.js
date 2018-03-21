@@ -6,6 +6,7 @@ export default class TaskPreviewModel {
     this.updatedAt = new Date(options.updatedAt)
     this.categories = options.categories
     this.state = options.state
+    this.openAt = options.openAt ? new Date(options.openAt) : null
   }
 
   isInitial () {

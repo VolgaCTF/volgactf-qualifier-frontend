@@ -62,6 +62,14 @@
         <% } %>
         </div>
     </div>
+    <% if ((identity.role === 'admin' || identity.role === 'manager') && task.state === 1 && !_.isNull(task.openAt)) { %>
+    <div class="card-body" style="padding: 0.25rem">
+        <% var openAt = (task.openAt instanceof Date) ? task.openAt : new Date(task.openAt) %>
+        <small class="text-primary">
+            <span class="oi oi-clock"></span>&nbsp;due to open on <%- moment(openAt).utc().format('MMM D [at] HH:mm [UTC]') %>
+        </small>
+    </div>
+    <% } %>
     <div class="card-footer pointer" data-task-id="<%- task.id %>" data-toggle="modal" data-target="#<%- submitAnswerModal %>">
         <% var sortedTaskCategories = _.sortBy(taskCategories, 'createdAt') %>
         <% for (var i=0; i<sortedTaskCategories.length; ++i) { %>

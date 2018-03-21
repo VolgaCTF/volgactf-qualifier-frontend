@@ -51,7 +51,7 @@
             <% var filteredTaskCategories = _.where(taskCategories, { taskId: entry.task.id }) %>
             <% var taskValue = _.findWhere(taskValues, { taskId: entry.task.id }) %>
             <% var taskRewardScheme = _.findWhere(taskRewardSchemes, { taskId: entry.task.id }) %>
-            <%= templates.taskCard({ _: _, identity: identity, contest: contest, task: entry.task, categories: categories, taskCategories: filteredTaskCategories, taskValue: taskValue, taskRewardScheme: taskRewardScheme, solved: entry.solved }) %>
+            <%= templates.taskCard({ _: _, moment: moment, identity: identity, contest: contest, task: entry.task, categories: categories, taskCategories: filteredTaskCategories, taskValue: taskValue, taskRewardScheme: taskRewardScheme, solved: entry.solved }) %>
         </div>
         <% } %>
     </div>
