@@ -46,9 +46,12 @@ class SupervisorProvider extends EventEmitter {
     realtimeProvider.addEventListener('updateSupervisorPassword', this.onUpdatePassword)
 
     this.onLogin = (e) => {
-      let options = JSON.parse(e.data)
-      let supervisor = new SupervisorModel(options)
-      this.trigger('loginSupervisor', [supervisor, new Date(options.__metadataCreatedAt)])
+      const options = JSON.parse(e.data)
+      const obj = {
+        supervisor: new SupervisorModel(options.supervisor),
+        geoIP: options.geoIP
+      }
+      this.trigger('loginSupervisor', [obj, new Date(options.__metadataCreatedAt)])
     }
 
     realtimeProvider.addEventListener('loginSupervisor', this.onLogin)

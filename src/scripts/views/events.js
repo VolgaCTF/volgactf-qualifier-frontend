@@ -178,7 +178,8 @@ class EventsView extends View {
           _: _,
           moment: moment,
           createdAt: createdAt,
-          supervisor: eventData
+          supervisor: eventData.supervisor,
+          geoIP: eventData.geoIP
         }))
         break
       }
@@ -402,7 +403,8 @@ class EventsView extends View {
           _: _,
           moment: moment,
           createdAt: createdAt,
-          team: eventData
+          team: eventData.team,
+          geoIP: eventData.geoIP
         }))
         break
       }

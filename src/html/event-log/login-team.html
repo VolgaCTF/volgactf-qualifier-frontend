@@ -1,5 +1,9 @@
 <p>
     <% var eventCreated = (createdAt instanceof Date) ? createdAt : new Date(createdAt) %>
     <span><code class="text-dark"><%- moment(eventCreated).utc().format('MM/DD HH:mm:ss.SSS [UTC]') %></code>&nbsp;</span>
-    <span class="text-primary">Team <strong><u><a class="text-primary" href="/team/<%- team.id %>/profile" target="_blank"><%- team.name %></a></u></strong> has logged in</span>
+    <% var hasCountryName = geoIP.countryName.length > 0 && geoIP.countryName !== '-' %>
+    <% var hasCityName = geoIP.cityName.length > 0 && geoIP.cityName !== '-' %>
+    <span class="text-primary">
+        Team <strong><u><a class="text-primary" href="/team/<%- team.id %>/profile" target="_blank"><%- team.name %></a></u></strong> has logged in<% if (hasCountryName || hasCityName) { %>&nbsp;from<% if (hasCityName) { %>&nbsp;<%- geoIP.cityName %><% } %><% if (hasCountryName) { %><% if (hasCityName) { %>,<% } %>&nbsp;<%- geoIP.countryName %><% } %><% } %>
+    </span>
 </p>

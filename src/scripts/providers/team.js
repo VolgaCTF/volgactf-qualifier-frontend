@@ -114,9 +114,12 @@ class TeamProvider extends EventEmitter {
       realtimeProvider.addEventListener('updateTeamPassword', this.onUpdatePassword)
 
       this.onLogin = (e) => {
-        let options = JSON.parse(e.data)
-        let team = new TeamModel(options)
-        this.trigger('loginTeam', [team, new Date(options.__metadataCreatedAt)])
+        const options = JSON.parse(e.data)
+        const obj = {
+          team: new TeamModel(options.team),
+          geoIP: options.geoIP
+        }
+        this.trigger('loginTeam', [obj, new Date(options.__metadataCreatedAt)])
       }
 
       realtimeProvider.addEventListener('loginTeam', this.onLogin)
