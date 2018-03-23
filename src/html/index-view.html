@@ -1,0 +1,57 @@
+<div class="container">
+    <% if (identity.role === 'guest') { %>
+    <div class="jumbotron mt-4">
+        {{#partials}}
+        {{#intro}}
+        <!--=include {{{path}}} -->
+        {{/intro}}
+        {{^intro}}
+        <!--=include ../partials/intro.html -->
+        {{/intro}}
+        {{/partials}}
+        <p>
+            <% if (contest.state !== 4) { %>
+            <a class="btn btn-primary btn-lg" href="/team/signup" role="button">Sign up</a>
+            <% } %>
+            <a class="btn btn-success btn-lg" href="/team/signin" role="button">Sign in</a>
+        </p>
+    </div>
+    <% } else if (identity.role === 'team') { %>
+    <% if (!identity.emailConfirmed) { %>
+    <!--=include ../partials/alert_email_verification.html -->
+    <% } %>
+    <h1>Welcome!</h1>
+    <% if (contest.state === 1) { %>
+    <p class="lead">
+        <%- contestTitle %> has not started yet.
+    </p>
+    <% } else if (contest.state === 2 || contest.state === 3) { %>
+    <p class="lead">
+        <%- contestTitle %> has started!
+    </p>
+    <% } else if (contest.state === 4) { %>
+    <p class="lead">
+        <%- contestTitle %> has finished!
+    </p>
+    <% } %>
+    <ul class="lead list-unstyled">
+        <li><a href="/team/<%- identity.id %>/profile">Team profile</a></li>
+        <li><a href="/news">News</a></li>
+        <% if (contest.state === 2 || contest.state === 3 || contest.state === 4) { %>
+        <li><a href="/scoreboard">Scoreboard</a></li>
+        <li><a href="/tasks">Tasks</a></li>
+        <% } %>
+    </ul>
+    <% } else if (identity.role === 'admin' || identity.role === 'manager') { %>
+    <h1>Welcome!</h1>
+    <ul class="lead list-unstyled">
+        <li><a href="/scoreboard">Scoreboard</a></li>
+        <li><a href="/news">News management</a></li>
+        <% if (identity.role === 'admin') { %>
+        <li><a href="/categories">Category management</a></li>
+        <li><a href="/tasks">Task management</a></li>
+        <% } %>
+        <li><a href="/events">Event log</a></li>
+    </ul>
+    <% } %>
+</div>

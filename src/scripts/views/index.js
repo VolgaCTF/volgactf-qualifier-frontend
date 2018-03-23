@@ -1,5 +1,9 @@
+import _ from 'underscore'
+import $ from 'jquery'
+import moment from 'moment'
 import View from './base'
 import contestProvider from '../providers/contest'
+import identityProvider from '../providers/identity'
 
 class IndexView extends View {
   constructor () {
@@ -8,6 +12,13 @@ class IndexView extends View {
   }
 
   render () {
+    $('#main').html(window.themis.quals.templates.indexView({
+      _: _,
+      moment: moment,
+      identity: identityProvider.getIdentity(),
+      contest: contestProvider.getContest(),
+      contestTitle: window.themis.quals.data.contestTitle
+    }))
   }
 
   present () {
