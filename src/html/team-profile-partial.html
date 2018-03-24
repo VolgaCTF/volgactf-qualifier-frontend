@@ -2,10 +2,10 @@
 <header class="themis-profile mt-4">
     <% if (sameTeam) { %>
     <a href="#" title="Click to upload new logo" data-action="upload-logo" data-toggle="modal" data-target="#upload-logo-modal">
-        <img class="img-thumbnail align-middle mr-2" src="/api/team/<%- team.id %>/logo">
+        <img class="img-thumbnail align-middle mr-2" src="/team/logo/<%- team.id %>.png">
     </a>
     <% } else { %>
-        <img class="img-thumbnail align-middle mr-2" src="/api/team/<%- team.id %>/logo">
+        <img class="img-thumbnail align-middle mr-2" src="/team/logo/<%- team.id %>.png">
     <% } %>
 
     <h1 class="d-inline align-middle">

@@ -8,7 +8,7 @@
         &nbsp;<a href="/team/<%- team.id %>/profile" class="themis-quals-team-profile-link" title="More information"><small><span class="oi oi-external-link"></span></small></a>
     </h5>
     <p class="card-text">
-        <img id="team-<%- team.id %>-logo" class="img-thumbnail" src="/api/team/<%- team.id %>/logo">
+        <img id="team-<%- team.id %>-logo" class="img-thumbnail" src="/team/logo/<%- team.id %>.png">
     </p>
     <p class="card-text text-secondary">
         <% var createdAt = (team.createdAt instanceof Date) ? team.createdAt : new Date(team.createdAt) %>

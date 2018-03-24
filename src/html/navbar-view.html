@@ -74,7 +74,7 @@
                     <% } else if (identity.role === 'manager') { %>
                     <span class="badge badge-primary">M</span>
                     <% } else if (identity.role === 'team') {%>
-                    <img class="d-inline-block align-middle mr-1" width="32px" height="32px" src="/api/team/<%- identity.id %>/logo">
+                    <img class="d-inline-block align-middle mr-1" width="32px" height="32px" src="/team/logo/<%- identity.id %>.png">
                     <% } %>
                     <span class="d-inline-block align-middle themis-quals-navbar-identity-name"><%- identity.name %></span>
                     &nbsp;<span class="caret"></span>

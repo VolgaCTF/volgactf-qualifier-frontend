@@ -55,7 +55,7 @@ class TeamsView extends View {
         setTimeout(() => {
           let el = document.getElementById(`team-${teamId}-logo`)
           if (el) {
-            el.setAttribute('src', `/api/team/${teamId}/logo?timestamp=${(new Date()).getTime()}`)
+            el.setAttribute('src', `/team/logo/${teamId}.png?timestamp=${(new Date()).getTime()}`)
           }
         }, 500)
         return false

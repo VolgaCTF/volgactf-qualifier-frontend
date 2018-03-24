@@ -2,7 +2,7 @@
 <tr class="themis-scoreboard-row<% print(highlight ? ' table-primary': ''); %>">
     <th scope="row"><%- rank %></th>
     <td>
-        <img id="team-<%- team.id %>-logo" class="themis-scoreboard-logo" src="/api/team/<%- team.id %>/logo">
+        <img id="team-<%- team.id %>-logo" class="themis-scoreboard-logo" src="/team/logo/<%- team.id %>.png">
         &nbsp;
         <a href="/team/<%- team.id %>/profile" class="themis-team-link"><%- team.name %></a>
     </td>
