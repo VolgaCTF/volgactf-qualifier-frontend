@@ -1,7 +1,7 @@
 <% var highlight = identity.role === 'team' && identity.id === team.id %>
-<% var displaySmCls = printLayout ? '' : 'd-none d-sm-table-cell' %>
-<% var displayMdCls = printLayout ? '' : 'd-none d-md-table-cell' %>
-<% var displayLgCls = printLayout ? '' : 'd-none d-lg-table-cell' %>
+<% var displaySmCls = printLayout ? 'themis-quals-whitespace-nowrap' : 'd-none d-sm-table-cell' %>
+<% var displayMdCls = printLayout ? 'themis-quals-whitespace-nowrap' : 'd-none d-md-table-cell' %>
+<% var displayLgCls = printLayout ? 'themis-quals-whitespace-nowrap' : 'd-none d-lg-table-cell' %>
 <tr class="themis-scoreboard-row<% print(highlight ? ' table-primary': ''); %>">
     <th scope="row"><%- rank %></th>
     <td>
@@ -15,7 +15,7 @@
     <td class="<%- displayLgCls %>"><%- team.institution %></td>
     <% } %>
     <td><%- teamRanking.score %></td>
-    <td class="<%- displaySmCls %> themis-quals-whitespace-nowrap">
+    <td class="<%- displaySmCls %>">
     <% if (teamRanking.lastUpdated) { %>
         <% var lastUpdated = (teamRanking.lastUpdated instanceof Date) ? teamRanking.lastUpdated : new Date(teamRanking.lastUpdated) %>
         <%- moment(lastUpdated).utc().format('MMM D [at] HH:mm:ss [UTC]') %>
