@@ -40,7 +40,7 @@
 
         <% for (var i=0; i<entries.length; ++i) { %>
             <% var entry = entries[i] %>
-            <%= templates.scoreboardTableRowPartial({ _: _, identity: identity, detailed: detailed, rank: i + 1, teamRanking: entry.teamRanking, team: entry.team, country: entry.country, moment: moment }) %>
+            <%= templates.scoreboardTableRowPartial({ _: _, identity: identity, detailed: detailed, printLayout: printLayout, rank: i + 1, teamRanking: entry.teamRanking, team: entry.team, country: entry.country, moment: moment }) %>
         <% } %>
     </tbody>
     <% if (teamRankings.length > 19) { %>
