@@ -37,6 +37,7 @@ class ScoreboardView extends View {
       teamRankings: teamRankingProvider.getTeamRankings(),
       countries: countryProvider.getCountries(),
       identity: identityProvider.getIdentity(),
+      printLayout: false,
       lastUpdated: new Date()
     }))
   }
