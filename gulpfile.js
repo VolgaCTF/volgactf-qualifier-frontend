@@ -7,7 +7,6 @@ const mustache = require('gulp-mustache')
 const sass = require('gulp-sass')
 const uglify = require('gulp-uglify')
 const minifyCSS = require('gulp-minify-css')
-// const minifyHTML = require('gulp-minify-html')
 const rev = require('gulp-rev')
 const concatCss = require('gulp-concat-css')
 
@@ -280,7 +279,7 @@ gulp.task('images', function (cb) {
   })
 })
 
-gulp.task('default', ['fonts', 'images', 'scripts', 'stylesheets'], function (cb) {
+gulp.task('html', function (cb) {
   let opts = {
     partials: {}
   }
@@ -369,7 +368,6 @@ gulp.task('default', ['fonts', 'images', 'scripts', 'stylesheets'], function (cb
           ]
         }))
         .on('error', console.log)
-        // .pipe(gulpIf(isProduction, minifyHTML()))
         .pipe(gulp.dest(path.join(buildDir, 'html')))
         .on('end', callback)
     },
@@ -390,3 +388,6 @@ gulp.task('default', ['fonts', 'images', 'scripts', 'stylesheets'], function (cb
     }
   })
 })
+
+gulp.task('default', gulp.series('fonts', 'images', 'scripts', 'stylesheets', 'html'))
+
