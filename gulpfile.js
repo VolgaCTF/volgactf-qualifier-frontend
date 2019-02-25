@@ -1,5 +1,3 @@
-require('dotenv').config()
-
 const gulp = require('gulp')
 const gulpIf = require('gulp-if')
 const plumber = require('gulp-plumber')
