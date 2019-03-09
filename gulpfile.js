@@ -21,6 +21,9 @@ const async = require('async')
 const axios = require('axios')
 const remoteSrc = require('gulp-remote-src')
 const tmp = require('tmp')
+const zopfli = require('gulp-zopfli-node')
+const brotli = require('gulp-brotli')
+const filter = require('gulp-filter')
 
 const customizerHost = process.env.THEMIS_QUALS_CUSTOMIZER_HOST || '127.0.0.1'
 const customizerPort = parseInt(process.env.THEMIS_QUALS_CUSTOMIZER_PORT || '7037', 10)
@@ -46,8 +49,8 @@ const paths = {
   html: 'src/html'
 }
 
-function isProduction () {
-  return process.env.NODE_ENV === 'production'
+function isOptimize () {
+  return process.env.OPTIMIZE === 'yes'
 }
 
 function isSass (file) {
@@ -55,35 +58,92 @@ function isSass (file) {
 }
 
 gulp.task('scripts', function (cb) {
-  async.series([
-    function (callback) {
-      del([path.join(buildDir, 'assets', 'js', '*')], callback)
-    },
-    function (callback) {
-      browserify({
-        entries: paths.scripts,
-        extensions: ['.js'],
-        debug: !isProduction()
-      })
-        .transform(babelify)
-        .bundle()
-        .pipe(source('themis-quals.js'))
-        .pipe(buffer())
-        .pipe(plumber())
-        .pipe(gulpIf(isProduction, uglify()))
-        .pipe(gulp.dest(path.join(buildDir, 'assets', 'js')))
-        .pipe(rev())
-        .pipe(gulp.dest(path.join(buildDir, 'assets', 'js')))
-        .pipe(rev.manifest('manifest.json'))
-        .pipe(gulp.dest(path.join(buildDir, 'assets', 'js')))
+  let tmpDir = null
+  const sequence = []
+
+  sequence.push(function (callback) {
+    tmp.dir({}, function (err, tmpPath, cleanupCallback) {
+      if (err) {
+        callback(err)
+      } else {
+        tmpDir = tmpPath
+        callback()
+      }
+    })
+  })
+
+  sequence.push(function (callback) {
+    del([path.join(buildDir, 'assets', 'js', '*')], callback)
+  })
+
+  sequence.push(function (callback) {
+    browserify({
+      entries: paths.scripts,
+      extensions: ['.js'],
+      debug: !isOptimize()
+    })
+      .transform(babelify)
+      .bundle()
+      .pipe(source('themis-quals.js'))
+      .pipe(buffer())
+      .pipe(plumber())
+      .pipe(gulpIf(isOptimize, uglify()))
+      .pipe(gulp.dest(tmpDir))
+      .pipe(rev())
+      .pipe(gulp.dest(tmpDir))
+      .pipe(rev.manifest('manifest.json'))
+      .pipe(gulp.dest(path.join(buildDir, 'assets', 'js')))
+      .on('end', callback)
+  })
+
+  sequence.push(function (callback) {
+    del([
+      path.join(tmpDir, 'themis-quals.js')
+    ], {
+      force: true
+    }, callback)
+  })
+
+  if (isOptimize()) {
+    sequence.push(function (callback) {
+      gulp
+        .src([
+          path.join(tmpDir, '*.js')
+        ])
+        .pipe(zopfli())
+        .pipe(gulp.dest(tmpDir))
         .on('end', callback)
-    },
-    function (callback) {
-      del([
-        path.join(buildDir, 'assets', 'js', 'themis-quals.js')
-      ], callback)
-    }
-  ], function (err, values) {
+    })
+    sequence.push(function (callback) {
+      gulp
+        .src([
+          path.join(tmpDir, '*.js')
+        ])
+        .pipe(brotli.compress({ skipLarger: true }))
+        .pipe(gulp.dest(tmpDir))
+        .on('end', callback)
+    })
+  }
+
+
+  sequence.push(function (callback) {
+    gulp
+      .src([
+        path.join(tmpDir, '*')
+      ])
+      .pipe(gulp.dest(path.join(buildDir, 'assets', 'js')))
+      .on('end', callback)
+  })
+
+  sequence.push(function (callback) {
+    del([
+      tmpDir
+    ], {
+      force: true
+    }, callback)
+  })
+
+  async.series(sequence, function (err, values) {
     if (err) {
       cb(err)
     } else {
@@ -95,68 +155,125 @@ gulp.task('scripts', function (cb) {
 gulp.task('stylesheets', function (cb) {
   let customizerIndex = null
   let tmpDir = null
-  async.series([
-    function (callback) {
-      tmp.dir({}, function (err, tmpPath, cleanupCallback) {
-        if (err) {
-          callback(err)
-        } else {
-          tmpDir = tmpPath
-          callback()
-        }
+  let tmpDir2 = null
+  const sequence = []
+
+  sequence.push(function (callback) {
+    tmp.dir({}, function (err, tmpPath, cleanupCallback) {
+      if (err) {
+        callback(err)
+      } else {
+        tmpDir = tmpPath
+        callback()
+      }
+    })
+  })
+
+  sequence.push(function (callback) {
+    tmp.dir({}, function (err, tmpPath, cleanupCallback) {
+      if (err) {
+        callback(err)
+      } else {
+        tmpDir2 = tmpPath
+        callback()
+      }
+    })
+  })
+
+  sequence.push(function (callback) {
+    del([
+      path.join(buildDir, 'assets', 'css', '*')
+    ], callback)
+  })
+
+  sequence.push(function (callback) {
+    axios.get(`http://${customizerHost}:${customizerPort}/assets/index/stylesheets`)
+      .then(function (response) {
+        customizerIndex = response.data
+        callback()
       })
-    },
-    function (callback) {
-      del([
-        path.join(buildDir, 'assets', 'css', '*')
-      ], callback)
-    },
-    function (callback) {
-      axios.get(`http://${customizerHost}:${customizerPort}/assets/index/stylesheets`)
-        .then(function (response) {
-          customizerIndex = response.data
-          callback()
-        })
-        .catch(function (err) {
-          callback(err)
-        })
-    },
-    function (callback) {
-      remoteSrc(customizerIndex, {
-        base: `http://${customizerHost}:${customizerPort}/assets/stylesheets/`
+      .catch(function (err) {
+        callback(err)
       })
-        .pipe(gulp.dest(tmpDir))
-        .on('end', callback)
-    },
-    function (callback) {
+  })
+
+  sequence.push(function (callback) {
+    remoteSrc(customizerIndex, {
+      base: `http://${customizerHost}:${customizerPort}/assets/stylesheets/`
+    })
+      .pipe(gulp.dest(tmpDir))
+      .on('end', callback)
+  })
+
+  sequence.push(function (callback) {
+    gulp
+      .src(paths.stylesheets.concat(customizerIndex.map(function (filename) {
+        return path.join(tmpDir, filename)
+      })))
+      .pipe(gulpIf(isSass, sass({
+        indentedSyntax: true,
+        errLogToConsole: true
+      })))
+      .pipe(concatCss('themis-quals.css', {
+        rebaseUrls: false
+      }))
+      .pipe(gulpIf(isOptimize, minifyCSS()))
+      .pipe(gulp.dest(tmpDir2))
+      .pipe(rev())
+      .pipe(gulp.dest(tmpDir2))
+      .pipe(rev.manifest('manifest.json'))
+      .pipe(gulp.dest(path.join(buildDir, 'assets', 'css')))
+      .on('end', callback)
+  })
+
+  sequence.push(function (callback) {
+    del([
+      path.join(tmpDir2, 'themis-quals.css')
+    ], {
+      force: true
+    }, callback)
+  })
+
+  if (isOptimize()) {
+    sequence.push(function (callback) {
       gulp
-        .src(paths.stylesheets.concat(customizerIndex.map(function (filename) {
-          return path.join(tmpDir, filename)
-        })))
-        .pipe(gulpIf(isSass, sass({
-          indentedSyntax: true,
-          errLogToConsole: true
-        })))
-        .pipe(concatCss('themis-quals.css', {
-          rebaseUrls: false
-        }))
-        .pipe(gulpIf(isProduction, minifyCSS()))
-        .pipe(gulp.dest(path.join(buildDir, 'assets', 'css')))
-        .pipe(rev())
-        .pipe(gulp.dest(path.join(buildDir, 'assets', 'css')))
-        .pipe(rev.manifest('manifest.json'))
-        .pipe(gulp.dest(path.join(buildDir, 'assets', 'css')))
+        .src([
+          path.join(tmpDir2, '*.css')
+        ])
+        .pipe(zopfli())
+        .pipe(gulp.dest(tmpDir2))
         .on('end', callback)
-    },
-    function (callback) {
-      del([
-        path.join(buildDir, 'assets', 'css', 'themis-quals.css'),
-        tmpDir
-      ], {
-        force: true
-      }, callback)
-    }
-  ], function (err, values) {
+    })
+    sequence.push(function (callback) {
+      gulp
+        .src([
+          path.join(tmpDir2, '*.css')
+        ])
+        .pipe(brotli.compress({ skipLarger: true }))
+        .pipe(gulp.dest(tmpDir2))
+        .on('end', callback)
+    })
+  }
+
+  sequence.push(function (callback) {
+    gulp
+      .src([
+        path.join(tmpDir2, '*')
+      ])
+      .pipe(gulp.dest(path.join(buildDir, 'assets', 'css')))
+      .on('end', callback)
+  })
+
+  sequence.push(function (callback) {
+    del([
+      tmpDir,
+      tmpDir2
+    ], {
+      force: true
+    }, callback)
+  })
+
+  async.series(sequence, function (err, values) {
     if (err) {
       cb(err)
     } else {
@@ -168,51 +285,91 @@ gulp.task('stylesheets', function (cb) {
 gulp.task('fonts', function (cb) {
   let customizerIndex = null
   let tmpDir = null
-  async.series([
-    function (callback) {
-      tmp.dir({}, function (err, tmpPath, cleanupCallback) {
-        if (err) {
-          callback(err)
-        } else {
-          tmpDir = tmpPath
-          callback()
-        }
+  const sequence = []
+
+  sequence.push(function (callback) {
+    tmp.dir({}, function (err, tmpPath, cleanupCallback) {
+      if (err) {
+        callback(err)
+      } else {
+        tmpDir = tmpPath
+        callback()
+      }
+    })
+  })
+
+  sequence.push(function (callback) {
+    del([
+      path.join(buildDir, 'assets', 'fonts', '*')
+    ], callback)
+  })
+
+  sequence.push(function (callback) {
+    axios.get(`http://${customizerHost}:${customizerPort}/assets/index/fonts`)
+      .then(function (response) {
+        customizerIndex = response.data
+        callback()
       })
-    },
-    function (callback) {
-      del([
-        path.join(buildDir, 'assets', 'fonts', '*')
-      ], callback)
-    },
-    function (callback) {
-      axios.get(`http://${customizerHost}:${customizerPort}/assets/index/fonts`)
-        .then(function (response) {
-          customizerIndex = response.data
-          callback()
-        })
-        .catch(function (err) {
-          callback(err)
-        })
-    },
-    function (callback) {
-      remoteSrc(customizerIndex, {
-        base: `http://${customizerHost}:${customizerPort}/assets/fonts/`
+      .catch(function (err) {
+        callback(err)
       })
-        .pipe(gulp.dest(tmpDir))
-        .on('end', callback)
-    },
-    function (callback) {
+  })
+
+  sequence.push(function (callback) {
+    remoteSrc(customizerIndex, {
+      base: `http://${customizerHost}:${customizerPort}/assets/fonts/`
+    })
+      .pipe(gulp.dest(tmpDir))
+      .on('end', callback)
+  })
+
+  sequence.push(function (callback) {
+    gulp
+      .src(paths.fonts.concat(customizerIndex.map(function (filename) {
+        return path.join(tmpDir, filename)
+      })))
+      .pipe(gulp.dest(path.join(buildDir, 'assets', 'fonts')))
+      .on('end', callback)
+  })
+
+  if (isOptimize()) {
+    sequence.push(function (callback) {
       gulp
         .src(paths.fonts.concat(customizerIndex.map(function (filename) {
           return path.join(tmpDir, filename)
         })))
+        .pipe(filter([
+          '**/*.eot',
+          '**/*.otf',
+          '**/*.ttf',
+          '**/*.svg'
+        ]))
+        .pipe(zopfli())
         .pipe(gulp.dest(path.join(buildDir, 'assets', 'fonts')))
         .on('end', callback)
-    },
-    function (callback) {
-      del([tmpDir], { force: true }, callback)
-    }
-  ], function (err, values) {
+    }) 
+    sequence.push(function (callback) {
+      gulp
+        .src(paths.fonts.concat(customizerIndex.map(function (filename) {
+          return path.join(tmpDir, filename)
+        })))
+        .pipe(filter([
+          '**/*.eot',
+          '**/*.otf',
+          '**/*.ttf',
+          '**/*.svg'
+        ]))
+        .pipe(brotli.compress({ skipLarger: true }))
+        .pipe(gulp.dest(path.join(buildDir, 'assets', 'fonts')))
+        .on('end', callback)
+    })
+  }
+
+  sequence.push(function (callback) {
+    del([tmpDir], { force: true }, callback)
+  })
+
+  async.series(sequence, function (err, values) {
     if (err) {
       cb(err)
     } else {
