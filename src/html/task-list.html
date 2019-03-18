@@ -18,11 +18,13 @@
             weight = solved ? 4 : 3
         }
         var createdAt = (taskPreview.createdAt instanceof Date) ? taskPreview.createdAt : new Date(taskPreview.createdAt)
+        var subscribed = (identity.role === 'admin' || identity.role === 'manager') && _.findWhere(supervisorTaskSubscriptions, { supervisorId: identity.id, taskId: taskPreview.id })
         return {
             task: taskPreview,
             solved: solved,
             weight: weight,
-            created: createdAt.getTime()
+            created: createdAt.getTime(),
+            subscribed: subscribed
         }
     }) %>
 
@@ -51,7 +53,7 @@
             <% var filteredTaskCategories = _.where(taskCategories, { taskId: entry.task.id }) %>
             <% var taskValue = _.findWhere(taskValues, { taskId: entry.task.id }) %>
             <% var taskRewardScheme = _.findWhere(taskRewardSchemes, { taskId: entry.task.id }) %>
-            <%= templates.taskCard({ _: _, moment: moment, identity: identity, contest: contest, task: entry.task, categories: categories, taskCategories: filteredTaskCategories, taskValue: taskValue, taskRewardScheme: taskRewardScheme, solved: entry.solved }) %>
+            <%= templates.taskCard({ _: _, moment: moment, identity: identity, contest: contest, task: entry.task, categories: categories, taskCategories: filteredTaskCategories, taskValue: taskValue, taskRewardScheme: taskRewardScheme, solved: entry.solved, subscribed: entry.subscribed }) %>
         </div>
         <% } %>
     </div>

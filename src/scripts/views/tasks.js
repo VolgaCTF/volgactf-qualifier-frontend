@@ -64,6 +64,128 @@ class TasksView extends View {
     this.onRenderTasks = null
   }
 
+  initSubscribeTaskModal () {
+    let $modal = $('#subscribe-task-modal')
+    $modal.modal({ show: false })
+
+    let $submitError = $modal.find('.submit-error > p')
+    let $submitSuccess = $modal.find('.submit-success > p')
+    let $submitButton = $modal.find('button[data-action="complete-subscribe-task"]')
+    let $form = $modal.find('form')
+
+    $submitButton.on('click', (e) => {
+      $form.trigger('submit')
+    })
+
+    $modal.on('show.bs.modal', (e) => {
+      const taskId = parseInt($(e.relatedTarget).data('task-id'), 10)
+      $modal.data('task-id', taskId)
+      $('#subscribe-task-email').val(identityProvider.getIdentity().email)
+      $submitError.text('')
+      $submitSuccess.text('')
+      $submitButton.show()
+    })
+
+    $modal.on('shown.bs.modal', (e) => {
+      $('#subscribe-task-email').focus()
+    })
+
+    $form.on('submit', (e) => {
+      e.preventDefault()
+      const taskId = $modal.data('task-id')
+      const url = `/api/task/${taskId}/subscribe`
+
+      $.ajax({
+        url: url,
+        type: 'POST',
+        dataType: 'json',
+        data: {},
+        headers: {
+          'X-CSRF-Token': identityProvider.getIdentity().token
+        },
+        success: (responseJSON, textStatus, jqXHR) => {
+          $submitButton.hide()
+          $submitSuccess.text('Subscribed to new reviews')
+          let reloadPage = () => {
+            window.location.reload()
+          }
+          setTimeout(reloadPage, 1000)
+        },
+        error: (jqXHR, textStatus, errorThrown) => {
+          if (jqXHR.responseJSON) {
+            $submitError.text(jqXHR.responseJSON)
+          } else {
+            $submitError.text('Unknown error. Please try again later.')
+          }
+        },
+        complete: () => {
+          $submitButton.prop('disabled', false)
+        }
+      })
+    })
+  }
+
+  initUnsubscribeTaskModal () {
+    let $modal = $('#unsubscribe-task-modal')
+    $modal.modal({ show: false })
+
+    let $submitError = $modal.find('.submit-error > p')
+    let $submitSuccess = $modal.find('.submit-success > p')
+    let $submitButton = $modal.find('button[data-action="complete-unsubscribe-task"]')
+    let $form = $modal.find('form')
+
+    $submitButton.on('click', (e) => {
+      $form.trigger('submit')
+    })
+
+    $modal.on('show.bs.modal', (e) => {
+      const taskId = parseInt($(e.relatedTarget).data('task-id'), 10)
+      $modal.data('task-id', taskId)
+      $('#unsubscribe-task-email').val(identityProvider.getIdentity().email)
+      $submitError.text('')
+      $submitSuccess.text('')
+      $submitButton.show()
+    })
+
+    $modal.on('shown.bs.modal', (e) => {
+      $('#unsubscribe-task-email').focus()
+    })
+
+    $form.on('submit', (e) => {
+      e.preventDefault()
+      const taskId = $modal.data('task-id')
+      const url = `/api/task/${taskId}/unsubscribe`
+
+      $.ajax({
+        url: url,
+        type: 'POST',
+        dataType: 'json',
+        data: {},
+        headers: {
+          'X-CSRF-Token': identityProvider.getIdentity().token
+        },
+        success: (responseJSON, textStatus, jqXHR) => {
+          $submitButton.hide()
+          $submitSuccess.text('Unsubscribed from new reviews')
+          let reloadPage = () => {
+            window.location.reload()
+          }
+          setTimeout(reloadPage, 1000)
+        },
+        error: (jqXHR, textStatus, errorThrown) => {
+          if (jqXHR.responseJSON) {
+            $submitError.text(jqXHR.responseJSON)
+          } else {
+            $submitError.text('Unknown error. Please try again later.')
+          }
+        },
+        complete: () => {
+          $submitButton.prop('disabled', false)
+        }
+      })
+    })
+  }
+
   initManageTaskFilesModal () {
     const $modal = $('#manage-task-files-modal')
     $modal.modal({ show: false })
@@ -1607,7 +1729,8 @@ class TasksView extends View {
       taskCategories: taskCategoryProvider.getTaskCategories(),
       taskValues: taskValueProvider.getTaskValues(),
       taskRewardSchemes: taskRewardSchemeProvider.getTaskRewardSchemes(),
-      teamTaskHits: teamTaskHits
+      teamTaskHits: teamTaskHits,
+      supervisorTaskSubscriptions: window.themis.quals.data.supervisorTaskSubscriptions
     }))
     this.setupTooltips()
   }
@@ -1641,6 +1764,11 @@ class TasksView extends View {
         this.initCloseTaskModal()
         this.initEditTaskModal()
         this.initManageTaskFilesModal()
+      }
+
+      if (identity.isAdmin() || identity.isManager()) {
+        this.initSubscribeTaskModal()
+        this.initUnsubscribeTaskModal()
       }
 
       if (identity.isTeam()) {

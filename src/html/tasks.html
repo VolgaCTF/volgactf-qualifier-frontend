@@ -36,7 +36,8 @@
                     </div>
                     <% } %>
                     <div id="themis-task-previews">
-                        <%= templates.taskList({ _: _, moment: moment, templates: templates, identity: identity, contest: contest, categories: categories, taskPreviews: taskPreviews, taskCategories: taskCategories, taskValues: taskValues, taskRewardSchemes: taskRewardSchemes, teamTaskHits: teamTaskHits }) %>
+                        <%= templates.taskList({ _: _, moment: moment, templates: templates, identity: identity, contest: contest, categories: categories, taskPreviews: taskPreviews, taskCategories: taskCategories, taskValues: taskValues, taskRewardSchemes: taskRewardSchemes, teamTaskHits: teamTaskHits,
+                        supervisorTaskSubscriptions: supervisorTaskSubscriptions }) %>
                     </div>
                 </section>
             </div>
@@ -150,6 +151,68 @@
             <% } %>
 
             <% if (identity.role === 'admin' || identity.role === 'manager') { %>
+            <div class="modal fade" id="subscribe-task-modal" tabindex="-1" role="dialog">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title">Subscribe to new reviews</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <form method="POST" novalidate>
+                                <div class="form-group">
+                                    <label for="subscribe-task-email" class="control-label">Email</label>
+                                    <input type="email" class="form-control" id="subscribe-task-email" disabled readonly>
+                                </div>
+                                <div class="submit-error">
+                                    <p class="text-danger"></p>
+                                </div>
+                                <div class="submit-success">
+                                    <p class="text-success"></p>
+                                </div>
+                            </form>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                            <button type="button" class="btn btn-primary" data-action="complete-subscribe-task">Subscribe</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal fade" id="unsubscribe-task-modal" tabindex="-1" role="dialog">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title">Unsubscribe from new reviews</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <form method="POST" novalidate>
+                                <div class="form-group">
+                                    <label for="unsubscribe-task-email" class="control-label">Email</label>
+                                    <input type="email" class="form-control" id="unsubscribe-task-email" disabled readonly>
+                                </div>
+                                <div class="submit-error">
+                                    <p class="text-danger"></p>
+                                </div>
+                                <div class="submit-success">
+                                    <p class="text-success"></p>
+                                </div>
+                            </form>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                            <button type="button" class="btn btn-primary" data-action="complete-unsubscribe-task">Unsubscribe</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <div class="modal fade" id="revise-task-modal" tabindex="-1" role="dialog">
                 <div class="modal-dialog">
                     <div class="modal-content">
@@ -578,6 +641,7 @@
                         taskValues: <%= jsesc(taskValues, { json: true, isScriptContext: true }) %>,
                         taskRewardSchemes: <%= jsesc(taskRewardSchemes, { json: true, isScriptContext: true}) %>,
                         teamTaskHits: <%= jsesc(teamTaskHits, { json: true, isScriptContext: true }) %>,
+                        supervisorTaskSubscriptions: <%= jsesc(supervisorTaskSubscriptions, { json: true, isScriptContext: true }) %>,
                         remoteCheckers: <%= jsesc(remoteCheckers, { json: true, isScriptContext: true }) %>,
                         taskRemoteCheckers: <%= jsesc(taskRemoteCheckers, { json: true, isScriptContext: true }) %>
                     },

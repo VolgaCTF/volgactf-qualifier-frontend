@@ -3,6 +3,7 @@ export default class IdentityModel {
     this.id = options.id || null  // admin, manager, team
     this.role = options.role
     this.name = options.name || null  // admin, manager, team
+    this.email = options.email || null
     this.emailConfirmed = options.emailConfirmed || null  // team
     this.token = options.token
   }
