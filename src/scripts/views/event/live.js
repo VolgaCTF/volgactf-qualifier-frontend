@@ -1,25 +1,25 @@
 import $ from 'jquery'
 import _ from 'underscore'
-import View from './base'
-import contestProvider from '../providers/contest'
-import identityProvider from '../providers/identity'
+import View from '../base'
+import contestProvider from '../../providers/contest'
+import identityProvider from '../../providers/identity'
 import moment from 'moment'
-import categoryProvider from '../providers/category'
-import postProvider from '../providers/post'
-import supervisorProvider from '../providers/supervisor'
-import taskProvider from '../providers/task'
-import taskCategoryProvider from '../providers/task-category'
-import teamProvider from '../providers/team'
-import teamTaskReviewProvider from '../providers/team-task-review'
-import teamTaskHitProvider from '../providers/team-task-hit'
+import categoryProvider from '../../providers/category'
+import postProvider from '../../providers/post'
+import supervisorProvider from '../../providers/supervisor'
+import taskProvider from '../../providers/task'
+import taskCategoryProvider from '../../providers/task-category'
+import teamProvider from '../../providers/team'
+import teamTaskReviewProvider from '../../providers/team-task-review'
+import teamTaskHitProvider from '../../providers/team-task-hit'
 
-import taskValueProvider from '../providers/task-value'
-import taskRewardSchemeProvider from '../providers/task-reward-scheme'
-import taskFileProvider from '../providers/task-file'
+import taskValueProvider from '../../providers/task-value'
+import taskRewardSchemeProvider from '../../providers/task-reward-scheme'
+import taskFileProvider from '../../providers/task-file'
 
-import remoteCheckerProvider from '../providers/remote-checker'
+import remoteCheckerProvider from '../../providers/remote-checker'
 
-class EventsView extends View {
+class EventsLiveView extends View {
   constructor () {
     super()
     this.$main = null
@@ -865,4 +865,4 @@ class EventsView extends View {
   }
 }
 
-export default new EventsView()
+export default new EventsLiveView()

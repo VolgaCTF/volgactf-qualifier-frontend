@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
     <head>
-        <title><%- contestTitle %> :: Events</title>
+        <title><%- contestTitle %> :: Events live</title>
 
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -22,7 +22,7 @@
         <div id="main" class="pb-4">
             <div class="container">
                 <header>
-                    <h1>Events</h1>
+                    <h1>Events <span class="text-danger">live</span></h1>
                 </header>
                 <section>
                     <div id="themis-quals-events">
@@ -45,7 +45,7 @@
         <script>
             window.themis = {
                 quals: {
-                    view: 'events',
+                    view: 'eventsLive',
                     data: {
                         identity: <%= jsesc(identity, { json: true, isScriptContext: true }) %>,
                         contest: <%= jsesc(contest, { json: true, isScriptContext: true }) %>,

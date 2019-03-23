@@ -13,7 +13,7 @@ import teamsView from './views/teams'
 import categoriesView from './views/categories'
 import tasksView from './views/tasks'
 import scoreboardView from './views/scoreboard'
-import eventsView from './views/events'
+import eventsLiveView from './views/event/live'
 import teamRestoreView from './views/team/restore'
 import teamResetPasswordView from './views/team/reset-password'
 import defaultView from './views/default'
@@ -45,7 +45,7 @@ $(document).ready(function () {
     categories: categoriesView,
     contest: contestView,
     remoteCheckers: remoteCheckersView,
-    events: eventsView,
+    eventsLive: eventsLiveView,
 
     teamSignin: teamSigninView,
     teamSignup: teamSignupView,
