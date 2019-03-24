@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
     <head>
-        <title><%- contestTitle %> :: Events live</title>
+        <title><%- contestTitle %> :: Event history</title>
 
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -22,7 +22,7 @@
         <div id="main" class="pb-4">
             <div class="container">
                 <header>
-                    <h1>Events <span class="text-danger">live</span></h1>
+                    <h1>Event history</h1>
                 </header>
                 <section>
                     <div id="themis-quals-events">
@@ -45,7 +45,7 @@
         <script>
             window.themis = {
                 quals: {
-                    view: 'eventLive',
+                    view: 'eventHistory',
                     data: {
                         identity: <%= jsesc(identity, { json: true, isScriptContext: true }) %>,
                         contest: <%= jsesc(contest, { json: true, isScriptContext: true }) %>,
@@ -56,7 +56,8 @@
                         taskValues: <%= jsesc(taskValues, { json: true, isScriptContext: true }) %>,
                         taskRewardSchemes: <%= jsesc(taskRewardSchemes, { json: true, isScriptContext: true}) %>,
                         remoteCheckers: <%= jsesc(remoteCheckers, { json: true, isScriptContext: true }) %>,
-                        teams: <%= jsesc(teams, { json: true, isScriptContext: true }) %>
+                        teams: <%= jsesc(teams, { json: true, isScriptContext: true }) %>,
+                        fetchThreshold: <%= jsesc(fetchThreshold, { json: true, isScriptContext: true }) %>,
                     },
                     templates: {
                         <% for (var templateName in templates) { %>

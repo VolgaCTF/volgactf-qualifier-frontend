@@ -1,0 +1,42 @@
+<nav>
+  <ul class="pagination">
+    <% var numPages = Math.floor(numEntries / pageSize) + (numEntries % pageSize > 0 ? 1 : 0) %>
+    <% var nextLinkClass = (page < numPages) ? '' : ' disabled' %>
+    <% var numPrevItems = 3 %>
+    <% var numNextItems = 3 %>
+
+    <% if (page > 1) { %>
+    <li class="page-item"><a class="page-link" href="#" data-action="load" data-page="<%- page - 1 %>">Previous</a></li>
+    <% } else { %>
+    <li class="page-item disabled"><a class="page-link" href="#">Previous</a></li>
+    <% } %>
+
+    <% for (var i = 1; i <= numPages; ++i) { %>
+      <% if (i < page) { %>
+        <% if (i === 1) { %>
+          <li class="page-item"><a class="page-link" href="#" data-action="load" data-page="<%- i %>"><%- i %></a></li>
+        <% } else if (page - i <= numPrevItems) { %>
+          <li class="page-item"><a class="page-link" href="#" data-action="load" data-page="<%- i %>"><%- i %></a></li>
+        <% } else if (page - i === numPrevItems + 1) { %>
+          <li class="page-item disabled"><a class="page-link" href="#">&hellip;</a></li>
+        <% } %>
+      <% } else if (i > page) { %>
+        <% if (i === numPages) { %>
+          <li class="page-item"><a class="page-link" href="#" data-action="load" data-page="<%- i %>"><%- i %></a></li>
+        <% } else if (i - page <= numNextItems) { %>
+          <li class="page-item"><a class="page-link" href="#" data-action="load" data-page="<%- i %>"><%- i %></a></li>
+        <% } else if (i - page === numNextItems + 1) { %>
+          <li class="page-item disabled"><a class="page-link" href="#">&hellip;</a></li>
+        <% } %>
+      <% } else { %>
+        <li class="page-item active"><a class="page-link" href="#"><%- i %></a></li>
+      <% } %>
+    <% } %>
+
+    <% if (page < numPages) { %>
+    <li class="page-item"><a class="page-link" href="#" data-action="load" data-page="<%- page + 1 %>">Next</a></li>
+    <% } else { %>
+    <li class="page-item disabled"><a class="page-link" href="#">Next</a></li>
+    <% } %>
+  </ul>
+</nav>
