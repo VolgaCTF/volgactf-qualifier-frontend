@@ -40,6 +40,11 @@
                         supervisorTaskSubscriptions: supervisorTaskSubscriptions }) %>
                     </div>
                 </section>
+                {{#partials}}
+                {{#competition_partners}}
+                <!--=include {{{path}}} -->
+                {{/competition_partners}}
+                {{/partials}}
             </div>
 
             <% if (identity.role === 'team') { %>

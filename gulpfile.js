@@ -347,7 +347,7 @@ gulp.task('fonts', function (cb) {
         .pipe(zopfli())
         .pipe(gulp.dest(path.join(buildDir, 'assets', 'fonts')))
         .on('end', callback)
-    }) 
+    })
     sequence.push(function (callback) {
       gulp
         .src(paths.fonts.concat(customizerIndex.map(function (filename) {
