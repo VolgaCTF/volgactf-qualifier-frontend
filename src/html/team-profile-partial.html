@@ -111,7 +111,7 @@
                 <% var taskValue = null %>
                 <% for (var i=0; i<sortedTeamTaskHits.length; ++i) { %>
                     <% task = _.findWhere(tasks, { id: sortedTeamTaskHits[i].taskId }) %>
-                    <% taskValue = _.findWhere(taskValues, { id: sortedTeamTaskHits[i].taskId }) %>
+                    <% taskValue = _.findWhere(taskValues, { taskId: sortedTeamTaskHits[i].taskId }) %>
                     <% if (task && taskValue) { %>
                     <tr>
                         <th scope="row"><% print(i + 1) %></th>
