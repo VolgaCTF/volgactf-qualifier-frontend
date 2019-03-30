@@ -567,7 +567,10 @@ class TasksView extends View {
     $taskRewardScheme.on('change', () => {
       const scheme = $('input[type="radio"]:checked', $taskRewardScheme).val()
       $taskRewardSchemeGroup.html(window.themis.quals.templates.createTaskRewardSchemePartial({
-        rewardScheme: scheme
+        _: _,
+        rewardScheme: scheme,
+        taskMinValue: window.themis.quals.data.taskMinValue,
+        taskMaxValue: window.themis.quals.data.taskMaxValue
       }))
     })
 
@@ -593,7 +596,10 @@ class TasksView extends View {
       $taskRewardSchemeFixed.prop('checked', true)
       $taskRewardSchemeVariable.prop('checked', false)
       $taskRewardSchemeGroup.html(window.themis.quals.templates.createTaskRewardSchemePartial({
-        rewardScheme: 'fixed'
+        _: _,
+        rewardScheme: 'fixed',
+        taskMinValue: window.themis.quals.data.taskMinValue,
+        taskMaxValue: window.themis.quals.data.taskMaxValue
       }))
 
       $submitError.text('')
@@ -870,8 +876,11 @@ class TasksView extends View {
       const taskId = $modal.data('task-id')
       const taskRewardScheme = _.findWhere(taskRewardSchemeProvider.getTaskRewardSchemes(), { taskId: taskId })
       $taskRewardSchemeGroup.html(window.themis.quals.templates.editTaskRewardSchemePartial({
+        _: _,
         rewardScheme: scheme,
-        taskRewardScheme: taskRewardScheme
+        taskRewardScheme: taskRewardScheme,
+        taskMinValue: window.themis.quals.data.taskMinValue,
+        taskMaxValue: window.themis.quals.data.taskMaxValue
       }))
     })
 
@@ -924,8 +933,11 @@ class TasksView extends View {
       $taskRewardSchemeFixed.prop('checked', rewardScheme === 'fixed')
       $taskRewardSchemeVariable.prop('checked', rewardScheme === 'variable')
       $taskRewardSchemeGroup.html(window.themis.quals.templates.editTaskRewardSchemePartial({
+        _: _,
         rewardScheme: rewardScheme,
-        taskRewardScheme: taskRewardScheme
+        taskRewardScheme: taskRewardScheme,
+        taskMinValue: window.themis.quals.data.taskMinValue,
+        taskMaxValue: window.themis.quals.data.taskMaxValue
       }))
 
       $taskHintList.empty()
