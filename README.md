@@ -1,5 +1,5 @@
 # VolgaCTF Qualifier frontend
-Frontend for VolgaCTF Qualifier events.
+VolgaCTF Qualifier platform frontend.
 
 [![js-standard-style](https://cdn.rawgit.com/feross/standard/master/badge.svg)](https://github.com/feross/standard)
 
