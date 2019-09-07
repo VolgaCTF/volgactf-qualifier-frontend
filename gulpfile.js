@@ -21,7 +21,7 @@ const async = require('async')
 const axios = require('axios')
 const remoteSrc = require('gulp-remote-src')
 const tmp = require('tmp')
-const zopfli = require('gulp-zopfli-node')
+const zopfli = require('gulp-zopfli-green')
 const brotli = require('gulp-brotli')
 const filter = require('gulp-filter')
 
