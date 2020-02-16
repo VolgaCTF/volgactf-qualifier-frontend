@@ -13,7 +13,7 @@ class TeamSignupView extends View {
   }
 
   initSignupForm () {
-    let $form = this.$main.find('form.themis-form-signup')
+    let $form = this.$main.find('form.volgactf-form-signup')
     $form.parsley({
       errorClass: 'is-invalid',
       successClass: 'is-valid',
@@ -29,7 +29,7 @@ class TeamSignupView extends View {
 
     $form.find('input[name="team"]').focus()
 
-    let $successAlert = this.$main.find('div.themis-alert-signup')
+    let $successAlert = this.$main.find('div.volgactf-alert-signup')
 
     let $submitError = $form.find('.submit-error > p')
     let $submitButton = $form.find('button')

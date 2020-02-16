@@ -1,9 +1,7 @@
 import $ from 'jquery'
-import _ from 'underscore'
 import EventBaseView from './base'
 import contestProvider from '../../providers/contest'
 import identityProvider from '../../providers/identity'
-import moment from 'moment'
 import categoryProvider from '../../providers/category'
 import postProvider from '../../providers/post'
 import supervisorProvider from '../../providers/supervisor'
@@ -437,7 +435,7 @@ class EventLiveView extends EventBaseView {
       this.subscribeToTeamTaskHitEvents()
       this.subscribeToTaskFileEvents()
 
-      this.container = document.getElementById('themis-quals-events')
+      this.container = document.getElementById('volgactf-qualifier-events')
     })
   }
 }

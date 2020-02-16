@@ -28,11 +28,11 @@ class ScoreboardView extends View {
   }
 
   renderScoreboard () {
-    this.$main.find('section').html(window.themis.quals.templates.scoreboardTable({
+    this.$main.find('section').html(window.volgactf.qualifier.templates.scoreboardTable({
       _: _,
       moment: moment,
       detailed: this.detailed,
-      templates: window.themis.quals.templates,
+      templates: window.volgactf.qualifier.templates,
       teams: teamProvider.getTeams(),
       teamRankings: teamRankingProvider.getTeamRankings(),
       countries: countryProvider.getCountries(),

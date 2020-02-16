@@ -21,12 +21,12 @@ class TeamsView extends View {
   renderTeams () {
     let countries = countryProvider.getCountries()
     let teams = teamProvider.getTeams()
-    this.$main.find('.themis-team-count').text(`(${teams.length})`)
-    this.$main.find('section').html(window.themis.quals.templates.teamList({
+    this.$main.find('.volgactf-team-count').text(`(${teams.length})`)
+    this.$main.find('section').html(window.volgactf.qualifier.templates.teamList({
       _: _,
       teams: teams,
       countries: countries,
-      templates: window.themis.quals.templates
+      templates: window.volgactf.qualifier.templates
     }))
   }
 

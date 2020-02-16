@@ -56,7 +56,7 @@ class NavigationBar {
         $prevSpan.tooltip('dispose')
       }
       this.$streamStateContainer.attr('data-stream-state', curState)
-      this.$streamStateContainer.html(window.themis.quals.templates.streamStatePartial({
+      this.$streamStateContainer.html(window.volgactf.qualifier.templates.streamStatePartial({
         _: _,
         state: curState
       }))
@@ -71,7 +71,7 @@ class NavigationBar {
     const prevState = this.$contestStateContainer.attr('data-contest-state')
     const prevLabel = this.$contestStateContainer.attr('data-contest-label')
 
-    const $curHtml = $(window.themis.quals.templates.contestStatePartial({
+    const $curHtml = $(window.volgactf.qualifier.templates.contestStatePartial({
       _: _,
       contest: contestProvider.getContest(),
       moment: moment
@@ -139,7 +139,7 @@ class NavigationBar {
   }
 
   present () {
-    const $navbar = $('#themis-navbar')
+    const $navbar = $('#volgactf-navbar')
     const $signout = $navbar.find('a[data-action="signout"]')
 
     if ($signout.length > 0) {
@@ -169,7 +169,7 @@ class NavigationBar {
       })
     }
 
-    this.$streamStateContainer = $('#themis-quals-stream-state')
+    this.$streamStateContainer = $('#volgactf-qualifier-stream-state')
     this.renderStreamState()
 
     this.onStreamState = () => {
@@ -177,7 +177,7 @@ class NavigationBar {
     }
     this.streamStateInterval = setInterval(this.onStreamState, 1000)
 
-    this.$contestStateContainer = $('#themis-quals-contest-state')
+    this.$contestStateContainer = $('#volgactf-qualifier-contest-state')
     this.renderContestState(true)
 
     this.onUpdateContest = (e) => {
@@ -193,7 +193,7 @@ class NavigationBar {
     contestProvider.on('updateContest', this.onUpdateContest)
 
     if (identityProvider.getIdentity().isTeam()) {
-      this.$teamRankingContainer = $('#themis-quals-team-ranking')
+      this.$teamRankingContainer = $('#volgactf-qualifier-team-ranking')
 
       this.onUpdateTeamRankings = (teamRankings) => {
         this.renderTeamRanking()

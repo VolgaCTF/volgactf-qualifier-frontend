@@ -5,7 +5,7 @@
 
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
-        <link rel="stylesheet" href="/assets/css/{{#cachebusting}}{{#themis_quals}}{{ css }}{{/themis_quals}}{{/cachebusting}}">
+        <link rel="stylesheet" href="/assets/css/{{#cachebusting}}{{#volgactf_qualifier}}{{ css }}{{/volgactf_qualifier}}{{/cachebusting}}">
         {{#partials}}
         {{#head}}
         <!--=include {{{path}}} -->
@@ -22,7 +22,7 @@
         <div id="main" class="pb-4">
             <div class="container">
             <% if (identity.role === 'guest') { %>
-                <form class="themis-quals-form-supervisor-create" method="POST" action="/api/supervisor/create" novalidate>
+                <form class="volgactf-qualifier-form-supervisor-create" method="POST" action="/api/supervisor/create" novalidate>
                     <div class="form-group">
                         <div class="offset-sm-4 col-sm-8">
                             <h1>Create account</h1>
@@ -65,7 +65,7 @@
                         </div>
                     </div>
                 </form>
-                <div class="themis-quals-create-supervisor-error">
+                <div class="volgactf-qualifier-create-supervisor-error">
                     <div class="col-sm-offset-3 col-sm-9">
                         <h2>Create account</h2>
                     </div>
@@ -73,7 +73,7 @@
                         Invalid create account URL!
                     </div>
                 </div>
-                <div class="themis-quals-create-supervisor-success">
+                <div class="volgactf-qualifier-create-supervisor-success">
                     <div class="col-sm-offset-3 col-sm-9">
                         <h2>Create account</h2>
                     </div>
@@ -104,8 +104,8 @@
         </footer>
 
         <script>
-            window.themis = {
-                quals: {
+            window.volgactf = {
+                qualifier: {
                     view: 'supervisorCreate',
                     data: {
                         identity: <%= jsesc(identity, { json: true, isScriptContext: true }) %>,
@@ -118,6 +118,6 @@
                 }
             }
         </script>
-        <script src="/assets/js/{{#cachebusting}}{{#themis_quals}}{{ js }}{{/themis_quals}}{{/cachebusting}}"></script>
+        <script src="/assets/js/{{#cachebusting}}{{#volgactf_qualifier}}{{ js }}{{/volgactf_qualifier}}{{/cachebusting}}"></script>
     </body>
 </html>

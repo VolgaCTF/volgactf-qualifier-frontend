@@ -14,7 +14,7 @@ class SupervisorCreateView extends View {
   present () {
     this.$main = $('#main')
 
-    let $form = this.$main.find('form.themis-quals-form-supervisor-create')
+    let $form = this.$main.find('form.volgactf-qualifier-form-supervisor-create')
     $form.parsley({
       errorClass: 'is-invalid',
       successClass: 'is-valid',
@@ -30,8 +30,8 @@ class SupervisorCreateView extends View {
     let $submitError = $form.find('.submit-error > p')
     let $submitButton = $form.find('button')
 
-    let $successAlert = this.$main.find('div.themis-quals-create-supervisor-success')
-    let $errorAlert = this.$main.find('div.themis-quals-create-supervisor-error')
+    let $successAlert = this.$main.find('div.volgactf-qualifier-create-supervisor-success')
+    let $errorAlert = this.$main.find('div.volgactf-qualifier-create-supervisor-error')
 
     let urlParams = new URLSearchParams(window.location.search)
     if (urlParams.has('code')) {

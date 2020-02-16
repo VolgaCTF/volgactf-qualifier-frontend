@@ -5,7 +5,7 @@
 
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
-        <link rel="stylesheet" href="/assets/css/{{#cachebusting}}{{#themis_quals}}{{ css }}{{/themis_quals}}{{/cachebusting}}">
+        <link rel="stylesheet" href="/assets/css/{{#cachebusting}}{{#volgactf_qualifier}}{{ css }}{{/volgactf_qualifier}}{{/cachebusting}}">
         {{#partials}}
         {{#head}}
         <!--=include {{{path}}} -->
@@ -22,7 +22,7 @@
         <div id="main" class="pb-4">
             <div class="container">
             <% if (identity.role === 'guest') { %>
-                <form class="themis-form-login" method="POST" action="/api/supervisor/signin" novalidate>
+                <form class="volgactf-form-login" method="POST" action="/api/supervisor/signin" novalidate>
                     <h1>Please log in</h1>
                     <div class="form-group">
                         <label for="login-team" class="sr-only">Username</label>
@@ -60,8 +60,8 @@
         </footer>
 
         <script>
-            window.themis = {
-                quals: {
+            window.volgactf = {
+                qualifier: {
                     view: 'supervisorSignin',
                     data: {
                         identity: <%= jsesc(identity, { json: true, isScriptContext: true }) %>,
@@ -74,6 +74,6 @@
                 }
             }
         </script>
-        <script src="/assets/js/{{#cachebusting}}{{#themis_quals}}{{ js }}{{/themis_quals}}{{/cachebusting}}"></script>
+        <script src="/assets/js/{{#cachebusting}}{{#volgactf_qualifier}}{{ js }}{{/volgactf_qualifier}}{{/cachebusting}}"></script>
     </body>
 </html>

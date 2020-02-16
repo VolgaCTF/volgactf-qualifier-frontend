@@ -5,7 +5,7 @@
 
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
-        <link rel="stylesheet" href="/assets/css/{{#cachebusting}}{{#themis_quals}}{{ css }}{{/themis_quals}}{{/cachebusting}}">
+        <link rel="stylesheet" href="/assets/css/{{#cachebusting}}{{#volgactf_qualifier}}{{ css }}{{/volgactf_qualifier}}{{/cachebusting}}">
         {{#partials}}
         {{#head}}
         <!--=include {{{path}}} -->
@@ -35,7 +35,7 @@
                         </button>
                     </div>
                     <% } %>
-                    <div id="themis-task-previews">
+                    <div id="volgactf-task-previews">
                         <%= templates.taskList({ _: _, moment: moment, templates: templates, identity: identity, contest: contest, categories: categories, taskPreviews: taskPreviews, taskCategories: taskCategories, taskValues: taskValues, taskRewardSchemes: taskRewardSchemes, teamTaskHits: teamTaskHits,
                         supervisorTaskSubscriptions: supervisorTaskSubscriptions }) %>
                     </div>
@@ -58,7 +58,7 @@
                             </button>
                         </div>
                         <div class="modal-body">
-                            <div class="themis-task-contents">
+                            <div class="volgactf-task-contents">
                             </div>
                         </div>
                         <div class="modal-body">
@@ -128,7 +128,7 @@
                             </button>
                         </div>
                         <div class="modal-body">
-                            <div class="themis-task-contents">
+                            <div class="volgactf-task-contents">
                             </div>
                         </div>
                         <div class="modal-body">
@@ -228,7 +228,7 @@
                             </button>
                         </div>
                         <div class="modal-body">
-                            <div class="themis-task-contents">
+                            <div class="volgactf-task-contents">
                             </div>
                         </div>
                         <div class="modal-body">
@@ -340,7 +340,7 @@
                                                             <label for="create-task-description" class="control-label">
                                                                 <strong>Description</strong>
                                                             </label>
-                                                            <textarea class="form-control themis-task-description" id="create-task-description" required minlength="2" maxlength="4096" name="description"></textarea>
+                                                            <textarea class="form-control volgactf-task-description" id="create-task-description" required minlength="2" maxlength="4096" name="description"></textarea>
                                                         </div>
                                                         <div class="form-group">
                                                             <label for="create-categories" class="control-label">
@@ -469,7 +469,7 @@
                                                             <label for="edit-task-description" class="control-label">
                                                                 <strong>Description</strong>
                                                             </label>
-                                                            <textarea class="form-control themis-task-description" id="edit-task-description" required minlength="2" maxlength="4096" name="description"></textarea>
+                                                            <textarea class="form-control volgactf-task-description" id="edit-task-description" required minlength="2" maxlength="4096" name="description"></textarea>
                                                         </div>
                                                         <div class="form-group">
                                                             <label for="edit-categories" class="control-label">
@@ -634,8 +634,8 @@
         </footer>
 
         <script>
-            window.themis = {
-                quals: {
+            window.volgactf = {
+                qualifier: {
                     view: 'tasks',
                     data: {
                         identity: <%= jsesc(identity, { json: true, isScriptContext: true }) %>,
@@ -676,6 +676,6 @@
                 }
             }
         </script>
-        <script src="/assets/js/{{#cachebusting}}{{#themis_quals}}{{ js }}{{/themis_quals}}{{/cachebusting}}"></script>
+        <script src="/assets/js/{{#cachebusting}}{{#volgactf_qualifier}}{{ js }}{{/volgactf_qualifier}}{{/cachebusting}}"></script>
     </body>
 </html>

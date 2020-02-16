@@ -15,7 +15,7 @@ class CountryProvider extends EventEmitter {
 
   initCountries () {
     const promise = $.Deferred()
-    this.countries = _.map(window.themis.quals.data.countries, (options) => {
+    this.countries = _.map(window.volgactf.qualifier.data.countries, (options) => {
       return new CountryModel(options)
     })
     promise.resolve(this.countries)

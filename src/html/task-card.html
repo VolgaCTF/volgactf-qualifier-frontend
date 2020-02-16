@@ -12,7 +12,7 @@
 <% submitAnswerModal = 'submit-task-modal' %>
 <% } %>
 
-<div class="card h-100 text-center themis-task-preview-container" data-task-id="<%- task.id %>">
+<div class="card h-100 text-center volgactf-task-preview-container" data-task-id="<%- task.id %>">
     <h5 class="card-header pointer <%- headerBgClass %> text-white" data-task-id="<%- task.id %>" data-toggle="modal" data-target="#<%- submitAnswerModal %>">
         <%- task.title %>
     </h5>
@@ -58,7 +58,7 @@
     <% } %>
     <div class="card-body pointer" data-task-id="<%- task.id %>" data-toggle="modal" data-target="#<%- submitAnswerModal %>">
 
-        <div class="themis-task-value">
+        <div class="volgactf-task-value">
         <% if (taskValue && taskRewardScheme) { %>
             <% if (_.isNull(taskRewardScheme.minValue)) { %>
                 <%- taskValue.value %>

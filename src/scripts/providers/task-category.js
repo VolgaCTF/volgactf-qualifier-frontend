@@ -63,7 +63,7 @@ class TaskCategoryProvider extends EventEmitter {
 
   initTaskCategories () {
     const promise = $.Deferred()
-    this.taskCategories = _.map(window.themis.quals.data.taskCategories, function (options) {
+    this.taskCategories = _.map(window.volgactf.qualifier.data.taskCategories, function (options) {
       return new TaskCategoryModel(options)
     })
     promise.resolve(this.taskCategories)

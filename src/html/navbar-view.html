@@ -10,11 +10,11 @@
         {{/partials}}
     </a>
 
-    <button class="navbar-toggler collapsed" type="button" data-toggle="collapse" data-target="#themis-navbar" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
+    <button class="navbar-toggler collapsed" type="button" data-toggle="collapse" data-target="#volgactf-navbar" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
     </button>
 
-    <div id="themis-navbar" class="collapse navbar-collapse">
+    <div id="volgactf-navbar" class="collapse navbar-collapse">
         <ul class="navbar-nav mr-auto">
             <li class="nav-item <% print((active === 'teams') ? 'active' : ''); %>">
                 <a class="nav-link" href="/teams">Teams</a>
@@ -51,15 +51,15 @@
             <% } %>
         </ul>
 
-        <div id="themis-quals-stream-state">
+        <div id="volgactf-qualifier-stream-state">
             <%= templates.streamStatePartial({ state: 'connecting' }) %>
         </div>
 
-        <div id="themis-quals-contest-state">
+        <div id="volgactf-qualifier-contest-state">
             <%= templates.contestStatePartial({ _: _, moment: moment, contest: contest }) %>
         </div>
 
-        <div id="themis-quals-team-ranking">
+        <div id="volgactf-qualifier-team-ranking">
         </div>
 
         <ul class="navbar-nav ml-auto">
@@ -77,10 +77,10 @@
                     <% } else if (identity.role === 'team') {%>
                     <img class="d-inline-block align-middle mr-1" width="32px" height="32px" src="/team/logo/<%- identity.id %>.png">
                     <% } %>
-                    <span class="d-inline-block align-middle themis-quals-navbar-identity-name"><%- identity.name %></span>
+                    <span class="d-inline-block align-middle volgactf-qualifier-navbar-identity-name"><%- identity.name %></span>
                     &nbsp;<span class="caret"></span>
                 </a>
-                <div class="dropdown-menu themis-quals-dropdown-menu" role="menu">
+                <div class="dropdown-menu volgactf-qualifier-dropdown-menu" role="menu">
                     <% if (identity.role === 'team') { %>
                     <a class="dropdown-item" href="/team/<%- identity.id %>/profile"><span class="oi oi-cog"></span>&nbsp;Edit profile</a>
                     <% } %>

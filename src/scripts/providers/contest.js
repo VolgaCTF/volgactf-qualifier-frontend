@@ -33,7 +33,7 @@ class ContestProvider extends EventEmitter {
 
   initContest () {
     const promise = $.Deferred()
-    this.contest = new ContestModel(window.themis.quals.data.contest)
+    this.contest = new ContestModel(window.volgactf.qualifier.data.contest)
     promise.resolve(this.contest)
 
     return promise

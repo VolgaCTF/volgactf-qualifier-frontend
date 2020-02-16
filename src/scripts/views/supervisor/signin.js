@@ -11,7 +11,7 @@ class SupervisorSigninView extends View {
   }
 
   initLoginForm () {
-    let $form = this.$main.find('form.themis-form-login')
+    let $form = this.$main.find('form.volgactf-form-login')
     $form.parsley({
       errorClass: 'is-invalid',
       successClass: 'is-valid',

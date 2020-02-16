@@ -196,12 +196,12 @@ class CategoriesView extends View {
   }
 
   renderCategories () {
-    $('#themis-categories-list').html(window.themis.quals.templates.categoryList({
+    $('#volgactf-categories-list').html(window.volgactf.qualifier.templates.categoryList({
       _: _,
       identity: identityProvider.getIdentity(),
       contest: contestProvider.getContest(),
       categories: categoryProvider.getCategories(),
-      templates: window.themis.quals.templates,
+      templates: window.volgactf.qualifier.templates,
       moment: moment
     }))
   }
@@ -216,7 +216,7 @@ class CategoriesView extends View {
     .done((categories) => {
       let urlParams = new URLSearchParams(window.location.search)
       if (urlParams.get('action') === 'scrollTo' && urlParams.has('categoryId')) {
-        let $el = $(`div.themis-quals-category[data-id="${urlParams.get('categoryId')}"]`)
+        let $el = $(`div.volgactf-qualifier-category[data-id="${urlParams.get('categoryId')}"]`)
         if ($el.length > 0) {
           $el.get(0).scrollIntoView()
         }

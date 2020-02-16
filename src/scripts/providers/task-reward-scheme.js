@@ -60,7 +60,7 @@ class TaskRewardSchemeProvider extends EventEmitter {
 
   initTaskRewardSchemes () {
     const promise = $.Deferred()
-    this.taskRewardSchemes = _.map(window.themis.quals.data.taskRewardSchemes, function (options) {
+    this.taskRewardSchemes = _.map(window.volgactf.qualifier.data.taskRewardSchemes, function (options) {
       return new TaskRewardSchemeModel(options)
     })
     promise.resolve(this.taskRewardSchemes)

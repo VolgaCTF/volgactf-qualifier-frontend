@@ -63,7 +63,7 @@ class RemoteCheckerProvider extends EventEmitter {
 
   initRemoteCheckers () {
     const promise = $.Deferred()
-    this.remoteCheckers = _.map(window.themis.quals.data.remoteCheckers, function (options) {
+    this.remoteCheckers = _.map(window.volgactf.qualifier.data.remoteCheckers, function (options) {
       return new RemoteCheckerModel(options)
     })
     promise.resolve(this.remoteCheckers)

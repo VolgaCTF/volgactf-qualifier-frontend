@@ -3,19 +3,14 @@ import _ from 'underscore'
 import EventBaseView from './base'
 import contestProvider from '../../providers/contest'
 import identityProvider from '../../providers/identity'
-import moment from 'moment'
 import categoryProvider from '../../providers/category'
 import postProvider from '../../providers/post'
-import supervisorProvider from '../../providers/supervisor'
 import taskProvider from '../../providers/task'
 import taskCategoryProvider from '../../providers/task-category'
 import teamProvider from '../../providers/team'
-import teamTaskReviewProvider from '../../providers/team-task-review'
-import teamTaskHitProvider from '../../providers/team-task-hit'
 
 import taskValueProvider from '../../providers/task-value'
 import taskRewardSchemeProvider from '../../providers/task-reward-scheme'
-import taskFileProvider from '../../providers/task-file'
 
 import remoteCheckerProvider from '../../providers/remote-checker'
 
@@ -52,7 +47,7 @@ class EventHistoryView extends EventBaseView {
 
   renderEvents (history) {
     const htmlStringList = []
-    const paginationHtmlString = window.themis.quals.templates.eventHistoryPaginationPartial({
+    const paginationHtmlString = window.volgactf.qualifier.templates.eventHistoryPaginationPartial({
       _: _,
       page: history.page,
       pageSize: history.pageSize,
@@ -74,7 +69,7 @@ class EventHistoryView extends EventBaseView {
   requestRenderEvents (page) {
     $(this.container).addClass('history-loading')
     $
-    .when(this.fetchEvents(window.themis.quals.data.fetchThreshold, page))
+    .when(this.fetchEvents(window.volgactf.qualifier.data.fetchThreshold, page))
     .then((eventHistory) => {
       const html = this.renderEvents(eventHistory)
       this.container.innerHTML = ''
@@ -105,7 +100,7 @@ class EventHistoryView extends EventBaseView {
       remoteCheckerProvider.initRemoteCheckers()
     )
     .done((identity, contest, eventHistory) => {
-      this.container = document.getElementById('themis-quals-events')
+      this.container = document.getElementById('volgactf-qualifier-events')
       this.requestRenderEvents(1)
 
       $(this.container).on('click', 'a[data-action="load"]', (e) => {

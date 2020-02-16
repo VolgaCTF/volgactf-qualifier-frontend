@@ -81,7 +81,7 @@ class TaskProvider extends EventEmitter {
 
   initTaskPreviews () {
     const promise = $.Deferred()
-    this.taskPreviews = _.map(window.themis.quals.data.taskPreviews, function (options) {
+    this.taskPreviews = _.map(window.volgactf.qualifier.data.taskPreviews, function (options) {
       return new TaskPreviewModel(options)
     })
     promise.resolve(this.taskPreviews)

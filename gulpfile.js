@@ -25,14 +25,14 @@ const zopfli = require('gulp-zopfli-green')
 const brotli = require('gulp-brotli')
 const filter = require('gulp-filter')
 
-const customizerHost = process.env.THEMIS_QUALS_CUSTOMIZER_HOST || '127.0.0.1'
-const customizerPort = parseInt(process.env.THEMIS_QUALS_CUSTOMIZER_PORT || '7037', 10)
+const customizerHost = process.env.VOLGACTF_QUALIFIER_CUSTOMIZER_HOST || '127.0.0.1'
+const customizerPort = parseInt(process.env.VOLGACTF_QUALIFIER_CUSTOMIZER_PORT || '7037', 10)
 
 const buildDir = path.join(__dirname, 'build')
 
 const paths = {
   scripts: [
-    'src/scripts/themis-quals.js'
+    'src/scripts/volgactf-qualifier.js'
   ],
   fonts: [
     'node_modules/open-iconic/font/fonts/*.eot',
@@ -42,7 +42,7 @@ const paths = {
     'node_modules/open-iconic/font/fonts/*.woff'
   ],
   stylesheets: [
-    'src/stylesheets/themis-quals.sass'
+    'src/stylesheets/volgactf-qualifier.sass'
   ],
   images: [
   ],
@@ -84,7 +84,7 @@ gulp.task('scripts', function (cb) {
     })
       .transform(babelify)
       .bundle()
-      .pipe(source('themis-quals.js'))
+      .pipe(source('volgactf-qualifier.js'))
       .pipe(buffer())
       .pipe(plumber())
       .pipe(gulpIf(isOptimize, uglify()))
@@ -98,7 +98,7 @@ gulp.task('scripts', function (cb) {
 
   sequence.push(function (callback) {
     del([
-      path.join(tmpDir, 'themis-quals.js')
+      path.join(tmpDir, 'volgactf-qualifier.js')
     ], {
       force: true
     }, callback)
@@ -214,7 +214,7 @@ gulp.task('stylesheets', function (cb) {
         indentedSyntax: true,
         errLogToConsole: true
       })))
-      .pipe(concatCss('themis-quals.css', {
+      .pipe(concatCss('volgactf-qualifier.css', {
         rebaseUrls: false
       }))
       .pipe(gulpIf(isOptimize, minifyCSS()))
@@ -228,7 +228,7 @@ gulp.task('stylesheets', function (cb) {
 
   sequence.push(function (callback) {
     del([
-      path.join(tmpDir2, 'themis-quals.css')
+      path.join(tmpDir2, 'volgactf-qualifier.css')
     ], {
       force: true
     }, callback)
@@ -461,9 +461,9 @@ gulp.task('html', function (cb) {
         const cachebusting_js = JSON.parse(fs.readFileSync(path.join(buildDir, 'assets', 'js', 'manifest.json'), 'utf8'))
         const cachebusting_css = JSON.parse(fs.readFileSync(path.join(buildDir, 'assets', 'css', 'manifest.json'), 'utf8'))
         opts.cachebusting = {
-          themis_quals: {
-            js: cachebusting_js['themis-quals.js'],
-            css: cachebusting_css['themis-quals.css']
+          volgactf_qualifier: {
+            js: cachebusting_js['volgactf-qualifier.js'],
+            css: cachebusting_css['volgactf-qualifier.css']
           }
         }
         callback()
@@ -545,4 +545,3 @@ gulp.task('html', function (cb) {
 })
 
 gulp.task('default', gulp.series('fonts', 'images', 'scripts', 'stylesheets', 'html'))
-

@@ -205,12 +205,12 @@ class RemoteCheckersView extends View {
   }
 
   renderRemoteCheckers () {
-    $('#themis-quals-remote-checker-list').html(window.themis.quals.templates.remoteCheckerList({
+    $('#volgactf-qualifier-remote-checker-list').html(window.volgactf.qualifier.templates.remoteCheckerList({
       _: _,
       identity: identityProvider.getIdentity(),
       contest: contestProvider.getContest(),
       remoteCheckers: remoteCheckerProvider.getRemoteCheckers(),
-      templates: window.themis.quals.templates,
+      templates: window.volgactf.qualifier.templates,
       moment: moment
     }))
   }
@@ -232,7 +232,7 @@ class RemoteCheckersView extends View {
 
       let urlParams = new URLSearchParams(window.location.search)
       if (urlParams.get('action') === 'scrollTo' && urlParams.has('remoteCheckerId')) {
-        let $el = $(`div.themis-quals-remote-checker[data-id="${urlParams.get('remoteCheckerId')}"]`)
+        let $el = $(`div.volgactf-qualifier-remote-checker[data-id="${urlParams.get('remoteCheckerId')}"]`)
         if ($el.length > 0) {
           $el.get(0).scrollIntoView()
         }

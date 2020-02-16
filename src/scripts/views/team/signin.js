@@ -11,7 +11,7 @@ class TeamSigninView extends View {
   }
 
   initSigninForm () {
-    let $form = this.$main.find('form.themis-form-signin')
+    let $form = this.$main.find('form.volgactf-form-signin')
     $form.parsley({
       errorClass: 'is-invalid',
       successClass: 'is-valid',

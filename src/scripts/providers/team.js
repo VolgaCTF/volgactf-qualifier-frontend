@@ -136,7 +136,7 @@ class TeamProvider extends EventEmitter {
 
   initTeamProfile () {
     const promise = $.Deferred()
-    promise.resolve(new TeamModel(window.themis.quals.data.team))
+    promise.resolve(new TeamModel(window.volgactf.qualifier.data.team))
 
     return promise
   }
@@ -165,7 +165,7 @@ class TeamProvider extends EventEmitter {
 
   initTeams () {
     const promise = $.Deferred()
-    this.teams = _.map(window.themis.quals.data.teams, (options) => {
+    this.teams = _.map(window.volgactf.qualifier.data.teams, (options) => {
       return new TeamModel(options)
     })
     promise.resolve(this.teams)

@@ -5,7 +5,7 @@
 
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
-        <link rel="stylesheet" href="/assets/css/{{#cachebusting}}{{#themis_quals}}{{ css }}{{/themis_quals}}{{/cachebusting}}">
+        <link rel="stylesheet" href="/assets/css/{{#cachebusting}}{{#volgactf_qualifier}}{{ css }}{{/volgactf_qualifier}}{{/cachebusting}}">
         {{#partials}}
         {{#head}}
         <!--=include {{{path}}} -->
@@ -30,7 +30,7 @@
                         <p class="lead">We are really sorry, but the contest has finished.</p>
                     </section>
                 <% } else { %>
-                    <form class="themis-form-signup" method="POST" enctype="multipart/form-data" action="/api/team/signup" novalidate>
+                    <form class="volgactf-form-signup" method="POST" enctype="multipart/form-data" action="/api/team/signup" novalidate>
                         <div class="form-group">
                             <div class="offset-sm-4 col-sm-8">
                                 <h1>Sign up</h1>
@@ -125,7 +125,7 @@
                         </div>
                     </form>
 
-                    <div class="themis-alert-signup">
+                    <div class="volgactf-alert-signup">
                         <div class="offset-sm-4 col-sm-8">
                             <h1>Sign up</h1>
                         </div>
@@ -158,8 +158,8 @@
         </footer>
 
         <script>
-            window.themis = {
-                quals: {
+            window.volgactf = {
+                qualifier: {
                     view: 'teamSignup',
                     data: {
                         identity: <%= jsesc(identity, { json: true, isScriptContext: true }) %>,
@@ -173,6 +173,6 @@
                 }
             }
         </script>
-        <script src="/assets/js/{{#cachebusting}}{{#themis_quals}}{{ js }}{{/themis_quals}}{{/cachebusting}}"></script>
+        <script src="/assets/js/{{#cachebusting}}{{#volgactf_qualifier}}{{ js }}{{/volgactf_qualifier}}{{/cachebusting}}"></script>
     </body>
 </html>

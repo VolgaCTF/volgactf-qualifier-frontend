@@ -251,12 +251,12 @@ class TasksView extends View {
         taskFileProvider.fetchTaskFilesByTask(taskId)
       )
       .done(function (taskFiles) {
-        $uploadedContainer.html(window.themis.quals.templates.taskFileList({
+        $uploadedContainer.html(window.volgactf.qualifier.templates.taskFileList({
           window: window,
           _: _,
           moment: moment,
           taskFiles: taskFiles,
-          templates: window.themis.quals.templates
+          templates: window.volgactf.qualifier.templates
         }))
         $uploadedContainer.find('[data-action="copy-to-clipboard"]').tooltip({
           trigger: 'manual'
@@ -439,7 +439,7 @@ class TasksView extends View {
 
     $taskHints.on('click', 'a[data-action="create-task-hint"]', (e) => {
       e.preventDefault()
-      $taskHintList.append(window.themis.quals.templates.createTaskHintTextareaPartial({
+      $taskHintList.append(window.volgactf.qualifier.templates.createTaskHintTextareaPartial({
         _: _,
         number: $taskHintList.children().length + 1,
         hint: ''
@@ -453,7 +453,7 @@ class TasksView extends View {
       let hints = getHints()
       $taskHintList.empty()
       _.each(hints, (hint, ndx) => {
-        $taskHintList.append(window.themis.quals.templates.createTaskHintTextareaPartial({
+        $taskHintList.append(window.volgactf.qualifier.templates.createTaskHintTextareaPartial({
           _: _,
           number: ndx + 1,
           hint: hint
@@ -463,7 +463,7 @@ class TasksView extends View {
 
     function getHints () {
       let hints = []
-      $taskHintList.find('.themis-task-hint-group').each((ndx, el) => {
+      $taskHintList.find('.volgactf-task-hint-group').each((ndx, el) => {
         let $el = $(el)
         hints.push($el.find('textarea').val())
       })
@@ -474,7 +474,7 @@ class TasksView extends View {
     $taskCheckMethodGroup.on('click', 'a[data-action="create-task-answer"]', (e) => {
       e.preventDefault()
       const $taskAnswerList = $('#create-task-answer-list')
-      $taskAnswerList.append(window.themis.quals.templates.createTaskAnswerInputPartial({
+      $taskAnswerList.append(window.volgactf.qualifier.templates.createTaskAnswerInputPartial({
         _: _,
         number: $taskAnswerList.children().length + 1,
         answer: '',
@@ -490,7 +490,7 @@ class TasksView extends View {
       let answers = getAnswers()
       $taskAnswerList.empty()
       _.each(answers, (entry, ndx) => {
-        $taskAnswerList.append(window.themis.quals.templates.createTaskAnswerInputPartial({
+        $taskAnswerList.append(window.volgactf.qualifier.templates.createTaskAnswerInputPartial({
           _: _,
           number: ndx + 1,
           answer: entry.answer,
@@ -502,7 +502,7 @@ class TasksView extends View {
     function getAnswers () {
       let answers = []
       const $taskAnswerList = $('#create-task-answer-list')
-      $taskAnswerList.find('.themis-task-answer-group').each((ndx, el) => {
+      $taskAnswerList.find('.volgactf-task-answer-group').each((ndx, el) => {
         let $el = $(el)
         answers.push({
           answer: $el.find('input[type=text]').val(),
@@ -516,7 +516,7 @@ class TasksView extends View {
     $tabPreview.on('show.bs.tab', (e) => {
       const md = new MarkdownRenderer()
 
-      $taskPreview.html(window.themis.quals.templates.taskContentPartial({
+      $taskPreview.html(window.volgactf.qualifier.templates.taskContentPartial({
         _: _,
         title: $taskTitle.val(),
         description: md.render($taskDescription.val()),
@@ -528,7 +528,7 @@ class TasksView extends View {
 
     $taskCheckMethod.on('change', () => {
       const method = $('input[type="radio"]:checked', $taskCheckMethod).val()
-      $taskCheckMethodGroup.html(window.themis.quals.templates.createTaskCheckMethodPartial({
+      $taskCheckMethodGroup.html(window.volgactf.qualifier.templates.createTaskCheckMethodPartial({
         checkMethod: method
       }))
       if (method === 'remote') {
@@ -566,11 +566,11 @@ class TasksView extends View {
 
     $taskRewardScheme.on('change', () => {
       const scheme = $('input[type="radio"]:checked', $taskRewardScheme).val()
-      $taskRewardSchemeGroup.html(window.themis.quals.templates.createTaskRewardSchemePartial({
+      $taskRewardSchemeGroup.html(window.volgactf.qualifier.templates.createTaskRewardSchemePartial({
         _: _,
         rewardScheme: scheme,
-        taskMinValue: window.themis.quals.data.taskMinValue,
-        taskMaxValue: window.themis.quals.data.taskMaxValue
+        taskMinValue: window.volgactf.qualifier.data.taskMinValue,
+        taskMaxValue: window.volgactf.qualifier.data.taskMaxValue
       }))
     })
 
@@ -589,17 +589,17 @@ class TasksView extends View {
 
       $taskCheckMethodList.prop('checked', true)
       $taskCheckMethodRemote.prop('checked', false)
-      $taskCheckMethodGroup.html(window.themis.quals.templates.createTaskCheckMethodPartial({
+      $taskCheckMethodGroup.html(window.volgactf.qualifier.templates.createTaskCheckMethodPartial({
         checkMethod: 'list'
       }))
 
       $taskRewardSchemeFixed.prop('checked', true)
       $taskRewardSchemeVariable.prop('checked', false)
-      $taskRewardSchemeGroup.html(window.themis.quals.templates.createTaskRewardSchemePartial({
+      $taskRewardSchemeGroup.html(window.volgactf.qualifier.templates.createTaskRewardSchemePartial({
         _: _,
         rewardScheme: 'fixed',
-        taskMinValue: window.themis.quals.data.taskMinValue,
-        taskMaxValue: window.themis.quals.data.taskMaxValue
+        taskMinValue: window.volgactf.qualifier.data.taskMinValue,
+        taskMaxValue: window.volgactf.qualifier.data.taskMaxValue
       }))
 
       $submitError.text('')
@@ -734,7 +734,7 @@ class TasksView extends View {
 
     $taskHints.on('click', 'a[data-action="create-task-hint"]', (e) => {
       e.preventDefault()
-      $taskHintList.append(window.themis.quals.templates.editTaskHintTextareaPartial({
+      $taskHintList.append(window.volgactf.qualifier.templates.editTaskHintTextareaPartial({
         _: _,
         number: $taskHintList.children().length + 1,
         hint: '',
@@ -750,7 +750,7 @@ class TasksView extends View {
       let hints = getHints()
       $taskHintList.empty()
       _.each(savedTaskHints, (entry, ndx) => {
-        $taskHintList.append(window.themis.quals.templates.editTaskHintTextareaPartial({
+        $taskHintList.append(window.volgactf.qualifier.templates.editTaskHintTextareaPartial({
           _: _,
           number: ndx + 1,
           editable: false,
@@ -758,7 +758,7 @@ class TasksView extends View {
         }))
       })
       _.each(hints, (hint, ndx) => {
-        $taskHintList.append(window.themis.quals.templates.editTaskHintTextareaPartial({
+        $taskHintList.append(window.volgactf.qualifier.templates.editTaskHintTextareaPartial({
           _: _,
           number: savedTaskHints.length + ndx + 1,
           editable: true,
@@ -769,7 +769,7 @@ class TasksView extends View {
 
     function getHints () {
       let hints = []
-      $taskHintList.find('.themis-task-hint-group[data-state-disabled=false]').each((ndx, el) => {
+      $taskHintList.find('.volgactf-task-hint-group[data-state-disabled=false]').each((ndx, el) => {
         let $el = $(el)
         hints.push($el.find('textarea').val())
       })
@@ -782,7 +782,7 @@ class TasksView extends View {
     $taskCheckMethodGroup.on('click', 'a[data-action="create-task-answer"]', (e) => {
       e.preventDefault()
       const $taskAnswerList = $('#edit-task-answer-list')
-      $taskAnswerList.append(window.themis.quals.templates.editTaskAnswerInputPartial({
+      $taskAnswerList.append(window.volgactf.qualifier.templates.editTaskAnswerInputPartial({
         _: _,
         number: $taskAnswerList.children().length + 1,
         editable: true,
@@ -799,7 +799,7 @@ class TasksView extends View {
       const $taskAnswerList = $('#edit-task-answer-list')
       $taskAnswerList.empty()
       _.each(savedTaskAnswers, (entry, ndx) => {
-        $taskAnswerList.append(window.themis.quals.templates.editTaskAnswerInputPartial({
+        $taskAnswerList.append(window.volgactf.qualifier.templates.editTaskAnswerInputPartial({
           _: _,
           number: ndx + 1,
           editable: false,
@@ -808,7 +808,7 @@ class TasksView extends View {
         }))
       })
       _.each(answers, (entry, ndx) => {
-        $taskAnswerList.append(window.themis.quals.templates.editTaskAnswerInputPartial({
+        $taskAnswerList.append(window.volgactf.qualifier.templates.editTaskAnswerInputPartial({
           _: _,
           number: savedTaskAnswers.length + ndx + 1,
           editable: true,
@@ -821,7 +821,7 @@ class TasksView extends View {
     function getAnswers () {
       let answers = []
       const $taskAnswerList = $('#edit-task-answer-list')
-      $taskAnswerList.find('.themis-task-answer-group[data-state-disabled=false]').each((ndx, el) => {
+      $taskAnswerList.find('.volgactf-task-answer-group[data-state-disabled=false]').each((ndx, el) => {
         let $el = $(el)
         answers.push({
           answer: $el.find('input[type=text]').val(),
@@ -842,7 +842,7 @@ class TasksView extends View {
         return md.render(hint)
       })
 
-      $taskPreview.html(window.themis.quals.templates.taskContentPartial({
+      $taskPreview.html(window.volgactf.qualifier.templates.taskContentPartial({
         _: _,
         title: $taskTitle.val(),
         description: md.render($taskDescription.val()),
@@ -875,12 +875,12 @@ class TasksView extends View {
       const scheme = $('input[type="radio"]:checked', $taskRewardScheme).val()
       const taskId = $modal.data('task-id')
       const taskRewardScheme = _.findWhere(taskRewardSchemeProvider.getTaskRewardSchemes(), { taskId: taskId })
-      $taskRewardSchemeGroup.html(window.themis.quals.templates.editTaskRewardSchemePartial({
+      $taskRewardSchemeGroup.html(window.volgactf.qualifier.templates.editTaskRewardSchemePartial({
         _: _,
         rewardScheme: scheme,
         taskRewardScheme: taskRewardScheme,
-        taskMinValue: window.themis.quals.data.taskMinValue,
-        taskMaxValue: window.themis.quals.data.taskMaxValue
+        taskMinValue: window.volgactf.qualifier.data.taskMinValue,
+        taskMaxValue: window.volgactf.qualifier.data.taskMaxValue
       }))
     })
 
@@ -889,12 +889,12 @@ class TasksView extends View {
       if (!_.isNull(clipboard)) {
         clipboard.destroy()
       }
-      $tabFileContainer.html(window.themis.quals.templates.taskFileListCompact({
+      $tabFileContainer.html(window.volgactf.qualifier.templates.taskFileListCompact({
         window: window,
         _: _,
         moment: moment,
         taskFiles: taskFiles,
-        templates: window.themis.quals.templates
+        templates: window.volgactf.qualifier.templates
       }))
       $tabFileContainer.find('[data-action="copy-to-clipboard"]').tooltip({
         trigger: 'manual'
@@ -932,12 +932,12 @@ class TasksView extends View {
       }
       $taskRewardSchemeFixed.prop('checked', rewardScheme === 'fixed')
       $taskRewardSchemeVariable.prop('checked', rewardScheme === 'variable')
-      $taskRewardSchemeGroup.html(window.themis.quals.templates.editTaskRewardSchemePartial({
+      $taskRewardSchemeGroup.html(window.volgactf.qualifier.templates.editTaskRewardSchemePartial({
         _: _,
         rewardScheme: rewardScheme,
         taskRewardScheme: taskRewardScheme,
-        taskMinValue: window.themis.quals.data.taskMinValue,
-        taskMaxValue: window.themis.quals.data.taskMaxValue
+        taskMinValue: window.volgactf.qualifier.data.taskMinValue,
+        taskMaxValue: window.volgactf.qualifier.data.taskMaxValue
       }))
 
       $taskHintList.empty()
@@ -950,7 +950,7 @@ class TasksView extends View {
 
       $taskCheckMethodList.prop('checked', checkMethod === 'list')
       $taskCheckMethodRemote.prop('checked', checkMethod === 'remote')
-      $taskCheckMethodGroup.html(window.themis.quals.templates.editTaskCheckMethodPartial({
+      $taskCheckMethodGroup.html(window.volgactf.qualifier.templates.editTaskCheckMethodPartial({
         checkMethod: checkMethod
       }))
 
@@ -984,7 +984,7 @@ class TasksView extends View {
 
           $taskHintList.empty()
           _.each(taskHints, (entry, ndx) => {
-            $taskHintList.append(window.themis.quals.templates.editTaskHintTextareaPartial({
+            $taskHintList.append(window.volgactf.qualifier.templates.editTaskHintTextareaPartial({
               _: _,
               number: ndx + 1,
               editable: false,
@@ -1000,7 +1000,7 @@ class TasksView extends View {
           if (checkMethod === 'list') {
             const $taskAnswerList = $('#edit-task-answer-list')
             _.each(taskAnswers, (entry, ndx) => {
-              $taskAnswerList.append(window.themis.quals.templates.editTaskAnswerInputPartial({
+              $taskAnswerList.append(window.volgactf.qualifier.templates.editTaskAnswerInputPartial({
                 _: _,
                 number: ndx + 1,
                 editable: false,
@@ -1106,7 +1106,7 @@ class TasksView extends View {
 
     let $taskAnswerGroup = $('#revise-task-answer-group')
     let $taskAnswer = $('#revise-task-answer')
-    let $taskContents = $modal.find('.themis-task-contents')
+    let $taskContents = $modal.find('.volgactf-task-contents')
 
     $modal.on('show.bs.modal', (e) => {
       let taskId = parseInt($(e.relatedTarget).data('task-id'), 10)
@@ -1134,7 +1134,7 @@ class TasksView extends View {
         .done((task, taskHints, taskHitStatistics, taskReviewStatistics) => {
           let md = new MarkdownRenderer()
 
-          $taskContents.html(window.themis.quals.templates.taskContentPartial({
+          $taskContents.html(window.volgactf.qualifier.templates.taskContentPartial({
             _: _,
             title: task.title,
             description: md.render(task.description),
@@ -1143,7 +1143,7 @@ class TasksView extends View {
             })
           }))
 
-          $taskStatus.html(window.themis.quals.templates.reviseTaskStatusPartial({
+          $taskStatus.html(window.volgactf.qualifier.templates.reviseTaskStatusPartial({
             _: _,
             solvedTeamCount: taskHitStatistics.count,
             averageRating: taskReviewStatistics.averageRating,
@@ -1294,7 +1294,7 @@ class TasksView extends View {
 
     let $submitFieldGroup = $('#submit-task-field-group')
     let $taskAnswer = $('#submit-task-answer')
-    let $taskContents = $modal.find('.themis-task-contents')
+    let $taskContents = $modal.find('.volgactf-task-contents')
 
     let $reviewButton = $modal.find('button[data-action="complete-review-task"]')
     let $reviewForm = $modal.find('form[data-target="review"]')
@@ -1412,7 +1412,7 @@ class TasksView extends View {
           _.each(taskHints, (entry) => {
             hintsFormatted.push(md.render(entry.hint))
           })
-          $taskContents.html(window.themis.quals.templates.taskContentPartial({
+          $taskContents.html(window.volgactf.qualifier.templates.taskContentPartial({
             _: _,
             title: task.title,
             description: md.render(task.description),
@@ -1421,7 +1421,7 @@ class TasksView extends View {
 
           teamTaskReview = _.findWhere(teamTaskReviews, { taskId: taskId, teamId: identityProvider.getIdentity().id })
 
-          $taskInfo.show().html(window.themis.quals.templates.submitTaskStatusPartial({
+          $taskInfo.show().html(window.volgactf.qualifier.templates.submitTaskStatusPartial({
             _: _,
             taskSolvedAt: taskSolvedAt ? moment(taskSolvedAt).format('MMM D [at] HH:mm [UTC]') : null,
             solvedTeamCount: taskHitStatistics.count,
@@ -1572,7 +1572,7 @@ class TasksView extends View {
 
     let $taskAnswerGroup = $('#check-task-answer-group')
     let $taskAnswer = $('#check-task-answer')
-    let $taskContents = $modal.find('.themis-task-contents')
+    let $taskContents = $modal.find('.volgactf-task-contents')
 
     $modal.on('show.bs.modal', (e) => {
       let taskId = parseInt($(e.relatedTarget).data('task-id'), 10)
@@ -1632,7 +1632,7 @@ class TasksView extends View {
               hintsFormatted.push(md.render(entry.hint))
             })
 
-            $taskContents.html(window.themis.quals.templates.taskContentPartial({
+            $taskContents.html(window.volgactf.qualifier.templates.taskContentPartial({
               _: _,
               title: task.title,
               description: md.render(task.description),
@@ -1730,10 +1730,10 @@ class TasksView extends View {
     }
 
     this.disposeTooltips()
-    this.$taskPreviewsList.html(window.themis.quals.templates.taskList({
+    this.$taskPreviewsList.html(window.volgactf.qualifier.templates.taskList({
       _: _,
       moment: moment,
-      templates: window.themis.quals.templates,
+      templates: window.volgactf.qualifier.templates,
       identity: identity,
       contest: contestProvider.getContest(),
       categories: categoryProvider.getCategories(),
@@ -1742,7 +1742,7 @@ class TasksView extends View {
       taskValues: taskValueProvider.getTaskValues(),
       taskRewardSchemes: taskRewardSchemeProvider.getTaskRewardSchemes(),
       teamTaskHits: teamTaskHits,
-      supervisorTaskSubscriptions: window.themis.quals.data.supervisorTaskSubscriptions
+      supervisorTaskSubscriptions: window.volgactf.qualifier.data.supervisorTaskSubscriptions
     }))
     this.setupTooltips()
   }
@@ -1791,7 +1791,7 @@ class TasksView extends View {
         this.initCheckTaskModal()
       }
 
-      this.$taskPreviewsList = $('#themis-task-previews')
+      this.$taskPreviewsList = $('#volgactf-task-previews')
       this.setupTooltips()
 
       this.onCreateTaskCategory = (taskCategory) => {

@@ -63,7 +63,7 @@ class CategoryProvider extends EventEmitter {
 
   initCategories () {
     const promise = $.Deferred()
-    this.categories = _.map(window.themis.quals.data.categories, function (options) {
+    this.categories = _.map(window.volgactf.qualifier.data.categories, function (options) {
       return new CategoryModel(options)
     })
     promise.resolve(this.categories)

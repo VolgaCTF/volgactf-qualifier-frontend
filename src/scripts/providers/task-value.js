@@ -60,7 +60,7 @@ class TaskValueProvider extends EventEmitter {
 
   initTaskValues () {
     const promise = $.Deferred()
-    this.taskValues = _.map(window.themis.quals.data.taskValues, function (options) {
+    this.taskValues = _.map(window.volgactf.qualifier.data.taskValues, function (options) {
       return new TaskValueModel(options)
     })
     promise.resolve(this.taskValues)

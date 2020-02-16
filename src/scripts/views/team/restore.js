@@ -11,7 +11,7 @@ class RestoreView extends View {
   }
 
   initRestoreForm () {
-    let $form = this.$main.find('form.themis-form-restore')
+    let $form = this.$main.find('form.volgactf-form-restore')
     $form.parsley({
       errorClass: 'is-invalid',
       successClass: 'is-valid',
@@ -27,7 +27,7 @@ class RestoreView extends View {
 
     $form.find('input[name="email"]').focus()
 
-    let $successAlert = this.$main.find('div.themis-alert-restore')
+    let $successAlert = this.$main.find('div.volgactf-alert-restore')
 
     let $submitError = $form.find('.submit-error > p')
     let $submitButton = $form.find('button')

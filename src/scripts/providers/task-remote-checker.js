@@ -35,7 +35,7 @@ class TaskRemoteCheckerProvider extends EventEmitter {
 
   initTaskRemoteCheckers () {
     const promise = $.Deferred()
-    this.taskRemoteCheckers = _.map(window.themis.quals.data.taskRemoteCheckers, function (options) {
+    this.taskRemoteCheckers = _.map(window.volgactf.qualifier.data.taskRemoteCheckers, function (options) {
       return new TaskRemoteCheckerModel(options)
     })
     promise.resolve(this.taskRemoteCheckers)

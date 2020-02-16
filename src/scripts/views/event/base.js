@@ -10,7 +10,7 @@ class EventBaseView extends View {
     let r = null
     switch (eventName) {
       case 'updateContest': {
-        r = window.themis.quals.templates.eventLogUpdateContest({
+        r = window.volgactf.qualifier.templates.eventLogUpdateContest({
           _: _,
           moment: moment,
           createdAt: createdAt,
@@ -19,7 +19,7 @@ class EventBaseView extends View {
         break
       }
       case 'createCategory': {
-        r = window.themis.quals.templates.eventLogCreateCategory({
+        r = window.volgactf.qualifier.templates.eventLogCreateCategory({
           _: _,
           moment: moment,
           createdAt: createdAt,
@@ -28,7 +28,7 @@ class EventBaseView extends View {
         break
       }
       case 'updateCategory': {
-        r = window.themis.quals.templates.eventLogUpdateCategory({
+        r = window.volgactf.qualifier.templates.eventLogUpdateCategory({
           _: _,
           moment: moment,
           createdAt: createdAt,
@@ -37,7 +37,7 @@ class EventBaseView extends View {
         break
       }
       case 'deleteCategory': {
-        r = window.themis.quals.templates.eventLogDeleteCategory({
+        r = window.volgactf.qualifier.templates.eventLogDeleteCategory({
           _: _,
           moment: moment,
           createdAt: createdAt,
@@ -46,7 +46,7 @@ class EventBaseView extends View {
         break
       }
       case 'createPost': {
-        r = window.themis.quals.templates.eventLogCreatePost({
+        r = window.volgactf.qualifier.templates.eventLogCreatePost({
           _: _,
           moment: moment,
           createdAt: createdAt,
@@ -55,7 +55,7 @@ class EventBaseView extends View {
         break
       }
       case 'updatePost': {
-        r = window.themis.quals.templates.eventLogUpdatePost({
+        r = window.volgactf.qualifier.templates.eventLogUpdatePost({
           _: _,
           moment: moment,
           createdAt: createdAt,
@@ -64,7 +64,7 @@ class EventBaseView extends View {
         break
       }
       case 'deletePost': {
-        r = window.themis.quals.templates.eventLogDeletePost({
+        r = window.volgactf.qualifier.templates.eventLogDeletePost({
           _: _,
           moment: moment,
           createdAt: createdAt,
@@ -73,7 +73,7 @@ class EventBaseView extends View {
         break
       }
       case 'createSupervisor': {
-        r = window.themis.quals.templates.eventLogCreateSupervisor({
+        r = window.volgactf.qualifier.templates.eventLogCreateSupervisor({
           _: _,
           moment: moment,
           createdAt: createdAt,
@@ -82,7 +82,7 @@ class EventBaseView extends View {
         break
       }
       case 'deleteSupervisor': {
-        r = window.themis.quals.templates.eventLogDeleteSupervisor({
+        r = window.volgactf.qualifier.templates.eventLogDeleteSupervisor({
           _: _,
           moment: moment,
           createdAt: createdAt,
@@ -91,7 +91,7 @@ class EventBaseView extends View {
         break
       }
       case 'updateSupervisorPassword': {
-        r = window.themis.quals.templates.eventLogUpdateSupervisorPassword({
+        r = window.volgactf.qualifier.templates.eventLogUpdateSupervisorPassword({
           _: _,
           moment: moment,
           createdAt: createdAt,
@@ -100,7 +100,7 @@ class EventBaseView extends View {
         break
       }
       case 'loginSupervisor': {
-        r = window.themis.quals.templates.eventLogLoginSupervisor({
+        r = window.volgactf.qualifier.templates.eventLogLoginSupervisor({
           _: _,
           moment: moment,
           createdAt: createdAt,
@@ -110,7 +110,7 @@ class EventBaseView extends View {
         break
       }
       case 'logoutSupervisor': {
-        r = window.themis.quals.templates.eventLogLogoutSupervisor({
+        r = window.volgactf.qualifier.templates.eventLogLogoutSupervisor({
           _: _,
           moment: moment,
           createdAt: createdAt,
@@ -119,7 +119,7 @@ class EventBaseView extends View {
         break
       }
       case 'createRemoteChecker': {
-        r = window.themis.quals.templates.eventLogCreateRemoteChecker({
+        r = window.volgactf.qualifier.templates.eventLogCreateRemoteChecker({
           _: _,
           moment: moment,
           createdAt: createdAt,
@@ -128,7 +128,7 @@ class EventBaseView extends View {
         break
       }
       case 'updateRemoteChecker': {
-        r = window.themis.quals.templates.eventLogUpdateRemoteChecker({
+        r = window.volgactf.qualifier.templates.eventLogUpdateRemoteChecker({
           _: _,
           moment: moment,
           createdAt: createdAt,
@@ -137,7 +137,7 @@ class EventBaseView extends View {
         break
       }
       case 'deleteRemoteChecker': {
-        r = window.themis.quals.templates.eventLogDeleteRemoteChecker({
+        r = window.volgactf.qualifier.templates.eventLogDeleteRemoteChecker({
           _: _,
           moment: moment,
           createdAt: createdAt,
@@ -146,7 +146,7 @@ class EventBaseView extends View {
         break
       }
       case 'createTask': {
-        r = window.themis.quals.templates.eventLogCreateTask({
+        r = window.volgactf.qualifier.templates.eventLogCreateTask({
           _: _,
           moment: moment,
           createdAt: createdAt,
@@ -155,7 +155,7 @@ class EventBaseView extends View {
         break
       }
       case 'updateTask': {
-        r = window.themis.quals.templates.eventLogUpdateTask({
+        r = window.volgactf.qualifier.templates.eventLogUpdateTask({
           _: _,
           moment: moment,
           createdAt: createdAt,
@@ -164,7 +164,7 @@ class EventBaseView extends View {
         break
       }
       case 'openTask': {
-        r = window.themis.quals.templates.eventLogOpenTask({
+        r = window.volgactf.qualifier.templates.eventLogOpenTask({
           _: _,
           moment: moment,
           createdAt: createdAt,
@@ -173,7 +173,7 @@ class EventBaseView extends View {
         break
       }
       case 'closeTask': {
-        r = window.themis.quals.templates.eventLogCloseTask({
+        r = window.volgactf.qualifier.templates.eventLogCloseTask({
           _: _,
           moment: moment,
           createdAt: createdAt,
@@ -185,7 +185,7 @@ class EventBaseView extends View {
         const task = _.findWhere(taskProvider.getTaskPreviews(), { id: eventData.taskId })
         const category = _.findWhere(categoryProvider.getCategories(), { id: eventData.categoryId })
         if (task && category) {
-          r = window.themis.quals.templates.eventLogCreateTaskCategory({
+          r = window.volgactf.qualifier.templates.eventLogCreateTaskCategory({
             _: _,
             moment: moment,
             createdAt: createdAt,
@@ -199,7 +199,7 @@ class EventBaseView extends View {
         const task = _.findWhere(taskProvider.getTaskPreviews(), { id: eventData.taskId })
         const category = _.findWhere(categoryProvider.getCategories(), { id: eventData.categoryId })
         if (task && category) {
-          r = window.themis.quals.templates.eventLogDeleteTaskCategory({
+          r = window.volgactf.qualifier.templates.eventLogDeleteTaskCategory({
             _: _,
             moment: moment,
             createdAt: createdAt,
@@ -212,7 +212,7 @@ class EventBaseView extends View {
       case 'createTaskValue': {
         const task = _.findWhere(taskProvider.getTaskPreviews(), { id: eventData.taskId })
         if (task) {
-          r = window.themis.quals.templates.eventLogCreateTaskValue({
+          r = window.volgactf.qualifier.templates.eventLogCreateTaskValue({
             _: _,
             moment: moment,
             createdAt: createdAt,
@@ -225,7 +225,7 @@ class EventBaseView extends View {
       case 'updateTaskValue': {
         const task = _.findWhere(taskProvider.getTaskPreviews(), { id: eventData.taskId })
         if (task) {
-          r = window.themis.quals.templates.eventLogUpdateTaskValue({
+          r = window.volgactf.qualifier.templates.eventLogUpdateTaskValue({
             _: _,
             moment: moment,
             createdAt: createdAt,
@@ -238,7 +238,7 @@ class EventBaseView extends View {
       case 'createTaskRewardScheme': {
         const task = _.findWhere(taskProvider.getTaskPreviews(), { id: eventData.taskId })
         if (task) {
-          r = window.themis.quals.templates.eventLogCreateTaskRewardScheme({
+          r = window.volgactf.qualifier.templates.eventLogCreateTaskRewardScheme({
             _: _,
             moment: moment,
             createdAt: createdAt,
@@ -251,7 +251,7 @@ class EventBaseView extends View {
       case 'updateTaskRewardScheme': {
         const task = _.findWhere(taskProvider.getTaskPreviews(), { id: eventData.taskId })
         if (task) {
-          r = window.themis.quals.templates.eventLogUpdateTaskRewardScheme({
+          r = window.volgactf.qualifier.templates.eventLogUpdateTaskRewardScheme({
             _: _,
             moment: moment,
             createdAt: createdAt,
@@ -262,7 +262,7 @@ class EventBaseView extends View {
         break
       }
       case 'createTeam': {
-        r = window.themis.quals.templates.eventLogCreateTeam({
+        r = window.volgactf.qualifier.templates.eventLogCreateTeam({
           _: _,
           moment: moment,
           createdAt: createdAt,
@@ -271,7 +271,7 @@ class EventBaseView extends View {
         break
       }
       case 'updateTeamEmail': {
-        r = window.themis.quals.templates.eventLogUpdateTeamEmail({
+        r = window.volgactf.qualifier.templates.eventLogUpdateTeamEmail({
           _: _,
           moment: moment,
           createdAt: createdAt,
@@ -280,7 +280,7 @@ class EventBaseView extends View {
         break
       }
       case 'updateTeamProfile': {
-        r = window.themis.quals.templates.eventLogUpdateTeamProfile({
+        r = window.volgactf.qualifier.templates.eventLogUpdateTeamProfile({
           _: _,
           moment: moment,
           createdAt: createdAt,
@@ -289,7 +289,7 @@ class EventBaseView extends View {
         break
       }
       case 'updateTeamPassword': {
-        r = window.themis.quals.templates.eventLogUpdateTeamPassword({
+        r = window.volgactf.qualifier.templates.eventLogUpdateTeamPassword({
           _: _,
           moment: moment,
           createdAt: createdAt,
@@ -298,7 +298,7 @@ class EventBaseView extends View {
         break
       }
       case 'updateTeamLogo': {
-        r = window.themis.quals.templates.eventLogUpdateTeamLogo({
+        r = window.volgactf.qualifier.templates.eventLogUpdateTeamLogo({
           _: _,
           moment: moment,
           createdAt: createdAt,
@@ -307,7 +307,7 @@ class EventBaseView extends View {
         break
       }
       case 'qualifyTeam': {
-        r = window.themis.quals.templates.eventLogQualifyTeam({
+        r = window.volgactf.qualifier.templates.eventLogQualifyTeam({
           _: _,
           moment: moment,
           createdAt: createdAt,
@@ -316,7 +316,7 @@ class EventBaseView extends View {
         break
       }
       case 'disqualifyTeam': {
-        r = window.themis.quals.templates.eventLogDisqualifyTeam({
+        r = window.volgactf.qualifier.templates.eventLogDisqualifyTeam({
           _: _,
           moment: moment,
           createdAt: createdAt,
@@ -325,7 +325,7 @@ class EventBaseView extends View {
         break
       }
       case 'loginTeam': {
-        r = window.themis.quals.templates.eventLogLoginTeam({
+        r = window.volgactf.qualifier.templates.eventLogLoginTeam({
           _: _,
           moment: moment,
           createdAt: createdAt,
@@ -335,7 +335,7 @@ class EventBaseView extends View {
         break
       }
       case 'logoutTeam': {
-        r = window.themis.quals.templates.eventLogLogoutTeam({
+        r = window.volgactf.qualifier.templates.eventLogLogoutTeam({
           _: _,
           moment: moment,
           createdAt: createdAt,
@@ -347,7 +347,7 @@ class EventBaseView extends View {
         const team = _.findWhere(teamProvider.getTeams(), { id: eventData.teamId })
         const task = _.findWhere(taskProvider.getTaskPreviews(), { id: eventData.taskId })
         if (team && task) {
-          r = window.themis.quals.templates.eventLogCreateTeamTaskHit({
+          r = window.volgactf.qualifier.templates.eventLogCreateTeamTaskHit({
             _: _,
             moment: moment,
             createdAt: createdAt,
@@ -362,7 +362,7 @@ class EventBaseView extends View {
         const team = _.findWhere(teamProvider.getTeams(), { id: eventData.teamId })
         const task = _.findWhere(taskProvider.getTaskPreviews(), { id: eventData.taskId })
         if (team && task) {
-          r = window.themis.quals.templates.eventLogCreateTeamTaskHitAttempt({
+          r = window.volgactf.qualifier.templates.eventLogCreateTeamTaskHitAttempt({
             _: _,
             moment: moment,
             createdAt: createdAt,
@@ -377,7 +377,7 @@ class EventBaseView extends View {
         const team = _.findWhere(teamProvider.getTeams(), { id: eventData.teamId })
         const task = _.findWhere(taskProvider.getTaskPreviews(), { id: eventData.taskId })
         if (team && task) {
-          r = window.themis.quals.templates.eventLogCreateTeamTaskReview({
+          r = window.volgactf.qualifier.templates.eventLogCreateTeamTaskReview({
             _: _,
             moment: moment,
             createdAt: createdAt,
@@ -391,7 +391,7 @@ class EventBaseView extends View {
       case 'createTaskFile': {
         const task = _.findWhere(taskProvider.getTaskPreviews(), { id: eventData.taskId })
         if (task) {
-          r = window.themis.quals.templates.eventLogCreateTaskFile({
+          r = window.volgactf.qualifier.templates.eventLogCreateTaskFile({
             _: _,
             moment: moment,
             createdAt: createdAt,
@@ -404,7 +404,7 @@ class EventBaseView extends View {
       case 'deleteTaskFile': {
         const task = _.findWhere(taskProvider.getTaskPreviews(), { id: eventData.taskId })
         if (task) {
-          r = window.themis.quals.templates.eventLogDeleteTaskFile({
+          r = window.volgactf.qualifier.templates.eventLogDeleteTaskFile({
             _: _,
             moment: moment,
             createdAt: createdAt,
@@ -415,7 +415,7 @@ class EventBaseView extends View {
         break
       }
       default: {
-        r = window.themis.quals.templates.eventLogUnknown({
+        r = window.volgactf.qualifier.templates.eventLogUnknown({
           _: _,
           moment: moment,
           eventName: eventName,

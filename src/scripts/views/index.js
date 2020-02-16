@@ -12,12 +12,12 @@ class IndexView extends View {
   }
 
   render () {
-    $('#main').html(window.themis.quals.templates.indexView({
+    $('#main').html(window.volgactf.qualifier.templates.indexView({
       _: _,
       moment: moment,
       identity: identityProvider.getIdentity(),
       contest: contestProvider.getContest(),
-      contestTitle: window.themis.quals.data.contestTitle
+      contestTitle: window.volgactf.qualifier.data.contestTitle
     }))
   }
 

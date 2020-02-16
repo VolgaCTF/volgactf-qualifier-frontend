@@ -62,7 +62,7 @@ class PostProvider extends EventEmitter {
 
   initPosts () {
     const promise = $.Deferred()
-    this.posts = _.map(window.themis.quals.data.posts, function (options) {
+    this.posts = _.map(window.volgactf.qualifier.data.posts, function (options) {
       return new PostModel(options)
     })
     promise.resolve(this.posts)

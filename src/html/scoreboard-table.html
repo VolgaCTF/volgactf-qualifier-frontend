@@ -5,9 +5,9 @@
     </caption>
     <thead>
         <tr>
-            <% var displaySmCls = printLayout ? 'themis-quals-whitespace-nowrap' : 'd-none d-sm-table-cell' %>
-            <% var displayMdCls = printLayout ? 'themis-quals-whitespace-nowrap' : 'd-none d-md-table-cell' %>
-            <% var displayLgCls = printLayout ? 'themis-quals-whitespace-nowrap' : 'd-none d-lg-table-cell' %>
+            <% var displaySmCls = printLayout ? 'volgactf-qualifier-whitespace-nowrap' : 'd-none d-sm-table-cell' %>
+            <% var displayMdCls = printLayout ? 'volgactf-qualifier-whitespace-nowrap' : 'd-none d-md-table-cell' %>
+            <% var displayLgCls = printLayout ? 'volgactf-qualifier-whitespace-nowrap' : 'd-none d-lg-table-cell' %>
             <th scope="col">#</th>
             <th scope="col">Team</th>
             <th scope="col" class="<%- displayMdCls %>">Country</th>
@@ -19,7 +19,7 @@
             <th scope="col" class="<%- displaySmCls %>">Last updated</th>
         </tr>
     </thead>
-    <tbody id="themis-scoreboard-table-body">
+    <tbody id="volgactf-scoreboard-table-body">
         <% var entries = _.map(teamRankings, function (teamRanking) {
             var team = _.findWhere(teams, { id: teamRanking.teamId })
             return {

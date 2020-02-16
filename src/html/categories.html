@@ -5,7 +5,7 @@
 
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
-        <link rel="stylesheet" href="/assets/css/{{#cachebusting}}{{#themis_quals}}{{ css }}{{/themis_quals}}{{/cachebusting}}">
+        <link rel="stylesheet" href="/assets/css/{{#cachebusting}}{{#volgactf_qualifier}}{{ css }}{{/volgactf_qualifier}}{{/cachebusting}}">
         {{#partials}}
         {{#head}}
         <!--=include {{{path}}} -->
@@ -32,7 +32,7 @@
                         </button>
                     </div>
                     <% } %>
-                    <div id="themis-categories-list">
+                    <div id="volgactf-categories-list">
                         <%= templates.categoryList({ _: _, identity: identity, contest: contest, categories: categories, templates: templates, moment: moment }) %>
                     </div>
                 </section>
@@ -56,7 +56,7 @@
                                 </div>
                                 <div class="form-group">
                                     <label for="create-category-description" class="control-label">Description</label>
-                                    <textarea class="form-control themis-category-description" id="create-category-description" minlength="0" maxlength="150" name="description"></textarea>
+                                    <textarea class="form-control volgactf-category-description" id="create-category-description" minlength="0" maxlength="150" name="description"></textarea>
                                 </div>
                                 <div class="submit-error">
                                     <p class="text-danger"></p>
@@ -111,7 +111,7 @@
                                 </div>
                                 <div class="form-group">
                                     <label for="edit-category-description" class="control-label">Description</label>
-                                    <textarea class="form-control themis-category-description" id="edit-category-description" minlength="0" maxlength="150" name="description"></textarea>
+                                    <textarea class="form-control volgactf-category-description" id="edit-category-description" minlength="0" maxlength="150" name="description"></textarea>
                                 </div>
                                 <div class="submit-error">
                                     <p class="text-danger"></p>
@@ -140,8 +140,8 @@
         </footer>
 
         <script>
-            window.themis = {
-                quals: {
+            window.volgactf = {
+                qualifier: {
                     view: 'categories',
                     data: {
                         identity: <%= jsesc(identity, { json: true, isScriptContext: true }) %>,
@@ -157,6 +157,6 @@
                 }
             }
         </script>
-        <script src="/assets/js/{{#cachebusting}}{{#themis_quals}}{{ js }}{{/themis_quals}}{{/cachebusting}}"></script>
+        <script src="/assets/js/{{#cachebusting}}{{#volgactf_qualifier}}{{ js }}{{/volgactf_qualifier}}{{/cachebusting}}"></script>
     </body>
 </html>

@@ -23,11 +23,11 @@ class NewsView extends View {
   renderPosts () {
     const identity = identityProvider.getIdentity()
     const posts = postProvider.getPosts()
-    this.$main.find('section').html(window.themis.quals.templates.postList({
+    this.$main.find('section').html(window.volgactf.qualifier.templates.postList({
       _: _,
       identity: identity,
       posts: posts,
-      templates: window.themis.quals.templates,
+      templates: window.volgactf.qualifier.templates,
       moment: moment,
       md: new MarkdownRenderer()
     }))
@@ -103,7 +103,7 @@ class NewsView extends View {
     $tabPreview.tab()
 
     $tabPreview.on('show.bs.tab', (e) => {
-      $postPreview.html(window.themis.quals.templates.postSimplifiedPartial({
+      $postPreview.html(window.volgactf.qualifier.templates.postSimplifiedPartial({
         _: _,
         moment: moment,
         md: new MarkdownRenderer(),
@@ -194,7 +194,7 @@ class NewsView extends View {
     $tabPreview.tab()
 
     $tabPreview.on('show.bs.tab', (e) => {
-      $postPreview.html(window.themis.quals.templates.postSimplifiedPartial({
+      $postPreview.html(window.volgactf.qualifier.templates.postSimplifiedPartial({
         _: _,
         moment: moment,
         md: new MarkdownRenderer(),
@@ -270,7 +270,7 @@ class NewsView extends View {
 
       let urlParams = new URLSearchParams(window.location.search)
       if (urlParams.get('action') === 'scrollTo' && urlParams.has('postId')) {
-        let $el = $(`div.themis-post[data-id="${urlParams.get('postId')}"]`)
+        let $el = $(`div.volgactf-post[data-id="${urlParams.get('postId')}"]`)
         if ($el.length > 0) {
           $el.get(0).scrollIntoView()
         }

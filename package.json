@@ -1,6 +1,6 @@
 {
-  "name": "themis-quals-frontend",
-  "version": "2.9.9",
+  "name": "volgactf-qualifier-frontend",
+  "version": "3.0.0",
   "description": "",
   "main": "index.js",
   "scripts": {
@@ -9,12 +9,12 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/aspyatkin/themis-quals-frontend.git"
+    "url": "https://github.com/VolgaCTF/volgactf-qualifier-frontend.git"
   },
-  "author": "Alexander Pyatkin",
+  "author": "VolgaCTF",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/aspyatkin/themis-quals-frontend/issues"
+    "url": "https://github.com/VolgaCTF/VolgaCTF-qualifier-frontend/issues"
   },
   "dependencies": {
     "async": "^2.6.0",

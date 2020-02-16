@@ -15,7 +15,7 @@ class IdentityProvider {
 
   initIdentity () {
     const promise = $.Deferred()
-    this.identity = new IdentityModel(window.themis.quals.data.identity)
+    this.identity = new IdentityModel(window.volgactf.qualifier.data.identity)
     promise.resolve(this.identity)
 
     return promise

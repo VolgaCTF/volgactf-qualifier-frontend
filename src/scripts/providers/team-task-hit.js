@@ -127,7 +127,7 @@ class TeamTaskHitProvider extends EventEmitter {
 
   initTeamTaskHits () {
     const promise = $.Deferred()
-    this.teamTaskHits = _.map(window.themis.quals.data.teamTaskHits, function (options) {
+    this.teamTaskHits = _.map(window.volgactf.qualifier.data.teamTaskHits, function (options) {
       return new TeamTaskHitModel(options)
     })
     promise.resolve(this.teamTaskHits)

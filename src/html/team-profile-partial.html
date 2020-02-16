@@ -1,5 +1,5 @@
 <% var sameTeam = identity.role === 'team' && identity.id === team.id %>
-<header class="themis-profile mt-4">
+<header class="volgactf-profile mt-4">
     <% if (sameTeam) { %>
     <a href="#" title="Click to upload new logo" data-action="upload-logo" data-toggle="modal" data-target="#upload-logo-modal">
         <img class="img-thumbnail align-middle mr-2" src="/team/logo/<%- team.id %>.png">

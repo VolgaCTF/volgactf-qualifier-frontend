@@ -76,7 +76,7 @@ $(document).ready(function () {
     teamRankingProvider.subscribe()
     navigationBar.present()
 
-    const viewName = window.themis.quals.view
+    const viewName = window.volgactf.qualifier.view
     if (viewName && views.hasOwnProperty(viewName)) {
       views[viewName].present()
     }

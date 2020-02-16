@@ -5,7 +5,7 @@
 
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
-        <link rel="stylesheet" href="/assets/css/{{#cachebusting}}{{#themis_quals}}{{ css }}{{/themis_quals}}{{/cachebusting}}">
+        <link rel="stylesheet" href="/assets/css/{{#cachebusting}}{{#volgactf_qualifier}}{{ css }}{{/volgactf_qualifier}}{{/cachebusting}}">
         {{#partials}}
         {{#head}}
         <!--=include {{{path}}} -->
@@ -63,7 +63,7 @@
                                                 <label for="create-post-title" class="control-label">Title</label>
                                                 <input type="text" class="form-control" id="create-post-title" required minlength="2" maxlength="250" name="title">
                                                 <label for="create-post-description" class="control-label">Description</label>
-                                                <textarea class="form-control themis-post-description" id="create-post-description" required minlength="1" maxlength="4096" name="description"></textarea>
+                                                <textarea class="form-control volgactf-post-description" id="create-post-description" required minlength="1" maxlength="4096" name="description"></textarea>
                                             </div>
                                             <div class="submit-error">
                                                 <p class="text-danger"></p>
@@ -129,7 +129,7 @@
                                                 <label for="edit-post-title" class="control-label">Title</label>
                                                 <input type="text" class="form-control" id="edit-post-title" required minlength="2" maxlength="250" name="title">
                                                 <label for="edit-post-description" class="control-label">Description</label>
-                                                <textarea class="form-control themis-post-description" id="edit-post-description" required minlength="1" maxlength="4096" name="description"></textarea>
+                                                <textarea class="form-control volgactf-post-description" id="edit-post-description" required minlength="1" maxlength="4096" name="description"></textarea>
                                             </div>
                                             <div class="submit-error">
                                                 <p class="text-danger"></p>
@@ -163,8 +163,8 @@
         </footer>
 
         <script>
-            window.themis = {
-                quals: {
+            window.volgactf = {
+                qualifier: {
                     view: 'news',
                     data: {
                         identity: <%= jsesc(identity, { json: true, isScriptContext: true }) %>,
@@ -181,6 +181,6 @@
                 }
             }
         </script>
-        <script src="/assets/js/{{#cachebusting}}{{#themis_quals}}{{ js }}{{/themis_quals}}{{/cachebusting}}"></script>
+        <script src="/assets/js/{{#cachebusting}}{{#volgactf_qualifier}}{{ js }}{{/volgactf_qualifier}}{{/cachebusting}}"></script>
     </body>
 </html>

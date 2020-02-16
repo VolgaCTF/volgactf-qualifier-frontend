@@ -82,7 +82,7 @@ class TeamTaskReviewProvider extends EventEmitter {
 
   initTeamTaskReviews () {
     const promise = $.Deferred()
-    this.teamTaskReviews = _.map(window.themis.quals.data.teamTaskReviews, function (options) {
+    this.teamTaskReviews = _.map(window.volgactf.qualifier.data.teamTaskReviews, function (options) {
       return new TeamTaskReviewModel(options)
     })
     promise.resolve(this.teamTaskReviews)
