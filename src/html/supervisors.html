@@ -12,9 +12,7 @@
         {{/head}}
         {{/partials}}
 
-        <% if (google_tag_id) { %>
         <%= templates.analytics({ _: _, google_tag_id: google_tag_id }) %>
-        <% } %>
     </head>
     <body>
         <%= templates.navbar({ _: _, active: 'contest', identity: identity, templates: templates, contestTitle: contestTitle, contest: contest, moment: moment }) %>

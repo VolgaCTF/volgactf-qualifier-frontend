@@ -12,9 +12,7 @@
         {{/head}}
         {{/partials}}
 
-        <% if (google_tag_id) { %>
         <%= templates.analytics({ _: _, google_tag_id: google_tag_id }) %>
-        <% } %>
     </head>
     <body>
         <%= templates.navbar({ _: _, active: null, identity: identity, templates: templates, contestTitle: contestTitle, contest: contest, moment: moment }) %>
@@ -22,7 +20,7 @@
         <div id="main" class="pb-4">
             <%= templates.indexView({ _: _, moment: moment, identity: identity, contest: contest, contestTitle: contestTitle }) %>
         </div>
-
+        <% runtimeStorage.viewName = 'index' %>
         <footer class="footer">
             {{#partials}}
             {{#footer}}
@@ -37,7 +35,7 @@
         <script>
             window.volgactf = {
                 qualifier: {
-                    view: 'index',
+                    view: <%= jsesc(runtimeStorage.viewName, { json: true, isScriptContext: true }) %>,
                     data: {
                         identity: <%= jsesc(identity, { json: true, isScriptContext: true }) %>,
                         contest: <%= jsesc(contest, { json: true, isScriptContext: true }) %>,
