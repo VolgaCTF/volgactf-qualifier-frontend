@@ -266,7 +266,8 @@ class EventBaseView extends View {
           _: _,
           moment: moment,
           createdAt: createdAt,
-          team: eventData
+          team: eventData.team,
+          ctftime: eventData.ctftime
         })
         break
       }
@@ -306,6 +307,16 @@ class EventBaseView extends View {
         })
         break
       }
+      case 'linkTeamCTFtime': {
+        r = window.volgactf.qualifier.templates.eventLogLinkTeamCTFtime({
+          _: _,
+          moment: moment,
+          createdAt: createdAt,
+          team: eventData.team,
+          ctftime: eventData.ctftime
+        })
+        break
+      }
       case 'qualifyTeam': {
         r = window.volgactf.qualifier.templates.eventLogQualifyTeam({
           _: _,
@@ -330,7 +341,8 @@ class EventBaseView extends View {
           moment: moment,
           createdAt: createdAt,
           team: eventData.team,
-          geoIP: eventData.geoIP
+          geoIP: eventData.geoIP,
+          ctftime: eventData.ctftime
         })
         break
       }

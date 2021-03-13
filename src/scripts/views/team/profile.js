@@ -304,6 +304,10 @@ class TeamProfileView extends View {
     }
   }
 
+  toggleChangePasswordControl (toggle) {
+    this.$main.find('button[data-action="change-password"]').toggle(toggle)
+  }
+
   initChangePasswordModal () {
     let $button = this.$main.find('button[data-action="change-password"]')
 
@@ -371,6 +375,97 @@ class TeamProfileView extends View {
             $submitSuccess.text('Password has been successfully changed!')
             let hideModal = () => {
               $modal.modal('hide')
+            }
+
+            setTimeout(hideModal, 1000)
+          },
+          error: (jqXHR, textStatus, errorThrown) => {
+            if (jqXHR.responseJSON) {
+              $submitError.text(jqXHR.responseJSON)
+            } else {
+              $submitError.text('Unknown error. Please try again later.')
+            }
+          },
+          complete: () => {
+            $submitButton.prop('disabled', false)
+          }
+        })
+      })
+    }
+  }
+
+  toggleSetPasswordControl (toggle) {
+    this.$main.find('button[data-action="set-password"]').toggle(toggle)
+  }
+
+  initSetPasswordModal () {
+    let $button = this.$main.find('button[data-action="set-password"]')
+
+    if ($button.length) {
+      let $modal = $('#set-password-modal')
+      $modal.modal({ show: false })
+
+      let $submitError = $modal.find('.submit-error > p')
+      let $submitSuccess = $modal.find('.submit-success > p')
+      let $submitButton = $modal.find('button[data-action="complete-set-password"]')
+      let $form = $modal.find('form')
+
+      let $newPassword = $('#set-pwd-new')
+      let $confirmNewPassword = $('#set-pwd-confirm-new')
+
+      $form.parsley({
+        errorClass: 'is-invalid',
+        successClass: 'is-valid',
+        classHandler: function (ParsleyField) {
+          return ParsleyField.$element
+        },
+        errorsContainer: function (ParsleyField) {
+          return ParsleyField.$element.parents('form-group')
+        },
+        errorsWrapper: '<div class="invalid-feedback">',
+        errorTemplate: '<span></span>'
+      })
+
+      $submitButton.on('click', (e) => {
+        $form.trigger('submit')
+      })
+
+      $modal.on('show.bs.modal', (e) => {
+        $newPassword.val('')
+        $confirmNewPassword.val('')
+        $form.find('div.form-group').show()
+        $submitError.text('')
+        $submitSuccess.text('')
+        $submitButton.show()
+        $form.parsley().reset()
+      })
+
+      $modal.on('shown.bs.modal', (e) => {
+        $newPassword.focus()
+      })
+
+      $form.on('submit', (e) => {
+        e.preventDefault()
+        $form.ajaxSubmit({
+          beforeSubmit: () => {
+            $submitError.text('')
+            $submitSuccess.text('')
+            $submitButton.prop('disabled', true)
+          },
+          clearForm: true,
+          dataType: 'json',
+          headers: {
+            'X-CSRF-Token': identityProvider.getIdentity().token
+          },
+          success: (responseText, textStatus, jqXHR) => {
+            $submitButton.hide()
+            $form.find('div.form-group').hide()
+            $submitSuccess.text('Password has been successfully set!')
+            let hideModal = () => {
+              $modal.modal('hide')
+              this.toggleSetPasswordControl(false)
+              this.initChangePasswordModal()
+              this.toggleChangePasswordControl(true)
             }
 
             setTimeout(hideModal, 1000)
@@ -472,7 +567,14 @@ class TeamProfileView extends View {
         }
 
         this.initEditProfileModal()
-        this.initChangePasswordModal()
+        console.log(team)
+        if (team.passwordSet) {
+          this.toggleSetPasswordControl(false)
+          this.initChangePasswordModal()
+        } else {
+          this.toggleChangePasswordControl(false)
+          this.initSetPasswordModal()
+        }
       }
     })
   }

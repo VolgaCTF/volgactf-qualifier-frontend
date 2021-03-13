@@ -1,0 +1,6 @@
+<p>
+    <% var eventCreated = (createdAt instanceof Date) ? createdAt : new Date(createdAt) %>
+    <span><code class="text-dark"><%- moment(eventCreated).utc().format('MM/DD HH:mm:ss.SSS [UTC]') %></code>&nbsp;</span>
+    <% var withCTFtime = ctftime && ctftime.name && ctftime.id && ctftime.team && ctftime.team.id %>
+    <span class="text-primary">Team <strong><u><a class="text-primary" href="/team/<%- team.id %>/profile" target="_blank"><%- team.name %></a></u></strong> has linked their profile<% if (withCTFtime) { %>&nbsp;with <u><a class="text-primary" href="https://ctftime.org/team/<%- ctftime.team.id %>" target="_blank" rel="noopener">CTFtime.org account</a></u> on behalf of <strong><u><a class="text-primary" href="https://ctftime.org/user/<%- ctftime.id %>"><%- ctftime.name %></a></u></strong><% } %></span>
+</p>

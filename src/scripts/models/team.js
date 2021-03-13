@@ -9,5 +9,9 @@ export default class TeamModel {
     this.email = (options.email) ? options.email : null
     this.emailConfirmed = (options.emailConfirmed) ? options.emailConfirmed : false
     this.disqualified = options.disqualified
+    this.ctftimeTeamId = options.ctftimeTeamId
+    if (options.passwordSet) {
+      this.passwordSet = options.passwordSet
+    }
   }
 }

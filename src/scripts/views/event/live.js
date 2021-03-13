@@ -325,6 +325,14 @@ class EventLiveView extends EventBaseView {
     }
 
     teamProvider.on('logoutTeam', this.onLogoutTeam)
+
+    this.onLinkTeamCTFtime = (e, createdAt) => {
+      this.appendLog('linkTeamCTFtime', e, createdAt)
+      return false
+    }
+
+    teamProvider.on('linkTeamCTFtime', this.onLinkTeamCTFtime)
+
   }
 
   subscribeToRemoteCheckerEvents () {

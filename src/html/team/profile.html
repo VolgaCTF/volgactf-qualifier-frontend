@@ -197,6 +197,41 @@
                     </div>
                 </div>
             </div>
+
+            <div class="modal fade" id="set-password-modal" tabindex="-1" role="dialog">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title">Set password</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <form method="POST" action="/api/team/create-password">
+                                <div class="form-group">
+                                    <label for="set-pwd-new" class="control-label">New password</label>
+                                    <input type="password" class="form-control" id="set-pwd-new" name="newPassword" required autofocus minlength="6" maxlength="40" pattern="^[A-Za-z0-9\x5b\x5d\x28\x29\x7b\x7d\x7e\x60\x21\x40\x23\x24\x25\x5e\x26\x2a\x2d\x5f\x3d\x2b\x27\x22\x3a\x3b\x7c\x2f\x5c\x2e\x2c\x3f\x3c\x3e]+$">
+                                </div>
+                                <div class="form-group">
+                                    <label for="set-pwd-confirm-new" class="control-label">Confirm new password</label>
+                                    <input type="password" class="form-control" id="set-pwd-confirm-new" required minlength="6" maxlength="40" pattern="^[A-Za-z0-9\x5b\x5d\x28\x29\x7b\x7d\x7e\x60\x21\x40\x23\x24\x25\x5e\x26\x2a\x2d\x5f\x3d\x2b\x27\x22\x3a\x3b\x7c\x2f\x5c\x2e\x2c\x3f\x3c\x3e]+$" data-parsley-equalto="#set-pwd-new">
+                                </div>
+                                <div class="submit-error">
+                                    <p class="text-danger"></p>
+                                </div>
+                                <div class="submit-success">
+                                    <p class="text-success"></p>
+                                </div>
+                            </form>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                            <button type="button" class="btn btn-primary" data-action="complete-set-password">Set</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
             <% } %>
         </div>
 

@@ -4,6 +4,8 @@ import 'bootstrap'
 import indexView from './views/index'
 import teamSigninView from './views/team/signin'
 import teamSignupView from './views/team/signup'
+import teamCtftimeOauthStartView from './views/team/ctftime/oauth/start.js'
+import teamCtftimeOauthCompleteView from './views/team/ctftime/oauth/complete.js'
 import supervisorSigninView from './views/supervisor/signin'
 import newsView from './views/news'
 import teamVerifyEmailView from './views/team/verify-email'
@@ -52,6 +54,8 @@ $(document).ready(function () {
 
     teamSignin: teamSigninView,
     teamSignup: teamSignupView,
+    teamCtftimeOauthStart: teamCtftimeOauthStartView,
+    teamCtftimeOauthComplete: teamCtftimeOauthCompleteView,
     teamVerifyEmail: teamVerifyEmailView,
     teamProfile: teamProfileView,
     teamRestore: teamRestoreView,

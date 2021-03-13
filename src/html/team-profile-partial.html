@@ -22,9 +22,8 @@
     <h3>General information</h3>
     <% var createdAt = (team.createdAt instanceof Date) ? team.createdAt : new Date(team.createdAt) %>
     <p class="text-secondary">Signed up on <%- moment(createdAt).utc().format('MMM D [at] HH:mm [UTC]') %></p>
-    <% if (sameTeam || identity.role === 'manager' || identity.role === 'admin') { %>
     <ul class="list-unstyled">
-        <% if ('email' in team && 'emailConfirmed' in team) { %>
+        <% if ((sameTeam || identity.role === 'manager' || identity.role === 'admin') && ('email' in team && 'emailConfirmed' in team)) { %>
         <li>
             <span class="oi oi-envelope-closed"></span>
             <% if (team.emailConfirmed) { %>
@@ -39,8 +38,20 @@
             <% } %>
         </li>
         <% } %>
+        <% if (team.ctftimeTeamId) { %>
+        <li>
+            <span class="oi oi-globe"></span>
+            <a href="https://ctftime.org/team/<%- team.ctftimeTeamId %>" target="_blank" rel="noopener">CTFtime.org</a>
+        </li>
+        <% } %>
+
+        <% if (!team.ctftimeTeamId && sameTeam) { %>
+        <li>
+            <span class="oi oi-share"></span>
+            <a href="/team/ctftime/oauth/start" target="_blank" rel="noopener">link with your CTFtime.org account</a>
+        </li>
+        <% } %>
     </ul>
-    <% } %>
     <ul class="list-unstyled">
         <% if (country !== '' || sameTeam) { %>
         <li><strong data-field="team-country">Country:</strong> <%- country.name %></li>
@@ -58,6 +69,9 @@
             </button>
             <button type="button" class="btn btn-primary btn-sm" data-action="change-password" data-toggle="modal" data-target="#change-password-modal">
                 Change password
+            </button>
+            <button type="button" class="btn btn-primary btn-sm" data-action="set-password" data-toggle="modal" data-target="#set-password-modal">
+                Set password
             </button>
         </li>
         <% } %>

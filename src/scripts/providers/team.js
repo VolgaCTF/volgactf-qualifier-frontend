@@ -84,10 +84,14 @@ class TeamProvider extends EventEmitter {
 
     if (identity.isSupervisor()) {
       this.onCreate = (e) => {
-        let options = JSON.parse(e.data)
-        let team = new TeamModel(options)
+        const options = JSON.parse(e.data)
+        const team = new TeamModel(options.team)
         this.teams.push(team)
-        this.trigger('createTeam', [team, new Date(options.__metadataCreatedAt)])
+        const obj = {
+          team: team,
+          ctftime: options.ctftime
+        }
+        this.trigger('createTeam', [obj, new Date(options.__metadataCreatedAt)])
       }
 
       realtimeProvider.addEventListener('createTeam', this.onCreate)
@@ -117,7 +121,8 @@ class TeamProvider extends EventEmitter {
         const options = JSON.parse(e.data)
         const obj = {
           team: new TeamModel(options.team),
-          geoIP: options.geoIP
+          geoIP: options.geoIP,
+          ctftime: options.ctftime
         }
         this.trigger('loginTeam', [obj, new Date(options.__metadataCreatedAt)])
       }
@@ -131,6 +136,23 @@ class TeamProvider extends EventEmitter {
       }
 
       realtimeProvider.addEventListener('logoutTeam', this.onLogout)
+
+      this.onLinkTeamCTFtime = (e) => {
+        let options = JSON.parse(e.data)
+        const team = new TeamModel(options.team)
+        const ndx = _.findIndex(this.teams, { id: team.id })
+        if (ndx > -1) {
+          this.teams.splice(ndx, 1)
+        }
+        this.teams.push(team)
+        const obj = {
+          team: team,
+          ctftime: options.ctftime
+        }
+        this.trigger('linkTeamCTFtime', [obj, new Date(options.__metadataCreatedAt)])
+      }
+
+      realtimeProvider.addEventListener('linkTeamCTFtime', this.onLinkTeamCTFtime)
     }
   }
 
