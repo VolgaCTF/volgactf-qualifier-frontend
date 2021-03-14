@@ -567,7 +567,6 @@ class TeamProfileView extends View {
         }
 
         this.initEditProfileModal()
-        console.log(team)
         if (team.passwordSet) {
           this.toggleSetPasswordControl(false)
           this.initChangePasswordModal()

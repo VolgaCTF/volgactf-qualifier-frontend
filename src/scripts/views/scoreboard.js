@@ -63,13 +63,10 @@ class ScoreboardView extends View {
       teamRankingProvider.on('updateTeamRankings', this.onUpdateTeamRankings)
 
       this.onUpdateTeamLogo = (team) => {
-        const teamId = team.id
-        setTimeout(() => {
-          let el = document.getElementById(`team-${teamId}-logo`)
-          if (el) {
-            el.setAttribute('src', `/team/logo/${teamId}.png?timestamp=${(new Date()).getTime()}`)
-          }
-        }, 500)
+        const el = document.getElementById(`team-${team.id}-logo`)
+        if (el) {
+          el.setAttribute('src', `/team/logo/${team.id}/${team.logoChecksum}`)
+        }
         return false
       }
 

@@ -75,7 +75,7 @@
                     <% } else if (identity.role === 'manager') { %>
                     <span class="badge badge-primary">M</span>
                     <% } else if (identity.role === 'team') {%>
-                    <img class="d-inline-block align-middle mr-1" width="32px" height="32px" src="/team/logo/<%- identity.id %>.png">
+                    <img id="team-<%- identity.id %>-navbar-logo" class="d-inline-block align-middle mr-1" width="32px" height="32px" src="/team/logo/<%- identity.id %>/<%- identity.logoChecksum %>">
                     <% } %>
                     <span class="d-inline-block align-middle volgactf-qualifier-navbar-identity-name"><%- identity.name %></span>
                     &nbsp;<span class="caret"></span>

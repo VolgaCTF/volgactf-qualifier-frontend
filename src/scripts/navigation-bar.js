@@ -5,6 +5,7 @@ import moment from 'moment'
 import identityProvider from './providers/identity'
 import contestProvider from './providers/contest'
 import teamRankingProvider from './providers/team-ranking'
+import identityLogoProvider from './providers/identity-logo'
 import dataStore from './data-store'
 
 class NavigationBar {
@@ -22,6 +23,8 @@ class NavigationBar {
 
     this.onUpdateTeamRankings = null
     this.teamRankingTemplate = null
+
+    this.onUpdateTeamLogo = null
 
     dataStore.onConnectedRealtime(() => {
       this.renderStreamState()
@@ -193,6 +196,19 @@ class NavigationBar {
     contestProvider.on('updateContest', this.onUpdateContest)
 
     if (identityProvider.getIdentity().isTeam()) {
+      identityLogoProvider.subscribe()
+
+      this.onUpdateTeamLogo = (team) => {
+        identityProvider.getIdentity().logoChecksum = team.logoChecksum
+        const el = document.getElementById(`team-${team.id}-navbar-logo`)
+        if (el) {
+          el.setAttribute('src', `/team/logo/${team.id}/${team.logoChecksum}`)
+        }
+        return false
+      }
+
+      identityLogoProvider.on('updateTeamLogo', this.onUpdateTeamLogo)
+
       this.$teamRankingContainer = $('#volgactf-qualifier-team-ranking')
 
       this.onUpdateTeamRankings = (teamRankings) => {

@@ -49,7 +49,12 @@ class TeamProvider extends EventEmitter {
     this.onUpdateLogo = (e) => {
       let options = JSON.parse(e.data)
       let team = new TeamModel(options)
-      this.trigger('updateTeamLogo', [team, new Date(options.__metadataCreatedAt)])
+      let ndx = _.findIndex(this.teams, { id: options.id })
+      if (ndx > -1) {
+        this.teams.splice(ndx, 1)
+        this.teams.push(team)
+        this.trigger('updateTeamLogo', [team, new Date(options.__metadataCreatedAt)])
+      }
     }
 
     realtimeProvider.addEventListener('updateTeamLogo', this.onUpdateLogo)

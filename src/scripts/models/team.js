@@ -13,5 +13,6 @@ export default class TeamModel {
     if (options.passwordSet) {
       this.passwordSet = options.passwordSet
     }
+    this.logoChecksum = options.logoChecksum || 'deadbeef'
   }
 }

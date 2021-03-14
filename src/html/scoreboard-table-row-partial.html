@@ -5,7 +5,7 @@
 <tr class="volgactf-scoreboard-row<% print(highlight ? ' table-primary': ''); %>">
     <th scope="row"><%- rank %></th>
     <td>
-        <img id="team-<%- team.id %>-logo" class="volgactf-scoreboard-logo" src="/team/logo/<%- team.id %>.png">
+        <img id="team-<%- team.id %>-logo" class="volgactf-scoreboard-logo" src="/team/logo/<%- team.id %>/<%- team.logoChecksum %>">
         &nbsp;
         <a href="/team/<%- team.id %>/profile" class="volgactf-team-link"><%- team.name %></a>
     </td>
