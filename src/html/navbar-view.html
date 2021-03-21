@@ -1,5 +1,9 @@
 <nav class="navbar navbar-expand-md navbar-dark bg-dark fixed-top">
+    <% if (active === 'home') { %>
+    <span class="navbar-brand">
+    <% } else { %>
     <a href="/" class="navbar-brand">
+    <% } %>
         {{#partials}}
         {{#brand}}
         <!--=include {{{path}}} -->
@@ -8,7 +12,11 @@
         <%- contestTitle %>
         {{/brand}}
         {{/partials}}
+    <% if (active === 'home') { %>
+    </span>
+    <% } else { %>
     </a>
+    <% } %>
 
     <button class="navbar-toggler collapsed" type="button" data-toggle="collapse" data-target="#volgactf-navbar" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
@@ -17,19 +25,39 @@
     <div id="volgactf-navbar" class="collapse navbar-collapse">
         <ul class="navbar-nav mr-auto">
             <li class="nav-item <% print((active === 'teams') ? 'active' : ''); %>">
+                <% if (active === 'teams') { %>
+                <span class="nav-link">Teams</span>
+                <% } else { %>
                 <a class="nav-link" href="/teams">Teams</a>
+                <% } %>
             </li>
             <li class="nav-item <% print((active === 'news') ? 'active' : ''); %>">
+                <% if (active === 'news') { %>
+                <span class="nav-link">News</span>
+                <% } else { %>
                 <a class="nav-link" href="/news">News</a>
+                <% } %>
             </li>
             <li class="nav-item <% print((active === 'scoreboard') ? 'active' : ''); %>">
+                <% if (active === 'scoreboard') { %>
+                <span class="nav-link">Scoreboard</span>
+                <% } else { %>
                 <a class="nav-link" href="/scoreboard">Scoreboard</a>
+                <% } %>
             </li>
             <li class="nav-item <% print((active === 'tasks') ? 'active' : ''); %>">
+                <% if (active === 'tasks') { %>
+                <span class="nav-link">Tasks</span>
+                <% } else { %>
                 <a class="nav-link" href="/tasks">Tasks</a>
+                <% } %>
             </li>
             <li class="nav-item <% print((active === 'about') ? 'active' : ''); %>">
+                <% if (active === 'about') { %>
+                <span class="nav-link">About</span>
+                <% } else { %>
                 <a class="nav-link" href="/about">About</a>
+                <% } %>
             </li>
 
             <% if (identity.role === 'admin' || identity.role === 'manager') { %>

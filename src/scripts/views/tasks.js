@@ -400,6 +400,7 @@ class TasksView extends View {
     const $taskRewardScheme = $('#create-task-reward-scheme')
     const $taskRewardSchemeFixed = $('#create-task-reward-scheme-fixed')
     const $taskRewardSchemeVariable = $('#create-task-reward-scheme-variable')
+    const $taskRewardSchemeDynlog = $('#create-task-reward-scheme-dynlog')
     const $taskRewardSchemeGroup = $('#create-task-reward-scheme-group')
 
     const $taskCheckMethod = $('#create-task-check-method')
@@ -560,7 +561,7 @@ class TasksView extends View {
           subtractHitCount: $('#create-task-reward-scheme-variable-subtract-hit-count').val()
         }
       } else {
-        return {}
+        return null
       }
     }
 
@@ -570,7 +571,11 @@ class TasksView extends View {
         _: _,
         rewardScheme: scheme,
         taskMinValue: window.volgactf.qualifier.data.taskMinValue,
-        taskMaxValue: window.volgactf.qualifier.data.taskMaxValue
+        taskMaxValue: window.volgactf.qualifier.data.taskMaxValue,
+        scoringDynlogMin: window.volgactf.qualifier.data.scoringDynlogMin,
+        scoringDynlogMax: window.volgactf.qualifier.data.scoringDynlogMax,
+        scoringDynlogK: window.volgactf.qualifier.data.scoringDynlogK,
+        scoringDynlogV: window.volgactf.qualifier.data.scoringDynlogV
       }))
     })
 
@@ -595,6 +600,7 @@ class TasksView extends View {
 
       $taskRewardSchemeFixed.prop('checked', true)
       $taskRewardSchemeVariable.prop('checked', false)
+      $taskRewardSchemeDynlog.prop('checked', false)
       $taskRewardSchemeGroup.html(window.volgactf.qualifier.templates.createTaskRewardSchemePartial({
         _: _,
         rewardScheme: 'fixed',
@@ -687,6 +693,7 @@ class TasksView extends View {
     const $taskRewardScheme = $('#edit-task-reward-scheme')
     const $taskRewardSchemeFixed = $('#edit-task-reward-scheme-fixed')
     const $taskRewardSchemeVariable = $('#edit-task-reward-scheme-variable')
+    const $taskRewardSchemeDynlog = $('#edit-task-reward-scheme-dynlog')
     const $taskRewardSchemeGroup = $('#edit-task-reward-scheme-group')
 
     let $taskHints = $('#edit-task-hints')
@@ -867,7 +874,7 @@ class TasksView extends View {
           subtractHitCount: $('#edit-task-reward-scheme-variable-subtract-hit-count').val()
         }
       } else {
-        return {}
+        return null
       }
     }
 
@@ -880,7 +887,11 @@ class TasksView extends View {
         rewardScheme: scheme,
         taskRewardScheme: taskRewardScheme,
         taskMinValue: window.volgactf.qualifier.data.taskMinValue,
-        taskMaxValue: window.volgactf.qualifier.data.taskMaxValue
+        taskMaxValue: window.volgactf.qualifier.data.taskMaxValue,
+        scoringDynlogMin: window.volgactf.qualifier.data.scoringDynlogMin,
+        scoringDynlogMax: window.volgactf.qualifier.data.scoringDynlogMax,
+        scoringDynlogK: window.volgactf.qualifier.data.scoringDynlogK,
+        scoringDynlogV: window.volgactf.qualifier.data.scoringDynlogV
       }))
     })
 
@@ -927,17 +938,26 @@ class TasksView extends View {
 
       const taskRewardScheme = _.findWhere(taskRewardSchemeProvider.getTaskRewardSchemes(), { taskId: taskId })
       let rewardScheme = 'fixed'
-      if (taskRewardScheme && !_.isNull(taskRewardScheme.minValue)) {
+      if (taskRewardScheme && !_.isNull(taskRewardScheme.minValue) && !_.isNull(taskRewardScheme.subtractHitCount) && !_.isNull(taskRewardScheme.subtractPoints)) {
         rewardScheme = 'variable'
       }
+      if (taskRewardScheme && !_.isNull(taskRewardScheme.minValue) && !_.isNull(taskRewardScheme.dynlogK) && !_.isNull(taskRewardScheme.dynlogV)) {
+        rewardScheme = 'dynlog'
+      }
+
       $taskRewardSchemeFixed.prop('checked', rewardScheme === 'fixed')
       $taskRewardSchemeVariable.prop('checked', rewardScheme === 'variable')
+      $taskRewardSchemeDynlog.prop('checked', rewardScheme === 'dynlog')
       $taskRewardSchemeGroup.html(window.volgactf.qualifier.templates.editTaskRewardSchemePartial({
         _: _,
         rewardScheme: rewardScheme,
         taskRewardScheme: taskRewardScheme,
         taskMinValue: window.volgactf.qualifier.data.taskMinValue,
-        taskMaxValue: window.volgactf.qualifier.data.taskMaxValue
+        taskMaxValue: window.volgactf.qualifier.data.taskMaxValue,
+        scoringDynlogMin: window.volgactf.qualifier.data.scoringDynlogMin,
+        scoringDynlogMax: window.volgactf.qualifier.data.scoringDynlogMax,
+        scoringDynlogK: window.volgactf.qualifier.data.scoringDynlogK,
+        scoringDynlogV: window.volgactf.qualifier.data.scoringDynlogV
       }))
 
       $taskHintList.empty()

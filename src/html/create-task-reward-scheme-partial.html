@@ -20,4 +20,21 @@
         <label for="create-task-reward-scheme-variable-subtract-hit-count" class="control-label">Subtract hit count</label>
         <input type="number" class="form-control" id="create-task-reward-scheme-variable-subtract-hit-count" required data-parsley-type="integer" data-parsley-min="1" data-parsley-max="500">
     </div>
+<% } else if (rewardScheme === 'dynlog') { %>
+    <div class="form-group">
+        <label class="control-label">Max points</label>
+        <input type="number" class="form-control" disabled value="<%- scoringDynlogMax %>">
+    </div>
+    <div class="form-group">
+        <label class="control-label">Min value</label>
+        <input type="number" class="form-control" disabled value="<%- scoringDynlogMin %>">
+    </div>
+    <div class="form-group">
+        <label class="control-label">K</label>
+        <input type="number" class="form-control" disabled value="<%- scoringDynlogK %>">
+    </div>
+    <div class="form-group">
+        <label class="control-label">V</label>
+        <input type="number" class="form-control" disabled value="<%- scoringDynlogV %>">
+    </div>
 <% } %>

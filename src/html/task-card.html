@@ -63,7 +63,11 @@
             <% if (_.isNull(taskRewardScheme.minValue)) { %>
                 <%- taskValue.value %>
             <% } else { %>
-                <% var rewardInformation = 'The starting value is ' + taskRewardScheme.maxValue.toString() + ' points. It decreases by ' + taskRewardScheme.subtractPoints.toString() + ' point' + ((taskRewardScheme.subtractPoints > 1) ? 's' : '') + ' each time ' + taskRewardScheme.subtractHitCount.toString() + ' more team' + ((taskRewardScheme.subtractHitCount > 1) ? 's' : '') + ' solve' + ((taskRewardScheme.subtractHitCount === 1) ? 's' : '') + ' the task until the value reaches the lower boundary of ' + taskRewardScheme.minValue.toString() + ' points. Having solved the task, every team gets an equal number of points.' %>
+                <% if (_.isNull(taskRewardScheme.subtractPoints) || _.isNull(taskRewardScheme.subtractHitCount)) { %>
+                    <% var rewardInformation = 'The starting value is ' + taskRewardScheme.maxValue.toString() + ' points. The more teams solve the task the more its value decreases until it reaches the lower boundary of ' + taskRewardScheme.minValue.toString() + ' points. Having solved the task, every team gets an equal number of points.' %>
+                <% } else { %>
+                    <% var rewardInformation = 'The starting value is ' + taskRewardScheme.maxValue.toString() + ' points. It decreases by ' + taskRewardScheme.subtractPoints.toString() + ' point' + ((taskRewardScheme.subtractPoints > 1) ? 's' : '') + ' each time ' + taskRewardScheme.subtractHitCount.toString() + ' more team' + ((taskRewardScheme.subtractHitCount > 1) ? 's' : '') + ' solve' + ((taskRewardScheme.subtractHitCount === 1) ? 's' : '') + ' the task until the value reaches the lower boundary of ' + taskRewardScheme.minValue.toString() + ' points. Having solved the task, every team gets an equal number of points.' %>
+                <% } %>
                 ~<%- taskValue.value %><sup class="text-danger" title="<%- rewardInformation %>" data-action="show-task-reward-information">*</sup>
             <% } %>
         <% } else { %>

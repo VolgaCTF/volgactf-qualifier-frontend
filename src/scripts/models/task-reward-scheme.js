@@ -6,6 +6,8 @@ export default class TaskRewardSchemeModel {
     this.minValue = options.minValue
     this.subtractPoints = options.subtractPoints
     this.subtractHitCount = options.subtractHitCount
+    this.dynlogK = options.dynlogK
+    this.dynlogV = options.dynlogV
     this.created = new Date(options.created)
     this.updated = new Date(options.updated)
   }

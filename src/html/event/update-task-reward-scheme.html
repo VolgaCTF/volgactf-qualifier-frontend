@@ -4,10 +4,14 @@
     <span class="text-primary">
         <% var desc = null %>
         <% if (_.isNull(taskRewardScheme.minValue)) { %>
-            <% var desc = '<strong>fixed</strong> (' + taskRewardScheme.maxValue.toString() + ' pts)' %>
+            <% var desc = '<strong>static</strong> (' + taskRewardScheme.maxValue.toString() + ' pts)' %>
         <% } else { %>
-            <% var desc = '<strong>variable</strong> (' + taskRewardScheme.minValue.toString() + '&ndash;' + taskRewardScheme.maxValue.toString() + ' pts; decrease by ' + taskRewardScheme.subtractPoints.toString() + ' pts each ' + taskRewardScheme.subtractHitCount.toString() + ' hit' + ((taskRewardScheme.subtractHitCount > 1) ? 's' : '') + ')' %>
+            <% if (_.isNull(taskRewardScheme.subtractPoints) || _.isNull(taskRewardScheme.subtractHitCount)) { %>
+                <% var desc = '<strong>dynamic (log)</strong> (' + taskRewardScheme.minValue.toString() + '&ndash;' + taskRewardScheme.maxValue.toString() + ' pts)' %>
+            <% } else { %>
+                <% var desc = '<strong>dynamic (lin)</strong> (' + taskRewardScheme.minValue.toString() + '&ndash;' + taskRewardScheme.maxValue.toString() + ' pts; decrease by ' + taskRewardScheme.subtractPoints.toString() + ' pts each ' + taskRewardScheme.subtractHitCount.toString() + ' hit' + ((taskRewardScheme.subtractHitCount > 1) ? 's' : '') + ')' %>
+            <% } %>
         <% } %>
-        Task <strong><u><a class="text-primary" href="/tasks?action=show&taskId=<%- task.id %>" target="_blank"><%- task.title %></a></u></strong> reward scheme has been updated to <%= desc %>
+        Task <strong><u><a class="text-primary" href="/tasks?action=show&taskId=<%- task.id %>" target="_blank"><%- task.title %></a></u></strong> scoring has been updated to <%= desc %>
     </span>
 </p>

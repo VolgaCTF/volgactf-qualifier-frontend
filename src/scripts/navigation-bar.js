@@ -128,7 +128,11 @@ class NavigationBar {
     })
     if (ndx !== -1) {
       if (_.isNull(this.teamRankingTemplate)) {
-        this.teamRankingTemplate = _.template('<span class="navbar-text text-info"><span class="oi oi-spreadsheet"></span>&nbsp;<%- rankFormatted %>&nbsp;/&nbsp;<%- score %>&nbsp;pts</span>')
+        if (window.location.pathname.indexOf('/scoreboard') === 0) {
+          this.teamRankingTemplate = _.template('<span class="navbar-text text-info"><span class="oi oi-spreadsheet"></span>&nbsp;<%- rankFormatted %>&nbsp;/&nbsp;<%- score %>&nbsp;pts</span>')
+        } else {
+          this.teamRankingTemplate = _.template('<a href="/scoreboard" class="navbar-text text-info"><span class="oi oi-spreadsheet"></span>&nbsp;<%- rankFormatted %>&nbsp;/&nbsp;<%- score %>&nbsp;pts</a>')
+        }
       }
 
       this.$teamRankingContainer.html(this.teamRankingTemplate({
