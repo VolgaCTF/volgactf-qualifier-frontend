@@ -56,7 +56,7 @@
     "gulp-filter": "^5.1.0",
     "gulp-if": "^2.0.0",
     "gulp-include": "^2.3.1",
-    "gulp-mustache": "^2.2.0",
+    "gulp-mustache": "^5.0.0",
     "gulp-plumber": "^1.1.0",
     "gulp-remote-src": "^0.4.3",
     "gulp-rev": "^7.0.0",
