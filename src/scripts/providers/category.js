@@ -23,11 +23,11 @@ class CategoryProvider extends EventEmitter {
       return
     }
 
-    let realtimeProvider = dataStore.getRealtimeProvider()
+    const realtimeProvider = dataStore.getRealtimeProvider()
 
     this.onCreate = (e) => {
-      let options = JSON.parse(e.data)
-      let category = new CategoryModel(options)
+      const options = JSON.parse(e.data)
+      const category = new CategoryModel(options)
       this.categories.push(category)
       this.trigger('createCategory', [category, new Date(options.__metadataCreatedAt)])
     }
@@ -35,9 +35,9 @@ class CategoryProvider extends EventEmitter {
     realtimeProvider.addEventListener('createCategory', this.onCreate)
 
     this.onUpdate = (e) => {
-      let options = JSON.parse(e.data)
-      let category = new CategoryModel(options)
-      let ndx = _.findIndex(this.categories, { id: category.id })
+      const options = JSON.parse(e.data)
+      const category = new CategoryModel(options)
+      const ndx = _.findIndex(this.categories, { id: category.id })
       if (ndx > -1) {
         this.categories.splice(ndx, 1)
       }
@@ -48,12 +48,12 @@ class CategoryProvider extends EventEmitter {
     realtimeProvider.addEventListener('updateCategory', this.onUpdate)
 
     this.onDelete = (e) => {
-      let options = JSON.parse(e.data)
-      let ndx = _.findIndex(this.categories, { id: options.id })
+      const options = JSON.parse(e.data)
+      const ndx = _.findIndex(this.categories, { id: options.id })
 
       if (ndx > -1) {
         this.categories.splice(ndx, 1)
-        let category = new CategoryModel(options)
+        const category = new CategoryModel(options)
         this.trigger('deleteCategory', [category, new Date(options.__metadataCreatedAt)])
       }
     }
@@ -71,8 +71,8 @@ class CategoryProvider extends EventEmitter {
   }
 
   fetchCategories () {
-    let promise = $.Deferred()
-    let url = '/api/category/index'
+    const promise = $.Deferred()
+    const url = '/api/category/index'
 
     $.ajax({
       url: url,
@@ -97,8 +97,8 @@ class CategoryProvider extends EventEmitter {
   }
 
   deleteCategory (id, token) {
-    let promise = $.Deferred()
-    let url = `/api/category/${id}/delete`
+    const promise = $.Deferred()
+    const url = `/api/category/${id}/delete`
 
     $.ajax({
       url: url,

@@ -11,7 +11,7 @@ class RestoreView extends View {
   }
 
   initRestoreForm () {
-    let $form = this.$main.find('form.volgactf-form-restore')
+    const $form = this.$main.find('form.volgactf-form-restore')
     $form.parsley({
       errorClass: 'is-invalid',
       successClass: 'is-valid',
@@ -27,10 +27,10 @@ class RestoreView extends View {
 
     $form.find('input[name="email"]').focus()
 
-    let $successAlert = this.$main.find('div.volgactf-alert-restore')
+    const $successAlert = this.$main.find('div.volgactf-alert-restore')
 
-    let $submitError = $form.find('.submit-error > p')
-    let $submitButton = $form.find('button')
+    const $submitError = $form.find('.submit-error > p')
+    const $submitButton = $form.find('button')
 
     $form.on('submit', (e) => {
       e.preventDefault()

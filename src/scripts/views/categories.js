@@ -24,12 +24,12 @@ class CategoriesView extends View {
   }
 
   initCreateCategoryModal () {
-    let $modal = $('#create-category-modal')
+    const $modal = $('#create-category-modal')
     $modal.modal({ show: false })
 
-    let $submitError = $modal.find('.submit-error > p')
-    let $submitButton = $modal.find('button[data-action="complete-create-category"]')
-    let $form = $modal.find('form')
+    const $submitError = $modal.find('.submit-error > p')
+    const $submitButton = $modal.find('button[data-action="complete-create-category"]')
+    const $form = $modal.find('form')
     $form.parsley({
       errorClass: 'is-invalid',
       successClass: 'is-valid',
@@ -89,12 +89,12 @@ class CategoriesView extends View {
   }
 
   initEditCategoryModal () {
-    let $modal = $('#edit-category-modal')
+    const $modal = $('#edit-category-modal')
     $modal.modal({ show: false })
 
-    let $submitError = $modal.find('.submit-error > p')
-    let $submitButton = $modal.find('button[data-action="complete-edit-category"]')
-    let $form = $modal.find('form')
+    const $submitError = $modal.find('.submit-error > p')
+    const $submitButton = $modal.find('button[data-action="complete-edit-category"]')
+    const $form = $modal.find('form')
     $form.parsley({
       errorClass: 'is-invalid',
       successClass: 'is-valid',
@@ -112,12 +112,12 @@ class CategoriesView extends View {
       $form.trigger('submit')
     })
 
-    let $editCategoryTitle = $('#edit-category-title')
-    let $editCategoryDescription = $('#edit-category-description')
+    const $editCategoryTitle = $('#edit-category-title')
+    const $editCategoryDescription = $('#edit-category-description')
 
     $modal.on('show.bs.modal', (e) => {
-      let categoryId = parseInt($(e.relatedTarget).data('category-id'), 10)
-      let category = _.findWhere(categoryProvider.getCategories(), { id: categoryId })
+      const categoryId = parseInt($(e.relatedTarget).data('category-id'), 10)
+      const category = _.findWhere(categoryProvider.getCategories(), { id: categoryId })
 
       $form.attr('action', `/api/category/${categoryId}/update`)
       $editCategoryTitle.val(category.title)
@@ -163,24 +163,24 @@ class CategoriesView extends View {
   }
 
   initDeleteCategoryModal () {
-    let $modal = $('#delete-category-modal')
+    const $modal = $('#delete-category-modal')
     $modal.modal({ show: false })
 
-    let $modalBody = $modal.find('.modal-body p.confirmation')
-    let $submitError = $modal.find('.submit-error > p')
-    let $submitButton = $modal.find('button[data-action="complete-delete-category"]')
+    const $modalBody = $modal.find('.modal-body p.confirmation')
+    const $submitError = $modal.find('.submit-error > p')
+    const $submitButton = $modal.find('button[data-action="complete-delete-category"]')
 
     $modal.on('show.bs.modal', (e) => {
-      let categoryId = parseInt($(e.relatedTarget).data('category-id'), 10)
+      const categoryId = parseInt($(e.relatedTarget).data('category-id'), 10)
       $modal.data('category-id', categoryId)
-      let category = _.findWhere(categoryProvider.getCategories(), { id: categoryId })
+      const category = _.findWhere(categoryProvider.getCategories(), { id: categoryId })
       const msgTemplate = _.template('You are about to delete the category <mark><%- title %></mark>. Continue?')
       $modalBody.html(msgTemplate({ title: category.title }))
       $submitError.text('')
     })
 
     $submitButton.on('click', (e) => {
-      let categoryId = $modal.data('category-id')
+      const categoryId = $modal.data('category-id')
       $
         .when(categoryProvider.deleteCategory(categoryId, identityProvider.getIdentity().token))
         .done(() => {
@@ -210,49 +210,49 @@ class CategoriesView extends View {
     this.$main = $('#main')
 
     $
-    .when(
-      categoryProvider.initCategories()
-    )
-    .done((categories) => {
-      let urlParams = new URLSearchParams(window.location.search)
-      if (urlParams.get('action') === 'scrollTo' && urlParams.has('categoryId')) {
-        let $el = $(`div.volgactf-qualifier-category[data-id="${urlParams.get('categoryId')}"]`)
-        if ($el.length > 0) {
-          $el.get(0).scrollIntoView()
+      .when(
+        categoryProvider.initCategories()
+      )
+      .done((categories) => {
+        const urlParams = new URLSearchParams(window.location.search)
+        if (urlParams.get('action') === 'scrollTo' && urlParams.has('categoryId')) {
+          const $el = $(`div.volgactf-qualifier-category[data-id="${urlParams.get('categoryId')}"]`)
+          if ($el.length > 0) {
+            $el.get(0).scrollIntoView()
+          }
         }
-      }
 
-      this.initCreateCategoryModal()
-      this.initEditCategoryModal()
-      this.initDeleteCategoryModal()
+        this.initCreateCategoryModal()
+        this.initEditCategoryModal()
+        this.initDeleteCategoryModal()
 
-      this.onCreateCategory = () => {
-        this.renderCategories()
-        return false
-      }
+        this.onCreateCategory = () => {
+          this.renderCategories()
+          return false
+        }
 
-      this.onUpdateCategory = () => {
-        this.renderCategories()
-        return false
-      }
+        this.onUpdateCategory = () => {
+          this.renderCategories()
+          return false
+        }
 
-      this.onDeleteCategory = () => {
-        this.renderCategories()
-        return false
-      }
+        this.onDeleteCategory = () => {
+          this.renderCategories()
+          return false
+        }
 
-      categoryProvider.subscribe()
-      categoryProvider.on('createCategory', this.onCreateCategory)
-      categoryProvider.on('updateCategory', this.onUpdateCategory)
-      categoryProvider.on('deleteCategory', this.onDeleteCategory)
+        categoryProvider.subscribe()
+        categoryProvider.on('createCategory', this.onCreateCategory)
+        categoryProvider.on('updateCategory', this.onUpdateCategory)
+        categoryProvider.on('deleteCategory', this.onDeleteCategory)
 
-      this.onUpdateContest = (contest) => {
-        this.renderCategories()
-        return false
-      }
+        this.onUpdateContest = (contest) => {
+          this.renderCategories()
+          return false
+        }
 
-      contestProvider.on('updateContest', this.onUpdateContest)
-    })
+        contestProvider.on('updateContest', this.onUpdateContest)
+      })
   }
 }
 

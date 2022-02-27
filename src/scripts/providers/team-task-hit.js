@@ -25,13 +25,13 @@ class TeamTaskHitProvider extends EventEmitter {
       return
     }
 
-    let realtimeProvider = dataStore.getRealtimeProvider()
-    let identity = identityProvider.getIdentity()
+    const realtimeProvider = dataStore.getRealtimeProvider()
+    const identity = identityProvider.getIdentity()
 
     if (identity.isSupervisor()) {
       this.onCreateTeamTaskHitAttempt = (e) => {
-        let options = JSON.parse(e.data)
-        let teamTaskHitAttempt = new TeamTaskHitAttemptModel(options)
+        const options = JSON.parse(e.data)
+        const teamTaskHitAttempt = new TeamTaskHitAttemptModel(options)
         this.trigger('createTeamTaskHitAttempt', [teamTaskHitAttempt, new Date(options.__metadataCreatedAt)])
       }
 
@@ -40,9 +40,9 @@ class TeamTaskHitProvider extends EventEmitter {
 
     if (identity.isSupervisor() || identity.isTeam()) {
       this.onCreateTeamTaskHit = (e) => {
-        let options = JSON.parse(e.data)
-        let teamTaskHit = new TeamTaskHitModel(options)
-        let ndx = _.findIndex(this.teamTaskHits, { teamId: options.teamId, taskId: options.taskId })
+        const options = JSON.parse(e.data)
+        const teamTaskHit = new TeamTaskHitModel(options)
+        const ndx = _.findIndex(this.teamTaskHits, { teamId: options.teamId, taskId: options.taskId })
         if (ndx === -1) {
           if (identity.isTeam() && !identity.isExactTeam(options.teamId)) {
             return
@@ -57,8 +57,8 @@ class TeamTaskHitProvider extends EventEmitter {
   }
 
   fetchTaskHitStatistics (taskId) {
-    let promise = $.Deferred()
-    let url = `/api/task/${taskId}/hit/statistics`
+    const promise = $.Deferred()
+    const url = `/api/task/${taskId}/hit/statistics`
 
     $.ajax({
       url: url,
@@ -79,8 +79,8 @@ class TeamTaskHitProvider extends EventEmitter {
   }
 
   fetchTeamHitStatistics (teamId) {
-    let promise = $.Deferred()
-    let url = `/api/team/${teamId}/hit/statistics`
+    const promise = $.Deferred()
+    const url = `/api/team/${teamId}/hit/statistics`
 
     $.ajax({
       url: url,
@@ -101,8 +101,8 @@ class TeamTaskHitProvider extends EventEmitter {
   }
 
   fetchTaskHits (taskId) {
-    let promise = $.Deferred()
-    let url = `/api/task/${taskId}/hit/index`
+    const promise = $.Deferred()
+    const url = `/api/task/${taskId}/hit/index`
 
     $.ajax({
       url: url,
@@ -135,8 +135,8 @@ class TeamTaskHitProvider extends EventEmitter {
   }
 
   fetchTeamHits (teamId) {
-    let promise = $.Deferred()
-    let url = `/api/team/${teamId}/hit/index`
+    const promise = $.Deferred()
+    const url = `/api/team/${teamId}/hit/index`
 
     $.ajax({
       url: url,

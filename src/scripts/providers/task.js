@@ -26,12 +26,12 @@ class TaskProvider extends EventEmitter {
       return
     }
 
-    let realtimeProvider = dataStore.getRealtimeProvider()
+    const realtimeProvider = dataStore.getRealtimeProvider()
 
     if (identityProvider.getIdentity().isSupervisor()) {
       this.onCreateTask = (e) => {
-        let options = JSON.parse(e.data)
-        let taskPreview = new TaskPreviewModel(options)
+        const options = JSON.parse(e.data)
+        const taskPreview = new TaskPreviewModel(options)
         this.taskPreviews.push(taskPreview)
         this.trigger('createTask', [taskPreview, new Date(options.__metadataCreatedAt)])
       }
@@ -40,9 +40,9 @@ class TaskProvider extends EventEmitter {
     }
 
     this.onOpenTask = (e) => {
-      let options = JSON.parse(e.data)
-      let taskPreview = new TaskPreviewModel(options)
-      let ndx = _.findIndex(this.taskPreviews, { id: options.id })
+      const options = JSON.parse(e.data)
+      const taskPreview = new TaskPreviewModel(options)
+      const ndx = _.findIndex(this.taskPreviews, { id: options.id })
       if (ndx > -1) {
         this.taskPreviews.splice(ndx, 1)
       }
@@ -53,9 +53,9 @@ class TaskProvider extends EventEmitter {
     realtimeProvider.addEventListener('openTask', this.onOpenTask)
 
     this.onCloseTask = (e) => {
-      let options = JSON.parse(e.data)
-      let taskPreview = new TaskPreviewModel(options)
-      let ndx = _.findIndex(this.taskPreviews, { id: options.id })
+      const options = JSON.parse(e.data)
+      const taskPreview = new TaskPreviewModel(options)
+      const ndx = _.findIndex(this.taskPreviews, { id: options.id })
       if (ndx > -1) {
         this.taskPreviews.splice(ndx, 1)
       }
@@ -66,9 +66,9 @@ class TaskProvider extends EventEmitter {
     realtimeProvider.addEventListener('closeTask', this.onCloseTask)
 
     this.onUpdateTask = (e) => {
-      let options = JSON.parse(e.data)
-      let taskPreview = new TaskPreviewModel(options)
-      let ndx = _.findIndex(this.taskPreviews, { id: options.id })
+      const options = JSON.parse(e.data)
+      const taskPreview = new TaskPreviewModel(options)
+      const ndx = _.findIndex(this.taskPreviews, { id: options.id })
       if (ndx > -1) {
         this.taskPreviews.splice(ndx, 1)
       }
@@ -89,8 +89,8 @@ class TaskProvider extends EventEmitter {
   }
 
   fetchTaskPreviews () {
-    let promise = $.Deferred()
-    let url = '/api/task/index'
+    const promise = $.Deferred()
+    const url = '/api/task/index'
 
     $.ajax({
       url: url,
@@ -115,8 +115,8 @@ class TaskProvider extends EventEmitter {
   }
 
   fetchTask (taskId) {
-    let promise = $.Deferred()
-    let url = `/api/task/${taskId}`
+    const promise = $.Deferred()
+    const url = `/api/task/${taskId}`
 
     $.ajax({
       url: url,
@@ -137,8 +137,8 @@ class TaskProvider extends EventEmitter {
   }
 
   openTask (id, token) {
-    let promise = $.Deferred()
-    let url = `/api/task/${id}/open`
+    const promise = $.Deferred()
+    const url = `/api/task/${id}/open`
 
     $.ajax({
       url: url,
@@ -164,8 +164,8 @@ class TaskProvider extends EventEmitter {
   }
 
   closeTask (id, token) {
-    let promise = $.Deferred()
-    let url = `/api/task/${id}/close`
+    const promise = $.Deferred()
+    const url = `/api/task/${id}/close`
 
     $.ajax({
       url: url,

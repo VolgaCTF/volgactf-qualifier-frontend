@@ -5,14 +5,14 @@ import TaskHintModel from '../models/task-hint'
 
 class TaskHintProvider extends EventEmitter {
   fetchTaskHintsByTask (taskId) {
-    let promise = $.Deferred()
-    let url = `/api/task/${taskId}/hint`
+    const promise = $.Deferred()
+    const url = `/api/task/${taskId}/hint`
 
     $.ajax({
       url: url,
       dataType: 'json',
       success: (responseJSON, textStatus, jqXHR) => {
-        let taskHints = _.map(responseJSON, (options) => {
+        const taskHints = _.map(responseJSON, (options) => {
           return new TaskHintModel(options)
         })
 

@@ -1,4 +1,3 @@
-import $ from 'jquery'
 import EventEmitter from 'wolfy87-eventemitter'
 import TeamModel from '../models/team'
 import identityProvider from './identity'
@@ -15,8 +14,8 @@ class IdentityLogoProvider extends EventEmitter {
       return
     }
 
-    let realtimeProvider = dataStore.getRealtimeProvider()
-    let identity = identityProvider.getIdentity()
+    const realtimeProvider = dataStore.getRealtimeProvider()
+    const identity = identityProvider.getIdentity()
 
     if (identity.isTeam()) {
       this.onUpdateLogo = (e) => {

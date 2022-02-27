@@ -71,18 +71,18 @@ $(document).ready(function () {
   }
 
   $
-  .when(
-    identityProvider.initIdentity(),
-    contestProvider.initContest()
-  )
-  .done(function (identity, contest) {
-    contestProvider.subscribe()
-    teamRankingProvider.subscribe()
-    navigationBar.present()
+    .when(
+      identityProvider.initIdentity(),
+      contestProvider.initContest()
+    )
+    .done(function (identity, contest) {
+      contestProvider.subscribe()
+      teamRankingProvider.subscribe()
+      navigationBar.present()
 
-    const viewName = window.volgactf.qualifier.view
-    if (viewName && views.hasOwnProperty(viewName)) {
-      views[viewName].present()
-    }
-  })
+      const viewName = window.volgactf.qualifier.view
+      if (viewName && Object.prototype.hasOwnProperty.call(views, viewName)) {
+        views[viewName].present()
+      }
+    })
 })

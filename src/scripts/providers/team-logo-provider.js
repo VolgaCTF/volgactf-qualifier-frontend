@@ -1,8 +1,5 @@
-import $ from 'jquery'
-import _ from 'underscore'
 import EventEmitter from 'wolfy87-eventemitter'
 import TeamModel from '../models/team'
-import identityProvider from './identity'
 import dataStore from '../data-store'
 
 class TeamLogoProvider extends EventEmitter {
@@ -16,11 +13,11 @@ class TeamLogoProvider extends EventEmitter {
       return
     }
 
-    let realtimeProvider = dataStore.getRealtimeProvider()
+    const realtimeProvider = dataStore.getRealtimeProvider()
 
     this.onUpdateLogo = (e) => {
-      let options = JSON.parse(e.data)
-      let team = new TeamModel(options)
+      const options = JSON.parse(e.data)
+      const team = new TeamModel(options)
       this.trigger('updateTeamLogo', [team, new Date(options.__metadataCreatedAt)])
     }
 

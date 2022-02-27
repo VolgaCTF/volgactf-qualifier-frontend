@@ -18,15 +18,15 @@ class TeamProfileView extends View {
   }
 
   initUploadLogoModal () {
-    let $button = this.$main.find('a[data-action="upload-logo"]')
+    const $button = this.$main.find('a[data-action="upload-logo"]')
 
     if ($button.length) {
-      let $modal = $('#upload-logo-modal')
+      const $modal = $('#upload-logo-modal')
       $modal.modal({ show: false })
 
-      let $submitError = $modal.find('.submit-error > p')
-      let $submitButton = $modal.find('button[data-action="complete-upload-logo"]')
-      let $form = $modal.find('form')
+      const $submitError = $modal.find('.submit-error > p')
+      const $submitButton = $modal.find('button[data-action="complete-upload-logo"]')
+      const $form = $modal.find('form')
       $form.parsley({
         errorClass: 'is-invalid',
         successClass: 'is-valid',
@@ -41,7 +41,7 @@ class TeamProfileView extends View {
       })
 
       $('input[type=file]').change(function () {
-        var fieldVal = $(this).val()
+        let fieldVal = $(this).val()
 
         // Change the node's value by removing the fake path (Chrome)
         fieldVal = fieldVal.replace('C:\\fakepath\\', '')
@@ -76,7 +76,7 @@ class TeamProfileView extends View {
             'X-CSRF-Token': identityProvider.getIdentity().token
           },
           success: (responseText, textStatus, jqXHR) => {
-            let onTimeout = () => {
+            const onTimeout = () => {
               $modal.modal('hide')
               window.location.reload()
             }
@@ -99,15 +99,15 @@ class TeamProfileView extends View {
   }
 
   initChangeEmailModal () {
-    let $button = this.$main.find('button[data-action="change-email"]')
+    const $button = this.$main.find('button[data-action="change-email"]')
 
     if ($button.length) {
-      let $modal = $('#change-email-modal')
+      const $modal = $('#change-email-modal')
       $modal.modal({ show: false })
 
-      let $submitError = $modal.find('.submit-error > p')
-      let $submitButton = $modal.find('button[data-action="complete-change-email"]')
-      let $form = $modal.find('form')
+      const $submitError = $modal.find('.submit-error > p')
+      const $submitButton = $modal.find('button[data-action="complete-change-email"]')
+      const $form = $modal.find('form')
       $form.parsley({
         errorClass: 'is-invalid',
         successClass: 'is-valid',
@@ -167,16 +167,16 @@ class TeamProfileView extends View {
   }
 
   initResendConfirmationModal () {
-    let $button = this.$main.find('button[data-action="resend-confirmation"]')
+    const $button = this.$main.find('button[data-action="resend-confirmation"]')
 
     if ($button.length) {
-      let $modal = $('#resend-confirmation-modal')
+      const $modal = $('#resend-confirmation-modal')
       $modal.modal({ show: false })
 
-      let $submitError = $modal.find('.submit-error > p')
-      let $submitSuccess = $modal.find('.submit-success > p')
-      let $submitButton = $modal.find('button[data-action="complete-resend-confirmation"]')
-      let $form = $modal.find('form')
+      const $submitError = $modal.find('.submit-error > p')
+      const $submitSuccess = $modal.find('.submit-success > p')
+      const $submitButton = $modal.find('button[data-action="complete-resend-confirmation"]')
+      const $form = $modal.find('form')
 
       $submitButton.on('click', (e) => {
         $form.trigger('submit')
@@ -209,7 +209,7 @@ class TeamProfileView extends View {
           success: (responseText, textStatus, jqXHR) => {
             $submitButton.hide()
             $submitSuccess.text('A new confirmation email will be sent soon!')
-            let hideModal = () => {
+            const hideModal = () => {
               $modal.modal('hide')
             }
 
@@ -231,15 +231,15 @@ class TeamProfileView extends View {
   }
 
   initEditProfileModal () {
-    let $button = this.$main.find('button[data-action="edit-profile"]')
+    const $button = this.$main.find('button[data-action="edit-profile"]')
 
     if ($button.length) {
-      let $modal = $('#edit-profile-modal')
+      const $modal = $('#edit-profile-modal')
       $modal.modal({ show: false })
 
-      let $submitError = $modal.find('.submit-error > p')
-      let $submitButton = $modal.find('button[data-action="complete-edit-profile"]')
-      let $form = $modal.find('form')
+      const $submitError = $modal.find('.submit-error > p')
+      const $submitButton = $modal.find('button[data-action="complete-edit-profile"]')
+      const $form = $modal.find('form')
       $form.parsley({
         errorClass: 'is-invalid',
         successClass: 'is-valid',
@@ -253,8 +253,8 @@ class TeamProfileView extends View {
         errorTemplate: '<span></span>'
       })
 
-      let $countrySelect = $('#edit-profile-country')
-      for (let country of countryProvider.getCountries()) {
+      const $countrySelect = $('#edit-profile-country')
+      for (const country of countryProvider.getCountries()) {
         $countrySelect.append($('<option></option>').attr('value', country.id).text(country.getName()))
       }
 
@@ -309,20 +309,20 @@ class TeamProfileView extends View {
   }
 
   initChangePasswordModal () {
-    let $button = this.$main.find('button[data-action="change-password"]')
+    const $button = this.$main.find('button[data-action="change-password"]')
 
     if ($button.length) {
-      let $modal = $('#change-password-modal')
+      const $modal = $('#change-password-modal')
       $modal.modal({ show: false })
 
-      let $submitError = $modal.find('.submit-error > p')
-      let $submitSuccess = $modal.find('.submit-success > p')
-      let $submitButton = $modal.find('button[data-action="complete-change-password"]')
-      let $form = $modal.find('form')
+      const $submitError = $modal.find('.submit-error > p')
+      const $submitSuccess = $modal.find('.submit-success > p')
+      const $submitButton = $modal.find('button[data-action="complete-change-password"]')
+      const $form = $modal.find('form')
 
-      let $currentPassword = $('#change-pwd-current')
-      let $newPassword = $('#change-pwd-new')
-      let $confirmNewPassword = $('#change-pwd-confirm-new')
+      const $currentPassword = $('#change-pwd-current')
+      const $newPassword = $('#change-pwd-new')
+      const $confirmNewPassword = $('#change-pwd-confirm-new')
 
       $form.parsley({
         errorClass: 'is-invalid',
@@ -373,7 +373,7 @@ class TeamProfileView extends View {
             $submitButton.hide()
             $form.find('div.form-group').hide()
             $submitSuccess.text('Password has been successfully changed!')
-            let hideModal = () => {
+            const hideModal = () => {
               $modal.modal('hide')
             }
 
@@ -399,19 +399,19 @@ class TeamProfileView extends View {
   }
 
   initSetPasswordModal () {
-    let $button = this.$main.find('button[data-action="set-password"]')
+    const $button = this.$main.find('button[data-action="set-password"]')
 
     if ($button.length) {
-      let $modal = $('#set-password-modal')
+      const $modal = $('#set-password-modal')
       $modal.modal({ show: false })
 
-      let $submitError = $modal.find('.submit-error > p')
-      let $submitSuccess = $modal.find('.submit-success > p')
-      let $submitButton = $modal.find('button[data-action="complete-set-password"]')
-      let $form = $modal.find('form')
+      const $submitError = $modal.find('.submit-error > p')
+      const $submitSuccess = $modal.find('.submit-success > p')
+      const $submitButton = $modal.find('button[data-action="complete-set-password"]')
+      const $form = $modal.find('form')
 
-      let $newPassword = $('#set-pwd-new')
-      let $confirmNewPassword = $('#set-pwd-confirm-new')
+      const $newPassword = $('#set-pwd-new')
+      const $confirmNewPassword = $('#set-pwd-confirm-new')
 
       $form.parsley({
         errorClass: 'is-invalid',
@@ -461,7 +461,7 @@ class TeamProfileView extends View {
             $submitButton.hide()
             $form.find('div.form-group').hide()
             $submitSuccess.text('Password has been successfully set!')
-            let hideModal = () => {
+            const hideModal = () => {
               $modal.modal('hide')
               this.toggleSetPasswordControl(false)
               this.initChangePasswordModal()
@@ -490,8 +490,8 @@ class TeamProfileView extends View {
 
     const identity = identityProvider.getIdentity()
     const contest = contestProvider.getContest()
-    let urlParts = window.location.pathname.split('/')
-    let teamId = parseInt(urlParts[urlParts.length - 2], 10)
+    const urlParts = window.location.pathname.split('/')
+    const teamId = parseInt(urlParts[urlParts.length - 2], 10)
     let promise = null
 
     if (identity.isSupervisor()) {
@@ -555,27 +555,27 @@ class TeamProfileView extends View {
     }
 
     promise
-    .done((team, countries, teamTaskHits, teamTaskReviews) => {
-      this.team = team
+      .done((team, countries, teamTaskHits, teamTaskReviews) => {
+        this.team = team
 
-      if (identity.isExactTeam(team.id)) {
-        this.initUploadLogoModal()
+        if (identity.isExactTeam(team.id)) {
+          this.initUploadLogoModal()
 
-        if (!identity.emailConfirmed) {
-          this.initResendConfirmationModal()
-          this.initChangeEmailModal()
+          if (!identity.emailConfirmed) {
+            this.initResendConfirmationModal()
+            this.initChangeEmailModal()
+          }
+
+          this.initEditProfileModal()
+          if (team.passwordSet) {
+            this.toggleSetPasswordControl(false)
+            this.initChangePasswordModal()
+          } else {
+            this.toggleChangePasswordControl(false)
+            this.initSetPasswordModal()
+          }
         }
-
-        this.initEditProfileModal()
-        if (team.passwordSet) {
-          this.toggleSetPasswordControl(false)
-          this.initChangePasswordModal()
-        } else {
-          this.toggleChangePasswordControl(false)
-          this.initSetPasswordModal()
-        }
-      }
-    })
+      })
   }
 }
 

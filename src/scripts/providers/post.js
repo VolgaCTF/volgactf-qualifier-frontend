@@ -23,11 +23,11 @@ class PostProvider extends EventEmitter {
       return
     }
 
-    let realtimeProvider = dataStore.getRealtimeProvider()
+    const realtimeProvider = dataStore.getRealtimeProvider()
 
     this.onCreate = (e) => {
-      let options = JSON.parse(e.data)
-      let post = new PostModel(options)
+      const options = JSON.parse(e.data)
+      const post = new PostModel(options)
       this.posts.push(post)
       this.trigger('createPost', [post, new Date(options.__metadataCreatedAt)])
     }
@@ -35,9 +35,9 @@ class PostProvider extends EventEmitter {
     realtimeProvider.addEventListener('createPost', this.onCreate)
 
     this.onUpdate = (e) => {
-      let options = JSON.parse(e.data)
-      let post = new PostModel(options)
-      let ndx = _.findIndex(this.posts, { id: options.id })
+      const options = JSON.parse(e.data)
+      const post = new PostModel(options)
+      const ndx = _.findIndex(this.posts, { id: options.id })
       if (ndx > -1) {
         this.posts.splice(ndx, 1)
       }
@@ -48,11 +48,11 @@ class PostProvider extends EventEmitter {
     realtimeProvider.addEventListener('updatePost', this.onUpdate)
 
     this.onDelete = (e) => {
-      let options = JSON.parse(e.data)
-      let ndx = _.findIndex(this.posts, { id: options.id })
+      const options = JSON.parse(e.data)
+      const ndx = _.findIndex(this.posts, { id: options.id })
       if (ndx > -1) {
         this.posts.splice(ndx, 1)
-        let post = new PostModel(options)
+        const post = new PostModel(options)
         this.trigger('deletePost', [post, new Date(options.__metadataCreatedAt)])
       }
     }
@@ -70,8 +70,8 @@ class PostProvider extends EventEmitter {
   }
 
   fetchPosts () {
-    let promise = $.Deferred()
-    let url = '/api/post/index'
+    const promise = $.Deferred()
+    const url = '/api/post/index'
 
     $.ajax({
       url: url,
@@ -96,8 +96,8 @@ class PostProvider extends EventEmitter {
   }
 
   deletePost (id, token) {
-    let promise = $.Deferred()
-    let url = `/api/post/${id}/delete`
+    const promise = $.Deferred()
+    const url = `/api/post/${id}/delete`
 
     $.ajax({
       url: url,

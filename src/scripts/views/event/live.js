@@ -332,7 +332,6 @@ class EventLiveView extends EventBaseView {
     }
 
     teamProvider.on('linkTeamCTFtime', this.onLinkTeamCTFtime)
-
   }
 
   subscribeToRemoteCheckerEvents () {
@@ -416,35 +415,35 @@ class EventLiveView extends EventBaseView {
 
   present () {
     $
-    .when(
-      identityProvider.initIdentity(),
-      contestProvider.initContest(),
-      categoryProvider.initCategories(),
-      postProvider.initPosts(),
-      taskProvider.initTaskPreviews(),
-      taskCategoryProvider.initTaskCategories(),
-      taskValueProvider.initTaskValues(),
-      taskRewardSchemeProvider.initTaskRewardSchemes(),
-      teamProvider.initTeams(),
-      remoteCheckerProvider.initRemoteCheckers()
-    )
-    .done((identity, contest) => {
-      this.subscribeToContestEvents()
-      this.subscribeToCategoryEvents()
-      this.subscribeToPostEvents()
-      this.subscribeToSupervisorEvents()
-      this.subscribeToRemoteCheckerEvents()
-      this.subscribeToTaskEvents()
-      this.subscribeToTaskCategoryEvents()
-      this.subscribeToTaskValueEvents()
-      this.subscribeToTaskRewardSchemeEvents()
-      this.subscribeToTeamEvents()
-      this.subscribeToTeamTaskReviewEvents()
-      this.subscribeToTeamTaskHitEvents()
-      this.subscribeToTaskFileEvents()
+      .when(
+        identityProvider.initIdentity(),
+        contestProvider.initContest(),
+        categoryProvider.initCategories(),
+        postProvider.initPosts(),
+        taskProvider.initTaskPreviews(),
+        taskCategoryProvider.initTaskCategories(),
+        taskValueProvider.initTaskValues(),
+        taskRewardSchemeProvider.initTaskRewardSchemes(),
+        teamProvider.initTeams(),
+        remoteCheckerProvider.initRemoteCheckers()
+      )
+      .done((identity, contest) => {
+        this.subscribeToContestEvents()
+        this.subscribeToCategoryEvents()
+        this.subscribeToPostEvents()
+        this.subscribeToSupervisorEvents()
+        this.subscribeToRemoteCheckerEvents()
+        this.subscribeToTaskEvents()
+        this.subscribeToTaskCategoryEvents()
+        this.subscribeToTaskValueEvents()
+        this.subscribeToTaskRewardSchemeEvents()
+        this.subscribeToTeamEvents()
+        this.subscribeToTeamTaskReviewEvents()
+        this.subscribeToTeamTaskHitEvents()
+        this.subscribeToTaskFileEvents()
 
-      this.container = document.getElementById('volgactf-qualifier-events')
-    })
+        this.container = document.getElementById('volgactf-qualifier-events')
+      })
   }
 }
 

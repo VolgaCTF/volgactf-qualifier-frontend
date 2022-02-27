@@ -19,27 +19,27 @@ class SupervisorProvider extends EventEmitter {
       return
     }
 
-    let realtimeProvider = dataStore.getRealtimeProvider()
+    const realtimeProvider = dataStore.getRealtimeProvider()
 
     this.onCreate = (e) => {
-      let options = JSON.parse(e.data)
-      let supervisor = new SupervisorModel(options)
+      const options = JSON.parse(e.data)
+      const supervisor = new SupervisorModel(options)
       this.trigger('createSupervisor', [supervisor, new Date(options.__metadataCreatedAt)])
     }
 
     realtimeProvider.addEventListener('createSupervisor', this.onCreate)
 
     this.onDelete = (e) => {
-      let options = JSON.parse(e.data)
-      let supervisor = new SupervisorModel(options)
+      const options = JSON.parse(e.data)
+      const supervisor = new SupervisorModel(options)
       this.trigger('deleteSupervisor', [supervisor, new Date(options.__metadataCreatedAt)])
     }
 
     realtimeProvider.addEventListener('deleteSupervisor', this.onDelete)
 
     this.onUpdatePassword = (e) => {
-      let options = JSON.parse(e.data)
-      let supervisor = new SupervisorModel(options)
+      const options = JSON.parse(e.data)
+      const supervisor = new SupervisorModel(options)
       this.trigger('updateSupervisorPassword', [supervisor, new Date(options.__metadataCreatedAt)])
     }
 
@@ -57,8 +57,8 @@ class SupervisorProvider extends EventEmitter {
     realtimeProvider.addEventListener('loginSupervisor', this.onLogin)
 
     this.onLogout = (e) => {
-      let options = JSON.parse(e.data)
-      let supervisor = new SupervisorModel(options)
+      const options = JSON.parse(e.data)
+      const supervisor = new SupervisorModel(options)
       this.trigger('logoutSupervisor', [supervisor, new Date(options.__metadataCreatedAt)])
     }
 

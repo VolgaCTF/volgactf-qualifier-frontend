@@ -36,9 +36,9 @@ class TaskValueProvider extends EventEmitter {
     }
 
     this.onUpdate = (e) => {
-      let options = JSON.parse(e.data)
+      const options = JSON.parse(e.data)
       const taskValue = new TaskValueModel(options)
-      let ndx = _.findIndex(this.taskValues, { id: options.id })
+      const ndx = _.findIndex(this.taskValues, { id: options.id })
       if (ndx > -1) {
         this.taskValues.splice(ndx, 1)
       }

@@ -34,24 +34,24 @@ class NewsView extends View {
   }
 
   initDeletePostModal () {
-    let $modal = $('#delete-post-modal')
+    const $modal = $('#delete-post-modal')
     $modal.modal({ show: false })
 
-    let $modalBody = $modal.find('.modal-body p.confirmation')
-    let $submitError = $modal.find('.submit-error > p')
-    let $submitButton = $modal.find('button[data-action="complete-delete-post"]')
+    const $modalBody = $modal.find('.modal-body p.confirmation')
+    const $submitError = $modal.find('.submit-error > p')
+    const $submitButton = $modal.find('button[data-action="complete-delete-post"]')
 
     $modal.on('show.bs.modal', (e) => {
-      let postId = parseInt($(e.relatedTarget).data('post-id'), 10)
+      const postId = parseInt($(e.relatedTarget).data('post-id'), 10)
       $modal.data('post-id', postId)
-      let post = _.findWhere(postProvider.getPosts(), { id: postId })
+      const post = _.findWhere(postProvider.getPosts(), { id: postId })
       const template = _.template('You are about to delete the post <mark><%- title %></mark>. Continue?')
       $modalBody.html(template({ title: post.title }))
       $submitError.text('')
     })
 
     $submitButton.on('click', (e) => {
-      let postId = $modal.data('post-id')
+      const postId = $modal.data('post-id')
       $
         .when(postProvider.deletePost(postId, identityProvider.getIdentity().token))
         .done(() => {
@@ -67,12 +67,12 @@ class NewsView extends View {
   }
 
   initCreatePostModal () {
-    let $modal = $('#create-post-modal')
+    const $modal = $('#create-post-modal')
     $modal.modal({ show: false })
 
-    let $submitError = $modal.find('.submit-error > p')
-    let $submitButton = $modal.find('button[data-action="complete-create-post"]')
-    let $form = $modal.find('form')
+    const $submitError = $modal.find('.submit-error > p')
+    const $submitButton = $modal.find('button[data-action="complete-create-post"]')
+    const $form = $modal.find('form')
     $form.parsley({
       errorClass: 'is-invalid',
       successClass: 'is-valid',
@@ -90,14 +90,14 @@ class NewsView extends View {
       $form.trigger('submit')
     })
 
-    let $tabList = $('#create-post-tablist')
-    let $tabData = $tabList.find('a[href="#create-post-data"]')
-    let $tabPreview = $tabList.find('a[href="#create-post-preview"]')
+    const $tabList = $('#create-post-tablist')
+    const $tabData = $tabList.find('a[href="#create-post-data"]')
+    const $tabPreview = $tabList.find('a[href="#create-post-preview"]')
 
-    let $postTitle = $('#create-post-title')
-    let $postDescription = $('#create-post-description')
+    const $postTitle = $('#create-post-title')
+    const $postDescription = $('#create-post-description')
 
-    let $postPreview = $('#create-post-preview')
+    const $postPreview = $('#create-post-preview')
 
     $tabData.tab()
     $tabPreview.tab()
@@ -158,12 +158,12 @@ class NewsView extends View {
   }
 
   initEditPostModal () {
-    let $modal = $('#edit-post-modal')
+    const $modal = $('#edit-post-modal')
     $modal.modal({ show: false })
 
-    let $submitError = $modal.find('.submit-error > p')
-    let $submitButton = $modal.find('button[data-action="complete-edit-post"]')
-    let $form = $modal.find('form')
+    const $submitError = $modal.find('.submit-error > p')
+    const $submitButton = $modal.find('button[data-action="complete-edit-post"]')
+    const $form = $modal.find('form')
     $form.parsley({
       errorClass: 'is-invalid',
       successClass: 'is-valid',
@@ -181,14 +181,14 @@ class NewsView extends View {
       $form.trigger('submit')
     })
 
-    let $tabList = $('#edit-post-tablist')
-    let $tabData = $tabList.find('a[href="#edit-post-data"]')
-    let $tabPreview = $tabList.find('a[href="#edit-post-preview"]')
+    const $tabList = $('#edit-post-tablist')
+    const $tabData = $tabList.find('a[href="#edit-post-data"]')
+    const $tabPreview = $tabList.find('a[href="#edit-post-preview"]')
 
-    let $postTitle = $('#edit-post-title')
-    let $postDescription = $('#edit-post-description')
+    const $postTitle = $('#edit-post-title')
+    const $postDescription = $('#edit-post-description')
 
-    let $postPreview = $('#edit-post-preview')
+    const $postPreview = $('#edit-post-preview')
 
     $tabData.tab()
     $tabPreview.tab()
@@ -206,8 +206,8 @@ class NewsView extends View {
 
     $modal.on('show.bs.modal', (e) => {
       $tabData.tab('show')
-      let postId = parseInt($(e.relatedTarget).data('post-id'), 10)
-      let post = _.findWhere(postProvider.getPosts(), { id: postId })
+      const postId = parseInt($(e.relatedTarget).data('post-id'), 10)
+      const post = _.findWhere(postProvider.getPosts(), { id: postId })
 
       $form.attr('action', `/api/post/${postId}/update`)
       $postTitle.val(post.title)
@@ -256,46 +256,46 @@ class NewsView extends View {
     this.$main = $('#main')
 
     $
-    .when(
-      postProvider.initPosts()
-    )
-    .done(() => {
-      const identity = identityProvider.getIdentity()
+      .when(
+        postProvider.initPosts()
+      )
+      .done(() => {
+        const identity = identityProvider.getIdentity()
 
-      if (identity.isSupervisor()) {
-        this.initCreatePostModal()
-        this.initDeletePostModal()
-        this.initEditPostModal()
-      }
-
-      let urlParams = new URLSearchParams(window.location.search)
-      if (urlParams.get('action') === 'scrollTo' && urlParams.has('postId')) {
-        let $el = $(`div.volgactf-post[data-id="${urlParams.get('postId')}"]`)
-        if ($el.length > 0) {
-          $el.get(0).scrollIntoView()
+        if (identity.isSupervisor()) {
+          this.initCreatePostModal()
+          this.initDeletePostModal()
+          this.initEditPostModal()
         }
-      }
 
-      this.onCreatePost = () => {
-        this.renderPosts()
-        return false
-      }
+        const urlParams = new URLSearchParams(window.location.search)
+        if (urlParams.get('action') === 'scrollTo' && urlParams.has('postId')) {
+          const $el = $(`div.volgactf-post[data-id="${urlParams.get('postId')}"]`)
+          if ($el.length > 0) {
+            $el.get(0).scrollIntoView()
+          }
+        }
 
-      this.onUpdatePost = () => {
-        this.renderPosts()
-        return false
-      }
+        this.onCreatePost = () => {
+          this.renderPosts()
+          return false
+        }
 
-      this.onDeletePost = () => {
-        this.renderPosts()
-        return false
-      }
+        this.onUpdatePost = () => {
+          this.renderPosts()
+          return false
+        }
 
-      postProvider.subscribe()
-      postProvider.on('createPost', this.onCreatePost)
-      postProvider.on('updatePost', this.onUpdatePost)
-      postProvider.on('deletePost', this.onDeletePost)
-    })
+        this.onDeletePost = () => {
+          this.renderPosts()
+          return false
+        }
+
+        postProvider.subscribe()
+        postProvider.on('createPost', this.onCreatePost)
+        postProvider.on('updatePost', this.onUpdatePost)
+        postProvider.on('deletePost', this.onDeletePost)
+      })
   }
 }
 

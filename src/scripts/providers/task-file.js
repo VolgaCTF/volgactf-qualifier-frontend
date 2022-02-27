@@ -13,8 +13,8 @@ class TaskFileProvider extends EventEmitter {
   }
 
   fetchTaskFilesByTask (taskId) {
-    let promise = $.Deferred()
-    let url = `/api/task/${taskId}/file/index`
+    const promise = $.Deferred()
+    const url = `/api/task/${taskId}/file/index`
 
     $.ajax({
       url: url,
@@ -39,8 +39,8 @@ class TaskFileProvider extends EventEmitter {
   }
 
   deleteTaskFile (taskId, taskFileId, token) {
-    let promise = $.Deferred()
-    let url = `/api/task/${taskId}/file/${taskFileId}/delete`
+    const promise = $.Deferred()
+    const url = `/api/task/${taskId}/file/${taskFileId}/delete`
 
     $.ajax({
       url: url,

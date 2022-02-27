@@ -13,7 +13,7 @@ class TeamSignupView extends View {
   }
 
   initSignupForm () {
-    let $form = this.$main.find('form.volgactf-form-signup')
+    const $form = this.$main.find('form.volgactf-form-signup')
     $form.parsley({
       errorClass: 'is-invalid',
       successClass: 'is-valid',
@@ -29,13 +29,13 @@ class TeamSignupView extends View {
 
     $form.find('input[name="team"]').focus()
 
-    let $successAlert = this.$main.find('div.volgactf-alert-signup')
+    const $successAlert = this.$main.find('div.volgactf-alert-signup')
 
-    let $submitError = $form.find('.submit-error > p')
-    let $submitButton = $form.find('button')
+    const $submitError = $form.find('.submit-error > p')
+    const $submitButton = $form.find('button')
 
     $('input[type="file"]').change(function () {
-      var fieldVal = $(this).val()
+      let fieldVal = $(this).val()
 
       // Change the node's value by removing the fake path (Chrome)
       fieldVal = fieldVal.replace('C:\\fakepath\\', '')
@@ -87,16 +87,16 @@ class TeamSignupView extends View {
     this.$main = $('#main')
 
     $
-    .when(
-      countryProvider.initCountries()
-    )
-    .done((countries) => {
-      const identity = identityProvider.getIdentity()
-      const contest = contestProvider.getContest()
-      if (identity.isGuest() && !contest.isFinished()) {
-        this.initSignupForm()
-      }
-    })
+      .when(
+        countryProvider.initCountries()
+      )
+      .done((countries) => {
+        const identity = identityProvider.getIdentity()
+        const contest = contestProvider.getContest()
+        if (identity.isGuest() && !contest.isFinished()) {
+          this.initSignupForm()
+        }
+      })
   }
 }
 

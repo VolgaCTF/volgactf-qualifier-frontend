@@ -22,8 +22,8 @@ class IdentityProvider {
   }
 
   fetchIdentity () {
-    let promise = $.Deferred()
-    let url = '/api/identity'
+    const promise = $.Deferred()
+    const url = '/api/identity'
 
     $.ajax({
       url: url,

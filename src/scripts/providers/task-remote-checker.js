@@ -21,7 +21,7 @@ class TaskRemoteCheckerProvider extends EventEmitter {
       return
     }
 
-    let realtimeProvider = dataStore.getRealtimeProvider()
+    const realtimeProvider = dataStore.getRealtimeProvider()
 
     this.onCreate = (e) => {
       const options = JSON.parse(e.data)

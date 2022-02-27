@@ -24,22 +24,22 @@ class TaskCategoryProvider extends EventEmitter {
       return
     }
 
-    let realtimeProvider = dataStore.getRealtimeProvider()
+    const realtimeProvider = dataStore.getRealtimeProvider()
 
     this.onCreate = (e) => {
-      let options = JSON.parse(e.data)
-      let taskCategory = new TaskCategoryModel(options)
+      const options = JSON.parse(e.data)
+      const taskCategory = new TaskCategoryModel(options)
       this.taskCategories.push(taskCategory)
       this.trigger('createTaskCategory', [taskCategory, new Date(options.__metadataCreatedAt)])
     }
 
     realtimeProvider.addEventListener('createTaskCategory', this.onCreate)
 
-    let identity = identityProvider.getIdentity()
+    const identity = identityProvider.getIdentity()
     if (identity.isTeam() || identity.isGuest()) {
       this.onReveal = (e) => {
-        let options = JSON.parse(e.data)
-        let taskCategory = new TaskCategoryModel(options)
+        const options = JSON.parse(e.data)
+        const taskCategory = new TaskCategoryModel(options)
         this.taskCategories.push(taskCategory)
         this.trigger('revealTaskCategory', [taskCategory, new Date(options.__metadataCreatedAt)])
       }
@@ -48,12 +48,12 @@ class TaskCategoryProvider extends EventEmitter {
     }
 
     this.onDelete = (e) => {
-      let options = JSON.parse(e.data)
-      let ndx = _.findIndex(this.taskCategories, { id: options.id })
+      const options = JSON.parse(e.data)
+      const ndx = _.findIndex(this.taskCategories, { id: options.id })
 
       if (ndx > -1) {
         this.taskCategories.splice(ndx, 1)
-        let taskCategory = new TaskCategoryModel(options)
+        const taskCategory = new TaskCategoryModel(options)
         this.trigger('deleteTaskCategory', [taskCategory, new Date(options.__metadataCreatedAt)])
       }
     }
@@ -71,8 +71,8 @@ class TaskCategoryProvider extends EventEmitter {
   }
 
   fetchTaskCategories () {
-    let promise = $.Deferred()
-    let url = '/api/task/category/index'
+    const promise = $.Deferred()
+    const url = '/api/task/category/index'
 
     $.ajax({
       url: url,
@@ -97,14 +97,14 @@ class TaskCategoryProvider extends EventEmitter {
   }
 
   fetchTaskCategoriesByTask (taskId) {
-    let promise = $.Deferred()
-    let url = `/api/task/${taskId}/category`
+    const promise = $.Deferred()
+    const url = `/api/task/${taskId}/category`
 
     $.ajax({
       url: url,
       dataType: 'json',
       success: (responseJSON, textStatus, jqXHR) => {
-        let taskCategories = _.map(responseJSON, (options) => {
+        const taskCategories = _.map(responseJSON, (options) => {
           return new TaskCategoryModel(options)
         })
 

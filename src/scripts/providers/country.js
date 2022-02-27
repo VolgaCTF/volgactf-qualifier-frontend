@@ -24,8 +24,8 @@ class CountryProvider extends EventEmitter {
   }
 
   fetchCountries () {
-    let promise = $.Deferred()
-    let url = '/api/country/index'
+    const promise = $.Deferred()
+    const url = '/api/country/index'
 
     $.ajax({
       url: url,

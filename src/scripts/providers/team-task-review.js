@@ -11,14 +11,14 @@ class TeamTaskReviewProvider extends EventEmitter {
   }
 
   fetchTeamTaskReviewsByTask (taskId) {
-    let promise = $.Deferred()
-    let url = `/api/task/${taskId}/review/index`
+    const promise = $.Deferred()
+    const url = `/api/task/${taskId}/review/index`
 
     $.ajax({
       url: url,
       dataType: 'json',
       success: (responseJSON, textStatus, jqXHR) => {
-        let teamTaskReviews = _.map(responseJSON, (options) => {
+        const teamTaskReviews = _.map(responseJSON, (options) => {
           return new TeamTaskReviewModel(options)
         })
 
@@ -37,8 +37,8 @@ class TeamTaskReviewProvider extends EventEmitter {
   }
 
   fetchTaskReviewStatistics (taskId) {
-    let promise = $.Deferred()
-    let url = `/api/task/${taskId}/review/statistics`
+    const promise = $.Deferred()
+    const url = `/api/task/${taskId}/review/statistics`
 
     $.ajax({
       url: url,
@@ -59,8 +59,8 @@ class TeamTaskReviewProvider extends EventEmitter {
   }
 
   fetchTeamReviewStatistics (teamId) {
-    let promise = $.Deferred()
-    let url = `/api/team/${teamId}/review/statistics`
+    const promise = $.Deferred()
+    const url = `/api/team/${teamId}/review/statistics`
 
     $.ajax({
       url: url,
@@ -90,8 +90,8 @@ class TeamTaskReviewProvider extends EventEmitter {
   }
 
   fetchTeamReviews (teamId) {
-    let promise = $.Deferred()
-    let url = `/api/team/${teamId}/review/index`
+    const promise = $.Deferred()
+    const url = `/api/team/${teamId}/review/index`
 
     $.ajax({
       url: url,
@@ -120,10 +120,10 @@ class TeamTaskReviewProvider extends EventEmitter {
       return
     }
 
-    let realtimeProvider = dataStore.getRealtimeProvider()
+    const realtimeProvider = dataStore.getRealtimeProvider()
 
     this.onCreateTeamTaskReview = (e) => {
-      let options = JSON.parse(e.data)
+      const options = JSON.parse(e.data)
       this.contest = new TeamTaskReviewModel(options)
       this.trigger('createTeamTaskReview', [this.contest, new Date(options.__metadataCreatedAt)])
     }

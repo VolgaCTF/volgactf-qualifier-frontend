@@ -30,7 +30,7 @@ class DataStore {
     }
 
     this.eventSource = new window.EventSource('/api/stream')
-    for (let func of this.onEventSourceOpenHandlers) {
+    for (const func of this.onEventSourceOpenHandlers) {
       this.eventSource.addEventListener('open', func)
     }
     this.eventSource.addEventListener('error', this.onEventSourceError)
@@ -38,7 +38,7 @@ class DataStore {
 
   disconnectRealtime () {
     if (this.eventSource) {
-      for (let func of this.onEventSourceOpenHandlers) {
+      for (const func of this.onEventSourceOpenHandlers) {
         this.eventSource.removeEventListener('open', func)
       }
       if (this.onEventSourceError) {

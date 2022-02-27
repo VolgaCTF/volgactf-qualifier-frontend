@@ -11,7 +11,7 @@ class SupervisorSigninView extends View {
   }
 
   initLoginForm () {
-    let $form = this.$main.find('form.volgactf-form-login')
+    const $form = this.$main.find('form.volgactf-form-login')
     $form.parsley({
       errorClass: 'is-invalid',
       successClass: 'is-valid',
@@ -25,8 +25,8 @@ class SupervisorSigninView extends View {
       errorTemplate: '<span></span>'
     })
 
-    let $submitError = $form.find('.submit-error > p')
-    let $submitButton = $form.find('button')
+    const $submitError = $form.find('.submit-error > p')
+    const $submitButton = $form.find('button')
 
     $form.on('submit', (e) => {
       e.preventDefault()

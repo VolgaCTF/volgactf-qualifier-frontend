@@ -30,13 +30,13 @@ class TeamProvider extends EventEmitter {
       return
     }
 
-    let realtimeProvider = dataStore.getRealtimeProvider()
-    let identity = identityProvider.getIdentity()
+    const realtimeProvider = dataStore.getRealtimeProvider()
+    const identity = identityProvider.getIdentity()
 
     this.onUpdateProfile = (e) => {
-      let options = JSON.parse(e.data)
-      let team = new TeamModel(options)
-      let ndx = _.findIndex(this.teams, { id: options.id })
+      const options = JSON.parse(e.data)
+      const team = new TeamModel(options)
+      const ndx = _.findIndex(this.teams, { id: options.id })
       if (ndx > -1) {
         this.teams.splice(ndx, 1)
         this.teams.push(team)
@@ -47,9 +47,9 @@ class TeamProvider extends EventEmitter {
     realtimeProvider.addEventListener('updateTeamProfile', this.onUpdateProfile)
 
     this.onUpdateLogo = (e) => {
-      let options = JSON.parse(e.data)
-      let team = new TeamModel(options)
-      let ndx = _.findIndex(this.teams, { id: options.id })
+      const options = JSON.parse(e.data)
+      const team = new TeamModel(options)
+      const ndx = _.findIndex(this.teams, { id: options.id })
       if (ndx > -1) {
         this.teams.splice(ndx, 1)
         this.teams.push(team)
@@ -60,9 +60,9 @@ class TeamProvider extends EventEmitter {
     realtimeProvider.addEventListener('updateTeamLogo', this.onUpdateLogo)
 
     this.onQualify = (e) => {
-      let options = JSON.parse(e.data)
-      let team = new TeamModel(options)
-      let ndx = _.findIndex(this.teams, { id: options.id })
+      const options = JSON.parse(e.data)
+      const team = new TeamModel(options)
+      const ndx = _.findIndex(this.teams, { id: options.id })
       if (ndx > -1) {
         this.teams.splice(ndx, 1)
       }
@@ -73,9 +73,9 @@ class TeamProvider extends EventEmitter {
     realtimeProvider.addEventListener('qualifyTeam', this.onQualify)
 
     this.onDisqualify = (e) => {
-      let options = JSON.parse(e.data)
-      let team = new TeamModel(options)
-      let ndx = _.findIndex(this.teams, { id: options.id })
+      const options = JSON.parse(e.data)
+      const team = new TeamModel(options)
+      const ndx = _.findIndex(this.teams, { id: options.id })
       if (ndx > -1) {
         this.teams.splice(ndx, 1)
       }
@@ -102,9 +102,9 @@ class TeamProvider extends EventEmitter {
       realtimeProvider.addEventListener('createTeam', this.onCreate)
 
       this.onUpdateEmail = (e) => {
-        let options = JSON.parse(e.data)
-        let team = new TeamModel(options)
-        let ndx = _.findIndex(this.teams, { id: options.id })
+        const options = JSON.parse(e.data)
+        const team = new TeamModel(options)
+        const ndx = _.findIndex(this.teams, { id: options.id })
         if (ndx > -1) {
           this.teams.splice(ndx, 1)
         }
@@ -115,8 +115,8 @@ class TeamProvider extends EventEmitter {
       realtimeProvider.addEventListener('updateTeamEmail', this.onUpdateEmail)
 
       this.onUpdatePassword = (e) => {
-        let options = JSON.parse(e.data)
-        let team = new TeamModel(options)
+        const options = JSON.parse(e.data)
+        const team = new TeamModel(options)
         this.trigger('updateTeamPassword', [team, new Date(options.__metadataCreatedAt)])
       }
 
@@ -135,15 +135,15 @@ class TeamProvider extends EventEmitter {
       realtimeProvider.addEventListener('loginTeam', this.onLogin)
 
       this.onLogout = (e) => {
-        let options = JSON.parse(e.data)
-        let team = new TeamModel(options)
+        const options = JSON.parse(e.data)
+        const team = new TeamModel(options)
         this.trigger('logoutTeam', [team, new Date(options.__metadataCreatedAt)])
       }
 
       realtimeProvider.addEventListener('logoutTeam', this.onLogout)
 
       this.onLinkTeamCTFtime = (e) => {
-        let options = JSON.parse(e.data)
+        const options = JSON.parse(e.data)
         const team = new TeamModel(options.team)
         const ndx = _.findIndex(this.teams, { id: team.id })
         if (ndx > -1) {
@@ -169,8 +169,8 @@ class TeamProvider extends EventEmitter {
   }
 
   fetchTeamProfile (id) {
-    let promise = $.Deferred()
-    let url = `/api/team/${id}/profile`
+    const promise = $.Deferred()
+    const url = `/api/team/${id}/profile`
 
     $.ajax({
       url: url,
@@ -201,8 +201,8 @@ class TeamProvider extends EventEmitter {
   }
 
   fetchTeams (callback) {
-    let promise = $.Deferred()
-    let url = '/api/team/index'
+    const promise = $.Deferred()
+    const url = '/api/team/index'
 
     $.ajax({
       url: url,

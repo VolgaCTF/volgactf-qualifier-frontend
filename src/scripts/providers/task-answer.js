@@ -5,14 +5,14 @@ import TaskAnswerModel from '../models/task-answer'
 
 class TaskAnswerProvider extends EventEmitter {
   fetchTaskAnswersByTask (taskId) {
-    let promise = $.Deferred()
-    let url = `/api/task/${taskId}/answer`
+    const promise = $.Deferred()
+    const url = `/api/task/${taskId}/answer`
 
     $.ajax({
       url: url,
       dataType: 'json',
       success: (responseJSON, textStatus, jqXHR) => {
-        let taskAnswers = _.map(responseJSON, (options) => {
+        const taskAnswers = _.map(responseJSON, (options) => {
           return new TaskAnswerModel(options)
         })
 

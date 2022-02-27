@@ -14,7 +14,7 @@ class SupervisorCreateView extends View {
   present () {
     this.$main = $('#main')
 
-    let $form = this.$main.find('form.volgactf-qualifier-form-supervisor-create')
+    const $form = this.$main.find('form.volgactf-qualifier-form-supervisor-create')
     $form.parsley({
       errorClass: 'is-invalid',
       successClass: 'is-valid',
@@ -27,13 +27,13 @@ class SupervisorCreateView extends View {
       errorsWrapper: '<div class="invalid-feedback">',
       errorTemplate: '<span></span>'
     })
-    let $submitError = $form.find('.submit-error > p')
-    let $submitButton = $form.find('button')
+    const $submitError = $form.find('.submit-error > p')
+    const $submitButton = $form.find('button')
 
-    let $successAlert = this.$main.find('div.volgactf-qualifier-create-supervisor-success')
-    let $errorAlert = this.$main.find('div.volgactf-qualifier-create-supervisor-error')
+    const $successAlert = this.$main.find('div.volgactf-qualifier-create-supervisor-success')
+    const $errorAlert = this.$main.find('div.volgactf-qualifier-create-supervisor-error')
 
-    let urlParams = new URLSearchParams(window.location.search)
+    const urlParams = new URLSearchParams(window.location.search)
     if (urlParams.has('code')) {
       $form.show()
 

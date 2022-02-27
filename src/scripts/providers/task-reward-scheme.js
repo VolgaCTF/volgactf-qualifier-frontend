@@ -23,7 +23,7 @@ class TaskRewardSchemeProvider extends EventEmitter {
       return
     }
 
-    let realtimeProvider = dataStore.getRealtimeProvider()
+    const realtimeProvider = dataStore.getRealtimeProvider()
 
     if (identity.isSupervisor()) {
       this.onCreate = (e) => {
@@ -36,9 +36,9 @@ class TaskRewardSchemeProvider extends EventEmitter {
     }
 
     this.onUpdate = (e) => {
-      let options = JSON.parse(e.data)
+      const options = JSON.parse(e.data)
       const taskRewardScheme = new TaskRewardSchemeModel(options)
-      let ndx = _.findIndex(this.taskRewardSchemes, { id: options.id })
+      const ndx = _.findIndex(this.taskRewardSchemes, { id: options.id })
       if (ndx > -1) {
         this.taskRewardSchemes.splice(ndx, 1)
       }

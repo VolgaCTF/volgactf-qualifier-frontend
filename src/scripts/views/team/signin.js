@@ -11,7 +11,7 @@ class TeamSigninView extends View {
   }
 
   initSigninForm () {
-    let $form = this.$main.find('form.volgactf-form-signin')
+    const $form = this.$main.find('form.volgactf-form-signin')
     $form.parsley({
       errorClass: 'is-invalid',
       successClass: 'is-valid',
@@ -27,8 +27,8 @@ class TeamSigninView extends View {
 
     $form.find('input[name="team"]').focus()
 
-    let $submitError = $form.find('.submit-error > p')
-    let $submitButton = $form.find('button')
+    const $submitError = $form.find('.submit-error > p')
+    const $submitButton = $form.find('button')
 
     $form.on('submit', (e) => {
       e.preventDefault()

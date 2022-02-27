@@ -23,7 +23,7 @@ class RemoteCheckerProvider extends EventEmitter {
       return
     }
 
-    let realtimeProvider = dataStore.getRealtimeProvider()
+    const realtimeProvider = dataStore.getRealtimeProvider()
 
     this.onCreate = (e) => {
       const options = JSON.parse(e.data)
@@ -71,8 +71,8 @@ class RemoteCheckerProvider extends EventEmitter {
   }
 
   deleteRemoteChecker (id, token) {
-    let promise = $.Deferred()
-    let url = `/api/remote_checker/${id}/delete`
+    const promise = $.Deferred()
+    const url = `/api/remote_checker/${id}/delete`
 
     $.ajax({
       url: url,

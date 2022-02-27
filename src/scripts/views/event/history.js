@@ -69,46 +69,46 @@ class EventHistoryView extends EventBaseView {
   requestRenderEvents (page) {
     $(this.container).addClass('history-loading')
     $
-    .when(this.fetchEvents(window.volgactf.qualifier.data.fetchThreshold, page))
-    .then((eventHistory) => {
-      const html = this.renderEvents(eventHistory)
-      this.container.innerHTML = ''
-      this.container.insertAdjacentHTML('beforeend', html)
-    })
-    .fail((e) => {
-      this.container.innerHTML = ''
-      const html = '<p class="text-danger">Unknown error. Please reload the page and try again.</p>'
-      this.container.insertAdjacentHTML('beforeend', html)
-    })
-    .always(() => {
-      $(this.container).removeClass('history-loading')
-    })
+      .when(this.fetchEvents(window.volgactf.qualifier.data.fetchThreshold, page))
+      .then((eventHistory) => {
+        const html = this.renderEvents(eventHistory)
+        this.container.innerHTML = ''
+        this.container.insertAdjacentHTML('beforeend', html)
+      })
+      .fail((e) => {
+        this.container.innerHTML = ''
+        const html = '<p class="text-danger">Unknown error. Please reload the page and try again.</p>'
+        this.container.insertAdjacentHTML('beforeend', html)
+      })
+      .always(() => {
+        $(this.container).removeClass('history-loading')
+      })
   }
 
   present () {
     $
-    .when(
-      identityProvider.initIdentity(),
-      contestProvider.initContest(),
-      categoryProvider.initCategories(),
-      postProvider.initPosts(),
-      taskProvider.initTaskPreviews(),
-      taskCategoryProvider.initTaskCategories(),
-      taskValueProvider.initTaskValues(),
-      taskRewardSchemeProvider.initTaskRewardSchemes(),
-      teamProvider.initTeams(),
-      remoteCheckerProvider.initRemoteCheckers()
-    )
-    .done((identity, contest, eventHistory) => {
-      this.container = document.getElementById('volgactf-qualifier-events')
-      this.requestRenderEvents(1)
+      .when(
+        identityProvider.initIdentity(),
+        contestProvider.initContest(),
+        categoryProvider.initCategories(),
+        postProvider.initPosts(),
+        taskProvider.initTaskPreviews(),
+        taskCategoryProvider.initTaskCategories(),
+        taskValueProvider.initTaskValues(),
+        taskRewardSchemeProvider.initTaskRewardSchemes(),
+        teamProvider.initTeams(),
+        remoteCheckerProvider.initRemoteCheckers()
+      )
+      .done((identity, contest, eventHistory) => {
+        this.container = document.getElementById('volgactf-qualifier-events')
+        this.requestRenderEvents(1)
 
-      $(this.container).on('click', 'a[data-action="load"]', (e) => {
-        e.preventDefault()
-        const page = parseInt($(e.target).attr('data-page'), 10)
-        this.requestRenderEvents(page)
+        $(this.container).on('click', 'a[data-action="load"]', (e) => {
+          e.preventDefault()
+          const page = parseInt($(e.target).attr('data-page'), 10)
+          this.requestRenderEvents(page)
+        })
       })
-    })
   }
 }
 

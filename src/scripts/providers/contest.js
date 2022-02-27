@@ -20,10 +20,10 @@ class ContestProvider extends EventEmitter {
       return
     }
 
-    let realtimeProvider = dataStore.getRealtimeProvider()
+    const realtimeProvider = dataStore.getRealtimeProvider()
 
     this.onUpdate = (e) => {
-      let options = JSON.parse(e.data)
+      const options = JSON.parse(e.data)
       this.contest = new ContestModel(options)
       this.trigger('updateContest', [this.contest, new Date(options.__metadataCreatedAt)])
     }
@@ -40,8 +40,8 @@ class ContestProvider extends EventEmitter {
   }
 
   fetchContest () {
-    let promise = $.Deferred()
-    let url = '/api/contest'
+    const promise = $.Deferred()
+    const url = '/api/contest'
 
     $.ajax({
       url: url,

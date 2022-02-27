@@ -65,13 +65,13 @@ class TasksView extends View {
   }
 
   initSubscribeTaskModal () {
-    let $modal = $('#subscribe-task-modal')
+    const $modal = $('#subscribe-task-modal')
     $modal.modal({ show: false })
 
-    let $submitError = $modal.find('.submit-error > p')
-    let $submitSuccess = $modal.find('.submit-success > p')
-    let $submitButton = $modal.find('button[data-action="complete-subscribe-task"]')
-    let $form = $modal.find('form')
+    const $submitError = $modal.find('.submit-error > p')
+    const $submitSuccess = $modal.find('.submit-success > p')
+    const $submitButton = $modal.find('button[data-action="complete-subscribe-task"]')
+    const $form = $modal.find('form')
 
     $submitButton.on('click', (e) => {
       $form.trigger('submit')
@@ -106,7 +106,7 @@ class TasksView extends View {
         success: (responseJSON, textStatus, jqXHR) => {
           $submitButton.hide()
           $submitSuccess.text('Subscribed to new reviews')
-          let reloadPage = () => {
+          const reloadPage = () => {
             window.location.reload()
           }
           setTimeout(reloadPage, 1000)
@@ -126,13 +126,13 @@ class TasksView extends View {
   }
 
   initUnsubscribeTaskModal () {
-    let $modal = $('#unsubscribe-task-modal')
+    const $modal = $('#unsubscribe-task-modal')
     $modal.modal({ show: false })
 
-    let $submitError = $modal.find('.submit-error > p')
-    let $submitSuccess = $modal.find('.submit-success > p')
-    let $submitButton = $modal.find('button[data-action="complete-unsubscribe-task"]')
-    let $form = $modal.find('form')
+    const $submitError = $modal.find('.submit-error > p')
+    const $submitSuccess = $modal.find('.submit-success > p')
+    const $submitButton = $modal.find('button[data-action="complete-unsubscribe-task"]')
+    const $form = $modal.find('form')
 
     $submitButton.on('click', (e) => {
       $form.trigger('submit')
@@ -167,7 +167,7 @@ class TasksView extends View {
         success: (responseJSON, textStatus, jqXHR) => {
           $submitButton.hide()
           $submitSuccess.text('Unsubscribed from new reviews')
-          let reloadPage = () => {
+          const reloadPage = () => {
             window.location.reload()
           }
           setTimeout(reloadPage, 1000)
@@ -222,7 +222,7 @@ class TasksView extends View {
     }
 
     $('input[type="file"]', $form).change(function () {
-      var fieldVal = $(this).val()
+      let fieldVal = $(this).val()
 
       fieldVal = fieldVal.replace('C:\\fakepath\\', '')
 
@@ -247,31 +247,31 @@ class TasksView extends View {
         clipboard.destroy()
       }
       $
-      .when(
-        taskFileProvider.fetchTaskFilesByTask(taskId)
-      )
-      .done(function (taskFiles) {
-        $uploadedContainer.html(window.volgactf.qualifier.templates.taskFileList({
-          window: window,
-          _: _,
-          moment: moment,
-          taskFiles: taskFiles,
-          templates: window.volgactf.qualifier.templates
-        }))
-        $uploadedContainer.find('[data-action="copy-to-clipboard"]').tooltip({
-          trigger: 'manual'
+        .when(
+          taskFileProvider.fetchTaskFilesByTask(taskId)
+        )
+        .done(function (taskFiles) {
+          $uploadedContainer.html(window.volgactf.qualifier.templates.taskFileList({
+            window: window,
+            _: _,
+            moment: moment,
+            taskFiles: taskFiles,
+            templates: window.volgactf.qualifier.templates
+          }))
+          $uploadedContainer.find('[data-action="copy-to-clipboard"]').tooltip({
+            trigger: 'manual'
+          })
+          clipboard = new ClipboardJS('#manage-task-files-uploaded [data-action="copy-to-clipboard"]', {
+            container: $modal[0]
+          })
+          clipboard.on('success', function (e) {
+            const $btn = $(e.trigger)
+            $btn.tooltip('show')
+            setTimeout(function () {
+              $btn.tooltip('hide')
+            }, 1000)
+          })
         })
-        clipboard = new ClipboardJS('#manage-task-files-uploaded [data-action="copy-to-clipboard"]', {
-          container: $modal[0]
-        })
-        clipboard.on('success', function (e) {
-          const $btn = $(e.trigger)
-          $btn.tooltip('show')
-          setTimeout(function () {
-            $btn.tooltip('hide')
-          }, 1000)
-        })
-      })
     }
 
     const reinitializeForm = function () {
@@ -294,18 +294,18 @@ class TasksView extends View {
       $btn.prop('disabled', true)
 
       $
-      .when(
-        taskFileProvider.deleteTaskFile(taskId, taskFileId, identityProvider.getIdentity().token)
-      )
-      .done(() => {
-        setTimeout(function () {
-          reloadUploadedList()
-        }, 1000)
-      })
-      .fail((err) => {
-        console.log(err)
-        $btn.prop('disabled', false)
-      })
+        .when(
+          taskFileProvider.deleteTaskFile(taskId, taskFileId, identityProvider.getIdentity().token)
+        )
+        .done(() => {
+          setTimeout(function () {
+            reloadUploadedList()
+          }, 1000)
+        })
+        .fail((err) => {
+          console.log(err)
+          $btn.prop('disabled', false)
+        })
     })
 
     $modal.on('show.bs.modal', (e) => {
@@ -361,12 +361,12 @@ class TasksView extends View {
   }
 
   initCreateTaskModal () {
-    let $modal = $('#create-task-modal')
+    const $modal = $('#create-task-modal')
     $modal.modal({ show: false })
 
-    let $submitError = $modal.find('.submit-error > p')
-    let $submitButton = $modal.find('button[data-action="complete-create-task"]')
-    let $form = $modal.find('form')
+    const $submitError = $modal.find('.submit-error > p')
+    const $submitButton = $modal.find('button[data-action="complete-create-task"]')
+    const $form = $modal.find('form')
     $form.parsley({
       errorClass: 'is-invalid',
       successClass: 'is-valid',
@@ -384,18 +384,18 @@ class TasksView extends View {
       $form.trigger('submit')
     })
 
-    let $tabList = $('#create-task-tablist')
-    let $tabData = $tabList.find('a[href="#create-task-data"]')
-    let $tabPreview = $tabList.find('a[href="#create-task-preview"]')
+    const $tabList = $('#create-task-tablist')
+    const $tabData = $tabList.find('a[href="#create-task-data"]')
+    const $tabPreview = $tabList.find('a[href="#create-task-preview"]')
 
-    let $taskTitle = $('#create-task-title')
-    let $taskDescription = $('#create-task-description')
-    let $categories = $('#create-categories')
+    const $taskTitle = $('#create-task-title')
+    const $taskDescription = $('#create-task-description')
+    const $categories = $('#create-categories')
 
     const $openAt = $('#create-open-at')
 
-    let $taskHints = $('#create-task-hints')
-    let $taskHintList = $('#create-task-hint-list')
+    const $taskHints = $('#create-task-hints')
+    const $taskHintList = $('#create-task-hint-list')
 
     const $taskRewardScheme = $('#create-task-reward-scheme')
     const $taskRewardSchemeFixed = $('#create-task-reward-scheme-fixed')
@@ -408,7 +408,7 @@ class TasksView extends View {
     const $taskCheckMethodRemote = $('#create-task-check-method-remote')
     const $taskCheckMethodGroup = $('#create-task-check-method-group')
 
-    let $taskPreview = $('#create-task-preview')
+    const $taskPreview = $('#create-task-preview')
 
     $tabData.tab()
     $tabPreview.tab()
@@ -449,9 +449,9 @@ class TasksView extends View {
 
     $taskHintList.on('click', 'a[data-action="remove-task-hint"]', (e) => {
       e.preventDefault()
-      let number = $(e.target).closest('a').attr('data-number')
+      const number = $(e.target).closest('a').attr('data-number')
       $(`#create-task-hint-${number}`).remove()
-      let hints = getHints()
+      const hints = getHints()
       $taskHintList.empty()
       _.each(hints, (hint, ndx) => {
         $taskHintList.append(window.volgactf.qualifier.templates.createTaskHintTextareaPartial({
@@ -463,9 +463,9 @@ class TasksView extends View {
     })
 
     function getHints () {
-      let hints = []
+      const hints = []
       $taskHintList.find('.volgactf-task-hint-group').each((ndx, el) => {
-        let $el = $(el)
+        const $el = $(el)
         hints.push($el.find('textarea').val())
       })
 
@@ -486,9 +486,9 @@ class TasksView extends View {
     $taskCheckMethodGroup.on('click', 'a[data-action="remove-task-answer"]', (e) => {
       e.preventDefault()
       const $taskAnswerList = $('#create-task-answer-list')
-      let number = $(e.target).closest('a').attr('data-number')
+      const number = $(e.target).closest('a').attr('data-number')
       $(`#create-task-answer-${number}`).remove()
-      let answers = getAnswers()
+      const answers = getAnswers()
       $taskAnswerList.empty()
       _.each(answers, (entry, ndx) => {
         $taskAnswerList.append(window.volgactf.qualifier.templates.createTaskAnswerInputPartial({
@@ -501,10 +501,10 @@ class TasksView extends View {
     })
 
     function getAnswers () {
-      let answers = []
+      const answers = []
       const $taskAnswerList = $('#create-task-answer-list')
       $taskAnswerList.find('.volgactf-task-answer-group').each((ndx, el) => {
-        let $el = $(el)
+        const $el = $(el)
         answers.push({
           answer: $el.find('input[type=text]').val(),
           caseSensitive: $el.find('input[type=checkbox]').prop('checked')
@@ -536,10 +536,12 @@ class TasksView extends View {
         const $taskRemoteChecker = $('#create-task-remote-checker')
         _.each(remoteCheckerProvider.getRemoteCheckers(), (remoteChecker) => {
           $taskRemoteChecker
-          .append($('<option></option>')
-          .attr('value', remoteChecker.id)
-          .prop('disabled', _.where(taskRemoteCheckerProvider.getTaskRemoteCheckers(), { remoteCheckerId: remoteChecker.id }).length > 0)
-          .text(remoteChecker.name))
+            .append(
+              $('<option></option>')
+                .attr('value', remoteChecker.id)
+                .prop('disabled', _.where(taskRemoteCheckerProvider.getTaskRemoteCheckers(), { remoteCheckerId: remoteChecker.id }).length > 0)
+                .text(remoteChecker.name)
+            )
         })
       }
     })
@@ -656,12 +658,12 @@ class TasksView extends View {
   }
 
   initEditTaskModal () {
-    let $modal = $('#edit-task-modal')
+    const $modal = $('#edit-task-modal')
     $modal.modal({ show: false })
 
-    let $submitError = $modal.find('.submit-error > p')
-    let $submitButton = $modal.find('button[data-action="complete-edit-task"]')
-    let $form = $modal.find('form')
+    const $submitError = $modal.find('.submit-error > p')
+    const $submitButton = $modal.find('button[data-action="complete-edit-task"]')
+    const $form = $modal.find('form')
     $form.parsley({
       errorClass: 'is-invalid',
       successClass: 'is-valid',
@@ -679,14 +681,14 @@ class TasksView extends View {
       $form.trigger('submit')
     })
 
-    let $tabList = $('#edit-task-tablist')
-    let $tabData = $tabList.find('a[href="#edit-task-data"]')
+    const $tabList = $('#edit-task-tablist')
+    const $tabData = $tabList.find('a[href="#edit-task-data"]')
     const $tabFiles = $tabList.find('a[href="#edit-task-files"]')
-    let $tabPreview = $tabList.find('a[href="#edit-task-preview"]')
+    const $tabPreview = $tabList.find('a[href="#edit-task-preview"]')
 
-    let $taskTitle = $('#edit-task-title')
-    let $taskDescription = $('#edit-task-description')
-    let $categories = $('#edit-categories')
+    const $taskTitle = $('#edit-task-title')
+    const $taskDescription = $('#edit-task-description')
+    const $categories = $('#edit-categories')
 
     const $openAt = $('#edit-open-at')
 
@@ -696,14 +698,14 @@ class TasksView extends View {
     const $taskRewardSchemeDynlog = $('#edit-task-reward-scheme-dynlog')
     const $taskRewardSchemeGroup = $('#edit-task-reward-scheme-group')
 
-    let $taskHints = $('#edit-task-hints')
-    let $taskHintList = $('#edit-task-hint-list')
+    const $taskHints = $('#edit-task-hints')
+    const $taskHintList = $('#edit-task-hint-list')
 
     const $taskCheckMethodList = $('#edit-task-check-method-list')
     const $taskCheckMethodRemote = $('#edit-task-check-method-remote')
     const $taskCheckMethodGroup = $('#edit-task-check-method-group')
 
-    let $taskPreview = $('#edit-task-preview')
+    const $taskPreview = $('#edit-task-preview')
 
     const $tabFileContainer = $('#edit-task-files')
     let clipboard = null
@@ -751,10 +753,10 @@ class TasksView extends View {
 
     $taskHintList.on('click', 'a[data-action="remove-task-hint"]', (e) => {
       e.preventDefault()
-      let number = $(e.target).closest('a').attr('data-number')
+      const number = $(e.target).closest('a').attr('data-number')
       $(`#edit-task-hint-${number}`).remove()
 
-      let hints = getHints()
+      const hints = getHints()
       $taskHintList.empty()
       _.each(savedTaskHints, (entry, ndx) => {
         $taskHintList.append(window.volgactf.qualifier.templates.editTaskHintTextareaPartial({
@@ -775,9 +777,9 @@ class TasksView extends View {
     })
 
     function getHints () {
-      let hints = []
+      const hints = []
       $taskHintList.find('.volgactf-task-hint-group[data-state-disabled=false]').each((ndx, el) => {
-        let $el = $(el)
+        const $el = $(el)
         hints.push($el.find('textarea').val())
       })
 
@@ -800,9 +802,9 @@ class TasksView extends View {
 
     $taskCheckMethodGroup.on('click', 'a[data-action="remove-task-answer"]', (e) => {
       e.preventDefault()
-      let number = $(e.target).closest('a').attr('data-number')
+      const number = $(e.target).closest('a').attr('data-number')
       $(`#edit-task-answer-${number}`).remove()
-      let answers = getAnswers()
+      const answers = getAnswers()
       const $taskAnswerList = $('#edit-task-answer-list')
       $taskAnswerList.empty()
       _.each(savedTaskAnswers, (entry, ndx) => {
@@ -826,10 +828,10 @@ class TasksView extends View {
     })
 
     function getAnswers () {
-      let answers = []
+      const answers = []
       const $taskAnswerList = $('#edit-task-answer-list')
       $taskAnswerList.find('.volgactf-task-answer-group[data-state-disabled=false]').each((ndx, el) => {
-        let $el = $(el)
+        const $el = $(el)
         answers.push({
           answer: $el.find('input[type=text]').val(),
           caseSensitive: $el.find('input[type=checkbox]').prop('checked')
@@ -842,8 +844,8 @@ class TasksView extends View {
     let savedTaskAnswers = null
 
     $tabPreview.on('show.bs.tab', (e) => {
-      let md = new MarkdownRenderer()
-      let hintsFormatted = savedTaskHints.map((entry) => {
+      const md = new MarkdownRenderer()
+      const hintsFormatted = savedTaskHints.map((entry) => {
         return entry.hint
       }).concat(getHints()).map((hint) => {
         return md.render(hint)
@@ -923,7 +925,7 @@ class TasksView extends View {
     }
 
     $modal.on('show.bs.modal', (e) => {
-      let taskId = parseInt($(e.relatedTarget).data('task-id'), 10)
+      const taskId = parseInt($(e.relatedTarget).data('task-id'), 10)
       $modal.data('task-id', taskId)
 
       $tabData.tab('show')
@@ -1032,11 +1034,12 @@ class TasksView extends View {
             const $taskRemoteChecker = $('#edit-task-remote-checker')
             $taskRemoteChecker.empty()
             _.each(remoteCheckerProvider.getRemoteCheckers(), (remoteChecker) => {
-              $taskRemoteChecker
-              .append($('<option></option>')
-              .attr('value', remoteChecker.id)
-              .prop('selected', _.where(taskRemoteCheckerProvider.getTaskRemoteCheckers(), { taskId: taskId, remoteCheckerId: remoteChecker.id }).length > 0)
-              .text(remoteChecker.name))
+              $taskRemoteChecker.append(
+                $('<option></option>')
+                  .attr('value', remoteChecker.id)
+                  .prop('selected', _.where(taskRemoteCheckerProvider.getTaskRemoteCheckers(), { taskId: taskId, remoteCheckerId: remoteChecker.id }).length > 0)
+                  .text(remoteChecker.name)
+              )
             })
           }
 
@@ -1099,14 +1102,14 @@ class TasksView extends View {
   }
 
   initReviseTaskModal () {
-    let $modal = $('#revise-task-modal')
+    const $modal = $('#revise-task-modal')
     $modal.modal({ show: false })
 
-    let $submitError = $modal.find('.submit-error > p')
-    let $submitSuccess = $modal.find('.submit-success > p')
-    let $taskStatus = $modal.find('#revise-task-status')
-    let $submitButton = $modal.find('button[data-action="complete-revise-task"]')
-    let $form = $modal.find('form')
+    const $submitError = $modal.find('.submit-error > p')
+    const $submitSuccess = $modal.find('.submit-success > p')
+    const $taskStatus = $modal.find('#revise-task-status')
+    const $submitButton = $modal.find('button[data-action="complete-revise-task"]')
+    const $form = $modal.find('form')
     $form.parsley({
       errorClass: 'is-invalid',
       successClass: 'is-valid',
@@ -1124,12 +1127,12 @@ class TasksView extends View {
       $form.trigger('submit')
     })
 
-    let $taskAnswerGroup = $('#revise-task-answer-group')
-    let $taskAnswer = $('#revise-task-answer')
-    let $taskContents = $modal.find('.volgactf-task-contents')
+    const $taskAnswerGroup = $('#revise-task-answer-group')
+    const $taskAnswer = $('#revise-task-answer')
+    const $taskContents = $modal.find('.volgactf-task-contents')
 
     $modal.on('show.bs.modal', (e) => {
-      let taskId = parseInt($(e.relatedTarget).data('task-id'), 10)
+      const taskId = parseInt($(e.relatedTarget).data('task-id'), 10)
       $modal.data('task-id', taskId)
 
       $form.parsley().reset()
@@ -1152,7 +1155,7 @@ class TasksView extends View {
           teamTaskReviewProvider.fetchTaskReviewStatistics(taskId)
         )
         .done((task, taskHints, taskHitStatistics, taskReviewStatistics) => {
-          let md = new MarkdownRenderer()
+          const md = new MarkdownRenderer()
 
           $taskContents.html(window.volgactf.qualifier.templates.taskContentPartial({
             _: _,
@@ -1197,7 +1200,7 @@ class TasksView extends View {
           $taskAnswerGroup.hide()
           $submitButton.hide()
           $submitSuccess.text('The answer is correct!')
-          let hideModal = () => {
+          const hideModal = () => {
             $modal.modal('hide')
             if (!dataStore.connectedRealtime()) {
               window.location.reload()
@@ -1221,24 +1224,24 @@ class TasksView extends View {
   }
 
   initOpenTaskModal () {
-    let $modal = $('#open-task-modal')
+    const $modal = $('#open-task-modal')
     $modal.modal({ show: false })
 
-    let $modalBody = $modal.find('.modal-body p.confirmation')
-    let $submitError = $modal.find('.submit-error > p')
-    let $submitButton = $modal.find('button[data-action="complete-open-task"]')
+    const $modalBody = $modal.find('.modal-body p.confirmation')
+    const $submitError = $modal.find('.submit-error > p')
+    const $submitButton = $modal.find('button[data-action="complete-open-task"]')
 
     $modal.on('show.bs.modal', (e) => {
-      let taskId = parseInt($(e.relatedTarget).data('task-id'), 10)
+      const taskId = parseInt($(e.relatedTarget).data('task-id'), 10)
       $modal.data('task-id', taskId)
-      let taskPreview = _.findWhere(taskProvider.getTaskPreviews(), { id: taskId })
+      const taskPreview = _.findWhere(taskProvider.getTaskPreviews(), { id: taskId })
       const msgTemplate = _.template('You are about to open the task <mark><%- title %></mark>. Teams will be able to submit answers for the task. Continue?')
       $modalBody.html(msgTemplate({ title: taskPreview.title }))
       $submitError.text('')
     })
 
     $submitButton.on('click', (e) => {
-      let taskId = $modal.data('task-id')
+      const taskId = $modal.data('task-id')
       $
         .when(taskProvider.openTask(taskId, identityProvider.getIdentity().token))
         .done(() => {
@@ -1254,24 +1257,24 @@ class TasksView extends View {
   }
 
   initCloseTaskModal () {
-    let $modal = $('#close-task-modal')
+    const $modal = $('#close-task-modal')
     $modal.modal({ show: false })
 
-    let $modalBody = $modal.find('.modal-body p.confirmation')
-    let $submitError = $modal.find('.submit-error > p')
-    let $submitButton = $modal.find('button[data-action="complete-close-task"]')
+    const $modalBody = $modal.find('.modal-body p.confirmation')
+    const $submitError = $modal.find('.submit-error > p')
+    const $submitButton = $modal.find('button[data-action="complete-close-task"]')
 
     $modal.on('show.bs.modal', (e) => {
-      let taskId = parseInt($(e.relatedTarget).data('task-id'), 10)
+      const taskId = parseInt($(e.relatedTarget).data('task-id'), 10)
       $modal.data('task-id', taskId)
-      let taskPreview = _.findWhere(taskProvider.getTaskPreviews(), { id: taskId })
+      const taskPreview = _.findWhere(taskProvider.getTaskPreviews(), { id: taskId })
       const msgTemplate = _.template('You are about to close the task <mark><%- title %></mark>. Teams will not be able to submit answers for the task although the scores will not be recalculated. Continue?')
       $modalBody.html(msgTemplate({ title: taskPreview.title }))
       $submitError.text('')
     })
 
     $submitButton.on('click', (e) => {
-      let taskId = $modal.data('task-id')
+      const taskId = $modal.data('task-id')
       $
         .when(taskProvider.closeTask(taskId, identityProvider.getIdentity().token))
         .done(() => {
@@ -1287,14 +1290,14 @@ class TasksView extends View {
   }
 
   initSubmitTaskModal () {
-    let $modal = $('#submit-task-modal')
+    const $modal = $('#submit-task-modal')
     $modal.modal({ show: false })
 
-    let $submitError = $modal.find('.submit-error > p')
-    let $taskInfo = $modal.find('.submit-info > p')
-    let $submitSuccess = $modal.find('.submit-success > p')
-    let $submitButton = $modal.find('button[data-action="complete-submit-task"]')
-    let $submitForm = $modal.find('form[data-target="submit"]')
+    const $submitError = $modal.find('.submit-error > p')
+    const $taskInfo = $modal.find('.submit-info > p')
+    const $submitSuccess = $modal.find('.submit-success > p')
+    const $submitButton = $modal.find('button[data-action="complete-submit-task"]')
+    const $submitForm = $modal.find('form[data-target="submit"]')
     $submitForm.parsley({
       errorClass: 'is-invalid',
       successClass: 'is-valid',
@@ -1312,12 +1315,12 @@ class TasksView extends View {
       $submitForm.trigger('submit')
     })
 
-    let $submitFieldGroup = $('#submit-task-field-group')
-    let $taskAnswer = $('#submit-task-answer')
-    let $taskContents = $modal.find('.volgactf-task-contents')
+    const $submitFieldGroup = $('#submit-task-field-group')
+    const $taskAnswer = $('#submit-task-answer')
+    const $taskContents = $modal.find('.volgactf-task-contents')
 
-    let $reviewButton = $modal.find('button[data-action="complete-review-task"]')
-    let $reviewForm = $modal.find('form[data-target="review"]')
+    const $reviewButton = $modal.find('button[data-action="complete-review-task"]')
+    const $reviewForm = $modal.find('form[data-target="review"]')
     $reviewForm.parsley({
       errorClass: 'is-invalid',
       successClass: 'is-valid',
@@ -1330,19 +1333,19 @@ class TasksView extends View {
       errorsWrapper: '<div class="invalid-feedback">',
       errorTemplate: '<span></span>'
     })
-    let $reviewError = $modal.find('.review-error > p')
-    let $reviewSuccess = $modal.find('.review-success > p')
+    const $reviewError = $modal.find('.review-error > p')
+    const $reviewSuccess = $modal.find('.review-success > p')
 
-    let $reviewFieldGroup = $modal.find('#review-task-field-group')
-    let $reviewRating = $modal.find('#review-task-rating')
-    let $reviewComment = $modal.find('#review-task-comment')
+    const $reviewFieldGroup = $modal.find('#review-task-field-group')
+    const $reviewRating = $modal.find('#review-task-rating')
+    const $reviewComment = $modal.find('#review-task-comment')
 
     $reviewButton.on('click', (e) => {
       $reviewForm.trigger('submit')
     })
 
     $modal.on('show.bs.modal', (e) => {
-      let taskId = parseInt($(e.relatedTarget).data('task-id'), 10)
+      const taskId = parseInt($(e.relatedTarget).data('task-id'), 10)
 
       $taskContents.empty()
       $taskAnswer.val('')
@@ -1359,9 +1362,9 @@ class TasksView extends View {
       $reviewError.text('')
       $reviewSuccess.text('')
 
-      let taskPreview = _.findWhere(taskProvider.getTaskPreviews(), { id: taskId })
-      let identity = identityProvider.getIdentity()
-      let contest = contestProvider.getContest()
+      const taskPreview = _.findWhere(taskProvider.getTaskPreviews(), { id: taskId })
+      const identity = identityProvider.getIdentity()
+      const contest = contestProvider.getContest()
       let taskSolvedAt = null
       let teamTaskReview = null
       let onlyReview = false
@@ -1370,7 +1373,7 @@ class TasksView extends View {
       $reviewButton.hide()
 
       if (taskPreview && identity.isTeam()) {
-        let taskHit = _.findWhere(teamTaskHitProvider.getTeamTaskHits(), {
+        const taskHit = _.findWhere(teamTaskHitProvider.getTeamTaskHits(), {
           teamId: identity.id,
           taskId: taskId
         })
@@ -1427,8 +1430,8 @@ class TasksView extends View {
           teamTaskReviewProvider.fetchTaskReviewStatistics(taskId)
         )
         .done((task, taskHitStatistics, taskHints, teamTaskReviews, taskReviewStatistics) => {
-          let md = new MarkdownRenderer()
-          let hintsFormatted = []
+          const md = new MarkdownRenderer()
+          const hintsFormatted = []
           _.each(taskHints, (entry) => {
             hintsFormatted.push(md.render(entry.hint))
           })
@@ -1447,11 +1450,13 @@ class TasksView extends View {
             solvedTeamCount: taskHitStatistics.count,
             reviewAverageRating: taskReviewStatistics.averageRating,
             reviewCount: taskReviewStatistics.count,
-            teamReview: teamTaskReview ? {
-              rating: teamTaskReview.rating,
-              comment: teamTaskReview.comment,
-              createdAt: moment(teamTaskReview.createdAt).format('MMM D [at] HH:mm [UTC]')
-            } : null
+            teamReview: teamTaskReview
+              ? {
+                  rating: teamTaskReview.rating,
+                  comment: teamTaskReview.comment,
+                  createdAt: moment(teamTaskReview.createdAt).format('MMM D [at] HH:mm [UTC]')
+                }
+              : null
           }))
 
           onlyReview = taskSolvedAt && contest.isStarted() && !teamTaskReview
@@ -1491,14 +1496,14 @@ class TasksView extends View {
           $submitButton.hide()
           $taskInfo.hide()
           $submitSuccess.text('Answer is correct!')
-          let showReviewForm = () => {
+          const showReviewForm = () => {
             $submitSuccess.text('')
             $reviewFieldGroup.show()
             $reviewButton.show()
             $reviewRating.focus()
           }
 
-          let hideModal = () => {
+          const hideModal = () => {
             $modal.modal('hide')
             if (!dataStore.connectedRealtime()) {
               window.location.reload()
@@ -1541,7 +1546,7 @@ class TasksView extends View {
           $reviewFieldGroup.hide()
           $reviewButton.hide()
           $reviewSuccess.text('Review has been submitted!')
-          let hideModal = () => {
+          const hideModal = () => {
             $modal.modal('hide')
             if (!dataStore.connectedRealtime()) {
               window.location.reload()
@@ -1565,14 +1570,14 @@ class TasksView extends View {
   }
 
   initCheckTaskModal () {
-    let $modal = $('#check-task-modal')
+    const $modal = $('#check-task-modal')
     $modal.modal({ show: false })
 
-    let $submitError = $modal.find('.submit-error > p')
-    let $taskInfo = $modal.find('.submit-info > p')
-    let $submitSuccess = $modal.find('.submit-success > p')
-    let $submitButton = $modal.find('button[data-action="complete-check-task"]')
-    let $form = $modal.find('form')
+    const $submitError = $modal.find('.submit-error > p')
+    const $taskInfo = $modal.find('.submit-info > p')
+    const $submitSuccess = $modal.find('.submit-success > p')
+    const $submitButton = $modal.find('button[data-action="complete-check-task"]')
+    const $form = $modal.find('form')
     $form.parsley({
       errorClass: 'is-invalid',
       successClass: 'is-valid',
@@ -1590,12 +1595,12 @@ class TasksView extends View {
       $form.trigger('submit')
     })
 
-    let $taskAnswerGroup = $('#check-task-answer-group')
-    let $taskAnswer = $('#check-task-answer')
-    let $taskContents = $modal.find('.volgactf-task-contents')
+    const $taskAnswerGroup = $('#check-task-answer-group')
+    const $taskAnswer = $('#check-task-answer')
+    const $taskContents = $modal.find('.volgactf-task-contents')
 
     $modal.on('show.bs.modal', (e) => {
-      let taskId = parseInt($(e.relatedTarget).data('task-id'), 10)
+      const taskId = parseInt($(e.relatedTarget).data('task-id'), 10)
 
       $taskContents.empty()
       $taskAnswer.val('')
@@ -1604,9 +1609,9 @@ class TasksView extends View {
       $submitSuccess.text('')
       $submitButton.prop('disabled', true)
 
-      let taskPreview = _.findWhere(taskProvider.getTaskPreviews(), { id: taskId })
-      let identity = identityProvider.getIdentity()
-      let contest = contestProvider.getContest()
+      const taskPreview = _.findWhere(taskProvider.getTaskPreviews(), { id: taskId })
+      const identity = identityProvider.getIdentity()
+      const contest = contestProvider.getContest()
 
       if (taskPreview && identity.isGuest()) {
         if (contest.isFinished()) {
@@ -1646,8 +1651,8 @@ class TasksView extends View {
             taskHintProvider.fetchTaskHintsByTask(taskId)
           )
           .done((task, taskHints) => {
-            let md = new MarkdownRenderer()
-            let hintsFormatted = []
+            const md = new MarkdownRenderer()
+            const hintsFormatted = []
             _.each(taskHints, (entry) => {
               hintsFormatted.push(md.render(entry.hint))
             })
@@ -1687,7 +1692,7 @@ class TasksView extends View {
           $taskAnswerGroup.hide()
           $submitButton.hide()
           $submitSuccess.text('Answer is correct!')
-          let hideModal = () => {
+          const hideModal = () => {
             $modal.modal('hide')
             if (!dataStore.connectedRealtime()) {
               window.location.reload()
@@ -1715,10 +1720,10 @@ class TasksView extends View {
   }
 
   showTaskModal (identity, taskId) {
-    let taskPreview = _.findWhere(taskProvider.getTaskPreviews(), { id: taskId })
+    const taskPreview = _.findWhere(taskProvider.getTaskPreviews(), { id: taskId })
     if (taskPreview) {
       let $modal = null
-      let $button = $(`<button data-task-id="${taskId}"></button>`)
+      const $button = $(`<button data-task-id="${taskId}"></button>`)
       if (identity.isSupervisor()) {
         $modal = $('#revise-task-modal')
       } else if (identity.isTeam()) {
@@ -1782,180 +1787,180 @@ class TasksView extends View {
     }
 
     promise
-    .done((taskPreviews, categories) => {
-      if (identity.isSupervisor()) {
-        this.initReviseTaskModal()
-      }
-
-      if (identity.isAdmin()) {
-        remoteCheckerProvider.subscribe()
-        taskRemoteCheckerProvider.subscribe()
-
-        this.initCreateTaskModal()
-        this.initOpenTaskModal()
-        this.initCloseTaskModal()
-        this.initEditTaskModal()
-        this.initManageTaskFilesModal()
-      }
-
-      if (identity.isAdmin() || identity.isManager()) {
-        this.initSubscribeTaskModal()
-        this.initUnsubscribeTaskModal()
-      }
-
-      if (identity.isTeam()) {
-        this.initSubmitTaskModal()
-      }
-
-      if (identity.isGuest()) {
-        this.initCheckTaskModal()
-      }
-
-      this.$taskPreviewsList = $('#volgactf-task-previews')
-      this.setupTooltips()
-
-      this.onCreateTaskCategory = (taskCategory) => {
-        this.requestRenderTasks()
-        return false
-      }
-
-      if (identity.isTeam() || identity.isGuest()) {
-        this.onRevealTaskCategory = (taskCategory) => {
-          this.requestRenderTasks()
-          return false
+      .done((taskPreviews, categories) => {
+        if (identity.isSupervisor()) {
+          this.initReviseTaskModal()
         }
-      }
 
-      this.onDeleteTaskCategory = () => {
-        this.requestRenderTasks()
-        return false
-      }
+        if (identity.isAdmin()) {
+          remoteCheckerProvider.subscribe()
+          taskRemoteCheckerProvider.subscribe()
 
-      this.onUpdateCategory = (category) => {
-        this.requestRenderTasks()
-        return false
-      }
+          this.initCreateTaskModal()
+          this.initOpenTaskModal()
+          this.initCloseTaskModal()
+          this.initEditTaskModal()
+          this.initManageTaskFilesModal()
+        }
 
-      categoryProvider.subscribe()
-      categoryProvider.on('updateCategory', this.onUpdateCategory)
+        if (identity.isAdmin() || identity.isManager()) {
+          this.initSubscribeTaskModal()
+          this.initUnsubscribeTaskModal()
+        }
 
-      taskProvider.subscribe()
-      if (identity.isSupervisor()) {
-        this.onCreateTask = (taskPreview) => {
+        if (identity.isTeam()) {
+          this.initSubmitTaskModal()
+        }
+
+        if (identity.isGuest()) {
+          this.initCheckTaskModal()
+        }
+
+        this.$taskPreviewsList = $('#volgactf-task-previews')
+        this.setupTooltips()
+
+        this.onCreateTaskCategory = (taskCategory) => {
           this.requestRenderTasks()
           return false
         }
 
-        taskProvider.on('createTask', this.onCreateTask)
-      }
+        if (identity.isTeam() || identity.isGuest()) {
+          this.onRevealTaskCategory = (taskCategory) => {
+            this.requestRenderTasks()
+            return false
+          }
+        }
 
-      this.onOpenTask = (taskPreview) => {
-        this.requestRenderTasks()
-        return false
-      }
-
-      taskProvider.on('openTask', this.onOpenTask)
-
-      this.onCloseTask = (taskPreview) => {
-        this.requestRenderTasks()
-        return false
-      }
-
-      taskProvider.on('closeTask', this.onCloseTask)
-
-      this.onUpdateTask = (taskPreview) => {
-        this.requestRenderTasks()
-        return false
-      }
-
-      taskProvider.on('updateTask', this.onUpdateTask)
-
-      if (identity.isTeam()) {
-        teamTaskHitProvider.subscribe()
-
-        this.onCreateTeamTaskHit = (teamTaskHit) => {
+        this.onDeleteTaskCategory = () => {
           this.requestRenderTasks()
           return false
         }
 
-        teamTaskHitProvider.on('createTeamTaskHit', this.onCreateTeamTaskHit)
-      }
-
-      this.onUpdateContest = (contest) => {
-        this.requestRenderTasks()
-        return false
-      }
-
-      contestProvider.on('updateContest', this.onUpdateContest)
-
-      teamProvider.subscribe()
-      taskCategoryProvider.subscribe()
-      taskCategoryProvider.on('createTaskCategory', this.onCreateTaskCategory)
-      taskCategoryProvider.on('deleteTaskCategory', this.onDeleteTaskCategory)
-
-      taskValueProvider.subscribe(identity)
-      taskRewardSchemeProvider.subscribe(identity)
-
-      this.onUpdateTaskValue = () => {
-        this.requestRenderTasks()
-        return false
-      }
-      taskValueProvider.on('updateTaskValue', this.onUpdateTaskValue)
-
-      if (identity.isSupervisor()) {
-        this.onCreateTaskValue = () => {
+        this.onUpdateCategory = (category) => {
           this.requestRenderTasks()
           return false
         }
-        taskValueProvider.on('createTaskValue', this.onCreateTaskValue)
-      }
 
-      if (identity.isTeam() || identity.isGuest()) {
-        this.onRevealTaskValue = () => {
+        categoryProvider.subscribe()
+        categoryProvider.on('updateCategory', this.onUpdateCategory)
+
+        taskProvider.subscribe()
+        if (identity.isSupervisor()) {
+          this.onCreateTask = (taskPreview) => {
+            this.requestRenderTasks()
+            return false
+          }
+
+          taskProvider.on('createTask', this.onCreateTask)
+        }
+
+        this.onOpenTask = (taskPreview) => {
           this.requestRenderTasks()
           return false
         }
-        taskValueProvider.on('revealTaskValue', this.onRevealTaskValue)
-      }
 
-      this.onUpdateTaskRewardScheme = () => {
-        this.requestRenderTasks()
-        return false
-      }
-      taskRewardSchemeProvider.on('updateTaskRewardScheme', this.onUpdateTaskRewardScheme)
+        taskProvider.on('openTask', this.onOpenTask)
 
-      if (identity.isSupervisor()) {
-        this.onCreateTaskRewardScheme = () => {
+        this.onCloseTask = (taskPreview) => {
           this.requestRenderTasks()
           return false
         }
-        taskRewardSchemeProvider.on('createTaskRewardScheme', this.onCreateTaskRewardScheme)
-      }
 
-      if (identity.isTeam() || identity.isGuest()) {
-        this.onRevealTaskRewardScheme = () => {
+        taskProvider.on('closeTask', this.onCloseTask)
+
+        this.onUpdateTask = (taskPreview) => {
           this.requestRenderTasks()
           return false
         }
-        taskValueProvider.on('revealTaskRewardScheme', this.onRevealTaskRewardScheme)
-      }
 
-      this.onRenderTasks = (force = false) => {
-        if ((this.flagRenderTasks || force) && !this.flagRenderingTasks) {
-          this.flagRenderingTasks = true
-          this.renderTaskPreviews()
-          this.flagRenderingTasks = false
-          this.flagRenderTasks = false
+        taskProvider.on('updateTask', this.onUpdateTask)
+
+        if (identity.isTeam()) {
+          teamTaskHitProvider.subscribe()
+
+          this.onCreateTeamTaskHit = (teamTaskHit) => {
+            this.requestRenderTasks()
+            return false
+          }
+
+          teamTaskHitProvider.on('createTeamTaskHit', this.onCreateTeamTaskHit)
         }
-      }
 
-      const urlParams = new URLSearchParams(window.location.search)
-      if (urlParams.get('action') === 'show' && urlParams.has('taskId')) {
-        this.showTaskModal(identity, parseInt(urlParams.get('taskId'), 10))
-      }
+        this.onUpdateContest = (contest) => {
+          this.requestRenderTasks()
+          return false
+        }
 
-      this.renderTasksInterval = window.setInterval(this.onRenderTasks, 500)
-    })
+        contestProvider.on('updateContest', this.onUpdateContest)
+
+        teamProvider.subscribe()
+        taskCategoryProvider.subscribe()
+        taskCategoryProvider.on('createTaskCategory', this.onCreateTaskCategory)
+        taskCategoryProvider.on('deleteTaskCategory', this.onDeleteTaskCategory)
+
+        taskValueProvider.subscribe(identity)
+        taskRewardSchemeProvider.subscribe(identity)
+
+        this.onUpdateTaskValue = () => {
+          this.requestRenderTasks()
+          return false
+        }
+        taskValueProvider.on('updateTaskValue', this.onUpdateTaskValue)
+
+        if (identity.isSupervisor()) {
+          this.onCreateTaskValue = () => {
+            this.requestRenderTasks()
+            return false
+          }
+          taskValueProvider.on('createTaskValue', this.onCreateTaskValue)
+        }
+
+        if (identity.isTeam() || identity.isGuest()) {
+          this.onRevealTaskValue = () => {
+            this.requestRenderTasks()
+            return false
+          }
+          taskValueProvider.on('revealTaskValue', this.onRevealTaskValue)
+        }
+
+        this.onUpdateTaskRewardScheme = () => {
+          this.requestRenderTasks()
+          return false
+        }
+        taskRewardSchemeProvider.on('updateTaskRewardScheme', this.onUpdateTaskRewardScheme)
+
+        if (identity.isSupervisor()) {
+          this.onCreateTaskRewardScheme = () => {
+            this.requestRenderTasks()
+            return false
+          }
+          taskRewardSchemeProvider.on('createTaskRewardScheme', this.onCreateTaskRewardScheme)
+        }
+
+        if (identity.isTeam() || identity.isGuest()) {
+          this.onRevealTaskRewardScheme = () => {
+            this.requestRenderTasks()
+            return false
+          }
+          taskValueProvider.on('revealTaskRewardScheme', this.onRevealTaskRewardScheme)
+        }
+
+        this.onRenderTasks = (force = false) => {
+          if ((this.flagRenderTasks || force) && !this.flagRenderingTasks) {
+            this.flagRenderingTasks = true
+            this.renderTaskPreviews()
+            this.flagRenderingTasks = false
+            this.flagRenderTasks = false
+          }
+        }
+
+        const urlParams = new URLSearchParams(window.location.search)
+        if (urlParams.get('action') === 'show' && urlParams.has('taskId')) {
+          this.showTaskModal(identity, parseInt(urlParams.get('taskId'), 10))
+        }
+
+        this.renderTasksInterval = window.setInterval(this.onRenderTasks, 500)
+      })
   }
 }
 

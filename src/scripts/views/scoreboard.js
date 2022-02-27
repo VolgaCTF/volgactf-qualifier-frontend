@@ -46,52 +46,52 @@ class ScoreboardView extends View {
     this.$main = $('#main')
 
     $
-    .when(
-      teamProvider.initTeams(),
-      countryProvider.initCountries()
-    )
-    .done((teams, countries) => {
-      let urlParams = new URLSearchParams(window.location.search)
-      this.detailed = urlParams.has('detailed')
+      .when(
+        teamProvider.initTeams(),
+        countryProvider.initCountries()
+      )
+      .done((teams, countries) => {
+        const urlParams = new URLSearchParams(window.location.search)
+        this.detailed = urlParams.has('detailed')
 
-      teamProvider.subscribe()
+        teamProvider.subscribe()
 
-      this.onUpdateTeamRankings = () => {
-        this.reloadScoreboard = true
-        return false
-      }
-      teamRankingProvider.on('updateTeamRankings', this.onUpdateTeamRankings)
-
-      this.onUpdateTeamLogo = (team) => {
-        const el = document.getElementById(`team-${team.id}-logo`)
-        if (el) {
-          el.setAttribute('src', `/team/logo/${team.id}/${team.logoChecksum}`)
+        this.onUpdateTeamRankings = () => {
+          this.reloadScoreboard = true
+          return false
         }
-        return false
-      }
+        teamRankingProvider.on('updateTeamRankings', this.onUpdateTeamRankings)
 
-      teamProvider.on('updateTeamLogo', this.onUpdateTeamLogo)
-
-      this.onUpdateTeamProfile = () => {
-        this.reloadScoreboard = true
-        return false
-      }
-
-      teamProvider.on('updateTeamProfile', this.onUpdateTeamProfile)
-
-      this.onReloadScoreboard = () => {
-        if (!this.reloadScoreboard || this.renderingScoreboard) {
-          return
+        this.onUpdateTeamLogo = (team) => {
+          const el = document.getElementById(`team-${team.id}-logo`)
+          if (el) {
+            el.setAttribute('src', `/team/logo/${team.id}/${team.logoChecksum}`)
+          }
+          return false
         }
 
-        this.renderingScoreboard = true
-        this.renderScoreboard()
-        this.reloadScoreboard = false
-        this.renderingScoreboard = false
-      }
+        teamProvider.on('updateTeamLogo', this.onUpdateTeamLogo)
 
-      this.reloadScoreboardInterval = setInterval(this.onReloadScoreboard, 1500)
-    })
+        this.onUpdateTeamProfile = () => {
+          this.reloadScoreboard = true
+          return false
+        }
+
+        teamProvider.on('updateTeamProfile', this.onUpdateTeamProfile)
+
+        this.onReloadScoreboard = () => {
+          if (!this.reloadScoreboard || this.renderingScoreboard) {
+            return
+          }
+
+          this.renderingScoreboard = true
+          this.renderScoreboard()
+          this.reloadScoreboard = false
+          this.renderingScoreboard = false
+        }
+
+        this.reloadScoreboardInterval = setInterval(this.onReloadScoreboard, 1500)
+      })
   }
 }
 

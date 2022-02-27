@@ -24,12 +24,12 @@ class RemoteCheckersView extends View {
   }
 
   initCreateRemoteCheckerModal () {
-    let $modal = $('#create-remote-checker-modal')
+    const $modal = $('#create-remote-checker-modal')
     $modal.modal({ show: false })
 
-    let $submitError = $modal.find('.submit-error > p')
-    let $submitButton = $modal.find('button[data-action="complete-create-remote-checker"]')
-    let $form = $modal.find('form')
+    const $submitError = $modal.find('.submit-error > p')
+    const $submitButton = $modal.find('button[data-action="complete-create-remote-checker"]')
+    const $form = $modal.find('form')
     $form.parsley({
       errorClass: 'is-invalid',
       successClass: 'is-valid',
@@ -89,12 +89,12 @@ class RemoteCheckersView extends View {
   }
 
   initEditRemoteCheckerModal () {
-    let $modal = $('#edit-remote-checker-modal')
+    const $modal = $('#edit-remote-checker-modal')
     $modal.modal({ show: false })
 
-    let $submitError = $modal.find('.submit-error > p')
-    let $submitButton = $modal.find('button[data-action="complete-edit-remote-checker"]')
-    let $form = $modal.find('form')
+    const $submitError = $modal.find('.submit-error > p')
+    const $submitButton = $modal.find('button[data-action="complete-edit-remote-checker"]')
+    const $form = $modal.find('form')
     $form.parsley({
       errorClass: 'is-invalid',
       successClass: 'is-valid',
@@ -112,14 +112,14 @@ class RemoteCheckersView extends View {
       $form.trigger('submit')
     })
 
-    let $editRemoteCheckerName = $('#edit-remote-checker-name')
-    let $editRemoteCheckerUrl = $('#edit-remote-checker-url')
-    let $editRemoteCheckerAuthUsername = $('#edit-remote-checker-auth-username')
-    let $editRemoteCheckerAuthPassword = $('#edit-remote-checker-auth-password')
+    const $editRemoteCheckerName = $('#edit-remote-checker-name')
+    const $editRemoteCheckerUrl = $('#edit-remote-checker-url')
+    const $editRemoteCheckerAuthUsername = $('#edit-remote-checker-auth-username')
+    const $editRemoteCheckerAuthPassword = $('#edit-remote-checker-auth-password')
 
     $modal.on('show.bs.modal', (e) => {
-      let remoteCheckerId = parseInt($(e.relatedTarget).data('remote-checker-id'), 10)
-      let remoteChecker = _.findWhere(remoteCheckerProvider.getRemoteCheckers(), { id: remoteCheckerId })
+      const remoteCheckerId = parseInt($(e.relatedTarget).data('remote-checker-id'), 10)
+      const remoteChecker = _.findWhere(remoteCheckerProvider.getRemoteCheckers(), { id: remoteCheckerId })
 
       $form.attr('action', `/api/remote_checker/${remoteCheckerId}/update`)
       $editRemoteCheckerName.val(remoteChecker.name)
@@ -167,17 +167,17 @@ class RemoteCheckersView extends View {
   }
 
   initDeleteRemoteCheckerModal () {
-    let $modal = $('#delete-remote-checker-modal')
+    const $modal = $('#delete-remote-checker-modal')
     $modal.modal({ show: false })
 
-    let $modalBody = $modal.find('.modal-body p.confirmation')
-    let $submitError = $modal.find('.submit-error > p')
-    let $submitButton = $modal.find('button[data-action="complete-delete-remote-checker"]')
+    const $modalBody = $modal.find('.modal-body p.confirmation')
+    const $submitError = $modal.find('.submit-error > p')
+    const $submitButton = $modal.find('button[data-action="complete-delete-remote-checker"]')
 
     $modal.on('show.bs.modal', (e) => {
-      let remoteCheckerId = parseInt($(e.relatedTarget).data('remote-checker-id'), 10)
+      const remoteCheckerId = parseInt($(e.relatedTarget).data('remote-checker-id'), 10)
       $modal.data('remote-checker-id', remoteCheckerId)
-      let remoteChecker = _.findWhere(remoteCheckerProvider.getRemoteCheckers(), { id: remoteCheckerId })
+      const remoteChecker = _.findWhere(remoteCheckerProvider.getRemoteCheckers(), { id: remoteCheckerId })
       const msgTemplate = _.template('You are about to delete the remote checker <mark><%- name %></mark>. Continue?')
       $modalBody.html(msgTemplate({ name: remoteChecker.name }))
       $submitError.text('')
@@ -186,21 +186,21 @@ class RemoteCheckersView extends View {
     $submitButton.on('click', (e) => {
       const remoteCheckerId = $modal.data('remote-checker-id')
       $
-      .when(
-        remoteCheckerProvider.deleteRemoteChecker(
-          remoteCheckerId,
-          identityProvider.getIdentity().token
+        .when(
+          remoteCheckerProvider.deleteRemoteChecker(
+            remoteCheckerId,
+            identityProvider.getIdentity().token
+          )
         )
-      )
-      .done(() => {
-        $modal.modal('hide')
-        if (!dataStore.connectedRealtime()) {
-          window.location.reload()
-        }
-      })
-      .fail((err) => {
-        $submitError.text(err)
-      })
+        .done(() => {
+          $modal.modal('hide')
+          if (!dataStore.connectedRealtime()) {
+            window.location.reload()
+          }
+        })
+        .fail((err) => {
+          $submitError.text(err)
+        })
     })
   }
 
@@ -219,52 +219,52 @@ class RemoteCheckersView extends View {
     this.$main = $('#main')
 
     $
-    .when(
-      remoteCheckerProvider.initRemoteCheckers()
-    )
-    .done(() => {
-      const identity = identityProvider.getIdentity()
-      if (identity.isAdmin()) {
-        this.initCreateRemoteCheckerModal()
-        this.initEditRemoteCheckerModal()
-        this.initDeleteRemoteCheckerModal()
-      }
-
-      let urlParams = new URLSearchParams(window.location.search)
-      if (urlParams.get('action') === 'scrollTo' && urlParams.has('remoteCheckerId')) {
-        let $el = $(`div.volgactf-qualifier-remote-checker[data-id="${urlParams.get('remoteCheckerId')}"]`)
-        if ($el.length > 0) {
-          $el.get(0).scrollIntoView()
+      .when(
+        remoteCheckerProvider.initRemoteCheckers()
+      )
+      .done(() => {
+        const identity = identityProvider.getIdentity()
+        if (identity.isAdmin()) {
+          this.initCreateRemoteCheckerModal()
+          this.initEditRemoteCheckerModal()
+          this.initDeleteRemoteCheckerModal()
         }
-      }
 
-      this.onCreateRemoteChecker = () => {
-        this.renderRemoteCheckers()
-        return false
-      }
+        const urlParams = new URLSearchParams(window.location.search)
+        if (urlParams.get('action') === 'scrollTo' && urlParams.has('remoteCheckerId')) {
+          const $el = $(`div.volgactf-qualifier-remote-checker[data-id="${urlParams.get('remoteCheckerId')}"]`)
+          if ($el.length > 0) {
+            $el.get(0).scrollIntoView()
+          }
+        }
 
-      this.onUpdateRemoteChecker = () => {
-        this.renderRemoteCheckers()
-        return false
-      }
+        this.onCreateRemoteChecker = () => {
+          this.renderRemoteCheckers()
+          return false
+        }
 
-      this.onDeleteRemoteChecker = () => {
-        this.renderRemoteCheckers()
-        return false
-      }
+        this.onUpdateRemoteChecker = () => {
+          this.renderRemoteCheckers()
+          return false
+        }
 
-      remoteCheckerProvider.subscribe()
-      remoteCheckerProvider.on('createRemoteChecker', this.onCreateRemoteChecker)
-      remoteCheckerProvider.on('updateRemoteChecker', this.onUpdateRemoteChecker)
-      remoteCheckerProvider.on('deleteRemoteChecker', this.onDeleteRemoteChecker)
+        this.onDeleteRemoteChecker = () => {
+          this.renderRemoteCheckers()
+          return false
+        }
 
-      this.onUpdateContest = (contest) => {
-        this.renderRemoteCheckers()
-        return false
-      }
+        remoteCheckerProvider.subscribe()
+        remoteCheckerProvider.on('createRemoteChecker', this.onCreateRemoteChecker)
+        remoteCheckerProvider.on('updateRemoteChecker', this.onUpdateRemoteChecker)
+        remoteCheckerProvider.on('deleteRemoteChecker', this.onDeleteRemoteChecker)
 
-      contestProvider.on('updateContest', this.onUpdateContest)
-    })
+        this.onUpdateContest = (contest) => {
+          this.renderRemoteCheckers()
+          return false
+        }
+
+        contestProvider.on('updateContest', this.onUpdateContest)
+      })
   }
 }
 

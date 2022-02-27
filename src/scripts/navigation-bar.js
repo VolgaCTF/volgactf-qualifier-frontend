@@ -222,13 +222,13 @@ class NavigationBar {
       teamRankingProvider.on('updateTeamRankings', this.onUpdateTeamRankings)
 
       $
-      .when(teamRankingProvider.fetchTeamRankings())
-      .done((teamRankings) => {
-        this.renderTeamRanking()
-      })
-      .fail((err) => {
-        console.log(err)
-      })
+        .when(teamRankingProvider.fetchTeamRankings())
+        .done((teamRankings) => {
+          this.renderTeamRanking()
+        })
+        .fail((err) => {
+          console.log(err)
+        })
     }
   }
 }

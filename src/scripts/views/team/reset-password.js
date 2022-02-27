@@ -14,7 +14,7 @@ class ResetPasswordView extends View {
   present () {
     this.$main = $('#main')
 
-    let $form = this.$main.find('form.volgactf-form-reset')
+    const $form = this.$main.find('form.volgactf-form-reset')
     $form.parsley({
       errorClass: 'is-invalid',
       successClass: 'is-valid',
@@ -27,13 +27,13 @@ class ResetPasswordView extends View {
       errorsWrapper: '<div class="invalid-feedback">',
       errorTemplate: '<span></span>'
     })
-    let $submitError = $form.find('.submit-error > p')
-    let $submitButton = $form.find('button')
+    const $submitError = $form.find('.submit-error > p')
+    const $submitButton = $form.find('button')
 
-    let $successAlert = this.$main.find('div.volgactf-reset-success')
-    let $errorAlert = this.$main.find('div.volgactf-reset-error')
+    const $successAlert = this.$main.find('div.volgactf-reset-success')
+    const $errorAlert = this.$main.find('div.volgactf-reset-error')
 
-    let urlParams = new URLSearchParams(window.location.search)
+    const urlParams = new URLSearchParams(window.location.search)
     if (urlParams.has('team') && urlParams.has('code')) {
       $form.show()
 

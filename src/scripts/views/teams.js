@@ -19,8 +19,8 @@ class TeamsView extends View {
   }
 
   renderTeams () {
-    let countries = countryProvider.getCountries()
-    let teams = teamProvider.getTeams()
+    const countries = countryProvider.getCountries()
+    const teams = teamProvider.getTeams()
     this.$main.find('.volgactf-team-count').text(`(${teams.length})`)
     this.$main.find('section').html(window.volgactf.qualifier.templates.teamList({
       _: _,
@@ -34,62 +34,62 @@ class TeamsView extends View {
     this.$main = $('#main')
 
     $
-    .when(
-      teamProvider.initTeams(),
-      countryProvider.initCountries()
-    )
-    .done(() => {
-      const identity = identityProvider.getIdentity()
+      .when(
+        teamProvider.initTeams(),
+        countryProvider.initCountries()
+      )
+      .done(() => {
+        const identity = identityProvider.getIdentity()
 
-      teamProvider.subscribe()
+        teamProvider.subscribe()
 
-      this.onUpdateTeamProfile = (team) => {
-        this.renderTeams()
-        return false
-      }
-
-      teamProvider.on('updateTeamProfile', this.onUpdateTeamProfile)
-
-      this.onUpdateTeamLogo = (team) => {
-        const el = document.getElementById(`team-${team.id}-logo`)
-        if (el) {
-          el.setAttribute('src', `/team/logo/${team.id}/${team.logoChecksum}`)
-        }
-        return false
-      }
-
-      teamProvider.on('updateTeamLogo', this.onUpdateTeamLogo)
-
-      this.onQualifyTeam = (team) => {
-        this.renderTeams()
-        return false
-      }
-
-      teamProvider.on('qualifyTeam', this.onQualifyTeam)
-
-      this.onDisqualifyTeam = (team) => {
-        this.renderTeams()
-        return false
-      }
-
-      teamProvider.on('disqualifyTeam', this.onDisqualifyTeam)
-
-      if (identity.isSupervisor()) {
-        this.onCreateTeam = (team) => {
+        this.onUpdateTeamProfile = (team) => {
           this.renderTeams()
           return false
         }
 
-        teamProvider.on('createTeam', this.onCreateTeam)
+        teamProvider.on('updateTeamProfile', this.onUpdateTeamProfile)
 
-        this.onUpdateTeamEmail = (team) => {
+        this.onUpdateTeamLogo = (team) => {
+          const el = document.getElementById(`team-${team.id}-logo`)
+          if (el) {
+            el.setAttribute('src', `/team/logo/${team.id}/${team.logoChecksum}`)
+          }
+          return false
+        }
+
+        teamProvider.on('updateTeamLogo', this.onUpdateTeamLogo)
+
+        this.onQualifyTeam = (team) => {
           this.renderTeams()
           return false
         }
 
-        teamProvider.on('updateTeamEmail', this.onUpdateTeamEmail)
-      }
-    })
+        teamProvider.on('qualifyTeam', this.onQualifyTeam)
+
+        this.onDisqualifyTeam = (team) => {
+          this.renderTeams()
+          return false
+        }
+
+        teamProvider.on('disqualifyTeam', this.onDisqualifyTeam)
+
+        if (identity.isSupervisor()) {
+          this.onCreateTeam = (team) => {
+            this.renderTeams()
+            return false
+          }
+
+          teamProvider.on('createTeam', this.onCreateTeam)
+
+          this.onUpdateTeamEmail = (team) => {
+            this.renderTeams()
+            return false
+          }
+
+          teamProvider.on('updateTeamEmail', this.onUpdateTeamEmail)
+        }
+      })
   }
 }
 
