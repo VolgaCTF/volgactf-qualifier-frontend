@@ -4,7 +4,7 @@ const plumber = require('gulp-plumber')
 const mustache = require('gulp-mustache')
 const sass = require('gulp-sass')(require('sass'))
 const uglify = require('gulp-uglify')
-const minifyCSS = require('gulp-minify-css')
+const cleanCSS = require('gulp-clean-css')
 const rev = require('gulp-rev')
 const concatCss = require('gulp-concat-css')
 
@@ -217,7 +217,7 @@ gulp.task('stylesheets', function (cb) {
       .pipe(concatCss('volgactf-qualifier.css', {
         rebaseUrls: false
       }))
-      .pipe(gulpIf(isOptimize, minifyCSS()))
+      .pipe(gulpIf(isOptimize, cleanCSS()))
       .pipe(gulp.dest(tmpDir2))
       .pipe(rev())
       .pipe(gulp.dest(tmpDir2))
