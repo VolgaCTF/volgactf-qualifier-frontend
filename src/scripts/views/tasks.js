@@ -19,6 +19,7 @@ import 'bootstrap'
 import 'jquery-form'
 import 'parsley'
 import 'tempusdominius-bootstrap-4'
+import 'bootstrap-select'
 
 import ClipboardJS from 'clipboard'
 
@@ -62,6 +63,85 @@ class TasksView extends View {
     this.flagRenderingTasks = false
     this.renderTasksInterval = null
     this.onRenderTasks = null
+  }
+
+  initCreateTaskFromGitHubModal () {
+    const $modal = $('#create-task-from-github-modal')
+    $modal.modal({ show: false })
+
+    const $submitError = $modal.find('.submit-error > p')
+    const $submitSuccess = $modal.find('.submit-success > p')
+    const $submitButton = $modal.find('button[data-action="complete-create-task-from-github"]')
+    const $form = $modal.find('form')
+    const $repositorySelect = $('#create-task-from-github-repository')
+
+    $submitButton.on('click', (e) => {
+      $form.trigger('submit')
+    })
+
+    $modal.on('show.bs.modal', (e) => {
+      $submitError.text('')
+      $submitSuccess.text('')
+      $submitButton.show()
+      $submitButton.prop('disabled', true)
+      $repositorySelect.selectpicker('destroy')
+      $repositorySelect.empty()
+      $repositorySelect.prop('disabled', true)
+    })
+
+    $modal.on('shown.bs.modal', (e) => {
+      $.ajax({
+        url: '/api/task/github_repository/index',
+        type: 'GET',
+        dataType: 'json',
+        success: (responseJSON, textStatus, jqXHR) => {
+          _.each(responseJSON, (repository) => {
+            $repositorySelect.append($('<option></option>').attr('value', repository).text(repository))
+          })
+          $repositorySelect.prop('disabled', false)
+          $repositorySelect.focus()
+          $repositorySelect.selectpicker()
+          $submitButton.prop('disabled', false)
+        },
+        error: (jqXHR, textStatus, errorThrown) => {
+          if (jqXHR.responseJSON) {
+            $submitError.text(jqXHR.responseJSON)
+          } else {
+            $submitError.text('Unknown error. Please try again later.')
+          }
+        }
+      })
+    })
+
+    $form.on('submit', (e) => {
+      e.preventDefault()
+
+      $form.ajaxSubmit({
+        beforeSubmit: () => {
+          $submitError.text('')
+          $submitSuccess.text('')
+          $submitButton.prop('disabled', true)
+        },
+        clearForm: true,
+        dataType: 'json',
+        headers: {
+          'X-CSRF-Token': identityProvider.getIdentity().token
+        },
+        success: (responseJSON, textStatus, jqXHR) => {
+          console.log(responseJSON)
+        },
+        error: (jqXHR, textStatus, errorThrown) => {
+          if (jqXHR.responseJSON) {
+            $submitError.text(jqXHR.responseJSON)
+          } else {
+            $submitError.text('Unknown error. Please try again later.')
+          }
+        },
+        complete: () => {
+          $submitButton.prop('disabled', false)
+        }
+      })
+    })
   }
 
   initSubscribeTaskModal () {
@@ -1797,6 +1877,7 @@ class TasksView extends View {
           taskRemoteCheckerProvider.subscribe()
 
           this.initCreateTaskModal()
+          this.initCreateTaskFromGitHubModal()
           this.initOpenTaskModal()
           this.initCloseTaskModal()
           this.initEditTaskModal()
