@@ -34,7 +34,7 @@
     "parsleyjs": "~2.8.1",
     "popper.js": "~1.16.1",
     "tempusdominus-bootstrap-4": "~5.1.0",
-    "twemoji": "~13.1.0",
+    "twemoji": "^14.0.2",
     "underscore": "~1.13.2",
     "url-search-params": "~0.10.0",
     "wolfy87-eventemitter": "~4.3.0"

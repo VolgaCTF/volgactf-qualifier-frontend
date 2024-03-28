@@ -128,7 +128,12 @@ class TasksView extends View {
           'X-CSRF-Token': identityProvider.getIdentity().token
         },
         success: (responseJSON, textStatus, jqXHR) => {
-          console.log(responseJSON)
+          $submitButton.hide()
+          $submitSuccess.text('Created the task')
+          const closeModal = () => {
+            $modal.modal('hide')
+          }
+          setTimeout(closeModal, 1000)
         },
         error: (jqXHR, textStatus, errorThrown) => {
           if (jqXHR.responseJSON) {
