@@ -31,8 +31,11 @@
                         <button type="button" class="btn btn-primary" data-action="create-task" data-toggle="modal" data-target="#create-task-modal">
                             Create
                         </button>
-                        <button type="button" class="btn btn-secondary" data-action="create-task-from-github" data-toggle="modal" data-target="#create-task-from-github-modal">
+                        <button type="button" class="btn btn-secondary" data-action="create-task-from-github" data-toggle="modal" data-target="#create-task-from-github-modal" data-feature="import-github">
                             Create from GitHub
+                        </button>
+                        <button type="button" class="btn btn-secondary" data-action="create-task-from-gitflic" data-toggle="modal" data-target="#create-task-from-gitflic-modal" data-feature="import-gitflic">
+                            Create from GitFlic
                         </button>
                     </div>
                     <% } %>
@@ -336,6 +339,38 @@
                         <div class="modal-footer">
                             <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
                             <button type="button" class="btn btn-primary" data-action="complete-create-task-from-github">Create</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal fade" id="create-task-from-gitflic-modal" tabindex="-1" role="dialog">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title">Create task from GitFlic</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <form method="POST" action="/api/task/create-from-gitflic" novalidate>
+                                <div class="form-group">
+                                    <label for="create-task-from-gitflic-repository" class="control-label">GitFlic repository</label>
+                                    <select class="form-control" id="create-task-from-gitflic-repository" data-live-search="true" name="repository">
+                                    </select>
+                                </div>
+                                <div class="submit-error">
+                                    <p class="text-danger"></p>
+                                </div>
+                                <div class="submit-success">
+                                    <p class="text-success"></p>
+                                </div>
+                            </form>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                            <button type="button" class="btn btn-primary" data-action="complete-create-task-from-gitflic">Create</button>
                         </div>
                     </div>
                 </div>

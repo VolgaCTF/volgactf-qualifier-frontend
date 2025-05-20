@@ -91,7 +91,91 @@ class TasksView extends View {
 
     $modal.on('shown.bs.modal', (e) => {
       $.ajax({
-        url: '/api/task/github_repository/index',
+        url: '/api/task/github-repository/index',
+        type: 'GET',
+        dataType: 'json',
+        success: (responseJSON, textStatus, jqXHR) => {
+          _.each(responseJSON, (repository) => {
+            $repositorySelect.append($('<option></option>').attr('value', repository).text(repository))
+          })
+          $repositorySelect.prop('disabled', false)
+          $repositorySelect.focus()
+          $repositorySelect.selectpicker()
+          $submitButton.prop('disabled', false)
+        },
+        error: (jqXHR, textStatus, errorThrown) => {
+          if (jqXHR.responseJSON) {
+            $submitError.text(jqXHR.responseJSON)
+          } else {
+            $submitError.text('Unknown error. Please try again later.')
+          }
+        }
+      })
+    })
+
+    $form.on('submit', (e) => {
+      e.preventDefault()
+
+      $form.ajaxSubmit({
+        beforeSubmit: () => {
+          $submitError.text('')
+          $submitSuccess.text('')
+          $submitButton.prop('disabled', true)
+        },
+        clearForm: true,
+        dataType: 'json',
+        headers: {
+          'X-CSRF-Token': identityProvider.getIdentity().token
+        },
+        success: (responseJSON, textStatus, jqXHR) => {
+          $submitButton.hide()
+          $submitSuccess.text('Created the task')
+          const closeModal = () => {
+            $modal.modal('hide')
+          }
+          setTimeout(closeModal, 1000)
+        },
+        error: (jqXHR, textStatus, errorThrown) => {
+          if (jqXHR.responseJSON) {
+            $submitError.text(jqXHR.responseJSON)
+          } else {
+            $submitError.text('Unknown error. Please try again later.')
+          }
+        },
+        complete: () => {
+          $submitButton.prop('disabled', false)
+        }
+      })
+    })
+  }
+
+  initCreateTaskFromGitFlicModal () {
+    const $modal = $('#create-task-from-gitflic-modal')
+    $modal.modal({ show: false })
+
+    const $submitError = $modal.find('.submit-error > p')
+    const $submitSuccess = $modal.find('.submit-success > p')
+    const $submitButton = $modal.find('button[data-action="complete-create-task-from-gitflic"]')
+    const $form = $modal.find('form')
+    const $repositorySelect = $('#create-task-from-gitflic-repository')
+
+    $submitButton.on('click', (e) => {
+      $form.trigger('submit')
+    })
+
+    $modal.on('show.bs.modal', (e) => {
+      $submitError.text('')
+      $submitSuccess.text('')
+      $submitButton.show()
+      $submitButton.prop('disabled', true)
+      $repositorySelect.selectpicker('destroy')
+      $repositorySelect.empty()
+      $repositorySelect.prop('disabled', true)
+    })
+
+    $modal.on('shown.bs.modal', (e) => {
+      $.ajax({
+        url: '/api/task/gitflic-repository/index',
         type: 'GET',
         dataType: 'json',
         success: (responseJSON, textStatus, jqXHR) => {
@@ -1883,6 +1967,7 @@ class TasksView extends View {
 
           this.initCreateTaskModal()
           this.initCreateTaskFromGitHubModal()
+          this.initCreateTaskFromGitFlicModal()
           this.initOpenTaskModal()
           this.initCloseTaskModal()
           this.initEditTaskModal()
