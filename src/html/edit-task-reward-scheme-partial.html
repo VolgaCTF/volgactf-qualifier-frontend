@@ -23,11 +23,11 @@
 <% } else if (rewardScheme === 'dynlog') { %>
     <div class="form-group">
         <label class="control-label">Max points</label>
-        <input type="number" class="form-control" disabled value="<%- taskRewardScheme.maxValue || scoringDynlogMax %>">
+        <input type="number" class="form-control" id="edit-task-reward-scheme-dynlog-max-value" required data-parsley-type="integer" data-parsley-min="<%- taskMinValue %>" data-parsley-max="<%- taskMaxValue %>" value="<% print(taskRewardScheme.maxValue || scoringDynlogMax) %>">
     </div>
     <div class="form-group">
         <label class="control-label">Min value</label>
-        <input type="number" class="form-control" disabled value="<%- taskRewardScheme.minValue || scoringDynlogMin %>">
+        <input type="number" class="form-control" id="edit-task-reward-scheme-dynlog-min-value" required data-parsley-type="integer" data-parsley-min="<%- taskMinValue %>" data-parsley-max="<%- taskMaxValue %>" value="<% print(taskRewardScheme.minValue || scoringDynlogMin) %>">
     </div>
     <div class="form-group">
         <label class="control-label">K</label>

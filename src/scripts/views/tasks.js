@@ -1044,6 +1044,11 @@ class TasksView extends View {
           subtractPoints: $('#edit-task-reward-scheme-variable-subtract-points').val(),
           subtractHitCount: $('#edit-task-reward-scheme-variable-subtract-hit-count').val()
         }
+      } else if (scheme === 'dynlog') {
+        return {
+          maxValue: $('#edit-task-reward-scheme-dynlog-max-value').val(),
+          minValue: $('#edit-task-reward-scheme-dynlog-min-value').val()
+        }
       } else {
         return null
       }
