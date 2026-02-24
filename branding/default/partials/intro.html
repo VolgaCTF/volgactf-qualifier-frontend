@@ -1,0 +1,20 @@
+<p style="text-align: right; margin-bottom: 0;">
+  <a href="http://www.ssau.ru/english/" target="_blank" rel="noopener"><img src="/assets/images/ssau.png" style="width: 50%; max-width: 500px;"></a>
+  <a href="https://www.samregion.ru/" target="_blank" rel="noopener"><img src="/assets/images/dit-samregion.png" style="width: 10%; max-width: 105px;"></a>
+</p>
+<h1>Hello there!</h1>
+<p>Welcome to VolgaCTF Qualifier!</p>
+<p><a href="https://volgactf.ru/en/" target="_blank" rel="noopener">VolgaCTF</a> is an international interuniversity cybersecurity competition organised by a group of IT enthusiasts in collaboration with the <a href="http://www.ssau.ru/english/education/institutes_faculties/ime/" target="_blank" rel="noopener">Institute of Informatics, Mathematics and Electronics of Samara University</a>.</p>
+<p>VolgaCTF Qualifier is an online competition. Top teams will be invited to participate in VolgaCTF Final, which will be held in Samara, Russia.</p>
+<% if (contest.state === 1) { %>
+<p>The competition starts on <a href="https://www.timeanddate.com/worldclock/fixedtime.html?msg=VolgaCTF+Qualifier+%2F+start&iso=20250329T12" target="_blank" rel="noopener">Mar 29 at 12:00 UTC</a> and lasts 24 hours.</p>
+<% } %>
+<% if (contest.state === 2 || contest.state === 3) { %>
+<p>The competition has already started and will finish on <a href="https://www.timeanddate.com/worldclock/fixedtime.html?msg=VolgaCTF+Qualifier+%2F+finish&iso=20250330T12" target="_blank" rel="noopener">Mar 30 at 12:00 UTC</a>.</p>
+<% } %>
+<% if (contest.state === 4) { %>
+<p>The competition has finished on <a href="https://www.timeanddate.com/worldclock/fixedtime.html?msg=VolgaCTF+Qualifier+%2F+finish&iso=20250330T12" target="_blank" rel="noopener">Mar 30 at 12:00 UTC</a>.</p>
+<% } %>
+<% if (contest.state !== 4) { %>
+<p>Interested? Read the <a href="/about" target="_blank" rel="noopener">rules</a> and <a href="/team/signup">sign up</a> to take part in the competition!</p>
+<% } %>

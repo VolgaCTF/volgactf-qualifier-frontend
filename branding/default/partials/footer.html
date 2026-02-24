@@ -1,0 +1,23 @@
+<div class="container d-none d-md-block">
+  <div class="float-left">
+    <ul class="list-unstyled text-left my-auto">
+      <li>&copy;&nbsp;<script>document.write((new Date()).getFullYear())</script>&nbsp;<a href="https://volgactf.ru/en/" target="_blank" rel="noopener">VolgaCTF</a></li>
+      <li><a href="https://github.com/VolgaCTF" target="_blank" rel="noopener">GitHub</a></li>
+    </ul>
+  </div>
+  <% if (runtimeStorage.viewName === 'index' && identity.role === 'guest') { %>
+  <div class="float-right my-auto">
+    <ul class="list-unstyled text-right">
+      <li><a href="https://twitter.com/VolgaCTF" target="_blank" rel="noopener">@VolgaCTF</a></li>
+    </ul>
+  </div>
+  <% } else { %>
+  <div class="float-right my-auto" style="text-align: right; padding-top: 5px;">
+    <a href="http://www.ssau.ru/english/" target="_blank" rel="noopener"><img src="/assets/images/ssau.png" style="height: 60px;"></a>
+    <a href="https://www.samregion.ru/" target="_blank" rel="noopener"><img src="/assets/images/dit-samregion.png" style="height: 60px;"></a>
+  </div>
+  <% } %>
+</div>
+<div class="container d-md-none text-center">
+  <p>&copy;&nbsp;<script>document.write((new Date()).getFullYear())</script>&nbsp;<a href="https://volgactf.ru/en/" target="_blank" rel="noopener">VolgaCTF</a></p>
+</div>

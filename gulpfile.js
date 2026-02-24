@@ -18,17 +18,30 @@ const del = require('del')
 const include = require('gulp-include')
 const path = require('path')
 const async = require('async')
-const axios = require('axios')
-const remoteSrc = require('gulp-remote-src')
 const tmp = require('tmp')
 const zopfli = require('gulp-zopfli-green')
 const brotli = require('gulp-brotli')
 const filter = require('gulp-filter')
 
-const customizerHost = process.env.VOLGACTF_QUALIFIER_CUSTOMIZER_HOST || '127.0.0.1'
-const customizerPort = parseInt(process.env.VOLGACTF_QUALIFIER_CUSTOMIZER_PORT || '7037', 10)
-
 const buildDir = path.join(__dirname, 'build')
+
+const brandingRoot = process.env.BRANDING_ROOT_PATH
+
+if (!brandingRoot) {
+  throw new Error('BRANDING_ROOT_PATH is not defined')
+}
+
+function getBrandingPath(subdir) {
+  return path.join(brandingRoot, subdir)
+}
+
+function getFiles(subdir) {
+  const dir = getBrandingPath(subdir)
+  return fs.readdirSync(dir).filter((filename) => {
+    const fullPath = path.join(dir, filename)
+    return fs.statSync(fullPath).isFile()
+  })
+}
 
 const paths = {
   scripts: [
@@ -153,21 +166,10 @@ gulp.task('scripts', function (cb) {
 })
 
 gulp.task('stylesheets', function (cb) {
-  let customizerIndex = null
-  let tmpDir = null
+  let customizerIndex = []
+  let customizerPaths = []
   let tmpDir2 = null
   const sequence = []
-
-  sequence.push(function (callback) {
-    tmp.dir({}, function (err, tmpPath, cleanupCallback) {
-      if (err) {
-        callback(err)
-      } else {
-        tmpDir = tmpPath
-        callback()
-      }
-    })
-  })
 
   sequence.push(function (callback) {
     tmp.dir({}, function (err, tmpPath, cleanupCallback) {
@@ -187,29 +189,20 @@ gulp.task('stylesheets', function (cb) {
   })
 
   sequence.push(function (callback) {
-    axios.get(`http://${customizerHost}:${customizerPort}/assets/index/stylesheets`)
-      .then(function (response) {
-        customizerIndex = response.data
-        callback()
-      })
-      .catch(function (err) {
-        callback(err)
-      })
-  })
-
-  sequence.push(function (callback) {
-    remoteSrc(customizerIndex, {
-      base: `http://${customizerHost}:${customizerPort}/assets/stylesheets/`
-    })
-      .pipe(gulp.dest(tmpDir))
-      .on('end', callback)
+    try {
+      customizerIndex = getFiles('stylesheets')
+      customizerPaths = customizerIndex.map(filename =>
+        path.join(getBrandingPath('stylesheets'), filename)
+      )
+      callback()
+    } catch (err) {
+      callback(err)
+    }
   })
 
   sequence.push(function (callback) {
     gulp
-      .src(paths.stylesheets.concat(customizerIndex.map(function (filename) {
-        return path.join(tmpDir, filename)
-      })))
+      .src(paths.stylesheets.concat(customizerPaths))
       .pipe(gulpIf(isSass, sass({
         indentedSyntax: true,
         errLogToConsole: true
@@ -266,7 +259,6 @@ gulp.task('stylesheets', function (cb) {
 
   sequence.push(function (callback) {
     del([
-      tmpDir,
       tmpDir2
     ], {
       force: true
@@ -284,19 +276,8 @@ gulp.task('stylesheets', function (cb) {
 
 gulp.task('fonts', function (cb) {
   let customizerIndex = null
-  let tmpDir = null
+  let customizerPaths = []
   const sequence = []
-
-  sequence.push(function (callback) {
-    tmp.dir({}, function (err, tmpPath, cleanupCallback) {
-      if (err) {
-        callback(err)
-      } else {
-        tmpDir = tmpPath
-        callback()
-      }
-    })
-  })
 
   sequence.push(function (callback) {
     del([
@@ -305,29 +286,20 @@ gulp.task('fonts', function (cb) {
   })
 
   sequence.push(function (callback) {
-    axios.get(`http://${customizerHost}:${customizerPort}/assets/index/fonts`)
-      .then(function (response) {
-        customizerIndex = response.data
-        callback()
-      })
-      .catch(function (err) {
-        callback(err)
-      })
-  })
-
-  sequence.push(function (callback) {
-    remoteSrc(customizerIndex, {
-      base: `http://${customizerHost}:${customizerPort}/assets/fonts/`
-    })
-      .pipe(gulp.dest(tmpDir))
-      .on('end', callback)
+    try {
+      customizerIndex = getFiles('fonts')
+      customizerPaths = customizerIndex.map(filename =>
+        path.join(getBrandingPath('fonts'), filename)
+      )
+      callback()
+    } catch (err) {
+      callback(err)
+    }
   })
 
   sequence.push(function (callback) {
     gulp
-      .src(paths.fonts.concat(customizerIndex.map(function (filename) {
-        return path.join(tmpDir, filename)
-      })))
+      .src(paths.fonts.concat(customizerPaths))
       .pipe(gulp.dest(path.join(buildDir, 'assets', 'fonts')))
       .on('end', callback)
   })
@@ -335,9 +307,7 @@ gulp.task('fonts', function (cb) {
   if (isOptimize()) {
     sequence.push(function (callback) {
       gulp
-        .src(paths.fonts.concat(customizerIndex.map(function (filename) {
-          return path.join(tmpDir, filename)
-        })))
+        .src(paths.fonts.concat(customizerPaths))
         .pipe(filter([
           '**/*.eot',
           '**/*.otf',
@@ -350,9 +320,7 @@ gulp.task('fonts', function (cb) {
     })
     sequence.push(function (callback) {
       gulp
-        .src(paths.fonts.concat(customizerIndex.map(function (filename) {
-          return path.join(tmpDir, filename)
-        })))
+        .src(paths.fonts.concat(customizerPaths))
         .pipe(filter([
           '**/*.eot',
           '**/*.otf',
@@ -365,10 +333,6 @@ gulp.task('fonts', function (cb) {
     })
   }
 
-  sequence.push(function (callback) {
-    del([tmpDir], { force: true }, callback)
-  })
-
   async.series(sequence, function (err, values) {
     if (err) {
       cb(err)
@@ -380,51 +344,31 @@ gulp.task('fonts', function (cb) {
 
 gulp.task('images', function (cb) {
   let customizerIndex = null
-  let tmpDir = null
+  let customizerPaths = []
+
   async.series([
-    function (callback) {
-      tmp.dir({}, function (err, tmpPath, cleanupCallback) {
-        if (err) {
-          callback(err)
-        } else {
-          tmpDir = tmpPath
-          callback()
-        }
-      })
-    },
     function (callback) {
       del([
         path.join(buildDir, 'assets', 'images', '*')
       ], callback)
     },
     function (callback) {
-      axios.get(`http://${customizerHost}:${customizerPort}/assets/index/images`)
-        .then(function (response) {
-          customizerIndex = response.data
-          callback()
-        })
-        .catch(function (err) {
-          callback(err)
-        })
-    },
-    function (callback) {
-      remoteSrc(customizerIndex, {
-        base: `http://${customizerHost}:${customizerPort}/assets/images/`
-      })
-        .pipe(gulp.dest(tmpDir))
-        .on('end', callback)
+      try {
+        customizerIndex = getFiles('images')
+        customizerPaths = customizerIndex.map(filename =>
+          path.join(getBrandingPath('images'), filename)
+        )
+        callback()
+      } catch (err) {
+        callback(err)
+      }
     },
     function (callback) {
       gulp
-        .src(paths.images.concat(customizerIndex.map(function (filename) {
-          return path.join(tmpDir, filename)
-        })))
+        .src(paths.images.concat(customizerPaths))
         .pipe(gulp.dest(path.join(buildDir, 'assets', 'images')))
         .on('end', callback)
     },
-    function (callback) {
-      del([tmpDir], { force: true }, callback)
-    }
   ], function (err, values) {
     if (err) {
       cb(err)
@@ -439,7 +383,6 @@ gulp.task('html', function (cb) {
     partials: {}
   }
   let customizerIndex = null
-  let tmpDir = null
   async.series([
     function (callback) {
       tmp.dir({}, function (err, tmpPath, cleanupCallback) {
@@ -472,45 +415,43 @@ gulp.task('html', function (cb) {
       }
     },
     function (callback) {
-      axios.get(`http://${customizerHost}:${customizerPort}/event-title`)
-        .then(function (response) {
-          opts.event = {
-            title: response.data
-          }
-          callback()
-        })
-        .catch(function (err) {
-          callback(err)
-        })
+      try {
+        const eventConfig = JSON.parse(
+          fs.readFileSync(path.join(brandingRoot, 'event.json'), 'utf8')
+        )
+
+        opts.event = {
+          title: eventConfig.title
+        }
+
+        callback()
+      } catch (err) {
+        callback(err)
+      }
     },
     function (callback) {
-      axios.get(`http://${customizerHost}:${customizerPort}/assets/index/partials`)
-        .then(function (response) {
-          customizerIndex = response.data
-          callback()
-        })
-        .catch(function (err) {
-          callback(err)
-        })
-    },
-    function (callback) {
-      remoteSrc(customizerIndex, {
-        base: `http://${customizerHost}:${customizerPort}/assets/partials/`
-      })
-        .pipe(gulp.dest(tmpDir))
-        .on('end', callback)
+      try {
+        customizerIndex = getFiles('partials')
+        callback()
+      } catch (err) {
+        callback(err)
+      }
     },
     function (callback) {
       const basedir = path.join(__dirname, paths.html)
-      fs.readdirSync(tmpDir).forEach(function(filename) {
-        const fullPath = path.join(tmpDir, filename)
+
+      customizerIndex.forEach(function(filename) {
+        const fullPath = path.join(getBrandingPath('partials'), filename)
+
         if (fs.statSync(fullPath).isFile() && path.extname(fullPath) === '.html') {
           const key = path.basename(fullPath, '.html')
+
           opts.partials[key] = {
             path: path.relative(basedir, fullPath)
           }
         }
       })
+
       callback()
     },
     function (callback) {
@@ -530,7 +471,6 @@ gulp.task('html', function (cb) {
       del([
         path.join(buildDir, 'assets', 'js', 'manifest.json'),
         path.join(buildDir, 'assets', 'css', 'manifest.json'),
-        tmpDir
       ], {
         force: true
       }, callback)
