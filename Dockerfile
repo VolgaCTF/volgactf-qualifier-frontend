@@ -19,11 +19,10 @@ WORKDIR /app
 COPY VERSION package*.json entrypoint.sh gulpfile.js .babelrc .
 COPY src ./src
 COPY branding/default ./branding/default
-ENV BRANDING_ROOT_PATH=/app/branding/default
+COPY branding/volgactf-2026-qualifier ./branding/volgactf-2026-qualifier
+ENV BRANDING_ROOT_PATH=/app/branding/volgactf-2026-qualifier
 ENV OPTIMIZE=yes
-# ENV NODE_OPTIONS=--openssl-legacy-provider
 RUN apk add --no-cache --virtual .gyp python3 make g++ && npm ci && npm run build && rm -rf ./node_modules ./src ./branding && apk del .gyp
-# RUN apk add --no-cache --virtual .gyp python3 make g++ postgresql-dev && npm ci --production && apk del .gyp
 RUN addgroup --gid ${GID} volgactf && adduser --uid ${UID} --disabled-password --gecos "" --ingroup volgactf --no-create-home volgactf && chown -R volgactf:volgactf .
 USER volgactf
 ENV HOME=/tmp
