@@ -323,6 +323,16 @@
                         </div>
                         <div class="modal-body">
                             <form method="POST" action="/api/task/create-from-github" novalidate>
+                                <% if (githubFilterTopics.length > 0) { %>
+                                <div class="alert alert-info">
+                                    <p>⚠️ Only the following repository topics are considered when loading the list:</p>
+                                    <ul>
+                                        <% for (var i=0; i<githubFilterTopics.length; ++i) { %>
+                                        <li><%= githubFilterTopics[i] %></li>
+                                        <% } %>
+                                    </ul>
+                                </div>
+                                <% } %>
                                 <div class="form-group">
                                     <label for="create-task-from-github-repository" class="control-label">GitHub repository</label>
                                     <select class="form-control" id="create-task-from-github-repository" data-live-search="true" name="repository">
@@ -734,7 +744,8 @@
                         scoringDynlogMin: <%= jsesc(scoringDynlog.min, { json: true, isScriptContext: true }) %>,
                         scoringDynlogMax: <%= jsesc(scoringDynlog.max, { json: true, isScriptContext: true}) %>,
                         scoringDynlogK: <%= jsesc(scoringDynlog.k, { json: true, isScriptContext: true }) %>,
-                        scoringDynlogV: <%= jsesc(scoringDynlog.v, { json: true, isScriptContext: true }) %>
+                        scoringDynlogV: <%= jsesc(scoringDynlog.v, { json: true, isScriptContext: true }) %>,
+                        githubFilterTopics: <%= jsesc(githubFilterTopics, { json: true, isScriptContext: true }) %>,
                     },
                     templates: {
                         contestStatePartial: <%= templates.contestStatePartial.source %>,
@@ -755,7 +766,7 @@
                         taskFileList: <%= templates.taskFileList.source %>,
                         taskFilePartial: <%= templates.taskFilePartial.source %>,
                         taskFileListCompact: <%= templates.taskFileListCompact.source %>,
-                        taskFilePartialCompact: <%= templates.taskFilePartialCompact.source %>
+                        taskFilePartialCompact: <%= templates.taskFilePartialCompact.source %>,
                     }
                 }
             }
