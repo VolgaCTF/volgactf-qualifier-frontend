@@ -31,12 +31,16 @@
                         <button type="button" class="btn btn-primary" data-action="create-task" data-toggle="modal" data-target="#create-task-modal">
                             Create
                         </button>
+                        <% if (githubEnabled) { %>
                         <button type="button" class="btn btn-secondary" data-action="create-task-from-github" data-toggle="modal" data-target="#create-task-from-github-modal" data-feature="import-github">
                             Create from GitHub
                         </button>
+                        <% } %>
+                        <% if (gitflicEnabled) { %>
                         <button type="button" class="btn btn-secondary" data-action="create-task-from-gitflic" data-toggle="modal" data-target="#create-task-from-gitflic-modal" data-feature="import-gitflic">
                             Create from GitFlic
                         </button>
+                        <% } %>
                     </div>
                     <% } %>
                     <div id="volgactf-task-previews">
@@ -745,6 +749,8 @@
                         scoringDynlogMax: <%= jsesc(scoringDynlog.max, { json: true, isScriptContext: true}) %>,
                         scoringDynlogK: <%= jsesc(scoringDynlog.k, { json: true, isScriptContext: true }) %>,
                         scoringDynlogV: <%= jsesc(scoringDynlog.v, { json: true, isScriptContext: true }) %>,
+                        githubEnabled: <%= jsesc(githubEnabled, { json: true, isScriptContext: true }) %>,
+                        gitflicEnabled: <%= jsesc(gitflicEnabled, { json: true, isScriptContext: true }) %>,
                         githubFilterTopics: <%= jsesc(githubFilterTopics, { json: true, isScriptContext: true }) %>,
                     },
                     templates: {

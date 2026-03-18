@@ -18,7 +18,7 @@
         <%= templates.navbar({ _: _, active: 'home', identity: identity, templates: templates, contestTitle: contestTitle, contest: contest, moment: moment }) %>
 
         <div id="main" class="pb-4">
-            <%= templates.indexView({ _: _, moment: moment, identity: identity, contest: contest, contestTitle: contestTitle }) %>
+            <%= templates.indexView({ _: _, moment: moment, identity: identity, contest: contest, contestTitle: contestTitle, ctftimeEnabled: ctftimeEnabled }) %>
         </div>
         <% runtimeStorage.viewName = 'index' %>
         <footer class="footer">
@@ -39,7 +39,8 @@
                     data: {
                         identity: <%= jsesc(identity, { json: true, isScriptContext: true }) %>,
                         contest: <%= jsesc(contest, { json: true, isScriptContext: true }) %>,
-                        contestTitle: <%= jsesc(contestTitle, { json: true, isScriptContext: true }) %>
+                        contestTitle: <%= jsesc(contestTitle, { json: true, isScriptContext: true }) %>,
+                        ctftimeEnabled: <%= jsesc(ctftimeEnabled, { json: true, isScriptContext: true }) %>,
                     },
                     templates: {
                         contestStatePartial: <%= templates.contestStatePartial.source %>,

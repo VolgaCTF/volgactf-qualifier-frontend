@@ -38,14 +38,14 @@
             <% } %>
         </li>
         <% } %>
-        <% if (team.ctftimeTeamId) { %>
+        <% if (ctftimeEnabled && team.ctftimeTeamId) { %>
         <li>
             <span class="oi oi-globe"></span>
             <a href="https://ctftime.org/team/<%- team.ctftimeTeamId %>" target="_blank" rel="noopener">CTFtime.org</a>
         </li>
         <% } %>
 
-        <% if (!team.ctftimeTeamId && sameTeam) { %>
+        <% if (ctftimeEnabled && !team.ctftimeTeamId && sameTeam) { %>
         <li data-feature="ctftime">
             <span class="oi oi-share"></span>
             <a href="/team/ctftime/oauth/start" target="_blank" rel="noopener">link with your CTFtime.org account</a>

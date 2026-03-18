@@ -24,7 +24,7 @@
                 <% } %>
                 <section>
                     <% var country = _.findWhere(countries, { id: team.countryId }) %>
-                    <%= templates.teamProfilePartial({ _: _, identity: identity, team: team, country: country, contest: contest, moment: moment, tasks: tasks, taskValues: taskValues, teamTaskHits: teamTaskHits, teamTaskReviews: teamTaskReviews, teamTaskHitStatistics: teamTaskHitStatistics, teamTaskReviewStatistics: teamTaskReviewStatistics }) %>
+                    <%= templates.teamProfilePartial({ _: _, identity: identity, team: team, country: country, contest: contest, moment: moment, tasks: tasks, taskValues: taskValues, teamTaskHits: teamTaskHits, teamTaskReviews: teamTaskReviews, teamTaskHitStatistics: teamTaskHitStatistics, teamTaskReviewStatistics: teamTaskReviewStatistics, ctftimeEnabled: ctftimeEnabled }) %>
                 </section>
             </div>
 
@@ -259,7 +259,8 @@
                         taskValues: <%= jsesc(taskValues, { json: true, isScriptContext: true }) %>,
                         teamTaskHits: <%= jsesc(teamTaskHits, { json: true, isScriptContext: true }) %>,
                         teamTaskHitStatistics: <%= jsesc(teamTaskHitStatistics, { json: true, isScriptContext: true }) %>,
-                        teamTaskReviewStatistics: <%= jsesc(teamTaskReviewStatistics, { json: true, isScriptContext: true }) %>
+                        teamTaskReviewStatistics: <%= jsesc(teamTaskReviewStatistics, { json: true, isScriptContext: true }) %>,
+                        ctftimeEnabled: <%= jsesc(ctftimeEnabled, { json: true, isScriptContext: true }) %>,
                     },
                     templates: {
                         contestStatePartial: <%= templates.contestStatePartial.source %>,

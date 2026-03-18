@@ -36,7 +36,9 @@
                     </div>
                     <div>
                         <p class="text-center"><a href="/team/restore">Forgot password?</a></p>
+                        <% if (ctftimeEnabled) { %>
                         <p class="text-center" data-feature="ctftime"><a class="text-secondary" href="/team/ctftime/oauth/start">Sign in with CTFtime.org</a></p>
+                        <% } %>
                     </div>
                 </form>
             <% } else { %>
@@ -67,7 +69,8 @@
                     view: 'teamSignin',
                     data: {
                         identity: <%= jsesc(identity, { json: true, isScriptContext: true }) %>,
-                        contest: <%= jsesc(contest, { json: true, isScriptContext: true }) %>
+                        contest: <%= jsesc(contest, { json: true, isScriptContext: true }) %>,
+                        ctftimeEnabled: <%= jsesc(ctftimeEnabled, { json: true, isScriptContext: true }) %>,
                     },
                     templates: {
                         streamStatePartial: <%= templates.streamStatePartial.source %>,
