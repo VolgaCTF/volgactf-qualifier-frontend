@@ -4,6 +4,6 @@
     <% var sortedTaskFiles = _.sortBy(taskFiles, 'createdAt').reverse() %>
     <% for (var i=0; i<sortedTaskFiles.length; ++i) { %>
         <% var taskFile = sortedTaskFiles[i] %>
-        <%= templates.taskFilePartialCompact({ window: window, _: _, taskFile: taskFile, moment: moment }) %>
+        <%= templates.taskFilePartialCompact({ window: window, _: _, taskFile: taskFile, remoteUploadEnabled: remoteUploadEnabled, moment: moment }) %>
     <% } %>
 <% } %>

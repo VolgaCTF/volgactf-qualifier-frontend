@@ -378,6 +378,7 @@ class TasksView extends View {
 
     const $fileInput = $('#manage-task-files-file')
     const $nameInput = $('#manage-task-files-name')
+    const $remoteInput = $('#manage-task-files-remote')
 
     const $progressControl = $('#manage-task-files-progress')
 
@@ -425,7 +426,8 @@ class TasksView extends View {
             _: _,
             moment: moment,
             taskFiles: taskFiles,
-            templates: window.volgactf.qualifier.templates
+            remoteUploadEnabled: window.volgactf.qualifier.data.remoteUploadEnabled,
+            templates: window.volgactf.qualifier.templates,
           }))
           $uploadedContainer.find('[data-action="copy-to-clipboard"]').tooltip({
             trigger: 'manual'
@@ -447,6 +449,7 @@ class TasksView extends View {
       $fileInput.val('')
       $fileInput.trigger('change')
       $nameInput.val('')
+      $remoteInput.prop('checked', false)
       updateProgressControl(0)
 
       $submitError.text('')
@@ -1081,6 +1084,7 @@ class TasksView extends View {
         _: _,
         moment: moment,
         taskFiles: taskFiles,
+        remoteUploadEnabled: window.volgactf.qualifier.data.remoteUploadEnabled,
         templates: window.volgactf.qualifier.templates
       }))
       $tabFileContainer.find('[data-action="copy-to-clipboard"]').tooltip({
