@@ -70,7 +70,7 @@ class TasksView extends View {
     $modal.modal({ show: false })
 
     const $submitError = $modal.find('.submit-error > p')
-    const $submitSuccess = $modal.find('.submit-success > p')
+    const $submitSuccessContainer = $modal.find('.submit-success')
     const $submitButton = $modal.find('button[data-action="complete-create-task-from-github"]')
     const $form = $modal.find('form')
     const $repositorySelect = $('#create-task-from-github-repository')
@@ -81,7 +81,7 @@ class TasksView extends View {
 
     $modal.on('show.bs.modal', (e) => {
       $submitError.text('')
-      $submitSuccess.text('')
+      $submitSuccessContainer.empty()
       $submitButton.show()
       $submitButton.prop('disabled', true)
       $repositorySelect.selectpicker('destroy')
@@ -119,7 +119,7 @@ class TasksView extends View {
       $form.ajaxSubmit({
         beforeSubmit: () => {
           $submitError.text('')
-          $submitSuccess.text('')
+          $submitSuccessContainer.empty()
           $submitButton.prop('disabled', true)
         },
         clearForm: true,
@@ -129,11 +129,26 @@ class TasksView extends View {
         },
         success: (responseJSON, textStatus, jqXHR) => {
           $submitButton.hide()
-          $submitSuccess.text('Created the task')
-          const closeModal = () => {
-            $modal.modal('hide')
+
+          let anyError = false
+          for (const [repository, report] of Object.entries(responseJSON)) {
+            let $reportItem = $('<p></p>')
+            if (report.error) {
+              anyError = true
+              $reportItem.attr('class', 'text-danger').text(`${repository}: ${report.reason}`)
+            } else {
+              $reportItem.attr('class', 'text-success').text(`${repository}: imported`)
+            }
+
+            $submitSuccessContainer.append($reportItem)
           }
-          setTimeout(closeModal, 1000)
+
+          if (!anyError) {
+            const closeModal = () => {
+              $modal.modal('hide')
+            }
+            setTimeout(closeModal, 1000)
+          }
         },
         error: (jqXHR, textStatus, errorThrown) => {
           if (jqXHR.responseJSON) {

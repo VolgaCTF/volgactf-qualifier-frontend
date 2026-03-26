@@ -33,7 +33,7 @@
                         </button>
                         <% if (githubEnabled) { %>
                         <button type="button" class="btn btn-secondary" data-action="create-task-from-github" data-toggle="modal" data-target="#create-task-from-github-modal" data-feature="import-github">
-                            Create from GitHub
+                            Import from GitHub
                         </button>
                         <% } %>
                         <% if (gitflicEnabled) { %>
@@ -320,7 +320,7 @@
                 <div class="modal-dialog">
                     <div class="modal-content">
                         <div class="modal-header">
-                            <h5 class="modal-title">Create task from GitHub</h5>
+                            <h5 class="modal-title">Import task from GitHub</h5>
                             <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                                 <span aria-hidden="true">&times;</span>
                             </button>
@@ -339,20 +339,19 @@
                                 <% } %>
                                 <div class="form-group">
                                     <label for="create-task-from-github-repository" class="control-label">GitHub repository</label>
-                                    <select class="form-control" id="create-task-from-github-repository" data-live-search="true" name="repository">
+                                    <select class="form-control" multiple size="1" id="create-task-from-github-repository" data-live-search="true" data-none-selected-text="Select one or multiple repositories" name="repositories">
                                     </select>
                                 </div>
                                 <div class="submit-error">
                                     <p class="text-danger"></p>
                                 </div>
                                 <div class="submit-success">
-                                    <p class="text-success"></p>
                                 </div>
                             </form>
                         </div>
                         <div class="modal-footer">
                             <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                            <button type="button" class="btn btn-primary" data-action="complete-create-task-from-github">Create</button>
+                            <button type="button" class="btn btn-primary" data-action="complete-create-task-from-github">Import</button>
                         </div>
                     </div>
                 </div>
