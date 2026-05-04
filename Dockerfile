@@ -16,11 +16,11 @@ LABEL org.label-schema.vcs-ref=$VCS_REF
 LABEL org.label-schema.version=$BUILD_VERSION
 
 WORKDIR /app
-COPY VERSION package*.json entrypoint.sh gulpfile.js .babelrc .
+COPY VERSION package*.json entrypoint.sh gulpfile.js .babelrc ./
 COPY src ./src
 COPY branding/default ./branding/default
-COPY branding/volgactf-2026-qualifier ./branding/volgactf-2026-qualifier
-ENV BRANDING_ROOT_PATH=/app/branding/volgactf-2026-qualifier
+COPY branding/samaractf-2026 ./branding/samaractf-2026
+ENV BRANDING_ROOT_PATH=/app/branding/samaractf-2026
 ENV OPTIMIZE=yes
 RUN apk add --no-cache --virtual .gyp python3 make g++ && npm ci && npm run build && rm -rf ./node_modules ./src ./branding && apk del .gyp
 RUN addgroup --gid ${GID} volgactf && adduser --uid ${UID} --disabled-password --gecos "" --ingroup volgactf --no-create-home volgactf && chown -R volgactf:volgactf .

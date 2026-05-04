@@ -1,0 +1,19 @@
+<p style="text-align: right; margin-bottom: 0;">
+  <a href="http://www.ssau.ru/english/" target="_blank" rel="noopener"><img src="/assets/images/ssau.png" style="width: 50%; max-width: 500px;"></a>
+</p>
+<h1>Hello there!</h1>
+<p>Welcome to SamaraCTF 2026!</p>
+<p>SamaraCTF 2026 is an open cybersecurity competition organised by the <a href="https://ssau.ru/english/education/institutes_faculties/iic" target="_blank" rel="noopener">Institute of IT and Cybernetics of Samara University</a>.</p>
+<p>Student teams from any university are invited to participate. At the end of the competition, the top three ranked teams representing Samara University will be awarded symbolic and valuable prizes.</p>
+<% if (contest.state === 1) { %>
+<p>The competition starts on <a href="https://www.timeanddate.com/worldclock/fixedtime.html?msg=SamaraCTF+2026+%2F+start&iso=20260515T15" target="_blank" rel="noopener">May 15 at 15:00 UTC</a> and lasts 48 hours.</p>
+<% } %>
+<% if (contest.state === 2 || contest.state === 3) { %>
+<p>The competition has already started and will finish on <a href="https://www.timeanddate.com/worldclock/fixedtime.html?msg=SamaraCTF+2026+%2F+finish&iso=20260517T15" target="_blank" rel="noopener">May 17 at 15:00 UTC</a>.</p>
+<% } %>
+<% if (contest.state === 4) { %>
+<p>The competition has finished on <a href="https://www.timeanddate.com/worldclock/fixedtime.html?msg=SamaraCTF+2026+%2F+finish&iso=20260517T15" target="_blank" rel="noopener">May 17 at 15:00 UTC</a>.</p>
+<% } %>
+<% if (contest.state !== 4) { %>
+<p>Interested? Read the <a href="/about" target="_blank" rel="noopener">rules</a> and <a href="/team/signup">sign up</a> to take part in the competition!</p>
+<% } %>
